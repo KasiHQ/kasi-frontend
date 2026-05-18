@@ -9,7 +9,9 @@ import { useAuth } from '../../context/AuthContext';
 const TopBar = () => {
   const { toggleLayout } = useLayout();
   const { isDark, toggleTheme } = useTheme();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+
+  const isService = user?.business_type === 'service';
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -28,10 +30,13 @@ const TopBar = () => {
       icon: Briefcase,
       children: [
         { icon: Users, label: 'Clients', path: '/clients' },
-        { icon: Briefcase, label: 'Services', path: '/services' },
-        { icon: Package, label: 'Products', path: '/products' },
-        { icon: Clock, label: 'Schedule', path: '/availability' },
-        { icon: CalendarDays, label: 'Bookings', path: '/bookings' },
+        ...(isService ? [
+          { icon: Briefcase, label: 'Services', path: '/services' },
+          { icon: Clock, label: 'Schedule', path: '/availability' },
+          { icon: CalendarDays, label: 'Bookings', path: '/bookings' },
+        ] : [
+          { icon: Package, label: 'Products', path: '/products' },
+        ])
       ]
     },
     {

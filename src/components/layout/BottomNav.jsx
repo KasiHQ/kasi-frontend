@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, CreditCard, BookOpen, MoreHorizontal, Users, Settings, HelpCircle, MessageCircle, LogOut, X, Sun, Moon, PanelLeft, PanelTop, Package, Wallet, Briefcase, Clock, CalendarDays, TrendingUp, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Package, Truck, MoreHorizontal, Users, Settings, TrendingUp, LogOut, X, Sun, Moon, PanelLeft, PanelTop, Briefcase, Calendar } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
 import { useLayout } from '../../context/LayoutContext';
@@ -8,55 +8,29 @@ import { useAuth } from '../../context/AuthContext';
 
 const BottomNav = () => {
   const [moreOpen, setMoreOpen] = useState(false);
-  const [expandedGroups, setExpandedGroups] = useState({});
   const { isDark, toggleTheme } = useTheme();
   const { layout, toggleLayout } = useLayout();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const toggleGroup = (label) => {
-    setExpandedGroups(prev => ({ ...prev, [label]: !prev[label] }));
-  };
+  const isService = user?.business_type === 'service';
 
-
-  const mainTabs = [
+  const mainTabs = isService ? [
     { icon: LayoutDashboard, label: 'Home', path: '/dashboard' },
-    { icon: BookOpen, label: 'Sales', path: '/sales' },
-    { icon: FileText, label: 'Invoices', path: '/invoices' },
-    { icon: CreditCard, label: 'Payments', path: '/payments' },
+    { icon: MessageSquare, label: 'Chats', path: '/chats' },
+    { icon: Briefcase, label: 'Services', path: '/services' },
+    { icon: Calendar, label: 'Bookings', path: '/bookings' },
+  ] : [
+    { icon: LayoutDashboard, label: 'Home', path: '/dashboard' },
+    { icon: MessageSquare, label: 'Chats', path: '/chats' },
+    { icon: Package, label: 'Store', path: '/products' },
+    { icon: Truck, label: 'Logistics', path: '/logistics' },
   ];
 
   const moreItems = [
-    {
-      label: 'Finances',
-      icon: Wallet,
-      children: [
-        { icon: FileText, label: 'Invoices', path: '/invoices' },
-        { icon: CreditCard, label: 'Payments', path: '/payments' },
-        { icon: Wallet, label: 'Wallet & Billing', path: '/billing' },
-      ]
-    },
-    {
-      label: 'Workspace',
-      icon: Briefcase,
-      children: [
-        { icon: Users, label: 'Clients', path: '/clients' },
-        { icon: Briefcase, label: 'Services', path: '/services' },
-        { icon: Package, label: 'Products', path: '/products' },
-        { icon: Clock, label: 'Schedule', path: '/availability' },
-        { icon: CalendarDays, label: 'Bookings', path: '/bookings' },
-      ]
-    },
-    {
-      label: 'System',
-      icon: Settings,
-      children: [
-        { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
-        { icon: MessageCircle, label: 'Integrations', path: '/integrations' },
-        { icon: Settings, label: 'Settings', path: '/settings' },
-      ]
-    },
-    { icon: HelpCircle, label: 'Help', path: '/help' },
+    { icon: Users, label: 'Customers', path: '/customers' },
+    { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
   const handleLogout = () => {
@@ -80,92 +54,37 @@ const BottomNav = () => {
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
               <span className="text-sm font-bold text-dark">More</span>
               <div className="flex items-center gap-1">
-                {/* Theme toggle */}
-                <button
-                  onClick={toggleTheme}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-                >
+                <button onClick={toggleTheme} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                   {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
-                {/* Layout toggle */}
-                <button
-                  onClick={toggleLayout}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-                >
+                <button onClick={toggleLayout} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                   {layout === 'sidebar' ? <PanelTop size={18} /> : <PanelLeft size={18} />}
                 </button>
-                {/* Close */}
-                <button
-                  onClick={() => setMoreOpen(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-                >
+                <button onClick={() => setMoreOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                   <X size={18} />
                 </button>
               </div>
             </div>
 
             {/* Menu items */}
-            <div className="p-2 max-h-[60vh] overflow-y-auto scrollbar-hide">
+            <div className="p-2">
               {moreItems.map((item) => (
-                item.children ? (
-                  <div key={item.label} className="mb-0.5">
-                    <button
-                      onClick={() => toggleGroup(item.label)}
-                      className={clsx(
-                        'w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm',
-                        'text-gray-600 hover:text-dark hover:bg-gray-50'
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <item.icon size={20} />
-                        <span>{item.label}</span>
-                      </div>
-                      <ChevronDown
-                        size={18}
-                        className={clsx('transition-transform duration-200', expandedGroups[item.label] ? 'rotate-180' : '')}
-                      />
-                    </button>
-                    {expandedGroups[item.label] && (
-                      <div className="mt-0.5 space-y-0.5 ml-9 border-l border-gray-100 pl-3">
-                        {item.children.map((child) => (
-                          <NavLink
-                            key={child.path}
-                            to={child.path}
-                            onClick={() => setMoreOpen(false)}
-                            className={({ isActive }) =>
-                              clsx(
-                                'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm',
-                                isActive
-                                  ? 'text-green-700 bg-green-50'
-                                  : 'text-gray-600 hover:text-dark hover:bg-gray-50'
-                              )
-                            }
-                          >
-                            <child.icon size={18} />
-                            <span>{child.label}</span>
-                          </NavLink>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMoreOpen(false)}
-                    className={({ isActive }) =>
-                      clsx(
-                        'flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm',
-                        isActive
-                          ? 'text-green-700 bg-green-50'
-                          : 'text-gray-600 hover:text-dark hover:bg-gray-50'
-                      )
-                    }
-                  >
-                    <item.icon size={20} />
-                    <span>{item.label}</span>
-                  </NavLink>
-                )
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setMoreOpen(false)}
+                  className={({ isActive }) =>
+                    clsx(
+                      'flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm',
+                      isActive
+                        ? 'text-green-700 bg-green-50'
+                        : 'text-gray-600 hover:text-dark hover:bg-gray-50'
+                    )
+                  }
+                >
+                  <item.icon size={20} />
+                  <span>{item.label}</span>
+                </NavLink>
               ))}
 
               <div className="border-t border-gray-100 mt-1 pt-1">
@@ -192,9 +111,7 @@ const BottomNav = () => {
               className={({ isActive }) =>
                 clsx(
                   'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-200',
-                  isActive
-                    ? 'text-primary'
-                    : 'text-gray-400'
+                  isActive ? 'text-primary' : 'text-gray-400'
                 )
               }
             >

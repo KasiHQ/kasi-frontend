@@ -15,7 +15,6 @@ import Invoices from './modules/Invoices/pages/Invoices';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import { ToastProvider } from './context/ToastContext';
 import Settings from './modules/Settings/pages/Settings';
-import Integrations from './modules/Settings/pages/Integrations';
 import SalesNotebook from './modules/Sales/pages/SalesNotebook';
 import Clients from './modules/Clients/pages/Clients';
 import Payments from './modules/Payments/pages/Payments';
@@ -33,8 +32,11 @@ import AdminAuditLogs from './modules/Admin/pages/AdminAuditLogs';
 import BillingDashboard from './modules/Billing/pages/BillingDashboard';
 import PaymentCallback from './modules/Billing/pages/PaymentCallback';
 import Services from './modules/Services/pages/Services';
-import Availability from './modules/Services/pages/Availability';
 import Bookings from './modules/Services/pages/Bookings';
+import Chats from './modules/Conversations/pages/Chats';
+import Logistics from './modules/Logistics/pages/Logistics';
+
+import { OnboardingWizard } from './modules/onboarding';
 
 function App() {
   return (
@@ -46,6 +48,11 @@ function App() {
           <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/onboarding" element={
+            <ProtectedRoute>
+              <OnboardingWizard />
+            </ProtectedRoute>
+          } />
           
           <Route path="/" element={<LandingPage />} />
           
@@ -55,6 +62,31 @@ function App() {
                   <Dashboard />
                 </ProtectedRoute>
               } />
+
+              {/* New primary pages */}
+              <Route path="/chats" element={
+                <ProtectedRoute>
+                  <Chats />
+                </ProtectedRoute>
+              } />
+              <Route path="/logistics" element={
+                <ProtectedRoute>
+                  <Logistics />
+                </ProtectedRoute>
+              } />
+              <Route path="/customers" element={
+                <ProtectedRoute>
+                  <Clients />
+                </ProtectedRoute>
+              } />
+
+              {/* Keep old /clients route working as alias */}
+              <Route path="/clients" element={
+                <ProtectedRoute>
+                  <Clients />
+                </ProtectedRoute>
+              } />
+
               <Route path="/sales" element={
                 <ProtectedRoute>
                   <SalesNotebook />
@@ -68,12 +100,6 @@ function App() {
               <Route path="/invoices/create" element={
                 <ProtectedRoute>
                   <CreateInvoice />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/clients" element={
-                <ProtectedRoute>
-                  <Clients />
                 </ProtectedRoute>
               } />
               
@@ -107,12 +133,6 @@ function App() {
                 </ProtectedRoute>
               } />
 
-              <Route path="/availability" element={
-                <ProtectedRoute>
-                  <Availability />
-                </ProtectedRoute>
-              } />
-
               <Route path="/bookings" element={
                 <ProtectedRoute>
                   <Bookings />
@@ -137,11 +157,7 @@ function App() {
                 </ProtectedRoute>
               } />
 
-              <Route path="/integrations" element={
-                <ProtectedRoute>
-                  <Integrations />
-                </ProtectedRoute>
-              } />
+
 
               <Route path="/admin" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Finance Admin', 'Support Admin']}>

@@ -14,6 +14,16 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Onboarding Redirection
+  if (!user.onboarding_completed && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Prevent going to onboarding if already completed
+  if (user.onboarding_completed && location.pathname === '/onboarding') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   // Admin RBAC Check
   if (allowedRoles && allowedRoles.length > 0) {
     if (!user.is_admin) {

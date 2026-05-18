@@ -13,7 +13,7 @@ const MainLayout = () => {
 
   if (layout === 'sidebar') {
     return (
-      <div className={`min-h-screen bg-white font-sans text-dark flex flex-col w-full overflow-x-hidden`}>
+      <div className={`min-h-screen bg-bg-main font-sans text-dark flex flex-col w-full overflow-x-hidden`}>
         <ImpersonationBanner />
         <BroadcastBanner />
         <div className="flex flex-1 min-w-0">
@@ -35,7 +35,7 @@ const MainLayout = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-white font-sans text-dark flex flex-col w-full overflow-x-hidden`}>
+    <div className={`min-h-screen bg-bg-main font-sans text-dark flex flex-col w-full overflow-x-hidden`}>
       <ImpersonationBanner />
       <BroadcastBanner />
       <TopBar />

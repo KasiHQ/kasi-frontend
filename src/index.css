@@ -37,9 +37,33 @@ body {
   color: var(--color-dark);
 }
 
+/* Base bg-bg-main for light mode */
+.bg-bg-main {
+  background-color: #faf8f5;
+}
+
 /* Safe area for iPhone bottom bar */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── Kasi Sidebar ──────────────────────── */
+.kasi-sidebar {
+  background-color: #fff;
+  border-right: 1px solid #f0f0f0;
+}
+
+.dark .kasi-sidebar {
+  background-color: #1e1e1e;
+  border-right-color: #2f2f2f;
+}
+
+.kasi-nav-active {
+  box-shadow: 0 2px 8px rgba(15, 140, 85, 0.25);
+}
+
+.dark .kasi-nav-active {
+  box-shadow: 0 2px 8px rgba(15, 140, 85, 0.15);
 }
 
 /* ========================================

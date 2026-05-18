@@ -18,6 +18,12 @@ dist-ssr
 .env.production
 .env.*.local
 
+# AI & Agent artifacts
+.gemini/
+.agent/
+*.md
+!README.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

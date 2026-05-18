@@ -17,9 +17,11 @@ const InvoiceDetail = ({ invoice }) => {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'Paid': return 'bg-green-100 text-green-700';
+            case 'Paid': return 'bg-blue-100 text-blue-700';
+            case 'In Transit': return 'bg-orange-100 text-orange-700';
+            case 'Delivered': return 'bg-green-100 text-green-700';
             case 'Unpaid': return 'bg-red-100 text-red-700';
-            case 'Pending': return 'bg-orange-100 text-orange-700';
+            case 'Pending': return 'bg-yellow-100 text-yellow-700';
             default: return 'bg-gray-100 text-gray-700';
         }
     };
@@ -43,6 +45,19 @@ const InvoiceDetail = ({ invoice }) => {
                 <p className="font-bold text-gray-900">{invoice.customer?.name}</p>
                 {invoice.customer?.phone && <p className="text-sm text-gray-500">{invoice.customer.phone}</p>}
                 {invoice.customer?.email && <p className="text-sm text-gray-500">{invoice.customer.email}</p>}
+                
+                {invoice.delivery_address && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Delivery Address</p>
+                        <p className="text-sm text-gray-800">{invoice.delivery_address}</p>
+                    </div>
+                )}
+                {invoice.rider_name && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Rider Info</p>
+                        <p className="text-sm font-semibold text-gray-800">{invoice.rider_name} - {invoice.rider_phone}</p>
+                    </div>
+                )}
             </div>
 
             {/* Dates */}
@@ -108,7 +123,11 @@ const InvoiceDetail = ({ invoice }) => {
 const InvoiceActions = ({ invoice, onInvoiceUpdated, onInvoiceDeleted, onViewDetails }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showDispatchModal, setShowDispatchModal] = useState(false);
+    const [riderName, setRiderName] = useState('');
+    const [riderPhone, setRiderPhone] = useState('');
     const [deleting, setDeleting] = useState(false);
+    const [dispatching, setDispatching] = useState(false);
     const { token } = useAuth();
     const { addToast } = useToast();
     const menuRef = useRef(null);
@@ -174,6 +193,40 @@ const InvoiceActions = ({ invoice, onInvoiceUpdated, onInvoiceDeleted, onViewDet
         setIsOpen(false);
     };
 
+    const handleDispatch = async () => {
+        if (!riderName) {
+            addToast('Rider name is required', 'error');
+            return;
+        }
+        setDispatching(true);
+        try {
+            const response = await api.patch(`/api/invoices/${invoice.id}`, {
+                status: 'In Transit',
+                rider_name: riderName,
+                rider_phone: riderPhone
+            });
+            addToast('Order dispatched!', 'success');
+            onInvoiceUpdated(response.data);
+            setShowDispatchModal(false);
+        } catch (error) {
+            console.error('Error dispatching:', error);
+            addToast('Failed to dispatch order', 'error');
+        } finally {
+            setDispatching(false);
+        }
+    };
+
+    const handleMarkDelivered = async () => {
+        try {
+            const response = await api.patch(`/api/invoices/${invoice.id}`, { status: 'Delivered' });
+            addToast('Order marked as delivered!', 'success');
+            onInvoiceUpdated(response.data);
+        } catch (error) {
+            addToast('Failed to update status', 'error');
+        }
+        setIsOpen(false);
+    };
+
     return (
         <>
             <div className="relative" ref={menuRef}>
@@ -205,12 +258,28 @@ const InvoiceActions = ({ invoice, onInvoiceUpdated, onInvoiceDeleted, onViewDet
                             >
                                 <Share2 size={16} /> Share via WhatsApp
                             </button>
-                            {invoice.status !== 'Paid' && (
+                            {invoice.status !== 'Paid' && invoice.status !== 'In Transit' && invoice.status !== 'Delivered' && (
                                 <button
                                     onClick={handleMarkAsPaid}
-                                    className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2"
+                                    className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg flex items-center gap-2"
                                 >
                                     <CheckCircle size={16} /> Mark as Paid
+                                </button>
+                            )}
+                            {invoice.status === 'Paid' && (
+                                <button
+                                    onClick={() => { setShowDispatchModal(true); setIsOpen(false); }}
+                                    className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 rounded-lg flex items-center gap-2"
+                                >
+                                    <CheckCircle size={16} /> Ship Order (Dispatch)
+                                </button>
+                            )}
+                            {invoice.status === 'In Transit' && (
+                                <button
+                                    onClick={handleMarkDelivered}
+                                    className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg flex items-center gap-2"
+                                >
+                                    <CheckCircle size={16} /> Mark as Delivered
                                 </button>
                             )}
                             <div className="h-px bg-gray-100 my-1"></div>
@@ -233,6 +302,45 @@ const InvoiceActions = ({ invoice, onInvoiceUpdated, onInvoiceDeleted, onViewDet
                 title="Delete this invoice?"
                 message={`This will permanently remove invoice ${invoice.reference} for ${invoice.customer.name}. This cannot be undone.`}
             />
+
+            {showDispatchModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-6">
+                        <h2 className="text-xl font-bold text-dark mb-2">Dispatch Order</h2>
+                        <p className="text-sm text-gray-500 mb-6">Enter rider details. We will automatically notify the customer via WhatsApp that their order is on the way.</p>
+                        
+                        <div className="space-y-4 mb-6">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Rider Name</label>
+                                <input 
+                                    type="text" 
+                                    value={riderName}
+                                    onChange={(e) => setRiderName(e.target.value)}
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20"
+                                    placeholder="e.g. John Doe (Gokada)"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1">Rider Phone (Optional)</label>
+                                <input 
+                                    type="text" 
+                                    value={riderPhone}
+                                    onChange={(e) => setRiderPhone(e.target.value)}
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20"
+                                    placeholder="e.g. 08012345678"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                            <Button variant="outline" onClick={() => setShowDispatchModal(false)} disabled={dispatching}>Cancel</Button>
+                            <Button onClick={handleDispatch} disabled={dispatching}>
+                                {dispatching ? 'Dispatching...' : 'Dispatch Order'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };
@@ -281,9 +389,11 @@ const Invoices = () => {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'Paid': return 'bg-green-100 text-green-700';
+            case 'Paid': return 'bg-blue-100 text-blue-700';
+            case 'In Transit': return 'bg-orange-100 text-orange-700';
+            case 'Delivered': return 'bg-green-100 text-green-700';
             case 'Unpaid': return 'bg-red-100 text-red-700';
-            case 'Pending': return 'bg-orange-100 text-orange-700';
+            case 'Pending': return 'bg-yellow-100 text-yellow-700';
             case 'Draft': return 'bg-gray-100 text-gray-700';
             default: return 'bg-gray-100 text-gray-700';
         }
