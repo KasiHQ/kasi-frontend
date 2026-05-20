@@ -41,12 +41,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (businessName, email, password) => {
+  const signup = async (businessName, email, password, businessType) => {
     try {
       const res = await api.post('/api/auth/register', { 
         business_name: businessName, 
         email, 
-        password 
+        password,
+        business_type: businessType
       });
       return res.data;
     } catch (error) {

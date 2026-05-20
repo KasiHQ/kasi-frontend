@@ -13,9 +13,15 @@ const OnboardingWizard = () => {
   const navigate = useNavigate();
   const { fetchUser, user } = useAuth();
   const { addToast } = useToast();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(user?.business_type ? 1 : 0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user?.business_type && currentStep === 0) {
+      setCurrentStep(1);
+    }
+  }, [user?.business_type, currentStep]);
 
   const steps = [
     {
