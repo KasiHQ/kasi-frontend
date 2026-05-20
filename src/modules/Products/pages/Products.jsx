@@ -49,6 +49,8 @@ const Products = () => {
     voice_pitch: '',
     instagram_links: '',
     external_knowledge: '',
+    bulk_discount_quantity: '',
+    bulk_discount_percentage: '',
   });
 
   useEffect(() => {
@@ -75,7 +77,7 @@ const Products = () => {
   const resetForm = () => {
     setForm({ 
       name: '', brand: '', category: '', description: '', price: '', happy_price: '', min_price: '', cost_price: '', in_stock: true, stock_quantity: '',
-      variants: '', weight: '', dimensions: '', expiry_date: '', voice_pitch: '', instagram_links: '', external_knowledge: ''
+      variants: '', weight: '', dimensions: '', expiry_date: '', voice_pitch: '', instagram_links: '', external_knowledge: '', bulk_discount_quantity: '', bulk_discount_percentage: ''
     });
     setEditing(null);
     setImages([]);
@@ -132,6 +134,8 @@ const Products = () => {
       voice_pitch: product.voice_pitch || '',
       instagram_links: Array.isArray(product.instagram_links) ? product.instagram_links.join(', ') : (product.instagram_links || ''),
       external_knowledge: product.external_knowledge || '',
+      bulk_discount_quantity: product.bulk_discount_quantity || '',
+      bulk_discount_percentage: product.bulk_discount_percentage || '',
     });
     setEditing(product.id);
     setImages(product.images || []);
@@ -370,6 +374,11 @@ const Products = () => {
                     <span className="text-xs text-gray-400 line-through">₦{Number(product.min_price).toLocaleString()}</span>
                   )}
                 </div>
+                {product.bulk_discount_quantity && product.bulk_discount_percentage && (
+                  <div className="mt-2 inline-flex items-center self-start bg-green-50 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded border border-green-100">
+                    Buy {product.bulk_discount_quantity}+ get {product.bulk_discount_percentage}% off
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2 border-t border-gray-100 mt-4 pt-3">
                   <button
@@ -453,6 +462,18 @@ const Products = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Cost Price (₦)</label>
                         <input type="number" value={form.cost_price} onChange={(e) => setForm({ ...form, cost_price: e.target.value })} placeholder="3000" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
+                      </div>
+                    </div>
+
+                    {/* Bulk Discounts */}
+                    <div className="grid grid-cols-2 gap-3 bg-green-50/50 p-3 rounded-xl border border-green-100/50">
+                      <div>
+                        <label className="block text-xs font-semibold text-green-800 mb-1">Bulk Buy Quantity</label>
+                        <input type="number" value={form.bulk_discount_quantity} onChange={(e) => setForm({ ...form, bulk_discount_quantity: e.target.value })} placeholder="e.g. 5" min="2" className="w-full px-3 py-2 border border-green-200 bg-white rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-green-800 mb-1">Discount Percentage (%)</label>
+                        <input type="number" value={form.bulk_discount_percentage} onChange={(e) => setForm({ ...form, bulk_discount_percentage: e.target.value })} placeholder="e.g. 15" min="1" max="99" className="w-full px-3 py-2 border border-green-200 bg-white rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
                       </div>
                     </div>
 

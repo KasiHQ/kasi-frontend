@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useLayout } from '../../context/LayoutContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import GlobalSearch from './GlobalSearch';
 
 const SIDEBAR_KEY = 'bfm-sidebar-collapsed';
 
@@ -72,6 +73,13 @@ const Sidebar = ({ onWidthChange }) => {
         </button>
       </div>
 
+      {/* Global Search (Hidden when collapsed) */}
+      {!collapsed && (
+        <div className="px-3 pb-3">
+          <GlobalSearch />
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className={clsx('flex-1 space-y-1', collapsed ? 'px-2' : 'px-3')}>
         {navItems.map((item) => (
@@ -132,13 +140,6 @@ const Sidebar = ({ onWidthChange }) => {
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-all duration-200"
           >
             {isDark ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
-          <button
-            onClick={toggleLayout}
-            title="Switch to topbar layout"
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-all duration-200"
-          >
-            <PanelTop size={15} />
           </button>
           {collapsed && (
             <button

@@ -146,7 +146,8 @@ const Settings = () => {
         delivery_details: '',
         payment_details: '',
         opening_hours: '',
-        business_type: ''
+        business_type: '',
+        agent_name: ''
     });
 
     useEffect(() => {
@@ -167,7 +168,8 @@ const Settings = () => {
                 delivery_details: user.delivery_details || '',
                 payment_details: user.payment_details || '',
                 opening_hours: user.opening_hours || '',
-                business_type: user.business_type || 'product'
+                business_type: user.business_type || 'product',
+                agent_name: user.agent_name || 'Kasi'
             });
         }
     }, [user]);
@@ -330,11 +332,13 @@ const Settings = () => {
                                 <label className="text-sm font-medium text-gray-700">Agent name</label>
                                 <input
                                     type="text"
-                                    value="Kasi"
-                                    readOnly
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium"
+                                    name="agent_name"
+                                    value={formData.agent_name}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm font-medium"
+                                    placeholder="e.g. Kasi"
                                 />
-                                <p className="text-xs text-gray-400">How Kasi introduces itself to customers.</p>
+                                <p className="text-xs text-gray-400">How your custom AI sales manager introduces itself to customers.</p>
                             </div>
 
                             <div className="space-y-2">
