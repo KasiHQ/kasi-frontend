@@ -36,7 +36,7 @@ import Bookings from './modules/Services/pages/Bookings';
 import Chats from './modules/Conversations/pages/Chats';
 import Logistics from './modules/Logistics/pages/Logistics';
 
-import { OnboardingWizard } from './modules/onboarding';
+import { OnboardingWizard } from './modules/Onboarding';
 
 function App() {
   return (
