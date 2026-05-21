@@ -56,11 +56,11 @@ const Sidebar = ({ onWidthChange }) => {
       <div className={clsx('flex items-center py-5', collapsed ? 'px-3 justify-center' : 'px-5 justify-between')}>
         {!collapsed ? (
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Kasi" className="w-7 h-7 rounded-lg" />
+            <img src="/kasi.png" alt="Kasi" className="w-7 h-7 rounded-lg" />
             <span className="text-xl font-extrabold tracking-tight" style={{ background: 'linear-gradient(135deg, #0F8C55, #0BBF6A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Kasi</span>
           </div>
         ) : (
-          <img src="/logo.png" alt="K" className="w-7 h-7 rounded-lg" />
+          <img src="/kasi.png" alt="K" className="w-7 h-7 rounded-lg" />
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}

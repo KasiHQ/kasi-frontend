@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Leaf, Check } from 'lucide-react';
+import { User, Check } from 'lucide-react';
 
 export const PricingVsAgentsSection = () => {
   const rows = [
@@ -79,7 +79,7 @@ export const PricingVsAgentsSection = () => {
 
                 {/* Kasi AI Header */}
                 <div className="col-span-6 md:col-span-4 bg-[#1A7A4A] text-white flex items-center justify-center gap-2 p-2">
-                  <Leaf size={16} className="text-[#D4F263] shrink-0 fill-current" />
+                  <img src="/kasi.png" alt="Kasi" className="w-4 h-4 object-contain shrink-0 select-none" />
                   <span className="text-xs md:text-[13px] font-black uppercase tracking-widest text-[#FFFFFF]">
                     Kasi AI
                   </span>

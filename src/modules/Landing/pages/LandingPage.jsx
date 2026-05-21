@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, Leaf, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { ArrowRight, Instagram, Twitter, Linkedin } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
 
@@ -217,7 +217,7 @@ const LandingPage = () => {
             {/* Column 1 — Brand */}
             <div className="lg:col-span-4 space-y-5">
               <span className="text-2xl font-black tracking-tight text-white font-bricolage flex items-center gap-2">
-                <Leaf size={24} className="text-[#1A7A4A] fill-current" />
+                <img src="/kasi.png" alt="Kasi" className="w-6 h-6 object-contain shrink-0 select-none" />
                 <span>Kasi AI</span>
               </span>
               <p className="text-[15px] text-white/50 leading-relaxed font-medium max-w-xs mt-4">

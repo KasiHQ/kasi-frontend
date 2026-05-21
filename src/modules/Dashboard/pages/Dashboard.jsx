@@ -282,21 +282,21 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
   return (
     <div className="space-y-6">
       {/* Stat Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border border-[#EAECF0] flex flex-col justify-between h-[120px] shadow-none">
+          <div key={i} className="bg-white rounded-2xl p-3 md:p-5 border border-[#EAECF0] flex flex-col justify-between h-[105px] md:h-[120px] shadow-none">
             <div className="flex items-start justify-between">
-              <p className="text-[11px] font-bold text-[#667085] uppercase tracking-wider">{stat.label}</p>
-              <div className={`w-9 h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-3`}>
-                <stat.icon size={18} />
+              <p className="text-[10px] md:text-[11px] font-bold text-[#667085] uppercase tracking-wider line-clamp-1 md:line-clamp-none">{stat.label}</p>
+              <div className={`w-7 h-7 md:w-9 md:h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-1 md:ml-3`}>
+                <stat.icon className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
               </div>
             </div>
-            <div className="mt-2">
-              <p className="text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
+            <div className="mt-1 md:mt-2">
+              <p className="text-xl md:text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
               {stat.trend ? (
-                <p className="text-xs text-[#12B76A] font-semibold mt-1">{stat.trend}</p>
+                <p className="text-[10px] md:text-xs text-[#12B76A] font-semibold mt-0.5 md:mt-1">{stat.trend}</p>
               ) : (
-                <p className="text-xs text-[#667085] mt-1">{stat.sub || ''}</p>
+                <p className="text-[10px] md:text-xs text-[#667085] mt-0.5 md:mt-1">{stat.sub || ''}</p>
               )}
             </div>
           </div>
@@ -485,21 +485,21 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
   return (
     <div className="space-y-6">
       {/* Stat Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border border-[#EAECF0] flex flex-col justify-between h-[120px] shadow-none">
+          <div key={i} className="bg-white rounded-2xl p-3 md:p-5 border border-[#EAECF0] flex flex-col justify-between h-[105px] md:h-[120px] shadow-none">
             <div className="flex items-start justify-between">
-              <p className="text-[11px] font-bold text-[#667085] uppercase tracking-wider">{stat.label}</p>
-              <div className={`w-9 h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-3`}>
-                <stat.icon size={18} />
+              <p className="text-[10px] md:text-[11px] font-bold text-[#667085] uppercase tracking-wider line-clamp-1 md:line-clamp-none">{stat.label}</p>
+              <div className={`w-7 h-7 md:w-9 md:h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-1 md:ml-3`}>
+                <stat.icon className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
               </div>
             </div>
-            <div className="mt-2">
-              <p className="text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
+            <div className="mt-1 md:mt-2">
+              <p className="text-xl md:text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
               {stat.trend ? (
-                <p className="text-xs text-[#12B76A] font-semibold mt-1">{stat.trend}</p>
+                <p className="text-[10px] md:text-xs text-[#12B76A] font-semibold mt-0.5 md:mt-1">{stat.trend}</p>
               ) : (
-                <p className={`text-xs font-semibold mt-1 ${stat.attention ? 'text-[#F79009]' : 'text-[#667085]'}`}>{stat.sub || ''}</p>
+                <p className={`text-[10px] md:text-xs font-semibold mt-0.5 md:mt-1 ${stat.attention ? 'text-[#F79009]' : 'text-[#667085]'}`}>{stat.sub || ''}</p>
               )}
             </div>
           </div>
@@ -635,22 +635,29 @@ const ActionAlerts = ({ user }) => {
 
   if (loading) return null;
 
+  const showPaystack = !hasPaystack && !dismissedPaystack;
+  const showWhatsApp = !hasWhatsApp && !dismissedWhatsApp;
+
+  if (!showPaystack && !showWhatsApp) return null;
+
   return (
-    <div className="space-y-2 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
       {/* 3.2 — PAYMENTS BANNER */}
-      {!hasPaystack && !dismissedPaystack && (
-        <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-lg py-1.5 px-3 flex items-center justify-between gap-3 shadow-none">
-          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+      {showPaystack && (
+        <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-xl p-3 flex flex-col justify-between gap-3 shadow-none">
+          <div className="flex gap-2.5 min-w-0">
             {/* Dollar icon in blue circle, 24px */}
-            <div className="w-6 h-6 rounded-full bg-[#D1E9FF] text-[#175CD3] flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-full bg-[#D1E9FF] text-[#175CD3] flex items-center justify-center shrink-0 mt-0.5">
               <DollarSign size={12} />
             </div>
-            <div className="text-xs text-[#344054] min-w-0 flex-1 leading-normal">
-              <span className="font-bold text-[#175CD3] tracking-wider uppercase mr-1.5">PAYMENTS NOT CONNECTED:</span>
-              Link your Paystack account to receive payments from customers.
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-bold text-[#175CD3] tracking-wider uppercase block mb-0.5">PAYMENTS NOT CONNECTED</span>
+              <p className="text-[11px] text-[#344054] leading-relaxed">
+                Link your Paystack account to receive payments from customers.
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center justify-between gap-2 shrink-0 border-t border-[#D1E9FF]/40 pt-2 mt-1">
             <button
               onClick={() => navigate('/settings/integrations')}
               className="px-2.5 py-1 bg-[#175CD3] hover:bg-[#114B9E] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
@@ -672,18 +679,20 @@ const ActionAlerts = ({ user }) => {
       )}
 
       {/* WHATSAPP BANNER */}
-      {!hasWhatsApp && !dismissedWhatsApp && (
-        <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-lg py-1.5 px-3 flex items-center justify-between gap-3 shadow-none">
-          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-            <div className="w-6 h-6 rounded-full bg-[#D1FADF] text-[#027A48] flex items-center justify-center shrink-0">
+      {showWhatsApp && (
+        <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-xl p-3 flex flex-col justify-between gap-3 shadow-none">
+          <div className="flex gap-2.5 min-w-0">
+            <div className="w-6 h-6 rounded-full bg-[#D1FADF] text-[#027A48] flex items-center justify-center shrink-0 mt-0.5">
               <MessageSquare size={12} />
             </div>
-            <div className="text-xs text-[#344054] min-w-0 flex-1 leading-normal">
-              <span className="font-bold text-[#027A48] tracking-wider uppercase mr-1.5">WHATSAPP NOT CONNECTED:</span>
-              Connect your WhatsApp so Kasi can start chatting with customers.
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-bold text-[#027A48] tracking-wider uppercase block mb-0.5">WHATSAPP NOT CONNECTED</span>
+              <p className="text-[11px] text-[#344054] leading-relaxed">
+                Connect your WhatsApp so Kasi can start chatting with customers.
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center justify-between gap-2 shrink-0 border-t border-[#D1FADF]/40 pt-2 mt-1">
             <button
               onClick={() => navigate('/settings/integrations')}
               className="px-2.5 py-1 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"

@@ -310,12 +310,10 @@ const OnboardingWizard = () => {
       >
         <div className="max-w-[540px] w-full text-center space-y-10 animate-in fade-in duration-1000">
           
-          {/* Animated pulsing leaf logo */}
+          {/* Animated pulsing brand logo */}
           <div className="flex justify-center">
             <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative animate-pulse">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
-                <path d="M2 22C2 22 6 20 10 16C14 12 16 8 20 2C20 2 12 4 8 8C4 12 2 16 2 22Z" fill="currentColor" />
-              </svg>
+              <img src="/kasi.png" alt="Kasi" className="w-12 h-12 object-contain select-none" />
             </div>
           </div>
 
@@ -361,9 +359,7 @@ const OnboardingWizard = () => {
         {/* Top: Logo */}
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 text-white font-sans text-xl font-bold tracking-tight">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 22C2 22 6 20 10 16C14 12 16 8 20 2C20 2 12 4 8 8C4 12 2 16 2 22Z" fill="#FFFFFF" />
-            </svg>
+            <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
             <span className="font-bold text-lg">Kasi</span>
             <span className="text-[#D4F263] font-bold text-lg">AI</span>
           </div>

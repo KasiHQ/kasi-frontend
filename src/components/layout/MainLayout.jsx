@@ -45,9 +45,13 @@ const MainLayout = () => {
           <style>{`@media(min-width:768px){.main-content-area{margin-left:${sidebarWidth}px !important;transition:margin-left 0.25s ease}}`}</style>
           
           {/* Top Bar of Main Content */}
-          <header className="h-16 bg-white border-b border-[#EAECF0] px-10 flex items-center justify-between sticky top-0 z-40 shrink-0">
+          <header className="h-16 bg-white border-b border-[#EAECF0] px-4 md:px-10 flex items-center justify-between sticky top-0 z-40 shrink-0">
             <div>
-              {!isDashboard && (
+              {isDashboard ? (
+                <div className="flex items-center">
+                  <img src="/kasi.png" alt="Kasi" className="h-6 md:h-7 w-auto object-contain select-none" />
+                </div>
+              ) : (
                 <span className="text-sm font-bold text-[#101828] tracking-tight capitalize">
                   {getPageTitle()}
                 </span>

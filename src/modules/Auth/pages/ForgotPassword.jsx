@@ -39,11 +39,7 @@ const ForgotPassword = () => {
         {/* Top: Logo */}
         <div className="relative z-10">
           <Link to="/" className="inline-flex items-center gap-2 text-white font-sans text-xl font-bold tracking-tight">
-            {/* White leaf icon placeholder or simple svg */}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor" className="hidden"/>
-              <path d="M2 22C2 22 6 20 10 16C14 12 16 8 20 2C20 2 12 4 8 8C4 12 2 16 2 22Z" fill="#FFFFFF" />
-            </svg>
+            <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
             <span className="font-bold text-lg">Kasi</span>
             <span className="text-[#D4F263] font-bold text-lg">AI</span>
           </Link>
@@ -84,7 +80,7 @@ const ForgotPassword = () => {
         <div className="relative z-10 flex items-center gap-2 border-t border-white/10 pt-6">
           <div className="w-2.5 h-2.5 rounded-full bg-[#12B76A] animate-pulse" />
           <span className="text-[10px] font-semibold tracking-[0.12em] text-white/30 uppercase">
-            SALIENCE TECHNOLOGY LTD
+            KASI AI
           </span>
         </div>
       </div>
@@ -133,6 +129,13 @@ const ForgotPassword = () => {
                   {/* Icon at top */}
                   <div className="w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center text-[#1A7A4A]">
                     <HelpCircle size={28} />
+                  </div>
+                  {/* Mobile Logo */}
+                  <div className="lg:hidden flex items-center gap-2 mb-6">
+                    <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
+                    <span className="font-sans text-xl font-bold tracking-tight text-[#101828]">
+                      Kasi<span className="text-[#1A7A4A]">AI</span>
+                    </span>
                   </div>
                   <div className="space-y-2">
                     <h2 className="text-2xl font-bold text-[#101828]">Forgot your password?</h2>
@@ -185,17 +188,13 @@ const ForgotPassword = () => {
         </div>
 
         {/* Footer secure row */}
-        <div className="w-full max-w-[400px] mx-auto pt-6 border-t border-[#EAECF0] flex items-center justify-between text-[#98A2B3]">
-          <p className="text-xs">
+        <div className="w-full max-w-[400px] mx-auto pt-6 border-t border-[#EAECF0] flex items-center justify-center text-[#98A2B3]">
+          <p className="text-xs text-center">
             Back to{' '}
             <Link to="/login" className="font-semibold text-[#1A7A4A] hover:underline">
               Sign In
             </Link>
           </p>
-          <div className="flex items-center gap-1 text-[10px] font-semibold tracking-wider uppercase">
-            <ShieldCheck size={12} className="text-[#1A7A4A]" />
-            <span>Secure Enterprise Auth</span>
-          </div>
         </div>
 
       </div>

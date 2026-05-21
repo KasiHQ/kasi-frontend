@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, ArrowRight } from 'lucide-react';
-import clsx from 'clsx';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Menu, X, ArrowRight } from "lucide-react";
+import clsx from "clsx";
 
 const NAV_LINKS = [
-  { id: 'dms', label: 'DMs' },
-  { id: 'invoices', label: 'Invoices' },
-  { id: 'negotiation', label: 'Negotiations' },
-  { id: 'logistics', label: 'Logistics' },
-  { id: 'pricing', label: 'Pricing' },
-  { id: 'testimonials', label: 'Testimonials' },
-  { id: 'faq', label: 'FAQ' },
+  { id: "dms", label: "DMs" },
+  { id: "invoices", label: "Invoices" },
+  { id: "negotiation", label: "Negotiations" },
+  { id: "logistics", label: "Logistics" },
+  { id: "pricing", label: "Pricing" },
+  { id: "testimonials", label: "Testimonials" },
+  { id: "faq", label: "FAQ" },
 ];
 
 export const LandingNavbar = ({ activeSection, scrolled }) => {
@@ -29,7 +29,7 @@ export const LandingNavbar = ({ activeSection, scrolled }) => {
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -37,34 +37,34 @@ export const LandingNavbar = ({ activeSection, scrolled }) => {
   // Prevent background scrolling when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
 
   return (
     <nav
       className={clsx(
-        'fixed top-0 left-0 right-0 z-[100] transition-all duration-300 w-full h-16 flex items-center justify-center',
-        scrolled 
-          ? 'bg-white border-b-[1.5px] border-[#E5E5E5]' 
-          : 'bg-transparent border-b-[1.5px] border-transparent'
+        "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 w-full h-16 flex items-center justify-center",
+        scrolled
+          ? "bg-white border-b-[1.5px] border-[#E5E5E5]"
+          : "bg-transparent border-b-[1.5px] border-transparent",
       )}
     >
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 flex justify-between items-center h-full">
         {/* Logo and Brand */}
         <a
           href="#hero"
-          onClick={(e) => handleLinkClick(e, 'hero')}
+          onClick={(e) => handleLinkClick(e, "hero")}
           className="flex items-center gap-2 group cursor-pointer"
         >
-          <img 
-            src="/logo.png" 
-            alt="Kasi AI Logo" 
+          <img
+            src="/kasi.png"
+            alt="Kasi AI Logo"
             className="w-8 h-8 object-contain shrink-0"
           />
           <span className="text-xl font-black text-black tracking-tight select-none">
@@ -82,10 +82,10 @@ export const LandingNavbar = ({ activeSection, scrolled }) => {
                 href={`#${link.id}`}
                 onClick={(e) => handleLinkClick(e, link.id)}
                 className={clsx(
-                  'text-[15px] font-medium tracking-tight transition-all duration-150 select-none block font-sans',
+                  "text-[15px] font-medium tracking-tight transition-all duration-150 select-none block font-sans",
                   isActive
-                    ? 'bg-[#0A0A0A] text-white rounded-[999px] py-1 px-3'
-                    : 'text-grey-700 hover:text-black hover:underline'
+                    ? "bg-[#0A0A0A] text-white rounded-[999px] py-1 px-3"
+                    : "text-grey-700 hover:text-black hover:underline",
                 )}
               >
                 {link.label}
@@ -132,14 +132,14 @@ export const LandingNavbar = ({ activeSection, scrolled }) => {
               <a
                 href="#hero"
                 onClick={(e) => {
-                  handleLinkClick(e, 'hero');
+                  handleLinkClick(e, "hero");
                   setMobileMenuOpen(false);
                 }}
                 className="flex items-center gap-2 group cursor-pointer"
               >
-                <img 
-                  src="/logo.png" 
-                  alt="Kasi AI Logo" 
+                <img
+                  src="/kasi.png"
+                  alt="Kasi AI Logo"
                   className="w-8 h-8 object-contain shrink-0"
                 />
                 <span className="text-xl font-black text-black tracking-tight select-none">
@@ -165,10 +165,10 @@ export const LandingNavbar = ({ activeSection, scrolled }) => {
                     href={`#${link.id}`}
                     onClick={(e) => handleLinkClick(e, link.id)}
                     className={clsx(
-                      'text-3xl font-black py-2.5 transition-all text-left block border-b border-transparent',
+                      "text-3xl font-black py-2.5 transition-all text-left block border-b border-transparent",
                       isActive
-                        ? 'text-black border-black inline-block'
-                        : 'text-grey-700 hover:text-black'
+                        ? "text-black border-black inline-block"
+                        : "text-grey-700 hover:text-black",
                     )}
                   >
                     {link.label}

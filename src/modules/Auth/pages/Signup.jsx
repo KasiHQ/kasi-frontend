@@ -86,9 +86,7 @@ const Signup = () => {
         {/* Top: Logo */}
         <div className="relative z-10">
           <Link to="/" className="inline-flex items-center gap-2 text-white font-sans text-xl font-bold tracking-tight">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 22C2 22 6 20 10 16C14 12 16 8 20 2C20 2 12 4 8 8C4 12 2 16 2 22Z" fill="#FFFFFF" />
-            </svg>
+            <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
             <span className="font-bold text-lg">Kasi</span>
             <span className="text-[#D4F263] font-bold text-lg">AI</span>
           </Link>
@@ -129,7 +127,7 @@ const Signup = () => {
         <div className="relative z-10 flex items-center gap-2 border-t border-white/10 pt-6">
           <div className="w-2.5 h-2.5 rounded-full bg-[#12B76A] animate-pulse" />
           <span className="text-[10px] font-semibold tracking-[0.12em] text-white/30 uppercase">
-            SALIENCE TECHNOLOGY LTD
+            KASI AI
           </span>
         </div>
       </div>
@@ -177,6 +175,13 @@ const Signup = () => {
             {step === 1 && (
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="space-y-2">
+                  {/* Mobile Logo */}
+                  <div className="lg:hidden flex items-center gap-2 mb-6">
+                    <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
+                    <span className="font-sans text-xl font-bold tracking-tight text-[#101828]">
+                      Kasi<span className="text-[#1A7A4A]">AI</span>
+                    </span>
+                  </div>
                   <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
                     Select your seller profile
                   </h2>
@@ -257,6 +262,13 @@ const Signup = () => {
             {step === 2 && (
               <form onSubmit={handleSubmit} className="space-y-5 animate-in fade-in duration-300">
                 <div className="space-y-2 mb-2">
+                  {/* Mobile Logo */}
+                  <div className="lg:hidden flex items-center gap-2 mb-6">
+                    <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
+                    <span className="font-sans text-xl font-bold tracking-tight text-[#101828]">
+                      Kasi<span className="text-[#1A7A4A]">AI</span>
+                    </span>
+                  </div>
                   <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
                     Create your account
                   </h2>
@@ -395,17 +407,13 @@ const Signup = () => {
         </div>
 
         {/* Footer secure row */}
-        <div className="w-full max-w-[440px] mx-auto pt-6 border-t border-[#EAECF0] flex items-center justify-between text-[#98A2B3]">
-          <p className="text-xs">
+        <div className="w-full max-w-[440px] mx-auto pt-6 border-t border-[#EAECF0] flex items-center justify-center text-[#98A2B3]">
+          <p className="text-xs text-center">
             Already have an account?{' '}
             <Link to="/login" className="font-semibold text-[#1A7A4A] hover:underline">
               Sign in here
             </Link>
           </p>
-          <div className="flex items-center gap-1 text-[10px] font-semibold tracking-wider uppercase">
-            <ShieldCheck size={12} className="text-[#1A7A4A]" />
-            <span>Secure Enterprise Auth</span>
-          </div>
         </div>
 
       </div>
