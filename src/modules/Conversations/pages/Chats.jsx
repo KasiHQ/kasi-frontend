@@ -68,16 +68,55 @@ const StatusBadge = ({ status }) => {
 
 // Platform badge config
 const getPlatformBadge = (platform) => {
-  if (platform === 'whatsapp') {
-    return { bg: 'bg-[rgba(37,211,102,0.1)]', color: 'text-[#128C7E]', icon: '📱', label: 'WhatsApp' };
+  const cleanPlatform = (platform || '').toLowerCase();
+  if (cleanPlatform === 'whatsapp') {
+    return {
+      bg: 'bg-emerald-50 border border-emerald-100',
+      color: 'text-emerald-700',
+      label: 'WhatsApp',
+      icon: (
+        <svg className="w-3 h-3 fill-emerald-600 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.517 2.266 2.27 3.507 5.289 3.507 8.494-.004 6.66-5.338 11.997-11.95 11.997-2.005-.001-3.973-.503-5.714-1.46L0 24zm6.59-20.347c-.186-.412-.384-.42-.562-.427-.146-.006-.314-.006-.482-.006-.168 0-.441.063-.672.314-.23.251-.879.859-.879 2.094 0 1.235.9 2.428 1.025 2.595.126.167 1.767 2.699 4.284 3.782.598.258 1.065.412 1.428.527.6.19 1.15.163 1.583.099.483-.072 1.482-.605 1.691-1.19.209-.584.209-1.086.146-1.19-.063-.105-.23-.167-.481-.293-.251-.126-1.482-.731-1.712-.815-.23-.084-.397-.126-.564.126-.167.251-.648.815-.794.982-.146.167-.293.188-.543.063-.25-.126-.98-.362-1.868-1.154-.69-.616-1.157-1.378-1.293-1.611-.136-.234-.015-.361.11-.486.112-.112.251-.293.376-.44.126-.146.167-.25.251-.418.084-.167.042-.314-.021-.44-.063-.125-.562-1.355-.77-1.854z"/>
+        </svg>
+      )
+    };
   }
-  if (platform === 'telegram') {
-    return { bg: 'bg-[rgba(0,136,204,0.1)]', color: 'text-[#0088CC]', icon: '✈', label: 'Telegram' };
+  if (cleanPlatform === 'telegram') {
+    return {
+      bg: 'bg-sky-50 border border-sky-100',
+      color: 'text-sky-700',
+      label: 'Telegram',
+      icon: (
+        <svg className="w-3 h-3 fill-sky-600 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.18l-1.92 9.07c-.14.63-.52.79-1.05.49l-2.93-2.16-1.41 1.36c-.16.16-.29.29-.6.29l.21-2.98 5.43-4.91c.24-.21-.05-.33-.37-.12L8.2 13.98l-2.89-.9c-.63-.2-.64-.63.13-.93l11.27-4.34c.52-.19.98.12.85.37z"/>
+        </svg>
+      )
+    };
   }
-  if (platform === 'instagram') {
-    return { bg: 'bg-[rgba(225,48,108,0.1)]', color: 'text-[#E1306C]', icon: '📷', label: 'Instagram' };
+  if (cleanPlatform === 'instagram') {
+    return {
+      bg: 'bg-pink-50 border border-pink-100',
+      color: 'text-pink-700',
+      label: 'Instagram',
+      icon: (
+        <svg className="w-3 h-3 stroke-pink-600 fill-none shrink-0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+        </svg>
+      )
+    };
   }
-  return { bg: 'bg-gray-100', color: 'text-gray-600', icon: '💬', label: platform };
+  return {
+    bg: 'bg-gray-50 border border-gray-100',
+    color: 'text-gray-600',
+    label: platform || 'Unknown',
+    icon: (
+      <svg className="w-3 h-3 fill-gray-500 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+      </svg>
+    )
+  };
 };
 
 const Chats = () => {

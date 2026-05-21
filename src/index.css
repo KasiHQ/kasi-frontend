@@ -44,6 +44,33 @@
   display: none; /* Chrome, Safari and Opera */
 }
 
+/* Custom premium slim scrollbars for the entire application */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(26, 122, 74, 0.25); /* Primary #1A7A4A brand color with opacity */
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 122, 74, 0.55);
+}
+
+/* Firefox custom scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(26, 122, 74, 0.25) transparent;
+}
+
+
 .mask-linear-edges {
   mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent);
@@ -410,17 +437,19 @@ body {
 
 /* Scrollbar */
 .dark ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 .dark ::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: transparent;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #444444;
-  border-radius: 4px;
+  background: rgba(52, 211, 153, 0.25);
+  border-radius: 9999px;
+  border: 1px solid transparent;
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+  background: rgba(52, 211, 153, 0.55);
 }
 
 /* Modal overlays */
@@ -636,8 +665,10 @@ body {
   border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-.theme-midnight-blue ::-webkit-scrollbar-track { background: #0f172a; }
-.theme-midnight-blue ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+.theme-midnight-blue ::-webkit-scrollbar { width: 6px; height: 6px; }
+.theme-midnight-blue ::-webkit-scrollbar-track { background: transparent; }
+.theme-midnight-blue ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 9999px; }
+.theme-midnight-blue ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.55); }
 
 /* ========================================
    THEME: PURPLE NIGHT — deep violet
@@ -717,8 +748,10 @@ body {
   border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-.theme-purple-night ::-webkit-scrollbar-track { background: #1a1025; }
-.theme-purple-night ::-webkit-scrollbar-thumb { background: #3f2f55; border-radius: 4px; }
+.theme-purple-night ::-webkit-scrollbar { width: 6px; height: 6px; }
+.theme-purple-night ::-webkit-scrollbar-track { background: transparent; }
+.theme-purple-night ::-webkit-scrollbar-thumb { background: rgba(192, 132, 252, 0.25); border-radius: 9999px; }
+.theme-purple-night ::-webkit-scrollbar-thumb:hover { background: rgba(192, 132, 252, 0.55); }
 
 /* ========================================
    THEME: OCEAN DARK — teal-black
@@ -798,8 +831,10 @@ body {
   border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-.theme-ocean-dark ::-webkit-scrollbar-track { background: #0d1b2a; }
-.theme-ocean-dark ::-webkit-scrollbar-thumb { background: #264a5e; border-radius: 4px; }
+.theme-ocean-dark ::-webkit-scrollbar { width: 6px; height: 6px; }
+.theme-ocean-dark ::-webkit-scrollbar-track { background: transparent; }
+.theme-ocean-dark ::-webkit-scrollbar-thumb { background: rgba(45, 212, 191, 0.25); border-radius: 9999px; }
+.theme-ocean-dark ::-webkit-scrollbar-thumb:hover { background: rgba(45, 212, 191, 0.55); }
 
 /* ========================================
    THEME: WARM DARK — charcoal with warm tones
@@ -879,8 +914,10 @@ body {
   border-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-.theme-warm-dark ::-webkit-scrollbar-track { background: #1c1917; }
-.theme-warm-dark ::-webkit-scrollbar-thumb { background: #44403c; border-radius: 4px; }
+.theme-warm-dark ::-webkit-scrollbar { width: 6px; height: 6px; }
+.theme-warm-dark ::-webkit-scrollbar-track { background: transparent; }
+.theme-warm-dark ::-webkit-scrollbar-thumb { background: rgba(251, 146, 60, 0.25); border-radius: 9999px; }
+.theme-warm-dark ::-webkit-scrollbar-thumb:hover { background: rgba(251, 146, 60, 0.55); }
 
 /* ── Custom Scroll Reveal Animations (AOS) ── */
 .reveal {

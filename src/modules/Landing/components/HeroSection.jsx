@@ -6,7 +6,7 @@ export const HeroSection = () => {
   return (
     <section
       id="hero"
-      className="w-full pt-[120px] pb-[80px] bg-white overflow-hidden relative"
+      className="w-full pt-[160px] pb-[80px] bg-white overflow-hidden relative"
     >
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">

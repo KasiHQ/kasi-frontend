@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2, Grid, List, Search } from 'lucide-react';
+import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2, Grid, List, Search, Info, Coins, Truck } from 'lucide-react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
@@ -35,6 +35,7 @@ const Products = () => {
   const fileInputRef = useRef(null);
   const [images, setImages] = useState([]); // Currently uploaded images for the editing product
   const [uploadingImages, setUploadingImages] = useState(false); // Are we currently uploading to Cloudinary?
+  const [activeFormTab, setActiveFormTab] = useState('basic'); // 'basic' | 'pricing' | 'inventory'
   
   const [form, setForm] = useState({
     name: '',
@@ -86,6 +87,7 @@ const Products = () => {
     });
     setEditing(null);
     setImages([]);
+    setActiveFormTab('basic');
     setShowModal(false);
   };
 
@@ -144,6 +146,7 @@ const Products = () => {
     });
     setEditing(product.id);
     setImages(product.images || []);
+    setActiveFormTab('basic');
     setShowModal(true);
   };
 
@@ -427,142 +430,295 @@ const Products = () => {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col transition-all duration-300">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
-              <h2 className="text-xl font-bold text-dark">
+              <h2 className="text-xl font-bold text-dark flex items-center gap-2">
+                <Package size={22} className="text-primary" />
                 {editing ? 'Edit Product' : 'Add New Product'}
               </h2>
-              <button onClick={resetForm} className="text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors">
+              <button onClick={resetForm} className="text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer">
                 <X size={20} />
               </button>
             </div>
 
             <div className="overflow-y-auto p-6 scrollbar-hide">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                 
-                {/* Left Column: Form Details */}
-                <div>
-                  <h3 className="text-sm font-semibold text-dark mb-4 flex items-center gap-2">
-                    <Package size={16} className="text-primary" />
-                    Product Details
-                  </h3>
+                {/* Left Column: Form Details (7cols on desktop) */}
+                <div className="md:col-span-7 flex flex-col">
+                  {/* Premium Tab Bar Selector */}
+                  <div className="flex border-b border-gray-100 pb-2 mb-5 gap-5 shrink-0 select-none">
+                    <button
+                      type="button"
+                      onClick={() => setActiveFormTab('basic')}
+                      className={`pb-2 text-sm font-semibold transition-all relative flex items-center gap-1.5 cursor-pointer ${
+                        activeFormTab === 'basic'
+                          ? 'text-primary border-b-2 border-primary font-bold'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      <Info size={15} />
+                      Basic Info
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveFormTab('pricing')}
+                      className={`pb-2 text-sm font-semibold transition-all relative flex items-center gap-1.5 cursor-pointer ${
+                        activeFormTab === 'pricing'
+                          ? 'text-primary border-b-2 border-primary font-bold'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      <Coins size={15} />
+                      Pricing
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveFormTab('inventory')}
+                      className={`pb-2 text-sm font-semibold transition-all relative flex items-center gap-1.5 cursor-pointer ${
+                        activeFormTab === 'inventory'
+                          ? 'text-primary border-b-2 border-primary font-bold'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      <Truck size={15} />
+                      Inventory
+                    </button>
+                  </div>
+
                   <form id="productForm" onSubmit={handleSubmit} className="space-y-4">
-                    {/* Basic Info */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
-                      <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Red Lipgloss" required className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-                        <input type="text" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="e.g. Fenty Beauty" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <input type="text" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="e.g. Cosmetics" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                    </div>
-
-                    {/* Pricing — 3-tier negotiation system */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Starting Price (₦) *</label>
-                        <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="17000" required min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Happy Price (₦)</label>
-                        <input type="number" value={form.happy_price} onChange={(e) => setForm({ ...form, happy_price: e.target.value })} placeholder="14500" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Price (₦)</label>
-                        <input type="number" value={form.min_price} onChange={(e) => setForm({ ...form, min_price: e.target.value })} placeholder="12000" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-gray-400 -mt-2">Starting = AI's opening quote • Happy = your target • Last = absolute floor the AI almost never reaches</p>
-                    <div className="grid grid-cols-1 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Cost Price (₦)</label>
-                        <input type="number" value={form.cost_price} onChange={(e) => setForm({ ...form, cost_price: e.target.value })} placeholder="3000" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                    </div>
-
-                    {/* Bulk Discounts */}
-                    <div className="grid grid-cols-2 gap-3 bg-green-50/50 p-3 rounded-xl border border-green-100/50">
-                      <div>
-                        <label className="block text-xs font-semibold text-green-800 mb-1">Bulk Buy Quantity</label>
-                        <input type="number" value={form.bulk_discount_quantity} onChange={(e) => setForm({ ...form, bulk_discount_quantity: e.target.value })} placeholder="e.g. 5" min="2" className="w-full px-3 py-2 border border-green-200 bg-white rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-green-800 mb-1">Discount Percentage (%)</label>
-                        <input type="number" value={form.bulk_discount_percentage} onChange={(e) => setForm({ ...form, bulk_discount_percentage: e.target.value })} placeholder="e.g. 15" min="1" max="99" className="w-full px-3 py-2 border border-green-200 bg-white rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                    </div>
-
-                    {/* Details */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Variants (comma separated)</label>
-                      <input type="text" value={form.variants} onChange={(e) => setForm({ ...form, variants: e.target.value })} placeholder="e.g. Red, Blue, XL" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Weight</label>
-                        <input type="text" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} placeholder="e.g. 500g" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Dimensions</label>
-                        <input type="text" value={form.dimensions} onChange={(e) => setForm({ ...form, dimensions: e.target.value })} placeholder="e.g. 10x10x5 cm" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                        <input type="date" value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                    </div>
-
-                    {/* Rich Texts */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                      <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Brief product description" rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none transition-all" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Voice Pitch (AI context)</label>
-                      <textarea value={form.voice_pitch} onChange={(e) => setForm({ ...form, voice_pitch: e.target.value })} placeholder="How would you pitch this product to a customer?" rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none transition-all" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">External Knowledge</label>
-                      <textarea value={form.external_knowledge} onChange={(e) => setForm({ ...form, external_knowledge: e.target.value })} placeholder="Reviews, specs, or comparison info" rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none transition-all" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Instagram Links (comma separated)</label>
-                      <input type="text" value={form.instagram_links} onChange={(e) => setForm({ ...form, instagram_links: e.target.value })} placeholder="e.g. https://instagram.com/p/..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-2">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Quantity in Stock</label>
-                        <input type="number" value={form.stock_quantity} onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })} placeholder="e.g. 50" min="0" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
-                      </div>
-                      <div className="flex items-end">
-                        <label className="w-full flex items-center justify-center gap-3 p-2.5 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors h-[38px]">
-                          <input
-                            type="checkbox"
-                            checked={form.in_stock}
-                            onChange={(e) => setForm({ ...form, in_stock: e.target.checked })}
-                            className="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300"
+                    {/* Tab 1: Basic Info */}
+                    {activeFormTab === 'basic' && (
+                      <div className="space-y-4 transition-all duration-200">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Product Name *</label>
+                          <input 
+                            type="text" 
+                            value={form.name} 
+                            onChange={(e) => setForm({ ...form, name: e.target.value })} 
+                            placeholder="e.g. HP Pavilion 15" 
+                            required 
+                            className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
                           />
-                          <span className="text-sm font-medium text-gray-700">Is In Stock</span>
-                        </label>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3.5">
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Brand</label>
+                            <input 
+                              type="text" 
+                              value={form.brand} 
+                              onChange={(e) => setForm({ ...form, brand: e.target.value })} 
+                              placeholder="e.g. HP" 
+                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Category</label>
+                            <input 
+                              type="text" 
+                              value={form.category} 
+                              onChange={(e) => setForm({ ...form, category: e.target.value })} 
+                              placeholder="e.g. Budget/Student" 
+                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
+                          <textarea 
+                            value={form.description} 
+                            onChange={(e) => setForm({ ...form, description: e.target.value })} 
+                            placeholder="Provide a captivating description for your buyers..." 
+                            rows={3} 
+                            className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none resize-none transition-all" 
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Instagram Links (comma separated)</label>
+                          <input 
+                            type="text" 
+                            value={form.instagram_links} 
+                            onChange={(e) => setForm({ ...form, instagram_links: e.target.value })} 
+                            placeholder="e.g. https://instagram.com/p/..." 
+                            className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                          />
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Tab 2: Smart Pricing */}
+                    {activeFormTab === 'pricing' && (
+                      <div className="space-y-4 transition-all duration-200">
+                        {/* 3-tier pricing */}
+                        <div className="grid grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Starting (₦) *</label>
+                            <input 
+                              type="number" 
+                              value={form.price} 
+                              onChange={(e) => setForm({ ...form, price: e.target.value })} 
+                              placeholder="850000" 
+                              required 
+                              min="0" 
+                              className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Happy (₦)</label>
+                            <input 
+                              type="number" 
+                              value={form.happy_price} 
+                              onChange={(e) => setForm({ ...form, happy_price: e.target.value })} 
+                              placeholder="14500" 
+                              min="0" 
+                              className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Last (₦)</label>
+                            <input 
+                              type="number" 
+                              value={form.min_price} 
+                              onChange={(e) => setForm({ ...form, min_price: e.target.value })} 
+                              placeholder="800000" 
+                              min="0" 
+                              className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
+                            />
+                          </div>
+                        </div>
+
+                        {/* Guideline helper card */}
+                        <div className="bg-gray-50 border border-gray-200/60 rounded-xl p-3 text-[11px] text-gray-500 leading-normal select-none">
+                          <span className="font-semibold text-dark block mb-0.5">ℹ️ Kasi AI Negotiation Rules:</span>
+                          <span className="block font-medium">· <strong className="text-gray-700">Starting Price</strong>: Open quote first offered to buyers.</span>
+                          <span className="block font-medium">· <strong className="text-gray-700">Happy Price</strong>: Target price AI handles to maximize deal value.</span>
+                          <span className="block font-medium">· <strong className="text-gray-700">Last Price</strong>: Absolute floor limit AI is barred from bypassing.</span>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Cost Price (₦)</label>
+                          <input 
+                            type="number" 
+                            value={form.cost_price} 
+                            onChange={(e) => setForm({ ...form, cost_price: e.target.value })} 
+                            placeholder="680000" 
+                            min="0" 
+                            className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                          />
+                        </div>
+
+                        {/* Bulk wholesale group */}
+                        <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-4 space-y-3">
+                          <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">⚡ Wholesale Bulk Discounts</span>
+                          <div className="grid grid-cols-2 gap-3.5">
+                            <div>
+                              <label className="block text-[11px] font-semibold text-emerald-800/80 mb-1">Bulk Buy Quantity</label>
+                              <input 
+                                type="number" 
+                                value={form.bulk_discount_quantity} 
+                                onChange={(e) => setForm({ ...form, bulk_discount_quantity: e.target.value })} 
+                                placeholder="e.g. 5" 
+                                min="2" 
+                                className="w-full px-3 py-2 border border-emerald-200 bg-white rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-semibold text-emerald-800/80 mb-1">Discount %</label>
+                              <input 
+                                type="number" 
+                                value={form.bulk_discount_percentage} 
+                                onChange={(e) => setForm({ ...form, bulk_discount_percentage: e.target.value })} 
+                                placeholder="e.g. 15" 
+                                min="1" 
+                                max="99" 
+                                className="w-full px-3 py-2 border border-emerald-200 bg-white rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tab 3: Inventory & Shipping */}
+                    {activeFormTab === 'inventory' && (
+                      <div className="space-y-4 transition-all duration-200">
+                        <div className="grid grid-cols-2 gap-3.5">
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Stock Quantity</label>
+                            <input 
+                              type="number" 
+                              value={form.stock_quantity} 
+                              onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })} 
+                              placeholder="e.g. 50" 
+                              min="0" 
+                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                            />
+                          </div>
+                          <div className="flex items-end">
+                            <label className="w-full flex items-center justify-center gap-2.5 p-2.5 border border-gray-200 hover:border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all h-[44px] select-none">
+                              <input
+                                type="checkbox"
+                                checked={form.in_stock}
+                                onChange={(e) => setForm({ ...form, in_stock: e.target.checked })}
+                                className="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300 cursor-pointer"
+                              />
+                              <span className="text-sm font-semibold text-gray-700">Set as In Stock</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Variants (comma separated)</label>
+                          <input 
+                            type="text" 
+                            value={form.variants} 
+                            onChange={(e) => setForm({ ...form, variants: e.target.value })} 
+                            placeholder="e.g. Red, Blue, XL" 
+                            className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2.5">
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Weight</label>
+                            <input 
+                              type="text" 
+                              value={form.weight} 
+                              onChange={(e) => setForm({ ...form, weight: e.target.value })} 
+                              placeholder="e.g. 500g" 
+                              className="w-full px-2.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Dimensions</label>
+                            <input 
+                              type="text" 
+                              value={form.dimensions} 
+                              onChange={(e) => setForm({ ...form, dimensions: e.target.value })} 
+                              placeholder="e.g. 10x10x5 cm" 
+                              className="w-full px-2.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Expiry Date</label>
+                            <input 
+                              type="date" 
+                              value={form.expiry_date} 
+                              onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} 
+                              className="w-full px-2 py-2 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-xs outline-none transition-all h-[44px]" 
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </form>
                 </div>
 
-                {/* Right Column: Image Gallery */}
-                <div>
+                {/* Right Column: Image Gallery (5cols on desktop) */}
+                <div className="md:col-span-5 border-t md:border-t-0 md:border-l border-gray-100 pt-6 md:pt-0 md:pl-8">
                   <h3 className="text-sm font-semibold text-dark mb-4 flex items-center gap-2">
                     <ImageIcon2 size={16} className="text-primary" />
                     Product Images
@@ -613,10 +769,10 @@ const Products = () => {
 
                       {/* Image Gallery Thumbnails */}
                       {images.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 gap-3">
                           {images.map((img) => (
                             <div key={img.id} className={`group relative aspect-square rounded-xl overflow-hidden border-2 ${img.is_primary ? 'border-primary shadow-sm' : 'border-transparent bg-gray-100'}`}>
-                              <img src={img.image_url} alt="Product" className="w-full h-full object-cover" />
+                              <img src={img.image_url} alt="Product" className="w-full h-full object-cover animate-fadeIn" />
                               
                               {/* Primary Badge */}
                               {img.is_primary && (
@@ -631,7 +787,7 @@ const Products = () => {
                                   <button 
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); handleSetPrimary(img.id); }}
-                                    className="bg-white/90 hover:bg-white text-dark text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors"
+                                    className="bg-white/90 hover:bg-white text-dark text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
                                   >
                                     <Star size={12} /> Set Cover
                                   </button>
@@ -639,7 +795,7 @@ const Products = () => {
                                 <button 
                                   type="button"
                                   onClick={(e) => { e.stopPropagation(); handleDeleteImage(img.id); }}
-                                  className="bg-red-500/90 hover:bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors"
+                                  className="bg-red-500/90 hover:bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
                                 >
                                   <Trash2 size={12} /> Remove
                                 </button>
