@@ -54,9 +54,11 @@ const BottomNav = () => {
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
               <span className="text-sm font-bold text-dark">More</span>
               <div className="flex items-center gap-1">
+                {/*
                 <button onClick={toggleTheme} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                   {isDark ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
+                */}
                 <button onClick={toggleLayout} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                   {layout === 'sidebar' ? <PanelTop size={18} /> : <PanelLeft size={18} />}
                 </button>

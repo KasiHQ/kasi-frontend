@@ -9,6 +9,7 @@ import { LayoutProvider } from './context/LayoutContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Login from './modules/Auth/pages/Login';
 import Signup from './modules/Auth/pages/Signup';
+import ForgotPassword from './modules/Auth/pages/ForgotPassword';
 
 import CreateInvoice from './modules/Invoices/pages/CreateInvoice';
 import Invoices from './modules/Invoices/pages/Invoices';
@@ -48,6 +49,7 @@ function App() {
           <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/onboarding" element={
             <ProtectedRoute>
               <OnboardingWizard />

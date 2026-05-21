@@ -134,6 +134,7 @@ const Sidebar = ({ onWidthChange }) => {
 
         {/* Utility Row */}
         <div className={clsx('flex gap-1 pt-1', collapsed ? 'flex-col items-center' : 'items-center')}>
+          {/*
           <button
             onClick={toggleTheme}
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -141,6 +142,7 @@ const Sidebar = ({ onWidthChange }) => {
           >
             {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
+          */}
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}

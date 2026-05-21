@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2 } from 'lucide-react';
+import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2, Grid, List, Search } from 'lucide-react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
@@ -16,6 +16,11 @@ const Products = () => {
   
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Filter/search/view states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterTab, setFilterTab] = useState('All'); // All | In Stock | Out of Stock | Hidden
+  const [viewMode, setViewMode] = useState('Grid'); // Grid | List
   
   // Modal states
   const [showModal, setShowModal] = useState(false);
@@ -247,6 +252,23 @@ const Products = () => {
   const handleDragOver = (e) => {
     e.preventDefault();
   };
+
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (product.brand && product.brand.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                          (product.category && product.category.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    let matchesTab = true;
+    if (filterTab === 'In Stock') {
+      matchesTab = product.in_stock && (product.stock_quantity === null || product.stock_quantity > 0);
+    } else if (filterTab === 'Out of Stock') {
+      matchesTab = !product.in_stock || (product.stock_quantity !== null && product.stock_quantity <= 0);
+    } else if (filterTab === 'Hidden') {
+      matchesTab = !product.in_stock;
+    }
+    
+    return matchesSearch && matchesTab;
+  });
 
   return (
     <div>

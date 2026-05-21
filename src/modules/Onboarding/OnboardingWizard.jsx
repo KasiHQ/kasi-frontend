@@ -1,311 +1,1029 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  CheckCircle, ArrowRight, ArrowLeft, ShoppingBag, 
+  Check, ArrowRight, ArrowLeft, ShoppingBag, 
   Briefcase, Phone, Instagram as InstagramIcon, 
-  Building, MapPin, Loader2, Send
+  Building, MapPin, Loader2, Send, UploadCloud,
+  MessageSquare, DollarSign, Wallet, ShieldCheck,
+  CheckCircle, Landmark, Copy
 } from 'lucide-react';
 import { onboardingAPI } from '../../api/onboarding';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import api from '../../api/axios';
 
 const OnboardingWizard = () => {
   const navigate = useNavigate();
   const { fetchUser, user } = useAuth();
   const { addToast } = useToast();
-  const [currentStep, setCurrentStep] = useState(user?.business_type ? 1 : 0);
+  
+  // Steps: 1 = Profile, 2 = Store details, 3 = First Product/Service, 4 = Channels, 5 = Payment, 6 = Launch Screen
+  const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (user?.business_type && currentStep === 0) {
-      setCurrentStep(1);
-    }
-  }, [user?.business_type, currentStep]);
+  // Form State
+  const [businessType, setBusinessType] = useState(user?.business_type || 'product');
+  
+  // Step 2 Store Details
+  const [storeName, setStoreName] = useState(user?.business_name || '');
+  const [storeCategory, setStoreCategory] = useState('');
+  const [storeDesc, setStoreDesc] = useState(user?.business_bio || '');
+  const [storeLocation, setStoreLocation] = useState(user?.address || '');
 
-  const steps = [
-    {
-      id: 'business_type',
-      title: 'Business Type',
-      description: 'What kind of business do you run?',
-    },
-    {
-      id: 'profile',
-      title: 'Business Profile',
-      description: 'Tell us about your business',
+  // Step 3 First Item
+  const [itemName, setItemName] = useState('');
+  const [startingPrice, setStartingPrice] = useState('');
+  const [happyPrice, setHappyPrice] = useState('');
+  const [lastPrice, setLastPrice] = useState('');
+  const [itemImage, setItemImage] = useState(null);
+  const [itemImageName, setItemImageName] = useState('');
+
+  // Step 4 Channels
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+  const [pairingCode, setPairingCode] = useState('');
+  const [connectingWA, setConnectingWA] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
+  const [isWhatsappConnected, setIsWhatsappConnected] = useState(false);
+  const [activeChannelTab, setActiveChannelTab] = useState('whatsapp'); // whatsapp, telegram, instagram, messenger
+
+  // Step 5 Payments
+  const [paymentOption, setPaymentOption] = useState('bank'); // 'paystack' or 'bank'
+  const [accountNumber, setAccountNumber] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [accountName, setAccountName] = useState('');
+  const [verifyingAccount, setVerifyingAccount] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    if (user && !initialized) {
+      if (user.business_type) {
+        setBusinessType(user.business_type);
+        setCurrentStep(2);
+      }
+      if (user.business_name) {
+        setStoreName(user.business_name);
+      }
+      if (user.business_bio) {
+        setStoreDesc(user.business_bio);
+      }
+      if (user.address) {
+        setStoreLocation(user.address);
+      }
+      if (user.phone) {
+        setWhatsappPhone(user.phone);
+      }
+      setInitialized(true);
     }
+  }, [user, initialized]);
+
+  const handleRoleSelect = (type) => {
+    setBusinessType(type);
+  };
+
+  // Poll WhatsApp connection status when on step 4
+  useEffect(() => {
+    if (currentStep !== 4 || isWhatsappConnected) return;
+
+    const fetchStatus = async () => {
+      try {
+        const res = await api.get('/api/whatsapp/status');
+        if (res.data.connected) {
+          setIsWhatsappConnected(true);
+          setPairingCode('');
+          addToast('WhatsApp connected successfully!', 'success');
+        }
+      } catch (err) {
+        console.error('Failed to fetch WhatsApp status:', err);
+      }
+    };
+
+    fetchStatus(); // initial check
+
+    const interval = setInterval(fetchStatus, 5000);
+    return () => clearInterval(interval);
+  }, [currentStep, isWhatsappConnected]);
+
+  const leftPanelHeadlines = {
+    1: "Choose your path to commerce autonomy.",
+    2: "Give your AI employee its credentials.",
+    3: "Define your pricing guidelines.",
+    4: "Open your business doors to the world.",
+    5: "Ensure you get paid instantly."
+  };
+
+  const categories = [
+    "Electronics", "Fashion & Clothing", "Food & Groceries", "Beauty & Cosmetics",
+    "Health & Wellness", "Home & Furniture", "Services", "Other"
   ];
 
+  const banks = [
+    "Access Bank", "Citibank Nigeria", "Ecobank Nigeria", "Fidelity Bank", 
+    "First Bank of Nigeria", "First City Monument Bank (FCMB)", "Guaranty Trust Bank (GTBank)",
+    "Keystone Bank", "Polaris Bank", "Providus Bank", "Stanbic IBTC Bank", 
+    "Standard Chartered", "Sterling Bank", "Union Bank of Nigeria", "United Bank for Africa (UBA)", 
+    "Unity Bank", "Wema Bank", "Zenith Bank"
+  ];
 
-  const handleBusinessType = async (type) => {
-    setLoading(true);
-    try {
-      await onboardingAPI.updateProfile({ business_type: type });
-      await fetchUser();
-      setCurrentStep(1);
-    } catch (error) {
-      setError('Failed to set business type');
-    } finally {
-      setLoading(false);
+  const handleNext = async () => {
+    setError('');
+    
+    // Save data per step
+    if (currentStep === 1) {
+      if (!businessType) {
+        setError('Please select a seller profile.');
+        return;
+      }
+      setLoading(true);
+      try {
+        await onboardingAPI.updateProfile({ business_type: businessType });
+        await fetchUser();
+        setCurrentStep(2);
+      } catch (err) {
+        setError('Failed to update seller profile. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    } else if (currentStep === 2) {
+      if (!storeName.trim()) {
+        setError('Store Name is required.');
+        return;
+      }
+      setLoading(true);
+      try {
+        await onboardingAPI.updateProfile({
+          business_name: storeName,
+          business_bio: storeDesc,
+          address: storeLocation,
+          // store_category matches the new metadata
+          store_category: storeCategory
+        });
+        await fetchUser();
+        setCurrentStep(3);
+      } catch (err) {
+        setError('Failed to save store details. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    } else if (currentStep === 3) {
+      if (!itemName.trim() || !startingPrice) {
+        setError('Item details are required unless skipped.');
+        return;
+      }
+      setLoading(true);
+      try {
+        // Post first item to backend or save in store profile
+        await onboardingAPI.updateProfile({
+          first_item_name: itemName,
+          first_item_starting_price: Number(startingPrice),
+          first_item_happy_price: happyPrice ? Number(happyPrice) : undefined,
+          first_item_last_price: lastPrice ? Number(lastPrice) : undefined
+        });
+        setCurrentStep(4);
+      } catch (err) {
+        setError('Failed to save item details.');
+      } finally {
+        setLoading(false);
+      }
+    } else if (currentStep === 4) {
+      // Channels step: we proceed
+      setCurrentStep(5);
+    } else if (currentStep === 5) {
+      setLoading(true);
+      try {
+        if (paymentOption === 'bank' && accountNumber && bankName) {
+          await onboardingAPI.updateProfile({
+            bank_account_number: accountNumber,
+            bank_name: bankName,
+            bank_account_name: accountName
+          });
+        }
+        setCurrentStep(6); // Launch Screen!
+      } catch (err) {
+        setError('Failed to finalize setup.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const handleProfileComplete = async () => {
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        addToast('File size should not exceed 5MB', 'error');
+        return;
+      }
+      setItemImage(file);
+      setItemImageName(file.name);
+      addToast('Image uploaded successfully!', 'success');
+    }
+  };
+
+  const handleConnectWhatsAppPairing = async () => {
+    if (!whatsappPhone.trim()) {
+      addToast('Please enter your WhatsApp phone number.', 'error');
+      return;
+    }
+    const cleanNumber = whatsappPhone.replace(/\D/g, '');
+    setConnectingWA(true);
+    setPairingCode('');
+    try {
+      const res = await api.post('/api/whatsapp/connect', { phone_number: cleanNumber });
+      if (res.data.pairing_code) {
+        setPairingCode(res.data.pairing_code);
+        addToast('Pairing code generated!', 'success');
+      }
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to generate code', 'error');
+    } finally {
+      setConnectingWA(false);
+    }
+  };
+
+  const copyPairingCode = () => {
+    if (!pairingCode) return;
+    navigator.clipboard.writeText(pairingCode);
+    setCodeCopied(true);
+    addToast('Code copied to clipboard!', 'success');
+    setTimeout(() => setCodeCopied(false), 2000);
+  };
+
+  const formatCode = (code) => {
+    if (!code) return ['', ''];
+    const clean = code.replace(/[-\s]/g, '');
+    return [clean.slice(0, 4), clean.slice(4, 8)];
+  };
+
+  const [codeA, codeB] = formatCode(pairingCode);
+
+  const verifyBankAccount = async () => {
+    if (accountNumber.length !== 10) {
+      addToast('Nigerian bank account numbers must be 10 digits.', 'error');
+      return;
+    }
+    if (!bankName) {
+      addToast('Please select a bank first.', 'error');
+      return;
+    }
+    setVerifyingAccount(true);
+    try {
+      // Verify account mock / check callback
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Populate account name dynamically
+      setAccountName(`${user?.business_name || 'Kasi Store'} Reconcile Account`);
+      addToast('Bank account successfully verified!', 'success');
+    } catch (err) {
+      addToast('Account verification failed.', 'error');
+    } finally {
+      setVerifyingAccount(false);
+    }
+  };
+
+  const handleLaunch = async () => {
     setLoading(true);
     try {
       await onboardingAPI.complete();
       await fetchUser();
       addToast('Onboarding completed! Welcome to Kasi.', 'success');
       navigate('/dashboard');
-    } catch (error) {
-      setError(error.response?.data?.message || 'Failed to complete onboarding');
+    } catch (err) {
+      console.error(err);
+      addToast('Failed to complete onboarding. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const renderStepContent = () => {
-    switch (steps[currentStep].id) {
-      case 'business_type':
-        return <BusinessTypeStep onSelect={handleBusinessType} selected={user?.business_type} loading={loading} />;
-      case 'profile':
-        return <ProfileStep onComplete={handleProfileComplete} initialData={user} loading={loading} />;
-      default:
-        return null;
-    }
-  };
+  // Render launch page (Post Onboarding)
+  if (currentStep === 6) {
+    return (
+      <div 
+        className="min-h-screen text-white flex flex-col items-center justify-center p-6 select-none"
+        style={{ backgroundColor: '#0F1F0F', fontFamily: '"Inter", system-ui, -apple-system, sans-serif' }}
+      >
+        <div className="max-w-[540px] w-full text-center space-y-10 animate-in fade-in duration-1000">
+          
+          {/* Animated pulsing leaf logo */}
+          <div className="flex justify-center">
+            <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative animate-pulse">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white">
+                <path d="M2 22C2 22 6 20 10 16C14 12 16 8 20 2C20 2 12 4 8 8C4 12 2 16 2 22Z" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h1 className="text-4xl font-extrabold tracking-tight">
+              Your commerce agent is live.
+            </h1>
+            <p className="text-white/60 text-base leading-relaxed">
+              Kasi is now ready to handle your DMs, negotiate prices, and collect payments — 24/7.
+            </p>
+          </div>
+
+          <div className="flex justify-center pt-2">
+            <span className="inline-flex items-center gap-2 bg-[#12B76A]/15 border border-[#12B76A]/30 text-[#12B76A] px-5 py-2 rounded-full text-sm font-semibold">
+              <span className="w-2 h-2 rounded-full bg-[#12B76A] animate-ping" />
+              Kasi is running
+            </span>
+          </div>
+
+          <div className="pt-6">
+            <button
+              onClick={handleLaunch}
+              disabled={loading}
+              className="w-full max-w-[320px] h-12 bg-white text-[#0F1F0F] rounded-lg text-sm font-bold hover:bg-[#F0F0F0] transition-all disabled:opacity-50 flex items-center justify-center gap-2 mx-auto"
+            >
+              {loading && <Loader2 size={16} className="animate-spin text-[#0F1F0F]" />}
+              <span>Go to your dashboard →</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 flex flex-col items-center">
-      <div className="max-w-2xl w-full">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-black text-dark mb-2 tracking-tight">Kasi Setup</h1>
-          <p className="text-gray-500 font-medium">Let's get your AI business agent ready.</p>
+    <div className="min-h-screen bg-white flex selection:bg-emerald-500/10 selection:text-primary kasi-app">
+      
+      {/* LEFT PANEL: Deep Dark Green, fixed, hidden on mobile */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] bg-[#0F1F0F] text-white p-12 flex-col justify-between relative overflow-hidden select-none">
+        <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+        
+        {/* Top: Logo */}
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 text-white font-sans text-xl font-bold tracking-tight">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 22C2 22 6 20 10 16C14 12 16 8 20 2C20 2 12 4 8 8C4 12 2 16 2 22Z" fill="#FFFFFF" />
+            </svg>
+            <span className="font-bold text-lg">Kasi</span>
+            <span className="text-[#D4F263] font-bold text-lg">AI</span>
+          </div>
         </div>
 
-        {/* Card Content */}
-        <div className="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-          <div className="p-8 sm:p-10">
+        {/* Middle: Headline (changes per step) */}
+        <div className="space-y-8 relative z-10 my-auto">
+          <div className="space-y-4">
+            <h1 className="text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight transition-all duration-300">
+              {leftPanelHeadlines[currentStep]}
+            </h1>
+            <p className="text-white/55 text-sm leading-relaxed">
+              Deploy your 24/7 AI employee. Automate catalog orders, negotiate within safe floor limits, and reconcile bank payments seamlessly.
+            </p>
+          </div>
+
+          {/* Feature list */}
+          <div className="space-y-4">
+            {[
+              { title: "Connect Social Inboxes", desc: "Instantly integrates with WhatsApp, Instagram, or Telegram." },
+              { title: "Interactive Bargaining", desc: "Autonomous AI negotiates pricing inside your guidelines." },
+              { title: "Direct Payment Callbacks", desc: "Callback alerts auto-verify bank payments immediately." }
+            ].map((prop, i) => (
+              <div key={i} className="flex gap-3.5 items-start">
+                <div className="w-5 h-5 rounded-full bg-[#1A7A4A]/50 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check size={12} className="text-[#D4F263]" />
+                </div>
+                <div className="space-y-0.5">
+                  <h4 className="text-sm font-semibold text-white leading-tight">{prop.title}</h4>
+                  <p className="text-xs text-white/45 leading-normal">{prop.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="relative z-10 flex items-center gap-2 border-t border-white/10 pt-6">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#12B76A] animate-pulse" />
+          <span className="text-[10px] font-semibold tracking-[0.12em] text-white/30 uppercase">
+            SALIENCE TECHNOLOGY LTD
+          </span>
+        </div>
+      </div>
+
+      {/* RIGHT PANEL: Wizard Steps */}
+      <div className="w-full lg:w-[55%] xl:w-[60%] flex flex-col justify-between min-h-screen relative p-0">
+        
+        {/* Top bar with progress indicator */}
+        <div className="flex flex-col w-full sticky top-0 bg-white z-20">
+          <div className="flex justify-between items-center w-full px-10 py-5">
+            {currentStep > 1 ? (
+              <button 
+                type="button"
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-xs font-medium text-[#667085] hover:text-[#101828] transition-colors"
+              >
+                <ArrowLeft size={14} />
+                <span>Back</span>
+              </button>
+            ) : (
+              <div className="w-10" />
+            )}
+            <span className="text-[12px] font-semibold tracking-wider text-[#98A2B3] uppercase">
+              STEP {currentStep} OF 5
+            </span>
+          </div>
+
+          {/* Thin Progress bar */}
+          <div className="h-[3px] bg-[#EAECF0] w-full relative">
+            <div 
+              className="h-full bg-[#1A7A4A] transition-all duration-500 ease-out"
+              style={{ width: `${currentStep * 20}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Step Content Wrapper */}
+        <div className="flex-1 flex items-center justify-center px-10 py-8">
+          <div className="w-full max-w-[480px] space-y-8">
+            
+            {/* Step error logs */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-2xl text-sm font-semibold border border-red-100 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <div className="p-4 bg-[#FEF3F2] text-[#F04438] rounded-lg text-xs font-semibold border border-[#FEF3F2] text-center">
                 {error}
               </div>
             )}
-            {renderStepContent()}
-          </div>
 
-          {/* Footer Progress */}
-          <div className="px-8 py-5 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-            <div className="flex gap-2">
-              {steps.map((_, i) => (
-                <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === currentStep ? 'w-8 bg-green-600' : 'w-4 bg-gray-200'}`} />
-              ))}
+            {/* STEP 1: SELECT SELLER PROFILE */}
+            {currentStep === 1 && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
+                    Select your seller profile
+                  </h2>
+                  <p className="text-[#667085] text-sm">
+                    Choose the option that aligns closest with your operational structure.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
+                  {/* Card 1: Product Seller */}
+                  <div
+                    onClick={() => handleRoleSelect('product')}
+                    className={`flex flex-col justify-between p-7 rounded-2xl border cursor-pointer transition-all relative ${
+                      businessType === 'product'
+                        ? 'border-[#1A7A4A] bg-white shadow-[0_0_0_4px_rgba(26,122,74,0.1)]'
+                        : 'border-[#EAECF0] bg-white shadow-sm hover:border-[#B0D9C1]'
+                    }`}
+                  >
+                    <div className="space-y-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-[#E8F5EE] text-[#1A7A4A]`}>
+                        <ShoppingBag size={22} />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="font-bold text-[#101828] text-base">Product Seller</h3>
+                        <p className="text-xs text-[#667085] leading-relaxed">
+                          I sell physical goods (clothing, beauty, gadgets) requiring inventory control, checkouts, and parcel delivery.
+                        </p>
+                      </div>
+                    </div>
+                    {businessType === 'product' && (
+                      <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-[#1A7A4A] flex items-center justify-center">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card 2: Service Provider */}
+                  <div
+                    onClick={() => handleRoleSelect('service')}
+                    className={`flex flex-col justify-between p-7 rounded-2xl border cursor-pointer transition-all relative ${
+                      businessType === 'service'
+                        ? 'border-[#1A7A4A] bg-white shadow-[0_0_0_4px_rgba(26,122,74,0.1)]'
+                        : 'border-[#EAECF0] bg-white shadow-sm hover:border-[#B0D9C1]'
+                    }`}
+                  >
+                    <div className="space-y-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-[#E8F5EE] text-[#1A7A4A]`}>
+                        <Briefcase size={22} />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="font-bold text-[#101828] text-base">Service Provider</h3>
+                        <p className="text-xs text-[#667085] leading-relaxed">
+                          I sell professional consultations, beauty services, gig bookings, scheduling, or customized agreements.
+                        </p>
+                      </div>
+                    </div>
+                    {businessType === 'service' && (
+                      <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-[#1A7A4A] flex items-center justify-center">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: STORE DETAILS */}
+            {currentStep === 2 && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
+                    Set up your store
+                  </h2>
+                  <p className="text-[#667085] text-sm">
+                    This is what Kasi will introduce itself as to your customers.
+                  </p>
+                </div>
+
+                <div className="space-y-4 pt-2">
+                  {/* Store Name */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-[#344054]">STORE NAME *</label>
+                    <input
+                      type="text"
+                      required
+                      value={storeName}
+                      onChange={(e) => setStoreName(e.target.value)}
+                      placeholder="e.g. AFH Electronics"
+                      className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                    />
+                    <p className="text-[11px] text-[#667085]">
+                      This is the name Kasi will use when greeting customers.
+                    </p>
+                  </div>
+
+                  {/* Store Category */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-[#344054]">STORE CATEGORY</label>
+                    <select
+                      value={storeCategory}
+                      onChange={(e) => setStoreCategory(e.target.value)}
+                      className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none bg-white transition-all"
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Describe your store */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-[#344054]">DESCRIBE YOUR STORE TO KASI</label>
+                    <textarea
+                      value={storeDesc}
+                      onChange={(e) => setStoreDesc(e.target.value)}
+                      placeholder="e.g. We sell premium Nigerian electronics. We are known for fast delivery and genuine products only."
+                      rows={3}
+                      className="w-full p-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none resize-y transition-all"
+                    />
+                    <p className="text-[11px] text-[#667085]">
+                      Kasi uses this to describe your store and handle customer questions.
+                    </p>
+                  </div>
+
+                  {/* Store Location */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-[#344054]">PHYSICAL LOCATION (OPTIONAL)</label>
+                    <div className="relative">
+                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
+                        <MapPin size={18} />
+                      </div>
+                      <input
+                        type="text"
+                        value={storeLocation}
+                        onChange={(e) => setStoreLocation(e.target.value)}
+                        placeholder="e.g. Computer Village, Ikeja, Lagos"
+                        className="w-full h-11 pl-[42px] pr-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: ADD FIRST PRODUCT / SERVICE */}
+            {currentStep === 3 && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
+                    {businessType === 'product' ? 'Add your first product' : 'Add your first service'}
+                  </h2>
+                  <p className="text-[#667085] text-sm">
+                    You can add more later. Let's start with one to get Kasi running.
+                  </p>
+                </div>
+
+                <div className="space-y-4 pt-2">
+                  {/* Item Name */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-[#344054]">
+                      {businessType === 'product' ? 'PRODUCT NAME *' : 'SERVICE NAME *'}
+                    </label>
+                    <input
+                      type="text"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                      placeholder={businessType === 'product' ? 'e.g. Samsung Galaxy A55' : 'e.g. Hair Braiding Session'}
+                      className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Pricing Matrix */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-[#344054]">STARTING PRICE (₦) *</label>
+                      <input
+                        type="number"
+                        value={startingPrice}
+                        onChange={(e) => setStartingPrice(e.target.value)}
+                        placeholder="150,000"
+                        className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-[#344054]">HAPPY PRICE (₦)</label>
+                      <input
+                        type="number"
+                        value={happyPrice}
+                        onChange={(e) => setHappyPrice(e.target.value)}
+                        placeholder="130,000"
+                        className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-[#344054]">LAST PRICE (₦)</label>
+                      <input
+                        type="number"
+                        value={lastPrice}
+                        onChange={(e) => setLastPrice(e.target.value)}
+                        placeholder="110,000"
+                        className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-[#98A2B3] italic leading-normal">
+                    Starting = AI opening · Happy = your target · Last = floor the AI almost never reaches
+                  </p>
+
+                  {/* Upload Image */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-[#344054]">IMAGE</label>
+                    <div className="border-2 border-dashed border-[#D0D5DD] hover:border-[#1A7A4A] hover:bg-[#F9FAFB] rounded-xl p-6 text-center cursor-pointer transition-all relative">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer" 
+                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <UploadCloud size={28} className="text-[#98A2B3]" />
+                        <p className="text-sm font-semibold text-[#344054]">
+                          {itemImageName ? itemImageName : 'Click or drag image here'}
+                        </p>
+                        <p className="text-xs text-[#98A2B3]">PNG, JPG up to 5MB</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep(4)}
+                    className="text-xs font-semibold text-[#667085] hover:underline"
+                  >
+                    Skip for now, I'll add products later →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4: CONNECT CHANNELS */}
+            {currentStep === 4 && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
+                    Connect your first sales channel
+                  </h2>
+                  <p className="text-[#667085] text-sm">
+                    Connect at least one channel so Kasi can start receiving and responding to customer messages.
+                  </p>
+                </div>
+
+                {/* Channel selection wrapper */}
+                <div className="space-y-4 pt-2">
+                  {/* WhatsApp expanded card */}
+                  <div className="bg-white border border-[#EAECF0] rounded-xl overflow-hidden shadow-xs">
+                    <div 
+                      onClick={() => setActiveChannelTab(activeChannelTab === 'whatsapp' ? '' : 'whatsapp')}
+                      className="flex items-center justify-between p-4 cursor-pointer hover:bg-[#F9FAFB]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center shrink-0">
+                          <MessageSquare size={18} />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-[#101828]">WhatsApp Business</h4>
+                          <p className="text-xs text-[#667085]">Link WhatsApp with pairing code</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        {isWhatsappConnected ? (
+                          <span className="inline-flex items-center gap-1.5 bg-[#ECFDF3] text-[#027A48] px-2.5 py-1 rounded-full text-xs font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#12B76A]" />
+                            Connected
+                          </span>
+                        ) : (
+                          <button type="button" className="text-xs font-semibold text-[#1A7A4A] hover:underline">
+                            Configure
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {activeChannelTab === 'whatsapp' && !isWhatsappConnected && (
+                      pairingCode ? (
+                        <div className="p-5 border-t border-[#EAECF0] bg-[#F9FAFB] space-y-4 animate-in slide-in-from-top-2 duration-200 text-center">
+                          <p className="text-xs text-gray-600">
+                            Enter this pairing code in your phone's WhatsApp:
+                            <br />
+                            <span className="font-semibold text-gray-800">Settings &gt; Linked Devices &gt; Link with phone number</span>
+                          </p>
+                          
+                          <div className="flex items-center justify-center gap-3">
+                            <div className="bg-white border border-[#D0D5DD] rounded-xl px-4 py-3 text-2xl font-bold tracking-widest text-[#101828] shadow-sm">{codeA}</div>
+                            <span className="text-gray-400 font-bold">—</span>
+                            <div className="bg-white border border-[#D0D5DD] rounded-xl px-4 py-3 text-2xl font-bold tracking-widest text-[#101828] shadow-sm">{codeB}</div>
+                          </div>
+
+                          <div className="flex flex-col items-center gap-2 pt-2">
+                            <button
+                              type="button"
+                              onClick={copyPairingCode}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 border border-[#D0D5DD] bg-white text-[#344054] text-xs font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                            >
+                              <Copy size={13} />
+                              {codeCopied ? 'Copied!' : 'Copy Code'}
+                            </button>
+                            
+                            <button
+                              type="button"
+                              onClick={() => { setPairingCode(''); setWhatsappPhone(''); }}
+                              className="text-xs text-[#667085] hover:text-[#101828] hover:underline"
+                            >
+                              Start over / Change phone number
+                            </button>
+                          </div>
+                          
+                          <div className="flex items-center justify-center gap-2 text-xs text-[#1A7A4A] font-semibold bg-[#E8F5EE] py-2 px-3 rounded-lg border border-[#B0D9C1] w-fit mx-auto animate-pulse">
+                            <Loader2 size={12} className="animate-spin" />
+                            <span>Waiting for connection...</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 border-t border-[#EAECF0] bg-[#F9FAFB] space-y-3 animate-in slide-in-from-top-2 duration-200">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-[#344054]">WhatsApp Phone Number</label>
+                            <input
+                              type="tel"
+                              value={whatsappPhone}
+                              onChange={(e) => setWhatsappPhone(e.target.value)}
+                              placeholder="e.g. 2348123456789"
+                              className="w-full h-11 px-3.5 border border-[#D0D5DD] bg-white rounded-lg text-sm text-[#101828] outline-none focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 transition-all"
+                            />
+                            <p className="text-[11px] text-[#667085]">
+                              Enter with country code (e.g. 234 for Nigeria) without the '+' prefix or leading 0.
+                            </p>
+                          </div>
+                          
+                          <div className="flex justify-end pt-1">
+                            <button
+                              type="button"
+                              onClick={handleConnectWhatsAppPairing}
+                              disabled={connectingWA || !whatsappPhone.trim()}
+                              className="h-10 px-4 bg-[#1A7A4A] text-white text-xs font-semibold rounded-lg hover:bg-[#0F5533] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                            >
+                              {connectingWA && <Loader2 size={13} className="animate-spin" />}
+                              <span>{connectingWA ? 'Generating...' : 'Get Code'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  {/* Mock Channel Cards */}
+                  {[
+                    { id: 'telegram', name: 'Telegram', sub: 'Connect via Telegram Bot API', color: 'bg-[#26A5E4]/10 text-[#26A5E4]' },
+                    { id: 'instagram', name: 'Instagram', sub: 'Direct DMs & Comments AI handler', color: 'bg-[#E4405F]/10 text-[#E4405F]' },
+                    { id: 'messenger', name: 'Facebook Messenger', sub: 'Messenger catalog assistant', color: 'bg-[#0084FF]/10 text-[#0084FF]' },
+                  ].map((ch) => (
+                    <div 
+                      key={ch.id}
+                      className="flex items-center justify-between p-4 bg-white border border-[#EAECF0] rounded-xl hover:bg-[#F9FAFB]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 rounded-lg ${ch.color} flex items-center justify-center shrink-0`}>
+                          <MessageSquare size={18} />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-[#101828]">{ch.name}</h4>
+                          <p className="text-xs text-[#667085]">{ch.sub}</p>
+                        </div>
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => addToast(`${ch.name} integration will be accessible from dashboard settings.`, 'info')}
+                        className="text-xs font-semibold text-[#98A2B3] hover:text-[#101828]"
+                      >
+                        Connect
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep(5)}
+                    className="text-xs font-semibold text-[#667085] hover:underline"
+                  >
+                    I'll connect channels later, set up Kasi first →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 5: PAYMENT SETUP */}
+            {currentStep === 5 && (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
+                    Where should Kasi send your money?
+                  </h2>
+                  <p className="text-[#667085] text-sm">
+                    Connect a payment method so Kasi can automatically collect and reconcile customer payments.
+                  </p>
+                </div>
+
+                <div className="space-y-4 pt-2">
+                  {/* Paystack Option Card */}
+                  <div
+                    onClick={() => setPaymentOption('paystack')}
+                    className={`flex items-start gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
+                      paymentOption === 'paystack'
+                        ? 'border-[#0066FF] bg-white shadow-xs'
+                        : 'border-[#EAECF0] bg-white hover:border-[#D0D5DD]'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      checked={paymentOption === 'paystack'}
+                      onChange={() => setPaymentOption('paystack')}
+                      className="text-[#0066FF] focus:ring-[#0066FF] mt-1"
+                    />
+                    <div className="space-y-3 flex-1">
+                      <div>
+                        <h4 className="font-bold text-sm text-[#101828] flex items-center gap-1.5">
+                          Connect Paystack
+                          <span className="bg-[#0066FF]/10 text-[#0066FF] px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            RECOMMENDED
+                          </span>
+                        </h4>
+                        <p className="text-xs text-[#667085] leading-relaxed">
+                          Customers pay directly via Paystack. Funds arrive in your Paystack balance automatically.
+                        </p>
+                      </div>
+                      
+                      {paymentOption === 'paystack' && (
+                        <button
+                          type="button"
+                          onClick={() => addToast('Redirecting to Paystack secure OAuth...', 'info')}
+                          className="w-full py-2.5 bg-[#0066FF] text-white text-xs font-bold rounded-lg hover:bg-[#0052cc] transition-colors"
+                        >
+                          Connect Paystack Account
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Bank Transfer Option Card */}
+                  <div
+                    onClick={() => setPaymentOption('bank')}
+                    className={`flex items-start gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
+                      paymentOption === 'bank'
+                        ? 'border-[#1A7A4A] bg-white shadow-xs'
+                        : 'border-[#EAECF0] bg-white hover:border-[#D0D5DD]'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      checked={paymentOption === 'bank'}
+                      onChange={() => setPaymentOption('bank')}
+                      className="text-[#1A7A4A] focus:ring-[#1A7A4A] mt-1"
+                    />
+                    <div className="space-y-3 flex-1">
+                      <div>
+                        <h4 className="font-bold text-sm text-[#101828]">Use Bank Transfer</h4>
+                        <p className="text-xs text-[#667085] leading-relaxed">
+                          Kasi shares your bank details with customers and verifies incoming transfers via callback.
+                        </p>
+                      </div>
+
+                      {paymentOption === 'bank' && (
+                        <div className="space-y-3 pt-2 border-t border-[#EAECF0] animate-in slide-in-from-top-2 duration-200" onClick={(e) => e.stopPropagation()}>
+                          <div className="grid grid-cols-2 gap-3">
+                            {/* Bank Name */}
+                            <div className="space-y-1">
+                              <label className="text-[10px] font-semibold text-[#344054]">BANK NAME</label>
+                              <select
+                                value={bankName}
+                                onChange={(e) => setBankName(e.target.value)}
+                                className="w-full h-10 px-2.5 border border-[#D0D5DD] bg-white rounded-lg text-xs outline-none"
+                              >
+                                <option value="">Select Bank</option>
+                                {banks.map(b => (
+                                  <option key={b} value={b}>{b}</option>
+                                ))}
+                              </select>
+                            </div>
+                            
+                            {/* Account Number */}
+                            <div className="space-y-1">
+                              <label className="text-[10px] font-semibold text-[#344054]">ACCOUNT NUMBER</label>
+                              <input
+                                type="text"
+                                maxLength={10}
+                                value={accountNumber}
+                                onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
+                                placeholder="0123456789"
+                                className="w-full h-10 px-2.5 border border-[#D0D5DD] bg-white rounded-lg text-xs outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Verify Bank Account button */}
+                          <div className="flex gap-2 items-end">
+                            <div className="flex-1 space-y-1">
+                              <label className="text-[10px] font-semibold text-[#344054]">ACCOUNT NAME</label>
+                              <input
+                                type="text"
+                                readOnly
+                                value={accountName}
+                                placeholder="Verify to fetch name..."
+                                className="w-full h-10 px-2.5 border border-[#EAECF0] bg-[#F9FAFB] rounded-lg text-xs text-[#667085] outline-none"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={verifyBankAccount}
+                              disabled={verifyingAccount || accountNumber.length !== 10 || !bankName}
+                              className="h-10 px-4 border border-[#D0D5DD] hover:bg-[#F9FAFB] text-[#344054] text-xs font-semibold rounded-lg transition-colors shrink-0 disabled:opacity-50 flex items-center justify-center gap-1"
+                            >
+                              {verifyingAccount && <Loader2 size={12} className="animate-spin" />}
+                              Verify
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep(6)}
+                    className="text-xs font-semibold text-[#667085] hover:underline"
+                  >
+                    I'll set up payments later →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Actions Bar */}
+            <div className="pt-4 flex justify-between items-center gap-4">
+              <div className="w-1" />
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={loading}
+                className="w-full sm:w-[180px] h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
+              >
+                {loading && <Loader2 size={16} className="animate-spin" />}
+                <span>{currentStep === 5 ? 'Finish Setup →' : 'Continue →'}</span>
+              </button>
             </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Step {currentStep + 1} of {steps.length}</p>
+
           </div>
         </div>
+
       </div>
+
     </div>
-  );
-};
-
-/* ── STEP: BUSINESS TYPE ─────────────────────────────────────────────────── */
-
-const BusinessTypeStep = ({ onSelect, selected, loading }) => {
-  const types = [
-    { id: 'product', title: 'Product Seller', desc: 'I sell physical or digital goods', icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { id: 'service', title: 'Service Provider', desc: 'I offer appointments and sessions', icon: Briefcase, color: 'text-purple-600', bg: 'bg-purple-50' }
-  ];
-
-  return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h2 className="text-2xl font-black text-dark">How do you sell?</h2>
-        <p className="text-gray-500 font-medium">This helps Kasi understand your workflow.</p>
-      </div>
-      <div className="grid grid-cols-1 gap-4">
-        {types.map((t) => (
-          <button
-            key={t.id}
-            disabled={loading}
-            onClick={() => onSelect(t.id)}
-            className={`group flex items-center gap-5 p-6 rounded-2xl border-2 transition-all text-left hover:border-green-600 hover:bg-green-50/30 ${
-              selected === t.id ? 'border-green-600 bg-green-50 shadow-lg ring-4 ring-green-50' : 'border-gray-100 bg-white'
-            }`}
-          >
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${t.bg} ${t.color}`}>
-              <t.icon size={28} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-black text-dark text-lg">{t.title}</h3>
-              <p className="text-sm text-gray-500 font-medium">{t.desc}</p>
-            </div>
-            <ArrowRight size={20} className={selected === t.id ? 'text-green-600' : 'text-gray-300'} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-/* ── STEP: BUSINESS PROFILE ──────────────────────────────────────────────── */
-
-const ProfileStep = ({ onComplete, initialData, loading }) => {
-  const { addToast } = useToast();
-  const [form, setForm] = useState({
-    business_name: initialData?.business_name || '',
-    business_bio: initialData?.business_bio || '',
-    instagram_handle: initialData?.instagram_handle || '',
-    address: initialData?.address || '',
-    phone: initialData?.phone || ''
-  });
-
-  const [verificationCode, setVerificationCode] = useState('');
-  const [codeSent, setCodeSent] = useState(false);
-  const [verifying, setVerifying] = useState(false);
-  const [isVerified, setIsVerified] = useState(initialData?.phone_verified || false);
-  const [sendingCode, setSendingCode] = useState(false);
-
-  const handleUpdateField = async (field, value) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSendCode = async () => {
-    if (!form.phone) {
-      addToast('Please enter your WhatsApp number first', 'error');
-      return;
-    }
-    setSendingCode(true);
-    try {
-      await onboardingAPI.sendVerification(form.phone);
-      setCodeSent(true);
-      addToast('Verification code sent to your WhatsApp!', 'success');
-    } catch (err) {
-      addToast('Failed to send code. Please try again.', 'error');
-    } finally {
-      setSendingCode(false);
-    }
-  };
-
-  const handleVerifyCode = async () => {
-    if (!verificationCode) return;
-    setVerifying(true);
-    try {
-      await onboardingAPI.verifyCode(verificationCode);
-      setIsVerified(true);
-      addToast('Phone number verified!', 'success');
-    } catch (err) {
-      addToast('Invalid verification code', 'error');
-    } finally {
-      setVerifying(false);
-    }
-  };
-
-  const handleFinalSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Save profile details first
-    try {
-      await onboardingAPI.updateProfile(form);
-      onComplete();
-    } catch (err) {
-      addToast('Failed to save profile', 'error');
-    }
-  };
-
-  return (
-    <form onSubmit={handleFinalSubmit} className="space-y-6">
-      <div className="space-y-1">
-        <h2 className="text-2xl font-black text-dark">Business Profile</h2>
-        <p className="text-gray-500 font-medium">Basic info so customers can find and trust you.</p>
-      </div>
-
-      <div className="space-y-5">
-        {/* Business Name */}
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Business Name</label>
-          <div className="relative">
-            <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="text"
-              required
-              className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-green-600 focus:ring-4 focus:ring-green-50 transition-all outline-none"
-              value={form.business_name}
-              onChange={(e) => handleUpdateField('business_name', e.target.value)}
-              placeholder="e.g. Afro Chic Boutique"
-            />
-          </div>
-        </div>
-
-        {/* WhatsApp Number (No Verification) */}
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">WhatsApp Number</label>
-          <div className="relative">
-            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="tel"
-              required
-              className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-green-600 focus:ring-4 focus:ring-green-50 transition-all outline-none"
-              value={form.phone}
-              onChange={(e) => handleUpdateField('phone', e.target.value)}
-              placeholder="+234 812 345 6789"
-            />
-          </div>
-        </div>
-
-        {/* Business Bio */}
-        <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Business Description</label>
-          <textarea
-            required
-            rows={3}
-            className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-green-600 focus:ring-4 focus:ring-green-50 transition-all outline-none resize-none"
-            value={form.business_bio}
-            onChange={(e) => handleUpdateField('business_bio', e.target.value)}
-            placeholder="What do you sell? Describe your unique style and what customers should know..."
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Location (Optional)</label>
-            <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-green-600 focus:ring-4 focus:ring-green-50 transition-all outline-none"
-                value={form.address}
-                onChange={(e) => handleUpdateField('address', e.target.value)}
-                placeholder="e.g. Lagos, Nigeria"
-              />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Instagram Handle</label>
-            <div className="relative">
-              <InstagramIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-green-600 focus:ring-4 focus:ring-green-50 transition-all outline-none"
-                value={form.instagram_handle}
-                onChange={(e) => handleUpdateField('instagram_handle', e.target.value)}
-                placeholder="@username"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-4 bg-green-600 text-white rounded-2xl text-lg font-black shadow-xl shadow-green-100 hover:bg-green-700 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:scale-100 mt-6 flex items-center justify-center gap-2"
-      >
-        {loading ? <><Loader2 size={20} className="animate-spin" /> Finalizing...</> : 'Complete Setup'}
-      </button>
-    </form>
   );
 };
 

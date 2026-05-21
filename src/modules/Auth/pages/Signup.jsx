@@ -1,53 +1,73 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ShoppingBag, Briefcase, Check, Building2, Mail, Lock, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Check, Mail, Lock, ShieldCheck, Eye, EyeOff, ShoppingBag, Briefcase } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { useToast } from '../../../context/ToastContext';
 
 const Signup = () => {
-  const [step, setStep] = useState('role'); // 'role' or 'form'
+  const [step, setStep] = useState(1); // 1 = Seller Profile, 2 = Credential details
   const [businessType, setBusinessType] = useState(''); // 'product' or 'service'
   const [businessName, setBusinessName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { signup, login } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const handleRoleSelect = (type) => {
     setBusinessType(type);
   };
 
-  const handleNextStep = () => {
-    if (businessType) {
-      setStep('form');
-    }
+  const getPasswordStrength = (pwd) => {
+    if (!pwd) return { score: 0, label: '', color: 'bg-gray-200' };
+    let score = 0;
+    if (pwd.length >= 6) score += 1;
+    if (/[A-Z]/.test(pwd)) score += 1;
+    if (/[0-9]/.test(pwd)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
+    
+    if (score <= 1) return { score: 1, label: 'Weak', color: 'bg-[#F04438]', textClass: 'text-[#F04438]' };
+    if (score === 2) return { score: 2, label: 'Fair', color: 'bg-[#F97316]', textClass: 'text-[#F97316]' };
+    if (score === 3) return { score: 3, label: 'Good', color: 'bg-[#F79009]', textClass: 'text-[#F79009]' };
+    if (score === 4) return { score: 4, label: 'Strong', color: 'bg-[#12B76A]', textClass: 'text-[#12B76A]' };
+    return { score: 1, label: 'Weak', color: 'bg-[#F04438]', textClass: 'text-[#F04438]' };
   };
 
-  const handlePrevStep = () => {
-    setStep('role');
-  };
+  const strength = getPasswordStrength(password);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!businessType) {
-      setError('Please select a business type first');
-      setStep('role');
+      setError('Please select a business profile first');
+      setStep(1);
+      return;
+    }
+    if (!agreeTerms) {
+      setError('You must agree to the Terms of Service and Privacy Policy');
       return;
     }
     setError('');
     setLoading(true);
+
+    const formattedPhone = phone.startsWith('+') ? phone : `+234${phone.replace(/^0+/, '')}`;
+
     try {
-      // 1. Sign up the user with their business type
+      // 1. Signup user
       await signup(businessName, email, password, businessType);
       
-      // 2. Automatically log in after successful signup
+      // 2. Automate login
       await login(email, password);
       
-      // 3. Route straight to dashboard (where they enter Onboarding Step 2 directly!)
-      navigate('/dashboard');
+      addToast('Account created successfully!', 'success');
+      
+      // 3. Route to onboarding
+      navigate('/onboarding');
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -56,289 +76,334 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-bg-main flex selection:bg-emerald-500/10 selection:text-primary">
+    <div className="min-h-screen bg-white flex selection:bg-emerald-500/10 selection:text-primary kasi-app">
       
-      {/* LEFT COLUMN: Brand Emerald backing, hidden on mobile */}
-      <div className="hidden lg:flex lg:w-[40%] xl:w-[35%] bg-gradient-to-br from-emerald-950 via-[#0F8C55] to-emerald-900 text-white p-12 flex-col justify-between relative overflow-hidden select-none">
-        {/* Abstract Background Design Grid */}
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] bg-emerald-400/20 rounded-full blur-[80px] pointer-events-none" />
+      {/* LEFT PANEL: Deep Dark Green, fixed, hidden on mobile */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] bg-[#0F1F0F] text-white p-12 flex-col justify-between relative overflow-hidden select-none">
+        {/* Dot-grid texture */}
+        <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
         
-        {/* Brand Header */}
+        {/* Top: Logo */}
         <div className="relative z-10">
-          <Link to="/" className="inline-flex items-center gap-2 text-white font-bricolage text-2xl font-black tracking-tight group">
-            <span>Kasi</span>
-            <span className="text-green-300">AI</span>
+          <Link to="/" className="inline-flex items-center gap-2 text-white font-sans text-xl font-bold tracking-tight">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 22C2 22 6 20 10 16C14 12 16 8 20 2C20 2 12 4 8 8C4 12 2 16 2 22Z" fill="#FFFFFF" />
+            </svg>
+            <span className="font-bold text-lg">Kasi</span>
+            <span className="text-[#D4F263] font-bold text-lg">AI</span>
           </Link>
         </div>
 
-        {/* Brand Pitch Copy */}
+        {/* Middle: Headline */}
         <div className="space-y-8 relative z-10 my-auto">
           <div className="space-y-4">
-            <h1 className="text-3xl xl:text-4xl font-semibold font-bricolage tracking-tight leading-tight">
+            <h1 className="text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight">
               A few clicks away from launching your commerce agent.
             </h1>
-            <p className="text-green-100/70 text-sm leading-relaxed font-prompt font-medium">
+            <p className="text-white/55 text-sm leading-relaxed">
               Deploy your 24/7 AI employee. Automate catalog orders, negotiate within safe floor limits, and reconcile bank payments seamlessly.
             </p>
           </div>
 
-          {/* Core Value Props Checklist */}
-          <div className="space-y-4 font-prompt">
+          {/* Feature list (3 items) */}
+          <div className="space-y-4">
             {[
               { title: "Connect Social Inboxes", desc: "Instantly integrates with WhatsApp, Instagram, or Telegram." },
               { title: "Interactive Bargaining", desc: "Autonomous AI negotiates pricing inside your guidelines." },
               { title: "Direct Payment Callbacks", desc: "Callback alerts auto-verify bank payments immediately." }
             ].map((prop, i) => (
               <div key={i} className="flex gap-3.5 items-start">
-                <div className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <Check size={12} className="text-green-300" />
+                <div className="w-5 h-5 rounded-full bg-[#1A7A4A]/50 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check size={12} className="text-[#D4F263]" />
                 </div>
                 <div className="space-y-0.5">
-                  <h4 className="text-xs font-bold text-white leading-tight">{prop.title}</h4>
-                  <p className="text-[10px] text-green-100/50 leading-normal font-medium">{prop.desc}</p>
+                  <h4 className="text-sm font-semibold text-white leading-tight">{prop.title}</h4>
+                  <p className="text-xs text-white/45 leading-normal">{prop.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Salience Tech Branding Watermark */}
+        {/* Bottom Bar */}
         <div className="relative z-10 flex items-center gap-2 border-t border-white/10 pt-6">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-[9px] font-black tracking-widest text-green-200/50 uppercase">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#12B76A] animate-pulse" />
+          <span className="text-[10px] font-semibold tracking-[0.12em] text-white/30 uppercase">
             SALIENCE TECHNOLOGY LTD
           </span>
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Signup Wizard Form */}
-      <div className="w-full lg:w-[60%] xl:w-[65%] flex flex-col justify-between min-h-screen px-6 py-10 md:p-12 xl:p-16 relative">
+      {/* RIGHT PANEL: Signup Wizard Form */}
+      <div className="w-full lg:w-[55%] xl:w-[60%] flex flex-col justify-between min-h-screen p-10 relative">
         
-        {/* Navigation Header */}
-        <div className="flex justify-between items-center max-w-lg mx-auto w-full mb-8">
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors group"
-          >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-            <span>Back to website</span>
-          </Link>
-          <span className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
-            {step === 'role' ? 'Step 1 of 2' : 'Step 2 of 2'}
+        {/* Top Bar */}
+        <div className="flex justify-between items-center w-full max-w-[440px] mx-auto mb-8">
+          {step === 2 ? (
+            <button 
+              type="button"
+              onClick={() => setStep(1)}
+              className="inline-flex items-center gap-2 text-xs font-medium text-[#667085] hover:text-[#101828] transition-colors group"
+            >
+              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+              <span>Back to profiles</span>
+            </button>
+          ) : (
+            <Link 
+              to="/" 
+              className="inline-flex items-center gap-2 text-xs font-medium text-[#667085] hover:text-[#101828] transition-colors group"
+            >
+              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+              <span>Back to website</span>
+            </Link>
+          )}
+          <span className="text-[10px] font-semibold tracking-wider text-[#98A2B3] uppercase">
+            {step === 1 ? 'STEP 1 OF 2' : 'STEP 2 OF 2'}
           </span>
         </div>
 
-        {/* Wizard Panel wrapper */}
+        {/* Form Panel wrapper */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-lg space-y-8">
+          <div className="w-full max-w-[440px] space-y-8">
             
-            {/* Success/Error Alerts */}
+            {/* Error Alerts */}
             {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 rounded-2xl text-xs font-bold border border-red-100 dark:border-red-500/20 text-center animate-in fade-in duration-300">
+              <div className="p-4 bg-[#FEF3F2] text-[#F04438] rounded-lg text-xs font-semibold border border-[#FEF3F2] text-center animate-in fade-in duration-300">
                 {error}
               </div>
             )}
 
-            {/* STEP 1: Interactive Role Cards */}
-            {step === 'role' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            {/* STEP 1: Select Seller Profile */}
+            {step === 1 && (
+              <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="space-y-2">
-                  <h2 className="text-2xl md:text-3xl font-semibold font-bricolage tracking-tight text-gray-900 dark:text-white">
+                  <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
                     Select your seller profile
                   </h2>
-                  <p className="text-gray-500 dark:text-gray-400 font-prompt text-xs md:text-sm font-medium">
+                  <p className="text-[#667085] text-sm">
                     Choose the option that aligns closest with your operational structure.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
                   {/* Card 1: Product Seller */}
-                  <button
-                    type="button"
+                  <div
                     onClick={() => handleRoleSelect('product')}
-                    className={`group flex flex-col justify-between p-6 rounded-2xl border-2 transition-all text-left relative ${
+                    className={`flex flex-col justify-between p-7 rounded-2xl border cursor-pointer transition-all relative ${
                       businessType === 'product'
-                        ? 'border-primary bg-emerald-500/5 ring-4 ring-primary/10'
-                        : 'border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/3 hover:border-gray-300 dark:hover:border-white/20'
+                        ? 'border-[#1A7A4A] bg-white shadow-[0_0_0_4px_rgba(26,122,74,0.1)]'
+                        : 'border-[#EAECF0] bg-white shadow-sm hover:border-[#B0D9C1]'
                     }`}
                   >
                     <div className="space-y-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 ${
-                        businessType === 'product'
-                          ? 'bg-primary text-white'
-                          : 'bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 shadow-sm border border-gray-100 dark:border-white/5'
-                      }`}>
-                        <ShoppingBag size={20} />
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-[#E8F5EE] text-[#1A7A4A]`}>
+                        <ShoppingBag size={22} />
                       </div>
                       <div className="space-y-1">
-                        <h3 className="font-bold text-gray-900 dark:text-white text-base">Product Seller</h3>
-                        <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-prompt font-medium">
+                        <h3 className="font-bold text-[#101828] text-base">Product Seller</h3>
+                        <p className="text-xs text-[#667085] leading-relaxed">
                           I sell physical goods (clothing, beauty, gadgets) requiring inventory control, checkouts, and parcel delivery.
                         </p>
                       </div>
                     </div>
                     {businessType === 'product' && (
-                      <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                      <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-[#1A7A4A] flex items-center justify-center">
                         <Check size={12} className="text-white" />
                       </div>
                     )}
-                  </button>
+                  </div>
 
                   {/* Card 2: Service Provider */}
-                  <button
-                    type="button"
+                  <div
                     onClick={() => handleRoleSelect('service')}
-                    className={`group flex flex-col justify-between p-6 rounded-2xl border-2 transition-all text-left relative ${
+                    className={`flex flex-col justify-between p-7 rounded-2xl border cursor-pointer transition-all relative ${
                       businessType === 'service'
-                        ? 'border-primary bg-emerald-500/5 ring-4 ring-primary/10'
-                        : 'border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/3 hover:border-gray-300 dark:hover:border-white/20'
+                        ? 'border-[#1A7A4A] bg-white shadow-[0_0_0_4px_rgba(26,122,74,0.1)]'
+                        : 'border-[#EAECF0] bg-white shadow-sm hover:border-[#B0D9C1]'
                     }`}
                   >
                     <div className="space-y-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 ${
-                        businessType === 'service'
-                          ? 'bg-primary text-white'
-                          : 'bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 shadow-sm border border-gray-100 dark:border-white/5'
-                      }`}>
-                        <Briefcase size={20} />
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center bg-[#E8F5EE] text-[#1A7A4A]`}>
+                        <Briefcase size={22} />
                       </div>
                       <div className="space-y-1">
-                        <h3 className="font-bold text-gray-900 dark:text-white text-base">Service Provider</h3>
-                        <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-prompt font-medium">
+                        <h3 className="font-bold text-[#101828] text-base">Service Provider</h3>
+                        <p className="text-xs text-[#667085] leading-relaxed">
                           I sell professional consultations, beauty services, gig bookings, scheduling, or customized agreements.
                         </p>
                       </div>
                     </div>
                     {businessType === 'service' && (
-                      <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                      <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-[#1A7A4A] flex items-center justify-center">
                         <Check size={12} className="text-white" />
                       </div>
                     )}
-                  </button>
+                  </div>
                 </div>
 
                 <button
                   type="button"
-                  onClick={handleNextStep}
+                  onClick={() => setStep(2)}
                   disabled={!businessType}
-                  className="w-full py-4 bg-primary text-white rounded-2xl font-prompt font-bold text-sm shadow-xl shadow-emerald-500/10 hover:bg-emerald-700 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:scale-100 transition-all flex items-center justify-center gap-2 mt-4"
+                  className="w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors disabled:bg-[#B0D9C1] disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
                 >
                   <span>Continue Setup</span>
-                  <ArrowRight size={16} />
+                  <span>→</span>
                 </button>
               </div>
             )}
 
             {/* STEP 2: Main Credential Input Form */}
-            {step === 'form' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="space-y-2">
-                  <button 
-                    type="button" 
-                    onClick={handlePrevStep}
-                    className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-widest text-gray-400 uppercase hover:text-gray-900 dark:hover:text-white transition-colors"
-                  >
-                    <ArrowLeft size={12} />
-                    <span>Back to profiles</span>
-                  </button>
-                  <h2 className="text-2xl md:text-3xl font-semibold font-bricolage tracking-tight text-gray-900 dark:text-white">
-                    Setup your login details
+            {step === 2 && (
+              <form onSubmit={handleSubmit} className="space-y-5 animate-in fade-in duration-300">
+                <div className="space-y-2 mb-2">
+                  <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
+                    Create your account
                   </h2>
-                  <p className="text-gray-500 dark:text-gray-400 font-prompt text-xs md:text-sm font-medium">
-                    Fill in your credentials to deploy your shop agent.
+                  <p className="text-[#667085] text-sm">
+                    Start your 7-day free trial. No credit card required.
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5 font-prompt">
-                  
-                  {/* Business Name Field */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Business Name</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                        <Building2 size={16} />
-                      </div>
-                      <input
-                        type="text"
-                        required
-                        className="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-bold text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:bg-white dark:focus:bg-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
-                        value={businessName}
-                        onChange={(e) => setBusinessName(e.target.value)}
-                        placeholder="e.g. Afro Chic Boutique"
-                      />
-                    </div>
-                  </div>
+                {/* Business Name Field */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-[#344054]">BUSINESS NAME</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] placeholder-[#98A2B3] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="e.g. Duro's Cosmetics"
+                  />
+                </div>
 
-                  {/* Email Address Field */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                        <Mail size={16} />
-                      </div>
-                      <input
-                        type="email"
-                        required
-                        className="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-bold text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:bg-white dark:focus:bg-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="name@usekasi.com"
-                      />
+                {/* Email Address Field */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-[#344054]">EMAIL ADDRESS</label>
+                  <div className="relative">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
+                      <Mail size={18} />
                     </div>
+                    <input
+                      type="email"
+                      required
+                      className="w-full h-11 pl-[42px] pr-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] placeholder-[#98A2B3] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@usekasi.com"
+                    />
                   </div>
+                </div>
 
-                  {/* Password Field */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Password</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                        <Lock size={16} />
-                      </div>
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        minLength={6}
-                        className="w-full pl-11 pr-12 py-3.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-bold text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:bg-white dark:focus:bg-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-950 dark:hover:text-white transition-colors cursor-pointer"
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
+                {/* Phone Number Field */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-[#344054]">PHONE NUMBER</label>
+                  <div className="flex rounded-lg border border-[#D0D5DD] overflow-hidden focus-within:border-[#1A7A4A] focus-within:ring-4 focus-within:ring-[#1A7A4A]/12 transition-all">
+                    <div className="flex items-center gap-1 bg-[#F9FAFB] border-r border-[#D0D5DD] px-3.5 py-2 text-sm text-[#344054] font-medium shrink-0">
+                      <span>🇳🇬</span>
+                      <span>+234</span>
                     </div>
+                    <input
+                      type="tel"
+                      required
+                      className="w-full h-11 px-3.5 text-sm text-[#101828] placeholder-[#98A2B3] outline-none"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="812 345 6789"
+                    />
                   </div>
+                </div>
 
-                  <div className="pt-2">
+                {/* Password Field */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-[#344054]">PASSWORD</label>
+                  <div className="relative">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
+                      <Lock size={18} />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      className="w-full h-11 pl-[42px] pr-11 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] placeholder-[#98A2B3] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••"
+                    />
                     <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-sm shadow-xl shadow-emerald-500/10 hover:bg-emerald-700 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:scale-100 transition-all flex items-center justify-center gap-2"
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3] hover:text-[#101828] transition-colors cursor-pointer"
                     >
-                      {loading ? 'Creating account...' : 'Create Account'}
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                </form>
-              </div>
+
+                  {/* Password Strength Indicator */}
+                  {password && (
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex gap-1 h-1">
+                        {[1, 2, 3, 4].map((num) => (
+                          <div
+                            key={num}
+                            className={`flex-1 h-full rounded-[2px] transition-all duration-300 ${
+                              strength.score >= num ? strength.color : 'bg-[#EAECF0]'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className={`text-[11px] font-semibold ${strength.textClass}`}>
+                        {strength.label}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Terms and Privacy Checkbox */}
+                <div className="flex items-start gap-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    required
+                    checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                    className="w-4 h-4 rounded border-[#D0D5DD] text-[#1A7A4A] focus:ring-[#1A7A4A] mt-0.5"
+                  />
+                  <label htmlFor="terms" className="text-xs text-[#344054] leading-normal select-none">
+                    I agree to the{' '}
+                    <Link to="/terms" className="text-[#1A7A4A] font-semibold hover:underline">
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link to="/privacy" className="text-[#1A7A4A] font-semibold hover:underline">
+                      Privacy Policy
+                    </Link>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || !agreeTerms}
+                  className="w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
+                >
+                  {loading ? 'Creating Account...' : 'Create Account →'}
+                </button>
+              </form>
             )}
+
           </div>
         </div>
 
-        {/* Footer info column */}
-        <div className="max-w-lg mx-auto w-full pt-8 border-t border-gray-100 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 font-prompt select-none">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+        {/* Footer secure row */}
+        <div className="w-full max-w-[440px] mx-auto pt-6 border-t border-[#EAECF0] flex items-center justify-between text-[#98A2B3]">
+          <p className="text-xs">
             Already have an account?{' '}
-            <Link to="/login" className="font-bold text-primary hover:text-emerald-700 transition-colors">
+            <Link to="/login" className="font-semibold text-[#1A7A4A] hover:underline">
               Sign in here
             </Link>
           </p>
-          <div className="flex items-center gap-1.5 text-[9px] font-black tracking-widest text-gray-400 uppercase">
-            <ShieldCheck size={12} className="text-primary" />
+          <div className="flex items-center gap-1 text-[10px] font-semibold tracking-wider uppercase">
+            <ShieldCheck size={12} className="text-[#1A7A4A]" />
             <span>Secure Enterprise Auth</span>
           </div>
         </div>

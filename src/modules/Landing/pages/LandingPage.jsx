@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { MessageSquare, Receipt, ShieldCheck, CheckCircle2, Heart, ArrowRight } from 'lucide-react';
+import { ArrowRight, Leaf, Instagram, Twitter, Linkedin } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
 
@@ -11,6 +11,11 @@ import { DmSection } from '../components/DmSection';
 import { InvoiceSection } from '../components/InvoiceSection';
 import { NegotiationSection } from '../components/NegotiationSection';
 import { LogisticsSection } from '../components/LogisticsSection';
+import { AutomationSection } from '../components/AutomationSection';
+import { PricingVsAgentsSection } from '../components/PricingVsAgentsSection';
+import { BookingSection } from '../components/BookingSection';
+import { CustomerIntelligenceSection } from '../components/CustomerIntelligenceSection';
+import { ProactiveOutreachSection } from '../components/ProactiveOutreachSection';
 import { PricingSection } from '../components/PricingSection';
 import { TestimonialSection } from '../components/TestimonialSection';
 import { FAQSection } from '../components/FAQSection';
@@ -49,11 +54,25 @@ const LandingPage = () => {
 
   // Scroll Tracking & Intersection Observer
   useEffect(() => {
-    const sections = ['hero', 'dms', 'invoices', 'negotiation', 'logistics', 'pricing', 'testimonials', 'faq'];
+    const sections = [
+      'hero',
+      'dms',
+      'invoices',
+      'negotiation',
+      'logistics',
+      'automation',
+      'pricing-vs-agents',
+      'bookings',
+      'customer-intelligence',
+      'proactive-outreach',
+      'pricing',
+      'testimonials',
+      'faq'
+    ];
     
     const observerOptions = {
       root: null,
-      rootMargin: '-30% 0px -60% 0px', // Capture elements as they occupy the middle of viewport
+      rootMargin: '-30% 0px -60% 0px',
       threshold: 0
     };
 
@@ -71,7 +90,7 @@ const LandingPage = () => {
     });
 
     const handleScroll = () => {
-      setScrolled(window.scrollY > 280); // Scrolled past the main hero banner height
+      setScrolled(window.scrollY > 280);
     };
     window.addEventListener('scroll', handleScroll);
 
@@ -86,7 +105,7 @@ const LandingPage = () => {
     const revealElements = document.querySelectorAll('.reveal');
     const observerOptions = {
       root: null,
-      rootMargin: '0px 0px -50px 0px', // trigger slightly before entering fully
+      rootMargin: '0px 0px -50px 0px',
       threshold: 0.1
     };
 
@@ -94,7 +113,7 @@ const LandingPage = () => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('reveal-active');
-          observer.unobserve(entry.target); // make it animate once for premium feel
+          observer.unobserve(entry.target);
         }
       });
     }, observerOptions);
@@ -107,7 +126,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-bg-main text-gray-900 dark:text-gray-100 font-sans tracking-tight antialiased selection:bg-green-500/10 selection:text-green-600 overflow-x-hidden w-full relative">
+    <div className="min-h-screen bg-white text-gray-900 font-sans tracking-tight antialiased selection:bg-green-500/10 selection:text-green-600 overflow-x-hidden w-full relative">
       
       {/* Dynamic Header */}
       <LandingNavbar activeSection={activeSection} scrolled={scrolled} />
@@ -123,148 +142,152 @@ const LandingPage = () => {
       
       <LogisticsSection />
       
+      <AutomationSection />
+      
+      <PricingVsAgentsSection />
+      
+      <BookingSection />
+      
+      <CustomerIntelligenceSection />
+      
+      <ProactiveOutreachSection />
+      
       <PricingSection />
       
       <TestimonialSection />
       
       <FAQSection />
 
-      {/* High-Impact Bottom Call to Action Section */}
-      <section className="py-24 bg-gradient-to-br from-primary to-emerald-950 text-white relative overflow-hidden transition-all duration-300">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none" />
+      {/* PART 5 — High-Impact Bottom Call to Action Section (Pre-footer) */}
+      <section className="py-24 bg-[#1A7A4A] text-white relative overflow-hidden select-none border-b-[1.5px] border-black">
+        <div className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none" />
 
-        <div className="max-w-5xl mx-auto px-4 relative z-10 text-center space-y-8 font-prompt">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 text-green-300 text-xs font-bold uppercase tracking-wider rounded-full">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-ping" />
-            <span>Ready for Autopilot?</span>
+        <div className="max-w-5xl mx-auto px-4 relative z-10 text-center flex flex-col items-center space-y-8 font-sans">
+          
+          {/* White Pill Tag Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 border-[1.5px] border-white/30 text-white text-[12px] font-black uppercase tracking-wider rounded-full">
+            <span>READY FOR AUTOPILOT?</span>
           </div>
 
-          <h2 className="text-[36px] md:text-5.5xl font-semibold font-bricolage tracking-tight max-w-3xl mx-auto leading-none">
-            Launch your autonomous <span className="text-green-300">commerce agent</span> in minutes.
+          {/* Headline */}
+          <h2 className="text-4xl md:text-5.5xl font-black font-bricolage tracking-tight max-w-3xl mx-auto leading-none text-white text-center">
+            Launch your autonomous<br />commerce agent in minutes.
           </h2>
 
-          <p className="text-sm md:text-base text-green-100/80 max-w-xl mx-auto leading-relaxed">
+          {/* Body */}
+          <p className="text-base md:text-lg text-white/75 max-w-xl mx-auto leading-relaxed text-center font-medium">
             Deploy your 24/7 AI employee today. Automatically handle inquiries, negotiate deals with floor limits, and reconcile payments seamlessly.
           </p>
 
-          {/* Quick Value Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto pt-4 text-left">
+          {/* 3 Centered Feature Chips */}
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-4 pt-4 max-w-4xl w-full">
             {[
-              { title: "24/7 Social Automation", desc: "No more missed inquiries or cold leads in DMs." },
-              { title: "Floor-Limit Bargaining", desc: "AI negotiates prices inside your safe thresholds." },
-              { title: "Naira Instant Reconciles", desc: "Automatic callback verification directly on bank receipts." }
-            ].map((hl, i) => (
-              <div key={i} className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs select-none">
-                <div className="flex items-center gap-2 text-green-300">
-                  <CheckCircle2 size={16} />
-                  <h4 className="text-xs font-bold text-white leading-none">{hl.title}</h4>
-                </div>
-                <p className="text-[10px] text-green-100/60 mt-2 font-medium">{hl.desc}</p>
+              "✓ 24/7 Social Automation — No more missed inquiries or cold leads in DMs.",
+              "✓ Floor-Limit Bargaining — AI negotiates prices inside your safe thresholds.",
+              "✓ Naira Instant Reconciles — Automatic callback verification directly on bank receipts."
+            ].map((chip, idx) => (
+              <div 
+                key={idx} 
+                className="bg-white/12 border-[1.5px] border-white/25 rounded-full px-6 py-3 text-white text-[15px] font-semibold text-center select-none"
+              >
+                {chip}
               </div>
             ))}
           </div>
 
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* CTA Button */}
+          <div className="pt-6">
             <Link
               to="/signup"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-emerald-950 hover:bg-green-50 font-bold text-sm rounded-full shadow-2xl transition-all hover:scale-103 active:scale-97 flex items-center justify-center gap-2 group"
+              className="px-12 py-5 bg-white hover:bg-green-50 text-[#1A7A4A] font-black text-[18px] rounded-full shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2 group border-[1.5px] border-black"
             >
               <span>Create Your Kasi Storefront</span>
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1 stroke-[3]" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Rebranded Dark-Mode High-end Footer (Image 4 inspired) */}
-      <footer className="bg-[#0a0c0e] text-[#9ca3af] border-t border-gray-900 py-16 transition-colors font-prompt select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* PART 6 — Neubrutalist Rebranded Dark-Mode Footer */}
+      <footer className="bg-[#0A0A0A] text-[#9ca3af] py-20 font-sans select-none text-left">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-6">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 items-start">
             
-            {/* Left Branding & QR Code Visual Block */}
-            <div className="lg:col-span-5 space-y-6 text-left">
+            {/* Column 1 — Brand */}
+            <div className="lg:col-span-4 space-y-5">
               <span className="text-2xl font-black tracking-tight text-white font-bricolage flex items-center gap-2">
-                Kasi <span className="text-primary">AI</span>
+                <Leaf size={24} className="text-[#1A7A4A] fill-current" />
+                <span>Kasi AI</span>
               </span>
-              <p className="text-xs text-gray-400 leading-relaxed font-medium max-w-sm">
-                Autonomous conversational sales agents helping African merchants turn direct messages into paid orders automatically. Connect Instagram, WhatsApp, or Telegram to start.
+              <p className="text-[15px] text-white/50 leading-relaxed font-medium max-w-xs mt-4">
+                Your AI sales agent that never sleeps.
               </p>
-
-              {/* QR Code SVG Card Visual */}
-              <div className="inline-flex items-center gap-4 p-4 bg-[#111317] border border-gray-850 rounded-2xl max-w-xs shadow-inner">
-                {/* SVG Mock QR Code */}
-                <div className="w-14 h-14 bg-white p-1 rounded-lg flex items-center justify-center shrink-0 shadow-md">
-                  <svg viewBox="0 0 100 100" className="w-full h-full text-emerald-900 fill-current">
-                    <rect x="0" y="0" width="25" height="25" />
-                    <rect x="0" y="75" width="25" height="25" />
-                    <rect x="75" y="0" width="25" height="25" />
-                    <rect x="35" y="35" width="30" height="30" />
-                    <rect x="10" y="40" width="10" height="10" />
-                    <rect x="80" y="80" width="10" height="10" />
-                    <rect x="50" y="10" width="10" height="10" />
-                    <rect x="10" y="50" width="10" height="10" />
-                    <rect x="50" y="80" width="15" height="15" />
-                  </svg>
-                </div>
-                <div className="text-left space-y-0.5">
-                  <span className="text-[10px] font-black text-white uppercase tracking-wider block">Scan to Test Agent</span>
-                  <span className="text-[9px] text-gray-500 font-bold block leading-tight">Try Kasi live demonstration storefront on WhatsApp.</span>
-                </div>
-              </div>
             </div>
 
-            {/* Links Columns Grid */}
-            <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
-              
-              {/* Product links */}
-              <div className="space-y-3.5 text-left">
-                <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Product</h4>
-                <ul className="space-y-2 text-xs font-bold text-gray-400">
-                  <li><a href="#dms" className="hover:text-primary transition-colors">Direct Messages</a></li>
-                  <li><a href="#pricing" className="hover:text-primary transition-colors">Success Credits</a></li>
-                  <li><a href="#faq" className="hover:text-primary transition-colors">Safety Systems</a></li>
-                  <li><Link to="/signup" className="hover:text-primary transition-colors">Merchant Portal</Link></li>
-                </ul>
-              </div>
+            {/* Column 2 — PRODUCT */}
+            <div className="lg:col-span-3 space-y-4">
+              <h4 className="text-[12px] font-bold text-white/40 uppercase tracking-widest">PRODUCT</h4>
+              <ul className="space-y-3 text-[15px] font-medium">
+                <li><a href="#dms" className="text-white/70 hover:text-white transition-colors">Direct Messages</a></li>
+                <li><a href="#invoices" className="text-white/70 hover:text-white transition-colors">Invoices & Payments</a></li>
+                <li><a href="#negotiation" className="text-white/70 hover:text-white transition-colors">Negotiations</a></li>
+                <li><a href="#logistics" className="text-white/70 hover:text-white transition-colors">Logistics</a></li>
+                <li><a href="#bookings" className="text-white/70 hover:text-white transition-colors">Booking & Scheduling</a></li>
+                <li><a href="#customer-intelligence" className="text-white/70 hover:text-white transition-colors">Customer Intelligence</a></li>
+                <li><a href="#pricing" className="text-white/70 hover:text-white transition-colors">Pricing</a></li>
+              </ul>
+            </div>
 
-              {/* Resources links */}
-              <div className="space-y-3.5 text-left">
-                <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Integrations</h4>
-                <ul className="space-y-2 text-xs font-bold text-gray-400">
-                  <li><a href="#" className="hover:text-primary transition-colors">WhatsApp API</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Instagram DM</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Telegram Bot</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Paystack callback</a></li>
-                </ul>
-              </div>
+            {/* Column 3 — INTEGRATIONS */}
+            <div className="lg:col-span-3 space-y-4">
+              <h4 className="text-[12px] font-bold text-white/40 uppercase tracking-widest">INTEGRATIONS</h4>
+              <ul className="space-y-3 text-[15px] font-medium text-white/70">
+                <li><a href="#" className="hover:text-white transition-colors">WhatsApp API</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Instagram DMs</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Facebook Messenger</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Telegram</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Paystack</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Google Calendar</a></li>
+              </ul>
+            </div>
 
-              {/* Company links */}
-              <div className="space-y-3.5 text-left col-span-2 md:col-span-1">
-                <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Company</h4>
-                <ul className="space-y-2 text-xs font-bold text-gray-400">
-                  <li><a href="#" className="hover:text-primary transition-colors">About Salience</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
-                  <li><a href="mailto:support@usekasi.com" className="hover:text-primary transition-colors">support@usekasi.com</a></li>
-                </ul>
-              </div>
-
+            {/* Column 4 — COMPANY */}
+            <div className="lg:col-span-2 space-y-4">
+              <h4 className="text-[12px] font-bold text-white/40 uppercase tracking-widest">COMPANY</h4>
+              <ul className="space-y-3 text-[15px] font-medium text-white/70">
+                <li><a href="#" className="hover:text-white transition-colors">About Salience</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="mailto:support@usekasi.com" className="hover:text-white transition-colors">Contact</a></li>
+              </ul>
             </div>
 
           </div>
 
-          {/* Bottom Bar separator & watermarks */}
-          <div className="border-t border-[#16181b] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-              © {new Date().getFullYear()} Kasi AI. All rights reserved.
+          {/* Bottom Bar */}
+          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <span className="text-[13px] text-white/40 font-medium">
+              © 2025 Salience Technologies. All rights reserved.
             </span>
             
-            {/* Salience Tech Watermark Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#111317] border border-gray-850 rounded-full text-[9px] font-black text-gray-400 uppercase tracking-widest">
-              <span className="w-1.5 h-1.5 bg-[#0F8C55] rounded-full animate-pulse" />
-              <span>MADE IN NIGERIA BY SALIENCE TECHNOLOGY LTD</span>
+            {/* Social icons */}
+            <div className="flex items-center gap-3">
+              {[
+                { icon: <Instagram size={16} />, url: "#" },
+                { icon: <Twitter size={16} />, url: "#" },
+                { icon: <Linkedin size={16} />, url: "#" }
+              ].map((soc, idx) => (
+                <a 
+                  key={idx} 
+                  href={soc.url}
+                  className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all"
+                >
+                  {soc.icon}
+                </a>
+              ))}
             </div>
           </div>
 

@@ -1,191 +1,125 @@
 import React from 'react';
-import { ShoppingBag, PieChart, TrendingUp, Edit3, Trash2, Plus, Check } from 'lucide-react';
+import { ShoppingBag, PieChart, TrendingUp } from 'lucide-react';
 
 export const DmSection = () => {
   return (
-    <section id="dms" className="py-24 bg-white dark:bg-bg-main border-b border-gray-50 dark:border-gray-850/80 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="dms" className="w-full py-[100px] bg-white border-b-[1.5px] border-[#E5E5E5] relative select-none">
+      <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6">
         
-        {/* Section Header */}
-        <div className="max-w-3xl mb-20 space-y-4 text-left reveal">
-          <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
-            01_Direct Messages (DMs)
-          </div>
-          <h2 className="text-[40px] max-md:leading-10 md:text-5xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight leading-none">
-            Conversations in, <span className="text-green-650">cash out.</span>
-          </h2>
-          <p className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium font-prompt leading-relaxed max-w-xl">
-            Whether your customers find you on WhatsApp, Telegram, or Instagram, Kasi connects to their favorite channels, answers FAQs, takes orders, and collects payment details smoothly.
-          </p>
-        </div>
-
-        {/* Three-Column Thin-Line Phone Grid (Image 2 style) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch font-prompt">
+        {/* Top 2-Column Split: Text Left | Mockup Panel Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-16">
           
-          {/* Column 1: Catalog Management */}
-          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01] reveal delay-100">
-            <div className="space-y-4 flex flex-col items-center">
-              {/* Outline Icon */}
-              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-bg-surface border border-gray-100 dark:border-gray-800 flex items-center justify-center shrink-0 text-gray-500 shadow-2xs">
-                <ShoppingBag size={18} />
-              </div>
-              <h3 className="text-lg font-bold text-gray-950 dark:text-white font-bricolage">Catalog Management</h3>
-              <p className="text-xs text-gray-450 dark:text-gray-450 font-semibold leading-relaxed max-w-[280px]">
-                Instantly create and edit products, set price thresholds, and customize descriptions for auto-negotiation.
-              </p>
+          {/* Left Column — Text & Section Headers */}
+          <div className="lg:col-span-7 space-y-6 text-left">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#E8F5EE] border-[1.5px] border-[#1A7A4A] text-[#1A7A4A] text-xs font-black uppercase tracking-wider rounded-full">
+              <span>01_Direct Messages (DMs)</span>
             </div>
-
-            {/* Thin-line CSS Phone Mockup of Product Edit Screen */}
-            <div className="w-full max-w-[240px] bg-white dark:bg-bg-surface rounded-[32px] border border-gray-200 dark:border-gray-800 p-4 flex flex-col overflow-hidden select-none shadow-2xs mt-4 text-left">
-              {/* Fake screen header */}
-              <div className="flex justify-between items-center pb-2.5 border-b border-gray-100 dark:border-gray-800 mb-3">
-                <span className="text-[9px] font-bold text-gray-900 dark:text-white uppercase tracking-wider font-bricolage">Bitter Kola</span>
-                <div className="flex gap-2">
-                  <Edit3 size={10} className="text-gray-400" />
-                  <Trash2 size={10} className="text-gray-400" />
-                </div>
-              </div>
-
-              {/* Minimal Forms Fields (Thin-line design) */}
-              <div className="space-y-2">
-                {[
-                  { label: 'Product Name', value: 'Bitter Kola Premium' },
-                  { label: 'Retail Price (₦)', value: '1,200' },
-                  { label: 'Floor Price (₦)', value: '950' },
-                  { label: 'Description', value: 'Organic Bitter Kola packs.' },
-                ].map((field, idx) => (
-                  <div key={idx} className="space-y-0.5 pb-2 border-b border-gray-100 dark:border-gray-850">
-                    <span className="text-[7px] font-black text-gray-400 uppercase tracking-widest">{field.label}</span>
-                    <div className="text-[9px] font-bold text-gray-800 dark:text-gray-200">{field.value}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Action Button */}
-              <div className="mt-3 flex justify-between items-center pt-1">
-                <span className="text-[7px] font-bold text-green-500 flex items-center gap-0.5"><Check size={8} strokeWidth={3}/> Saved</span>
-                <span className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Active catalog</span>
-              </div>
-            </div>
+            
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-tight text-[#0A0A0A] font-bricolage">
+              Conversations in,<br />cash out.
+            </h2>
+            
+            <p className="text-base md:text-lg text-grey-700 max-w-xl leading-relaxed font-sans font-medium">
+              Whether your customers find you on WhatsApp, Telegram, or Instagram, Kasi connects to their favourite channels, answers FAQs, takes orders, and collects payment details smoothly. No missed messages. No cold leads. Ever.
+            </p>
           </div>
 
-          {/* Column 2: Sales Channels */}
-          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01] reveal delay-200">
-            <div className="space-y-4 flex flex-col items-center">
-              {/* Outline Icon */}
-              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-bg-surface border border-gray-100 dark:border-gray-800 flex items-center justify-center shrink-0 text-gray-500 shadow-2xs">
-                <PieChart size={18} />
-              </div>
-              <h3 className="text-lg font-bold text-gray-950 dark:text-white font-bricolage">Sales Channels</h3>
-              <p className="text-xs text-gray-450 dark:text-gray-450 font-semibold leading-relaxed max-w-[280px]">
-                Monitor your sales breakdown by platform to see where your customers buy from most.
-              </p>
-            </div>
-
-            {/* Thin-line CSS Phone Mockup of Sales Channels Pie Chart */}
-            <div className="w-full max-w-[240px] bg-white dark:bg-bg-surface rounded-[32px] border border-gray-200 dark:border-gray-800 p-4 flex flex-col overflow-hidden select-none shadow-2xs mt-4 text-left">
-              {/* Fake screen header */}
-              <div className="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-gray-800 mb-3">
-                <span className="text-[9px] font-bold text-gray-900 dark:text-white uppercase tracking-wider font-bricolage">Channels</span>
-                <div className="flex gap-1 bg-gray-50 dark:bg-bg-main p-0.5 rounded-md border border-gray-100 dark:border-gray-800">
-                  <span className="text-[6px] font-bold px-1.5 py-0.5 bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-sm">NGN</span>
-                  <span className="text-[6px] font-bold px-1.5 py-0.5 text-gray-400">USD</span>
+          {/* Right Column — Phone Mockup Panel */}
+          <div className="lg:col-span-5 relative flex items-center justify-center">
+            {/* Rectangular green panel */}
+            <div className="relative w-full max-w-[420px] aspect-[4/5] bg-[#1A7A4A] rounded-2xl flex items-center justify-center p-8 border-[1.5px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-visible">
+              <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none rounded-2xl" />
+              
+              {/* Phone screen showing catalog management UI */}
+              <div className="w-[210px] h-[370px] bg-white rounded-[24px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 z-10">
+                {/* Screen Header */}
+                <div className="bg-white border-b-[1.5px] border-black px-4 py-2.5 flex justify-between items-center shrink-0 text-left">
+                  <span className="text-[10px] font-black text-black font-bricolage">Add Product</span>
+                  <span className="text-[7.5px] font-bold text-brand bg-brand-light border border-brand px-1.5 py-0.2 rounded-full uppercase leading-none font-sans">Active</span>
                 </div>
-              </div>
 
-              {/* Crisp thin-line SVG pie chart */}
-              <div className="flex flex-col items-center justify-center my-1.5">
-                <div className="relative flex items-center justify-center w-20 h-20">
-                  <svg viewBox="0 0 100 100" className="w-20 h-20 transform -rotate-90">
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#E5E7EB" strokeWidth="6" />
-                    {/* WhatsApp: 55% (Green) - strokeDasharray=251, strokeDashoffset=113 */}
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#10B981" strokeWidth="6" strokeDasharray="251.2" strokeDashoffset="113.04" />
-                    {/* Telegram: 30% (Blue) - offset by 55%, length 75.3 */}
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#3B82F6" strokeWidth="6" strokeDasharray="251.2" strokeDashoffset="188.4" className="origin-center rotate-[198deg]" />
-                    {/* Instagram: 15% (Pink) - offset by 85%, length 37.6 */}
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#EC4899" strokeWidth="6" strokeDasharray="251.2" strokeDashoffset="226.08" className="origin-center rotate-[306deg]" />
-                  </svg>
-                  <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-[6px] font-black text-gray-400 uppercase tracking-widest leading-none">WhatsApp</span>
-                    <span className="text-[9px] font-black text-gray-900 dark:text-white leading-none mt-0.5">55%</span>
+                {/* Form fields simulator */}
+                <div className="flex-1 bg-bg-subtle p-3.5 flex flex-col gap-2.5 text-left font-sans">
+                  <div className="space-y-0.5">
+                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Product Name</label>
+                    <div className="bg-white border border-black rounded-[6px] px-2 py-1 text-[9px] font-bold text-black leading-none">Bitter Kola Premium</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Retail Price (₦)</label>
+                    <div className="bg-white border border-black rounded-[6px] px-2 py-1 text-[9px] font-bold text-black leading-none">₦1,250</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Floor Price (₦)</label>
+                    <div className="bg-white border border-black rounded-[6px] px-2 py-1 text-[9px] font-bold text-[#1A7A4A] leading-none">₦950</div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Auto-Negotiation Limits</label>
+                    <div className="bg-[#E8F5EE] border border-[#1A7A4A] rounded-[6px] p-1.5 text-[7.5px] font-bold text-[#1A7A4A] leading-tight">
+                      Accept offers ≥ ₦950. Reject offers below automatically.
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Legends list */}
-              <div className="grid grid-cols-3 gap-1 mt-2 text-[7px] font-extrabold text-gray-400">
-                <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                  <span>WA: 55%</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
-                  <span>TG: 30%</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#EC4899]" />
-                  <span>IG: 15%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 3: Order Analytics */}
-          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01] reveal delay-300">
-            <div className="space-y-4 flex flex-col items-center">
-              {/* Outline Icon */}
-              <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-bg-surface border border-gray-100 dark:border-gray-800 flex items-center justify-center shrink-0 text-gray-500 shadow-2xs">
-                <TrendingUp size={18} />
-              </div>
-              <h3 className="text-lg font-bold text-gray-950 dark:text-white font-bricolage">Order Analytics</h3>
-              <p className="text-xs text-gray-450 dark:text-gray-450 font-semibold leading-relaxed max-w-[280px]">
-                Track conversion trends, successful checkouts, and customer haggling habits over time.
-              </p>
-            </div>
-
-            {/* Thin-line CSS Phone Mockup of Order Analytics Line Chart */}
-            <div className="w-full max-w-[240px] bg-white dark:bg-bg-surface rounded-[32px] border border-gray-200 dark:border-gray-800 p-4 flex flex-col overflow-hidden select-none shadow-2xs mt-4 text-left">
-              {/* Fake screen header */}
-              <div className="flex justify-between items-center pb-2 border-b border-gray-100 dark:border-gray-800 mb-3">
-                <span className="text-[9px] font-bold text-gray-900 dark:text-white uppercase tracking-wider font-bricolage">Sales Velocity</span>
-                <span className="text-[7px] font-bold text-green-500">+18%</span>
-              </div>
-
-              {/* Summary Stats */}
-              <div className="space-y-0.5 mb-2">
-                <span className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Total Sales Value</span>
-                <h4 className="text-xs font-black text-gray-950 dark:text-white">₦258,400.00</h4>
-              </div>
-
-              {/* Crisp thin-line SVG line chart */}
-              <div className="my-1">
-                <svg viewBox="0 0 100 40" className="w-full h-11">
-                  <path d="M 0 35 Q 20 20 40 28 T 80 12 T 100 6" fill="none" stroke="#00B05C" strokeWidth="1.5" />
-                  <path d="M 0 35 Q 20 20 40 28 T 80 12 T 100 6 L 100 40 L 0 40 Z" fill="url(#green-grad)" opacity="0.08" />
-                  <defs>
-                    <linearGradient id="green-grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#00B05C" />
-                      <stop offset="100%" stopColor="#00B05C" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
+              {/* Floating Props */}
+              
+              {/* 1. Small Naira coin top-right */}
+              <div className="absolute -top-4 -right-4 z-20 animate-bounce" style={{ animationDuration: '4s' }}>
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="24" cy="26" rx="18" ry="14" fill="#D97706" stroke="#0A0A0A" strokeWidth="1.5" />
+                  <ellipse cx="24" cy="22" rx="18" ry="14" fill="#FBBF24" stroke="#0A0A0A" strokeWidth="1.5" />
+                  <text x="24" y="27" fill="#0A0A0A" fontSize="15" fontWeight="900" textAnchor="middle" fontFamily="Bricolage Grotesque, sans-serif">₦</text>
                 </svg>
               </div>
 
-              {/* Micro stats table */}
-              <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-850 grid grid-cols-3 gap-1 text-[7px] font-extrabold text-gray-400">
-                <div>
-                  <span className="block text-gray-900 dark:text-white text-[8px]">1,240</span>
-                  <span>Checkouts</span>
-                </div>
-                <div>
-                  <span className="block text-gray-900 dark:text-white text-[8px]">94%</span>
-                  <span>Closed</span>
-                </div>
-                <div>
-                  <span className="block text-gray-900 dark:text-white text-[8px]">₦15k</span>
-                  <span>Avg Order</span>
-                </div>
+              {/* 2. Chat bubble bottom-left */}
+              <div className="absolute -bottom-6 -left-6 bg-white border-[1.5px] border-black rounded-[16px] p-3.5 shadow-[4px_4px_0px_#0A0A0A] text-left text-[10px] font-bold leading-normal text-black max-w-[200px] z-20 transform -rotate-[2deg] font-sans">
+                Hey there! How much for 2 packs?
               </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Feature Cards underneath in 3-column grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
+          
+          {/* Card 1: Catalog Management */}
+          <div className="bg-white border-[1.5px] border-[#E5E5E5] rounded-2xl p-6 text-left flex flex-col gap-4 transition-all duration-300 hover:translate-y-[-4px] hover:border-black hover:shadow-[4px_4px_0px_#0A0A0A]">
+            <div className="w-12 h-12 rounded-xl bg-accent border-[1.5px] border-black flex items-center justify-center shrink-0 text-black shadow-[2px_2px_0px_#0A0A0A]">
+              <ShoppingBag size={22} className="text-[#1A7A4A]" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-[#0A0A0A] font-bricolage">Catalog Management</h3>
+              <p className="text-[15px] font-normal text-[#6B6B6B] leading-relaxed">
+                Instantly create and edit products, set price thresholds, and customise descriptions for auto-negotiation.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2: Sales Channels */}
+          <div className="bg-white border-[1.5px] border-[#E5E5E5] rounded-2xl p-6 text-left flex flex-col gap-4 transition-all duration-300 hover:translate-y-[-4px] hover:border-black hover:shadow-[4px_4px_0px_#0A0A0A]">
+            <div className="w-12 h-12 rounded-xl bg-accent border-[1.5px] border-black flex items-center justify-center shrink-0 text-black shadow-[2px_2px_0px_#0A0A0A]">
+              <PieChart size={22} className="text-[#1A7A4A]" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-[#0A0A0A] font-bricolage">Sales Channels</h3>
+              <p className="text-[15px] font-normal text-[#6B6B6B] leading-relaxed">
+                Monitor your sales breakdown by platform and see exactly where your customers buy from most.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3: Order Analytics */}
+          <div className="bg-white border-[1.5px] border-[#E5E5E5] rounded-2xl p-6 text-left flex flex-col gap-4 transition-all duration-300 hover:translate-y-[-4px] hover:border-black hover:shadow-[4px_4px_0px_#0A0A0A]">
+            <div className="w-12 h-12 rounded-xl bg-accent border-[1.5px] border-black flex items-center justify-center shrink-0 text-black shadow-[2px_2px_0px_#0A0A0A]">
+              <TrendingUp size={22} className="text-[#1A7A4A]" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-[#0A0A0A] font-bricolage">Order Analytics</h3>
+              <p className="text-[15px] font-normal text-[#6B6B6B] leading-relaxed">
+                Track conversion trends, successful checkouts, and customer haggling habits over time.
+              </p>
             </div>
           </div>
 

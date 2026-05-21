@@ -17,11 +17,15 @@ export const THEMES = [
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
+    // Force light theme and stick to it for now
+    return 'light';
+    /*
     try {
       return localStorage.getItem(THEME_KEY) || 'light';
     } catch {
       return 'light';
     }
+    */
   });
 
   useEffect(() => {
@@ -42,13 +46,16 @@ export const ThemeProvider = ({ children }) => {
       root.classList.add(`theme-${theme}`);
     }
 
+    /*
     try {
       localStorage.setItem(THEME_KEY, theme);
     } catch {}
+    */
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    // Keep as no-op to stick to light mode
+    // setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const currentTheme = THEMES.find(t => t.id === theme) || THEMES[0];

@@ -226,7 +226,7 @@ const Settings = () => {
                 <TabButton active={activeTab === 'general'} icon={Building} label="General" onClick={() => setActiveTab('general')} />
                 <TabButton active={activeTab === 'payment'} icon={CreditCard} label="Payment" onClick={() => setActiveTab('payment')} />
                 <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
-                <TabButton active={activeTab === 'appearance'} icon={Palette} label="Appearance" onClick={() => setActiveTab('appearance')} />
+                {/* <TabButton active={activeTab === 'appearance'} icon={Palette} label="Appearance" onClick={() => setActiveTab('appearance')} /> */}
                 <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
             </div>
 
@@ -527,7 +527,8 @@ const Settings = () => {
             )}
 
             {/* ── APPEARANCE TAB ──────────────────── */}
-            {activeTab === 'appearance' && (
+            {/*
+            activeTab === 'appearance' && (
                 <div className="space-y-6">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-6">
                         <div>
@@ -549,7 +550,8 @@ const Settings = () => {
                         </p>
                     </div>
                 </div>
-            )}
+            )
+            */}
             
             {/* ── ACTIVITY LOGS TAB ──────────────────── */}
             {activeTab === 'activity' && (

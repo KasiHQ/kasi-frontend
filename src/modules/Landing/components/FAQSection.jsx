@@ -25,18 +25,18 @@ export const FAQSection = () => {
   ];
 
   return (
-    <section id="faq" className="py-28 bg-white dark:bg-bg-main border-b border-gray-50 dark:border-gray-850/80 transition-colors">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="faq" className="py-28 bg-white border-b-1.5 border-black">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 font-prompt">
         
         {/* Section Header */}
-        <div className="text-center mb-20 space-y-4 reveal">
-          <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
+        <div className="text-center mb-20 space-y-4">
+          <div className="badge-section">
             07_FAQ & Support
           </div>
-          <h2 className="text-[40px] max-md:leading-10 md:text-5xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight">
-            Frequently asked <span className="text-green-650">questions.</span>
+          <h2 className="font-section-h2">
+            Frequently asked <span className="text-brand">questions.</span>
           </h2>
-          <p className="text-base md:text-lg text-gray-550 dark:text-gray-400 font-medium font-prompt leading-relaxed max-w-xl mx-auto">
+          <p className="font-body-large text-grey-700 max-w-xl mx-auto mt-2">
             Everything you need to know about Kasi AI's credit features, direct bank integrations, and social chat channel connections.
           </p>
         </div>
@@ -48,16 +48,16 @@ export const FAQSection = () => {
             return (
               <div 
                 key={idx}
-                className={`bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 rounded-3xl overflow-hidden transition-all duration-300 shadow-2xs hover:shadow-xs reveal delay-${(idx + 1) * 100}`}
+                className="bg-white border-hard rounded-2xl overflow-hidden transition-all duration-300 shadow-hard hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#0A0A0A]"
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                  className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none cursor-pointer"
                 >
-                  <span className="text-sm font-extrabold text-gray-900 dark:text-white pl-1 flex items-center gap-2">
+                  <span className="text-sm font-black text-black pl-1 flex items-center gap-2">
                     <span>{faq.q}</span>
                   </span>
-                  <div className="p-1.5 rounded-lg bg-white dark:bg-bg-main text-gray-400 hover:text-gray-950 dark:hover:text-white border border-gray-100 dark:border-gray-800/80 transition-colors">
+                  <div className="p-1.5 rounded-lg bg-bg-subtle text-black border-hard transition-colors">
                     {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </div>
                 </button>
@@ -66,10 +66,10 @@ export const FAQSection = () => {
                 <div 
                   className={clsx(
                     'transition-all duration-300 ease-in-out overflow-hidden pl-7 pr-12',
-                    isOpen ? 'max-h-48 border-t border-gray-50 dark:border-gray-850 py-5 opacity-100' : 'max-h-0 py-0 opacity-0'
+                    isOpen ? 'max-h-48 border-t-1.5 border-black py-5 opacity-100' : 'max-h-0 py-0 opacity-0'
                   )}
                 >
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold leading-relaxed">
+                  <p className="text-xs text-grey-700 font-bold leading-relaxed">
                     {faq.a}
                   </p>
                 </div>
@@ -79,19 +79,19 @@ export const FAQSection = () => {
         </div>
 
         {/* Help block below */}
-        <div className="bg-green-500/5 border border-green-500/10 rounded-[32px] p-6 md:p-8 mt-16 flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-xs transition-shadow">
+        <div className="bg-brand-light border-hard rounded-2xl p-6 md:p-8 mt-16 flex flex-col md:flex-row items-center justify-between gap-6 shadow-hard">
           <div className="flex gap-4 items-center">
-            <div className="w-10 h-10 rounded-xl bg-green-500/10 text-green-600 flex items-center justify-center shrink-0 shadow-2xs">
+            <div className="w-10 h-10 rounded-xl bg-accent border-hard text-black flex items-center justify-center shrink-0 shadow-sm">
               <MessageCircle size={18} />
             </div>
             <div className="space-y-0.5 text-left">
-              <h4 className="text-sm font-extrabold text-gray-950 dark:text-white">Still have questions?</h4>
-              <p className="text-[10px] text-gray-400 font-semibold leading-relaxed">We are here to help you get integrated and running smoothly.</p>
+              <h4 className="text-sm font-black text-black">Still have questions?</h4>
+              <p className="text-[10px] text-grey-700 font-bold leading-relaxed">We are here to help you get integrated and running smoothly.</p>
             </div>
           </div>
           <a
             href="mailto:support@usekasi.com"
-            className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-50 text-white dark:text-gray-900 rounded-full font-bold text-xs shadow-md transition-all hover:scale-101 active:scale-99 shrink-0"
+            className="px-5 py-2.5 btn-primary shrink-0 select-none"
           >
             Contact Support
           </a>
@@ -101,3 +101,4 @@ export const FAQSection = () => {
     </section>
   );
 };
+

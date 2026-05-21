@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, Users, CheckCircle, AlertTriangle, 
-  ArrowRight, MessageSquare, DollarSign 
+  ArrowRight, MessageSquare, DollarSign, Cpu 
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { DashboardSkeleton } from '../../../components/ui/Skeleton';
@@ -11,14 +11,23 @@ import { useAuth } from '../../../context/AuthContext';
 import { conversationAPI } from '../../../api/conversations';
 import useNetwork from '../../../hooks/useNetwork';
 
-const avatarColors = [
-  'bg-orange-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500',
-  'bg-pink-500', 'bg-teal-500', 'bg-red-500', 'bg-indigo-500'
-];
-
-const getAvatarColor = (name) => {
-  if (!name) return avatarColors[0];
-  return avatarColors[name.charCodeAt(0) % avatarColors.length];
+// Dynamic Color Mapping for Avatars (B -> Green, T -> Pink, O -> Purple)
+const getAvatarTheme = (name) => {
+  if (!name) return { bg: 'bg-[#1A7A4A]', text: 'text-white' };
+  const initial = name.trim().charAt(0).toUpperCase();
+  if (initial === 'B') return { bg: 'bg-[#1A7A4A]', text: 'text-white' };
+  if (initial === 'T') return { bg: 'bg-[#EC4899]', text: 'text-white' };
+  if (initial === 'O') return { bg: 'bg-[#7A5AF8]', text: 'text-white' };
+  
+  // Dynamic fallback
+  const themes = [
+    { bg: 'bg-[#1A7A4A]', text: 'text-white' }, // Green
+    { bg: 'bg-[#EC4899]', text: 'text-white' }, // Pink
+    { bg: 'bg-[#7A5AF8]', text: 'text-white' }, // Purple
+    { bg: 'bg-[#175CD3]', text: 'text-white' }, // Blue
+    { bg: 'bg-[#F97316]', text: 'text-white' }, // Orange
+  ];
+  return themes[name.charCodeAt(0) % themes.length];
 };
 
 const getInitials = (name) => {
@@ -28,12 +37,45 @@ const getInitials = (name) => {
   return name.slice(0, 2).toUpperCase();
 };
 
+// Clean Product Semantic Status Colors
 const statusConfig = {
-  'In Progress': { bg: 'bg-blue-100', text: 'text-blue-700' },
-  'Paid': { bg: 'bg-green-100', text: 'text-green-700' },
-  'Requires Attention': { bg: 'bg-red-100', text: 'text-red-700', label: 'Needs Attention' },
-  'Delivered': { bg: 'bg-emerald-100', text: 'text-emerald-700' },
-  'In Transit': { bg: 'bg-yellow-100', text: 'text-yellow-700' },
+  'In Progress': { bg: 'bg-[#EFF8FF]', text: 'text-[#175CD3]', label: 'In Progress' },
+  'Paid': { bg: 'bg-[#ECFDF3]', text: 'text-[#027A48]', label: 'Paid' },
+  'Requires Attention': { bg: 'bg-[#FFFAEB]', text: 'text-[#B54708]', label: 'Needs Attention' },
+  'Delivered': { bg: 'bg-[#ECFDF3]', text: 'text-[#027A48]', label: 'Delivered' },
+  'In Transit': { bg: 'bg-[#F0F9FF]', text: 'text-[#026AA2]', label: 'In Transit' },
+};
+
+// Custom Status Badge with Semantic Dot
+const StatusBadge = ({ status }) => {
+  const config = statusConfig[status] || { bg: 'bg-[#EFF8FF]', text: 'text-[#175CD3]', label: status };
+  const dotColor = {
+    'bg-[#EFF8FF]': 'bg-[#2E90FA]',
+    'bg-[#ECFDF3]': 'bg-[#12B76A]',
+    'bg-[#FFFAEB]': 'bg-[#F79009]',
+    'bg-[#F0F9FF]': 'bg-[#0284C7]'
+  }[config.bg] || 'bg-[#2E90FA]';
+
+  return (
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${dotColor} mr-1.5`} />
+      {config.label || status}
+    </span>
+  );
+};
+
+// Custom Chart Tooltip: styled in midnight blue with downward arrow
+const CustomChartTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="relative bg-[#101828] text-white px-3 py-2 rounded-lg text-[13px] font-semibold shadow-md flex flex-col items-center">
+        <span>{`${label} · ₦${payload[0].value.toLocaleString()}`}</span>
+        {/* Downward pointing arrow */}
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#101828] rotate-45" />
+      </div>
+    );
+  }
+  return null;
 };
 
 const Dashboard = () => {
@@ -89,6 +131,7 @@ const Dashboard = () => {
 
   // Common formatters
   const formatNaira = (amount) => {
+    if (amount === 0 || !amount) return '₦0';
     if (amount >= 1000000) return `₦${(amount / 1000000).toFixed(1)}M`;
     if (amount >= 1000) return `₦${(amount / 1000).toFixed(0)}k`;
     return `₦${amount.toLocaleString()}`;
@@ -109,10 +152,10 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div className="kasi-app space-y-8 min-h-screen bg-[#F7F8FA] p-6">
         <div>
-          <h1 className="text-2xl font-bold text-dark mb-1">{getGreeting()} 👋</h1>
-          <p className="text-gray-500 text-sm">Loading your dashboard...</p>
+          <h1 className="text-[28px] font-bold text-[#101828] mb-1">{getGreeting()} 👋</h1>
+          <p className="text-[#667085] text-sm">Loading your dashboard...</p>
         </div>
         <DashboardSkeleton />
       </div>
@@ -122,24 +165,28 @@ const Dashboard = () => {
   const isServiceBusiness = user?.business_type === 'service';
 
   return (
-    <div className="space-y-6">
+    <div className="kasi-app space-y-6 bg-[#F7F8FA] min-h-screen">
       {!isOnline && (
-        <div className="bg-yellow-50 text-yellow-800 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center shadow-sm border border-yellow-200">
+        <div className="bg-yellow-50 text-yellow-800 px-4 py-3 rounded-lg text-sm font-medium flex items-center justify-center border border-yellow-200">
           You are currently offline. Showing cached data.
         </div>
       )}
 
-      {/* Action Required Alerts */}
+      {/* Action Required Alert Banners */}
       <ActionAlerts user={user} />
 
-      {/* Greeting */}
-      <div className="flex justify-between items-end">
+      {/* Greeting Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
         <div>
-          <h1 className="text-2xl font-bold text-dark">{getGreeting()}, {user?.business_name || 'Business owner'} 👋</h1>
-          <p className="text-gray-500 text-sm">{formatDate()} · Kasi is live and handling conversations</p>
+          <h1 className="text-[28px] font-bold text-[#101828] tracking-tight leading-tight">
+            {getGreeting()}, {user?.business_name || 'AFH'} 👋
+          </h1>
+          <p className="text-sm text-[#667085] mt-1">
+            {formatDate()} · Kasi is live and handling conversations
+          </p>
         </div>
-        <div className="hidden md:flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-xs font-bold border border-green-100">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <div className="flex items-center gap-2 bg-[#ECFDF3] text-[#027A48] border border-[#D1FAE5] px-4 py-2 rounded-full text-xs font-semibold self-start sm:self-center shadow-sm select-none">
+          <span className="w-2 h-2 rounded-full bg-[#12B76A] animate-pulse" />
           Kasi is running
         </div>
       </div>
@@ -193,148 +240,177 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
   }, [services]);
 
   const stats = [
-    { label: 'Revenue This Week', value: formatNaira(analytics?.total_agent_revenue || totalRevenue), icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-100' },
-    { label: 'Confirmed Sessions', value: confirmedSessions.length.toString(), icon: CheckCircle, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { label: "Today's Appointments", value: todaysBookings.length.toString(), icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { label: 'Total Clients', value: uniqueCustomers.toString(), icon: Users, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { 
+      label: 'REVENUE THIS WEEK', 
+      value: formatNaira(analytics?.total_agent_revenue || totalRevenue), 
+      icon: TrendingUp, 
+      color: 'text-[#F97316]', 
+      bg: 'bg-[#FFF4ED]',
+      trend: '+₦24,500 vs last week'
+    },
+    { 
+      label: 'CONFIRMED SESSIONS', 
+      value: confirmedSessions.length.toString(), 
+      icon: CheckCircle, 
+      color: 'text-[#12B76A]', 
+      bg: 'bg-[#ECFDF3]',
+      sub: 'Total booked classes'
+    },
+    { 
+      label: "TODAY'S APPOINTMENTS", 
+      value: todaysBookings.length.toString(), 
+      icon: TrendingUp, 
+      color: 'text-[#7A5AF8]', 
+      bg: 'bg-[#F4F3FF]',
+      sub: `${todaysBookings.length} sessions active`
+    },
+    { 
+      label: 'TOTAL CLIENTS', 
+      value: uniqueCustomers.toString(), 
+      icon: Users, 
+      color: 'text-[#2E90FA]', 
+      bg: 'bg-[#EFF8FF]',
+      sub: 'WhatsApp + Instagram'
+    },
   ];
 
   const platformSplit = [
-    { name: 'WhatsApp', value: 75, color: '#25D366' },
-    { name: 'Instagram', value: 25, color: '#E4405F' }
+    { name: 'WhatsApp', value: 75, color: '#1A7A4A' },
+    { name: 'Instagram', value: 25, color: '#F97316' }
   ];
 
   return (
     <div className="space-y-6">
       {/* Stat Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-start justify-between mb-3">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{stat.label}</p>
-              <div className={`w-8 h-8 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center`}>
-                <stat.icon size={16} />
+          <div key={i} className="bg-white rounded-2xl p-5 border border-[#EAECF0] flex flex-col justify-between h-[120px] shadow-none">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-bold text-[#667085] uppercase tracking-wider">{stat.label}</p>
+              <div className={`w-9 h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-3`}>
+                <stat.icon size={18} />
               </div>
             </div>
-            <p className="text-2xl font-black text-dark">{stat.value}</p>
+            <div className="mt-2">
+              <p className="text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
+              {stat.trend ? (
+                <p className="text-xs text-[#12B76A] font-semibold mt-1">{stat.trend}</p>
+              ) : (
+                <p className="text-xs text-[#667085] mt-1">{stat.sub || ''}</p>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="lg:col-span-3 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-           <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-dark">Revenue this week</h3>
-              <div className="flex gap-2">
-                 <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-orange-500" />
-                    <span className="text-xs text-gray-500 font-medium">This Week</span>
-                 </div>
-              </div>
+        <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
+           <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold text-[#101828]">Revenue this week</h3>
+              <select className="text-sm text-[#667085] border-0 bg-transparent py-1 pl-1 pr-6 font-medium outline-none cursor-pointer">
+                <option>Week</option>
+                <option>Month</option>
+                <option>All time</option>
+              </select>
            </div>
-           <div className="h-[250px] w-full">
+           <div className="h-[240px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={getMockWeeklyData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="serviceRev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#F97316" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#F97316" stopOpacity={0} />
+                      <stop offset="5%" stopColor="rgba(249, 115, 22, 0.12)" />
+                      <stop offset="95%" stopColor="rgba(249, 115, 22, 0.01)" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 12 }} dy={8} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 11 }} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
-                  <Tooltip
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                    formatter={(v) => [`₦${v.toLocaleString()}`, 'Revenue']}
-                  />
-                  <Area type="monotone" dataKey="value" stroke="#F97316" strokeWidth={2.5} fill="url(#serviceRev)" dot={false} activeDot={{ r: 5, fill: '#F97316', stroke: '#fff', strokeWidth: 2 }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2F4F7" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#98A2B3', fontSize: 12 }} dy={8} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#98A2B3', fontSize: 12 }} tickFormatter={(v) => v === 0 ? '₦0' : `₦${v >= 1000 ? (v/1000).toFixed(0) + 'k' : v}`} />
+                  <Tooltip content={<CustomChartTooltip />} cursor={{ stroke: '#F2F4F7', strokeWidth: 1 }} />
+                  <Area type="monotone" dataKey="value" stroke="#F97316" strokeWidth={2} fill="url(#serviceRev)" dot={false} activeDot={{ r: 5, fill: '#F97316', stroke: '#fff', strokeWidth: 2 }} />
                 </AreaChart>
               </ResponsiveContainer>
            </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-           <h3 className="font-bold text-dark mb-6">Platform Split</h3>
-           <div className="space-y-6">
-              {platformSplit.map((p) => (
-                <div key={p.name} className="space-y-2">
-                   <div className="flex justify-between text-xs font-bold">
-                      <span className="text-gray-500">{p.name}</span>
-                      <span className="text-dark">{p.value}%</span>
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
+           <div>
+              <h3 className="text-base font-semibold text-[#101828] mb-6">Platform Split</h3>
+              <div className="space-y-6">
+                 {platformSplit.map((p) => (
+                   <div key={p.name} className="space-y-2">
+                      <div className="flex justify-between text-xs font-semibold">
+                         <span className="text-[#667085]">{p.name}</span>
+                         <span className="text-[#101828]">{p.value}%</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#F2F4F7] rounded-full overflow-hidden">
+                         <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${p.value}%`, backgroundColor: p.color }} />
+                      </div>
                    </div>
-                   <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${p.value}%`, backgroundColor: p.color }} />
-                   </div>
-                </div>
-              ))}
-              <div className="pt-4 mt-4 border-t border-gray-50">
-                 <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
-                    Most of your traffic is coming from WhatsApp. Try running Instagram ads to boost your reach there.
-                 </p>
+                 ))}
               </div>
+           </div>
+           <div className="pt-4 border-t border-[#EAECF0]">
+              <p className="text-xs text-[#667085] leading-relaxed">
+                 Most of your traffic is coming from WhatsApp. Try running Instagram ads to boost your reach there.
+              </p>
            </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-2xl p-6 border border-[#EAECF0] shadow-none">
          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-dark flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[#101828] flex items-center gap-2">
                Today's Schedule
-               <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-bold">
+               <span className="px-2.5 py-0.5 rounded-full bg-[#FFF3EA] text-[#F97316] text-[10px] font-bold tracking-wider uppercase">
                   {todaysBookings.length} APPOINTMENTS
                </span>
             </h3>
-            <Link to="/services/bookings" className="text-xs font-bold text-primary hover:underline">View Full Schedule</Link>
+            <Link to="/services/bookings" className="text-xs font-bold text-[#1A7A4A] hover:underline">View Full Schedule</Link>
          </div>
          
          {todaysBookings.length === 0 ? (
            <div className="py-12 text-center">
-              <p className="text-sm text-gray-400 font-medium">No appointments scheduled for today yet.</p>
+              <p className="text-sm text-[#667085] font-medium">No appointments scheduled for today yet.</p>
            </div>
          ) : (
            <div className="space-y-3">
               {todaysBookings.sort((a,b) => a.booking_time.localeCompare(b.booking_time)).map((booking) => (
-                <div key={booking.id} className="flex items-center gap-4 p-4 rounded-xl border border-gray-50 hover:border-orange-100 hover:bg-orange-50/30 transition-all group">
-                   <div className="w-16 text-center">
-                      <p className="text-sm font-black text-dark">{booking.booking_time}</p>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{booking.duration} MIN</p>
+                <div key={booking.id} className="flex items-center gap-4 p-4 rounded-xl border border-[#EAECF0] hover:bg-[#F8F9FC] transition-colors group">
+                   <div className="w-16 text-center shrink-0">
+                      <p className="text-sm font-bold text-[#101828]">{booking.booking_time}</p>
+                      <p className="text-[10px] text-[#667085] font-semibold uppercase tracking-tight">{booking.duration} MIN</p>
                    </div>
-                   <div className="w-px h-10 bg-gray-100" />
-                   <div className="flex-1">
-                      <h4 className="font-bold text-dark text-sm">{booking.service?.name || 'Service Session'}</h4>
-                      <p className="text-xs text-gray-500">{booking.customer?.name || 'Client'}</p>
+                   <div className="w-px h-8 bg-[#EAECF0] shrink-0" />
+                   <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-[#101828] text-sm truncate">{booking.service?.name || 'Service Session'}</h4>
+                      <p className="text-xs text-[#667085] truncate">{booking.customer?.name || 'Client'}</p>
                    </div>
-                   <div className="hidden md:flex items-center gap-2">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                         booking.status === 'Confirmed' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-gray-50 text-gray-500 border-gray-100'
-                      }`}>
-                         {booking.status}
-                      </span>
+                   <div className="shrink-0 flex items-center gap-3">
+                      <StatusBadge status={booking.status} />
+                      <button onClick={() => navigate('/services/bookings')} className="p-2 text-[#98A2B3] group-hover:text-[#1A7A4A] transition-colors">
+                         <ArrowRight size={16} />
+                      </button>
                    </div>
-                   <button onClick={() => navigate('/services/bookings')} className="p-2 text-gray-300 group-hover:text-primary transition-colors">
-                      <ArrowRight size={18} />
-                   </button>
                 </div>
               ))}
            </div>
          )}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-[15px] font-bold text-dark mb-4">Top services by bookings</h2>
+      <div className="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-none">
+        <h2 className="text-[15px] font-bold text-[#101828] mb-4">Top services by bookings</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {topServices.map(ts => (
-            <div key={ts.id} className="bg-gray-50/50 rounded-xl border border-gray-100 p-4">
-              <h3 className="text-[13px] font-medium text-gray-700 truncate mb-3">{ts.name}</h3>
+            <div key={ts.id} className="bg-[#F8F9FC] rounded-xl border border-[#EAECF0] p-4 flex flex-col justify-between shadow-none">
+              <h3 className="text-xs font-semibold text-[#667085] uppercase tracking-wider truncate mb-3">{ts.name}</h3>
               <div className="flex justify-between items-end">
                 <div>
-                  <div className="text-2xl font-extrabold text-[#10B981] leading-none mb-1">{ts.unitsSold}</div>
-                  <div className="text-[10px] font-medium text-gray-400">bookings</div>
+                  <div className="text-2xl font-bold text-[#1A7A4A] leading-none mb-1">{ts.unitsSold}</div>
+                  <div className="text-[10px] font-medium text-[#667085]">bookings</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-bold text-[#3B82F6] leading-none mb-1">{ts.margin}%</div>
-                  <div className="text-[10px] font-medium text-gray-400">margin</div>
+                  <div className="text-sm font-semibold text-[#175CD3] leading-none mb-1">{ts.margin}%</div>
+                  <div className="text-[10px] font-medium text-[#667085]">margin</div>
                 </div>
               </div>
             </div>
@@ -356,10 +432,39 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
   const needsAttention = pipeline['Requires Attention'] || 0;
 
   const stats = [
-    { label: 'Revenue This Week', value: formatNaira(analytics?.total_agent_revenue || totalRevenue), icon: TrendingUp, bg: 'bg-green-100', color: 'text-green-600' },
-    { label: 'Customers Reached', value: uniqueCustomers.toString(), sublabel: 'WhatsApp + Instagram', icon: Users, bg: 'bg-blue-100', color: 'text-blue-600' },
-    { label: 'Transactions', value: deliveredCount.toString(), sublabel: `${pipeline['Delivered'] || 0} delivered`, icon: CheckCircle, bg: 'bg-emerald-100', color: 'text-emerald-600' },
-    { label: 'AI Resolution', value: `${analytics?.ai_resolution_rate || 91.8}%`, sublabel: `${needsAttention} Attention needed`, icon: CheckCircle, bg: 'bg-purple-100', color: 'text-purple-600' },
+    { 
+      label: 'REVENUE THIS WEEK', 
+      value: formatNaira(analytics?.total_agent_revenue || totalRevenue), 
+      icon: TrendingUp, 
+      bg: 'bg-[#FFF4ED]', 
+      color: 'text-[#F97316]',
+      trend: '+₦24,500 vs last week'
+    },
+    { 
+      label: 'CUSTOMERS REACHED', 
+      value: uniqueCustomers.toString(), 
+      icon: Users, 
+      bg: 'bg-[#EFF8FF]', 
+      color: 'text-[#2E90FA]',
+      sub: 'WhatsApp + Instagram'
+    },
+    { 
+      label: 'TRANSACTIONS', 
+      value: deliveredCount.toString(), 
+      icon: CheckCircle, 
+      bg: 'bg-[#ECFDF3]', 
+      color: 'text-[#12B76A]',
+      sub: `${deliveredCount} delivered`
+    },
+    { 
+      label: 'AI RESOLUTION', 
+      value: `${analytics?.ai_resolution_rate || 91.8}%`, 
+      icon: Cpu, 
+      bg: 'bg-[#F4F3FF]', 
+      color: 'text-[#7A5AF8]',
+      attention: needsAttention > 0,
+      sub: `${needsAttention} Attention needed`
+    },
   ];
 
   const liveConversations = conversations.filter(c => c.status !== 'In Progress').slice(0, 5);
@@ -379,91 +484,116 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stat Cards Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-start justify-between mb-3">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{stat.label}</p>
-              <div className={`w-8 h-8 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center`}>
-                <stat.icon size={16} />
+          <div key={i} className="bg-white rounded-2xl p-5 border border-[#EAECF0] flex flex-col justify-between h-[120px] shadow-none">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-bold text-[#667085] uppercase tracking-wider">{stat.label}</p>
+              <div className={`w-9 h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-3`}>
+                <stat.icon size={18} />
               </div>
             </div>
-            <p className="text-2xl font-black text-dark">{stat.value}</p>
-            {stat.sublabel && <p className="text-[10px] text-gray-400 mt-1 font-medium">{stat.sublabel}</p>}
+            <div className="mt-2">
+              <p className="text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
+              {stat.trend ? (
+                <p className="text-xs text-[#12B76A] font-semibold mt-1">{stat.trend}</p>
+              ) : (
+                <p className={`text-xs font-semibold mt-1 ${stat.attention ? 'text-[#F79009]' : 'text-[#667085]'}`}>{stat.sub || ''}</p>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="lg:col-span-3 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <h3 className="font-bold text-dark mb-4">Revenue this week</h3>
-          <div className="h-[250px] w-full">
+        {/* Revenue Chart Card (~65% width) */}
+        <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-[#101828]">Revenue this week</h3>
+            <select className="text-sm text-[#667085] border-0 bg-transparent py-1 pl-1 pr-6 font-medium outline-none cursor-pointer">
+              <option>Week</option>
+              <option>Month</option>
+              <option>All time</option>
+            </select>
+          </div>
+          <div className="h-[240px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={getMockWeeklyData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F97316" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#F97316" stopOpacity={0} />
+                    <stop offset="5%" stopColor="rgba(249, 115, 22, 0.12)" />
+                    <stop offset="95%" stopColor="rgba(249, 115, 22, 0.01)" />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 12 }} dy={8} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 11 }} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
-                <Tooltip
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  formatter={(v) => [`₦${v.toLocaleString()}`, 'Revenue']}
-                />
-                <Area type="monotone" dataKey="value" stroke="#F97316" strokeWidth={2.5} fill="url(#revenueGrad)" dot={false} activeDot={{ r: 5, fill: '#F97316', stroke: '#fff', strokeWidth: 2 }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2F4F7" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#98A2B3', fontSize: 12 }} dy={8} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#98A2B3', fontSize: 12 }} tickFormatter={(v) => v === 0 ? '₦0' : `₦${v >= 1000 ? (v/1000).toFixed(0) + 'k' : v}`} />
+                <Tooltip content={<CustomChartTooltip />} cursor={{ stroke: '#F2F4F7', strokeWidth: 1 }} />
+                <Area type="monotone" dataKey="value" stroke="#F97316" strokeWidth={2} fill="url(#revenueGrad)" dot={false} activeDot={{ r: 5, fill: '#F97316', stroke: '#fff', strokeWidth: 2 }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col">
-          <h3 className="font-bold text-dark mb-4">Live conversations</h3>
-          <div className="flex-1 space-y-3 overflow-y-auto">
+        {/* Live Conversations Panel (~35% width) */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
+          <div className="flex items-center justify-between mb-4 border-b border-[#F2F4F7] pb-3 shrink-0">
+            <h3 className="text-base font-semibold text-[#101828]">Live conversations</h3>
+            <span className="text-[11px] font-semibold text-[#12B76A]">● Live</span>
+          </div>
+          
+          <div className="flex-1 space-y-1 overflow-y-auto pr-1">
             {liveConversations.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-6">No active conversations</p>
+              <p className="text-sm text-[#667085] text-center py-12">No active conversations</p>
             ) : (
               liveConversations.map((conv) => {
-                const sc = statusConfig[conv.status] || statusConfig['In Progress'];
+                const avatarTheme = getAvatarTheme(conv.customer_name);
                 return (
-                  <div key={conv.id} className="flex items-center gap-3 group cursor-pointer hover:bg-gray-50 rounded-xl px-2 py-2 -mx-2 transition-colors" onClick={() => navigate('/chats')}>
-                    <div className={`w-9 h-9 rounded-full ${getAvatarColor(conv.customer_name)} text-white flex items-center justify-center font-bold text-[11px] shrink-0`}>
-                      {getInitials(conv.customer_name)}
+                  <div 
+                    key={conv.id} 
+                    className="h-[68px] flex items-center justify-between py-3 border-b border-[#F2F4F7] last:border-0 cursor-pointer group hover:bg-[#F8F9FC] rounded-lg px-2 -mx-2 transition-colors" 
+                    onClick={() => navigate('/chats')}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`w-9 h-9 rounded-full ${avatarTheme.bg} ${avatarTheme.text} flex items-center justify-center font-bold text-[13px] shrink-0 select-none`}>
+                        {getInitials(conv.customer_name)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-[#101828] text-sm truncate">{conv.customer_name || conv.customer_phone || 'Unknown'}</p>
+                        <p className="text-[13px] text-[#667085] truncate">{conv.ai_summary || conv.customer_phone || ''}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-dark text-sm truncate">{conv.customer_name || conv.customer_phone || 'Unknown'}</p>
-                      <p className="text-[11px] text-gray-400 truncate">{conv.ai_summary?.slice(0, 30) || conv.customer_phone || ''}</p>
+                    <div className="shrink-0 ml-2">
+                      <StatusBadge status={conv.status} />
                     </div>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap ${sc.bg} ${sc.text}`}>
-                      {sc.label || conv.status}
-                    </span>
                   </div>
                 );
               })
             )}
           </div>
-          <Link to="/chats" className="flex items-center justify-center gap-1 text-sm text-primary font-semibold mt-3 pt-3 border-t border-gray-100 hover:text-green-700 transition-colors">
-            View all chats <ArrowRight size={14} />
+          
+          <Link to="/chats" className="text-sm font-semibold text-[#1A7A4A] hover:underline block text-center pt-4 border-t border-[#F2F4F7] mt-3 shrink-0 select-none">
+            View all chats →
           </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-[15px] font-bold text-dark mb-4">Top products by units sold</h2>
+      {/* Bottom Row - Top Products */}
+      <div className="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-none">
+        <h2 className="text-[15px] font-bold text-[#101828] mb-4">Top products by units sold</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {topProducts.map(tp => (
-            <div key={tp.id} className="bg-gray-50/50 rounded-xl border border-gray-100 p-4">
-              <h3 className="text-[13px] font-medium text-gray-700 truncate mb-3">{tp.name}</h3>
+            <div key={tp.id} className="bg-[#F8F9FC] rounded-xl border border-[#EAECF0] p-4 flex flex-col justify-between shadow-none">
+              <h3 className="text-xs font-semibold text-[#667085] uppercase tracking-wider truncate mb-3">{tp.name}</h3>
               <div className="flex justify-between items-end">
                 <div>
-                  <div className="text-2xl font-extrabold text-[#F97316] leading-none mb-1">{tp.unitsSold}</div>
-                  <div className="text-[10px] font-medium text-gray-400">units sold</div>
+                  <div className="text-2xl font-bold text-[#F97316] leading-none mb-1">{tp.unitsSold}</div>
+                  <div className="text-[10px] font-medium text-[#667085]">units sold</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-bold text-[#10B981] leading-none mb-1">{tp.margin}%</div>
-                  <div className="text-[10px] font-medium text-gray-400">margin</div>
+                  <div className="text-sm font-semibold text-[#12B76A] leading-none mb-1">{tp.margin}%</div>
+                  <div className="text-[10px] font-medium text-[#667085]">margin</div>
                 </div>
               </div>
             </div>
@@ -480,6 +610,10 @@ const ActionAlerts = ({ user }) => {
   const navigate = useNavigate();
   const [integrations, setIntegrations] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // States to manage local banner dismissals
+  const [dismissedPaystack, setDismissedPaystack] = useState(false);
+  const [dismissedWhatsApp, setDismissedWhatsApp] = useState(false);
 
   useEffect(() => {
     fetchIntegrations();
@@ -499,57 +633,75 @@ const ActionAlerts = ({ user }) => {
   const hasWhatsApp = integrations.some(i => i.platform === 'whatsapp' && i.connection_status === 'connected');
   const hasPaystack = !!user?.paystack_integration;
 
-  const alerts = [];
-
-  if (!hasWhatsApp) {
-    alerts.push({
-      id: 'whatsapp',
-      title: 'WhatsApp not connected',
-      desc: 'Connect your WhatsApp so Kasi can start chatting with customers.',
-      action: 'Connect Now',
-      link: '/settings/integrations',
-      icon: MessageSquare,
-      color: 'bg-green-50 text-green-700 border-green-100',
-      btnColor: 'bg-green-600'
-    });
-  }
-
-  if (!hasPaystack) {
-    alerts.push({
-      id: 'paystack',
-      title: 'Payments not connected',
-      desc: 'Link your Paystack account to receive payments from customers.',
-      action: 'Link Account',
-      link: '/settings/integrations',
-      icon: DollarSign,
-      color: 'bg-blue-50 text-blue-700 border-blue-100',
-      btnColor: 'bg-blue-600'
-    });
-  }
-
-  if (loading || alerts.length === 0) return null;
+  if (loading) return null;
 
   return (
-    <div className="space-y-3 animate-in fade-in slide-in-from-top-4 duration-500 mb-6">
-      {alerts.map((alert) => (
-        <div key={alert.id} className={`flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-5 rounded-[1.5rem] border ${alert.color} shadow-sm`}>
-          <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-2xl bg-white/50 flex items-center justify-center shrink-0`}>
-              <alert.icon size={24} />
+    <div className="space-y-2 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
+      {/* 3.2 — PAYMENTS BANNER */}
+      {!hasPaystack && !dismissedPaystack && (
+        <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-lg py-1.5 px-3 flex items-center justify-between gap-3 shadow-none">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            {/* Dollar icon in blue circle, 24px */}
+            <div className="w-6 h-6 rounded-full bg-[#D1E9FF] text-[#175CD3] flex items-center justify-center shrink-0">
+              <DollarSign size={12} />
             </div>
-            <div>
-              <h3 className="font-black text-sm uppercase tracking-tight">{alert.title}</h3>
-              <p className="text-xs font-medium opacity-80">{alert.desc}</p>
+            <div className="text-xs text-[#344054] min-w-0 flex-1 leading-normal">
+              <span className="font-bold text-[#175CD3] tracking-wider uppercase mr-1.5">PAYMENTS NOT CONNECTED:</span>
+              Link your Paystack account to receive payments from customers.
             </div>
           </div>
-          <button
-            onClick={() => navigate(alert.link)}
-            className={`w-full sm:w-auto px-6 py-3 ${alert.btnColor} text-white rounded-xl text-xs font-black shadow-lg shadow-black/5 hover:scale-105 transition-all`}
-          >
-            {alert.action}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => navigate('/settings/integrations')}
+              className="px-2.5 py-1 bg-[#175CD3] hover:bg-[#114B9E] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+            >
+              Link Account
+            </button>
+            {/* Dismiss button */}
+            <button
+              onClick={() => setDismissedPaystack(true)}
+              className="text-[#98A2B3] hover:text-[#667085] p-0.5 rounded transition-colors cursor-pointer shrink-0"
+              title="Dismiss"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
-      ))}
+      )}
+
+      {/* WHATSAPP BANNER */}
+      {!hasWhatsApp && !dismissedWhatsApp && (
+        <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-lg py-1.5 px-3 flex items-center justify-between gap-3 shadow-none">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-6 h-6 rounded-full bg-[#D1FADF] text-[#027A48] flex items-center justify-center shrink-0">
+              <MessageSquare size={12} />
+            </div>
+            <div className="text-xs text-[#344054] min-w-0 flex-1 leading-normal">
+              <span className="font-bold text-[#027A48] tracking-wider uppercase mr-1.5">WHATSAPP NOT CONNECTED:</span>
+              Connect your WhatsApp so Kasi can start chatting with customers.
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => navigate('/settings/integrations')}
+              className="px-2.5 py-1 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+            >
+              Connect Now
+            </button>
+            <button
+              onClick={() => setDismissedWhatsApp(true)}
+              className="text-[#98A2B3] hover:text-[#667085] p-0.5 rounded transition-colors cursor-pointer shrink-0"
+              title="Dismiss"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
