@@ -128,13 +128,13 @@ export const HeroSection = () => {
                 <div className="flex-1 bg-bg-subtle p-3 flex flex-col gap-3 overflow-y-auto no-scrollbar">
                   {/* Customer bubble */}
                   <div className="self-end max-w-[85%] bg-black text-white border border-black px-3.5 py-2.5 rounded-[16px] rounded-tr-none text-[9.5px] font-bold leading-normal font-sans text-left shadow-sm">
-                    How much for 2 packs of Bitter Kola?
+                    How much for 2 plates of fried rice and 1 wrap of suya?
                   </div>
 
                   {/* Kasi automated reply */}
                   <div className="self-start max-w-[85%] bg-white text-black border border-black px-3.5 py-2.5 rounded-[16px] rounded-tl-none text-[9.5px] font-bold leading-normal font-sans text-left shadow-sm">
-                    Bitter Kola is ₦1,250 a pack. Since you are ordering 2
-                    packs, I can apply a bulk discount and do <b>₦2,100</b>.{" "}
+                    Fried rice and suya is ₦5,500. Since you are ordering 2
+                    packs, I can apply a bulk discount and do <b>₦8,000</b>.{" "}
                     <br />
                     <br />
                     Should I confirm this order?
@@ -264,12 +264,13 @@ export const HeroSection = () => {
                   RECEIPT
                 </div>
                 <div className="flex justify-between">
-                  <span>Bitter Kola</span>
+                  <span>Fried Rice</span>
+                  <span>Suya</span>
                   <span>x2</span>
                 </div>
                 <div className="flex justify-between mb-1">
                   <span>Total</span>
-                  <span>₦2,100</span>
+                  <span>₦8,000</span>
                 </div>
                 <div className="text-center bg-[#E8F5EE] text-[#1A7A4A] border border-[#1A7A4A] py-0.5 rounded-[4px] font-bold text-[6.5px] uppercase">
                   PAID
