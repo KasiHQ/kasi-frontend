@@ -31,14 +31,14 @@ export const TestimonialSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-20 space-y-4 text-left">
+        <div className="max-w-3xl mb-20 space-y-4 text-left reveal">
           <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
             06_Testimonials & Love
           </div>
           <h2 className="text-[40px] max-md:leading-10 md:text-5xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight">
-            Loved by merchants in <span className="text-green-600">Nigeria.</span>
+            Loved by merchants in <span className="text-green-650">Nigeria.</span>
           </h2>
-          <p className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium font-prompt leading-relaxed max-w-xl">
+          <p className="text-base md:text-lg text-gray-550 dark:text-gray-400 font-medium font-prompt leading-relaxed max-w-xl">
             See how vendors across Lagos, Abuja, and Port Harcourt leverage Kasi's automated direct-selling agent to double conversions and free up precious hours.
           </p>
         </div>
@@ -48,7 +48,7 @@ export const TestimonialSection = () => {
           {TESTIMONIALS.map((t, idx) => (
             <div 
               key={idx} 
-              className="bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-6 relative hover:scale-[1.01]"
+              className={`bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-6 relative hover:scale-[1.01] reveal delay-${(idx + 1) * 100}`}
             >
               {/* Quote icon ornament */}
               <div className="absolute top-6 right-8 text-gray-100 dark:text-gray-805 select-none pointer-events-none">

@@ -7,7 +7,7 @@ export const LogisticsSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 font-prompt">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-20 space-y-4 text-left">
+        <div className="max-w-3xl mb-20 space-y-4 text-left reveal">
           <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
             04_Logistics & Dispatch
           </div>
@@ -23,7 +23,7 @@ export const LogisticsSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Graphics (Custom dispatch and delivery progress timeline) */}
-          <div className="lg:col-span-6 flex justify-center text-left">
+          <div className="lg:col-span-6 flex justify-center text-left reveal delay-100">
             <div className="w-full max-w-[420px] bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-[32px] p-6 md:p-8 hover:shadow-xl transition-shadow duration-300 space-y-6">
               
               <div className="flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-850 pb-3">
@@ -86,7 +86,7 @@ export const LogisticsSection = () => {
           </div>
 
           {/* Right Column: Key Details */}
-          <div className="lg:col-span-6 space-y-8 text-left">
+          <div className="lg:col-span-6 space-y-8 text-left reveal reveal-right delay-200">
             <h3 className="text-2xl md:text-3.5xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight leading-tight">
               Say goodbye to manual dispatch headaches.
             </h3>

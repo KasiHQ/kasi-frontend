@@ -35,7 +35,7 @@ export const NegotiationSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 font-prompt">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-20 space-y-4 text-left">
+        <div className="max-w-3xl mb-20 space-y-4 text-left reveal">
           <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
             03_Smart Negotiation
           </div>
@@ -51,7 +51,7 @@ export const NegotiationSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Left Column: Explainer and Interactive Slider */}
-          <div className="lg:col-span-5 space-y-8 text-left">
+          <div className="lg:col-span-5 space-y-8 text-left reveal delay-100">
             <div className="space-y-4">
               <h3 className="text-2xl md:text-3.5xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight leading-tight">
                 Try the Live AI Haggling Simulator
@@ -100,7 +100,7 @@ export const NegotiationSection = () => {
           </div>
 
           {/* Right Column: Custom live response chatbot mockup */}
-          <div className="lg:col-span-7 flex justify-center lg:justify-end text-left">
+          <div className="lg:col-span-7 flex justify-center lg:justify-end text-left reveal reveal-right delay-200">
             <div className="w-full max-w-[460px] bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-850 rounded-[32px] p-6 hover:shadow-xl transition-shadow duration-300 flex flex-col gap-4">
               
               <div className="flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1 border-b border-gray-100 dark:border-gray-800 pb-3">

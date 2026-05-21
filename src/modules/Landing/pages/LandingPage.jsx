@@ -81,6 +81,31 @@ const LandingPage = () => {
     };
   }, []);
 
+  // Custom Animate on Scroll (AOS) Intersection Observer
+  useEffect(() => {
+    const revealElements = document.querySelectorAll('.reveal');
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px 0px -50px 0px', // trigger slightly before entering fully
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-active');
+          observer.unobserve(entry.target); // make it animate once for premium feel
+        }
+      });
+    }, observerOptions);
+
+    revealElements.forEach(el => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-white dark:bg-bg-main text-gray-900 dark:text-gray-100 font-sans tracking-tight antialiased selection:bg-green-500/10 selection:text-green-600 overflow-x-hidden w-full relative">
       

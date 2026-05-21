@@ -15,7 +15,7 @@ export const InvoiceSection = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="max-w-3xl mb-20 space-y-4">
+        <div className="max-w-3xl mb-20 space-y-4 reveal">
           <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
             02_Invoicing & Payments
           </div>
@@ -32,7 +32,7 @@ export const InvoiceSection = () => {
         {/* Modular Grid Layout (Inspired by Image 4) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start font-prompt">
           {/* Left Column: Heading and 3D Angled Phone Invoice Tracker */}
-          <div className="lg:col-span-6 space-y-8 bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 md:p-12 hover:shadow-xl transition-shadow duration-300">
+          <div className="lg:col-span-6 space-y-8 bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 md:p-12 hover:shadow-xl transition-shadow duration-300 reveal delay-100">
             <div className="space-y-4">
               <h3 className="text-2xl md:text-3.5xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight leading-tight">
                 Stay in control of your cash, every step of the way.
@@ -148,7 +148,7 @@ export const InvoiceSection = () => {
           {/* Right Column: Custom Command Centre Plate and Stats Analytics Chart */}
           <div className="lg:col-span-6 space-y-8">
             {/* Top Wreath Capsule (Inspired by Image 4 black banner) */}
-            <div className="relative w-full bg-gray-950 text-white rounded-[32px] p-8 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <div className="relative w-full bg-gray-950 text-white rounded-[32px] p-8 overflow-hidden hover:shadow-xl transition-shadow duration-300 reveal reveal-right delay-200">
               {/* Star plate ambient decoration */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-blue-500/10 blur-[60px] rounded-full pointer-events-none" />
 
@@ -169,7 +169,7 @@ export const InvoiceSection = () => {
             </div>
 
             {/* Bottom Revenue Chart Card (Inspired by Image 4 right bottom card) */}
-            <div className="bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 md:p-12 hover:shadow-xl transition-shadow duration-300 space-y-8">
+            <div className="bg-white dark:bg-bg-surface border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 md:p-12 hover:shadow-xl transition-shadow duration-300 space-y-8 reveal reveal-right delay-300">
               <div className="flex justify-between items-end">
                 <div className="space-y-1">
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-0.5">

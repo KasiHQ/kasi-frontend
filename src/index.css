@@ -10,8 +10,9 @@
   --color-secondary: #ff8c00;
   --color-dark: #111827;
   --color-bg-main: #FFFFFF;
+  --font-sans: "Bricolage Grotesque", sans-serif;
   --font-bricolage: "Bricolage Grotesque", sans-serif;
-  --font-prompt: "Inter", sans-serif;
+  --font-prompt: "Bricolage Grotesque", sans-serif;
 }
 
 /* Custom Utilities */
@@ -39,6 +40,7 @@
 body {
   background-color: var(--color-bg-main);
   color: var(--color-dark);
+  font-family: var(--font-sans);
 }
 
 /* Base bg-bg-main for light mode */
@@ -721,3 +723,54 @@ body {
 
 .theme-warm-dark ::-webkit-scrollbar-track { background: #1c1917; }
 .theme-warm-dark ::-webkit-scrollbar-thumb { background: #44403c; border-radius: 4px; }
+
+/* ── Custom Scroll Reveal Animations (AOS) ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.reveal.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-fade {
+  transform: none;
+}
+.reveal-fade.reveal-active {
+  opacity: 1;
+}
+
+.reveal-left {
+  transform: translateX(-30px);
+}
+.reveal-left.reveal-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  transform: translateX(30px);
+}
+.reveal-right.reveal-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  transform: scale(0.95);
+}
+.reveal-scale.reveal-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Staggered Delay classes */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+.delay-500 { transition-delay: 500ms; }

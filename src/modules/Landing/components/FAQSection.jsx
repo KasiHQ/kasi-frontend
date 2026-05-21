@@ -29,14 +29,14 @@ export const FAQSection = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center mb-20 space-y-4">
+        <div className="text-center mb-20 space-y-4 reveal">
           <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
             07_FAQ & Support
           </div>
           <h2 className="text-[40px] max-md:leading-10 md:text-5xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight">
-            Frequently asked <span className="text-green-600">questions.</span>
+            Frequently asked <span className="text-green-650">questions.</span>
           </h2>
-          <p className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium font-prompt leading-relaxed max-w-xl mx-auto">
+          <p className="text-base md:text-lg text-gray-550 dark:text-gray-400 font-medium font-prompt leading-relaxed max-w-xl mx-auto">
             Everything you need to know about Kasi AI's credit features, direct bank integrations, and social chat channel connections.
           </p>
         </div>
@@ -48,7 +48,7 @@ export const FAQSection = () => {
             return (
               <div 
                 key={idx}
-                className="bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 rounded-3xl overflow-hidden transition-all duration-300 shadow-2xs hover:shadow-xs"
+                className={`bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 rounded-3xl overflow-hidden transition-all duration-300 shadow-2xs hover:shadow-xs reveal delay-${(idx + 1) * 100}`}
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : idx)}

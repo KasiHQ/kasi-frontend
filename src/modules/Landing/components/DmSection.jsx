@@ -7,7 +7,7 @@ export const DmSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="max-w-3xl mb-20 space-y-4 text-left">
+        <div className="max-w-3xl mb-20 space-y-4 text-left reveal">
           <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
             01_Direct Messages (DMs)
           </div>
@@ -23,7 +23,7 @@ export const DmSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch font-prompt">
           
           {/* Column 1: Catalog Management */}
-          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01]">
+          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01] reveal delay-100">
             <div className="space-y-4 flex flex-col items-center">
               {/* Outline Icon */}
               <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-bg-surface border border-gray-100 dark:border-gray-800 flex items-center justify-center shrink-0 text-gray-500 shadow-2xs">
@@ -70,7 +70,7 @@ export const DmSection = () => {
           </div>
 
           {/* Column 2: Sales Channels */}
-          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01]">
+          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01] reveal delay-200">
             <div className="space-y-4 flex flex-col items-center">
               {/* Outline Icon */}
               <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-bg-surface border border-gray-100 dark:border-gray-800 flex items-center justify-center shrink-0 text-gray-500 shadow-2xs">
@@ -131,7 +131,7 @@ export const DmSection = () => {
           </div>
 
           {/* Column 3: Order Analytics */}
-          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01]">
+          <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-bg-main p-6 rounded-[32px] hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-850 hover:scale-[1.01] reveal delay-300">
             <div className="space-y-4 flex flex-col items-center">
               {/* Outline Icon */}
               <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-bg-surface border border-gray-100 dark:border-gray-800 flex items-center justify-center shrink-0 text-gray-500 shadow-2xs">

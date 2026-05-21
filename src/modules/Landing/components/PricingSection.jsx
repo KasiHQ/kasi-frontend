@@ -22,9 +22,8 @@ export const PricingSection = () => {
   return (
     <section id="pricing" className="py-24 bg-white dark:bg-bg-main border-b border-gray-50 dark:border-gray-850/80 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 font-prompt">
-        
-        {/* Section Header */}
-        <div className="max-w-3xl mb-20 space-y-4 text-left">
+             {/* Section Header */}
+        <div className="max-w-3xl mb-20 space-y-4 text-left reveal">
           <div className="inline-block px-3 py-1 bg-transparent text-gray-950 dark:text-white text-xs font-bold font-mono rounded-full border border-gray-950 dark:border-white/20">
             05_Credits & Pricing
           </div>
@@ -40,7 +39,7 @@ export const PricingSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20 items-stretch">
           
           {/* Card 1 */}
-          <div className="bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 p-8 rounded-[32px] flex flex-col items-center text-center justify-between hover:shadow-lg transition-shadow duration-300">
+          <div className="bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 p-8 rounded-[32px] flex flex-col items-center text-center justify-between hover:shadow-lg transition-shadow duration-300 reveal delay-100">
             <div className="space-y-4 flex flex-col items-center">
               <div className="w-12 h-12 rounded-2xl bg-gray-900 text-white dark:bg-white dark:text-gray-950 font-bold font-bricolage text-lg flex items-center justify-center shadow-md">
                 1
@@ -54,7 +53,7 @@ export const PricingSection = () => {
           </div>
 
           {/* Card 2: Highlighted active card */}
-          <div className="bg-green-50/20 dark:bg-green-950/5 border-2 border-green-500 p-8 rounded-[32px] flex flex-col items-center text-center justify-between shadow-xl relative hover:scale-[1.01] transition-transform duration-300">
+          <div className="bg-green-50/20 dark:bg-green-950/5 border-2 border-green-500 p-8 rounded-[32px] flex flex-col items-center text-center justify-between shadow-xl relative hover:scale-[1.01] transition-transform duration-300 reveal delay-200">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-550 text-white px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-md">
               100% Free Chats
             </div>
@@ -72,7 +71,7 @@ export const PricingSection = () => {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 p-8 rounded-[32px] flex flex-col items-center text-center justify-between hover:shadow-lg transition-shadow duration-300">
+          <div className="bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 p-8 rounded-[32px] flex flex-col items-center text-center justify-between hover:shadow-lg transition-shadow duration-300 reveal delay-300">
             <div className="space-y-4 flex flex-col items-center">
               <div className="w-12 h-12 rounded-2xl bg-gray-900 text-white dark:bg-white dark:text-gray-950 font-bold font-bricolage text-lg flex items-center justify-center shadow-md">
                 3
@@ -88,7 +87,7 @@ export const PricingSection = () => {
         </div>
 
         {/* Pricing Calculator Block */}
-        <div className="bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 md:p-12 flex flex-col lg:flex-row items-center gap-12 hover:shadow-xl transition-shadow duration-300">
+        <div className="bg-gray-50/50 dark:bg-bg-surface/50 border border-gray-100 dark:border-gray-800 rounded-[32px] p-8 md:p-12 flex flex-col lg:flex-row items-center gap-12 hover:shadow-xl transition-shadow duration-300 reveal delay-100">
           
           {/* Slider input column */}
           <div className="w-full lg:w-1/2 space-y-6 text-left">

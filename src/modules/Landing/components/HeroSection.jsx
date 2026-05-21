@@ -14,7 +14,7 @@ export const HeroSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           {/* Left Column: Heading and copy */}
-          <div className="lg:col-span-6 space-y-8 text-left">
+          <div className="lg:col-span-6 space-y-8 text-left reveal">
             <h1 className="text-[40px] max-md:leading-10 md:text-5xl lg:text-6xl font-semibold font-bricolage text-gray-900 dark:text-white tracking-tight leading-[1.08] max-w-xl">
               AI-Powered <br className="hidden md:block"/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-400">Direct Sales</span> <br />
@@ -60,7 +60,7 @@ export const HeroSection = () => {
           </div>
 
           {/* Right Column: Beautiful background card & 3D interactive CSS phone mockup */}
-          <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end mt-10 lg:mt-0">
+          <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end mt-10 lg:mt-0 reveal reveal-right delay-200">
             {/* Ambient Background Plate matching Image 1 */}
             <div className="relative w-full max-w-[440px] aspect-square bg-[#00B05C] rounded-[48px] shadow-2xl p-8 flex items-center justify-center overflow-visible group hover:scale-[1.01] transition-transform duration-500">
               {/* White dot grid pattern overlay */}
