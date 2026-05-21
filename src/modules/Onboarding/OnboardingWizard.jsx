@@ -205,10 +205,6 @@ const ProfileStep = ({ onComplete, initialData, loading }) => {
 
   const handleFinalSubmit = async (e) => {
     e.preventDefault();
-    if (!isVerified) {
-      addToast('Please verify your WhatsApp number first', 'warning');
-      return;
-    }
     
     // Save profile details first
     try {
@@ -243,65 +239,20 @@ const ProfileStep = ({ onComplete, initialData, loading }) => {
           </div>
         </div>
 
-        {/* WhatsApp Verification */}
+        {/* WhatsApp Number (No Verification) */}
         <div className="space-y-1.5">
           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">WhatsApp Number</label>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="tel"
-                required
-                disabled={isVerified}
-                className={`w-full pl-12 pr-4 py-3.5 border rounded-2xl text-sm font-bold transition-all outline-none ${
-                  isVerified 
-                    ? 'bg-green-50 border-green-200 text-green-700' 
-                    : 'bg-gray-50 border-gray-100 focus:bg-white focus:border-green-600 focus:ring-4 focus:ring-green-50'
-                }`}
-                value={form.phone}
-                onChange={(e) => handleUpdateField('phone', e.target.value)}
-                placeholder="+234 812 345 6789"
-              />
-              {isVerified && <CheckCircle size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-green-600" />}
-            </div>
-            {!isVerified && (
-              <button
-                type="button"
-                onClick={handleSendCode}
-                disabled={sendingCode || !form.phone}
-                className="px-4 py-3.5 bg-dark text-white rounded-2xl text-xs font-black hover:bg-black disabled:opacity-50 transition-all flex items-center gap-2"
-              >
-                {sendingCode ? <Loader2 size={16} className="animate-spin" /> : <><Send size={14} /> Send Code</>}
-              </button>
-            )}
+          <div className="relative">
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="tel"
+              required
+              className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-green-600 focus:ring-4 focus:ring-green-50 transition-all outline-none"
+              value={form.phone}
+              onChange={(e) => handleUpdateField('phone', e.target.value)}
+              placeholder="+234 812 345 6789"
+            />
           </div>
-          
-          {codeSent && !isVerified && (
-            <div className="mt-2 space-y-2 animate-in slide-in-from-top-2 duration-300">
-              <p className="text-[10px] text-blue-600 font-bold bg-blue-50 px-3 py-1.5 rounded-lg flex items-center gap-2 border border-blue-100">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                DEVELOPER NOTE: Check your Flask terminal for the 6-digit code.
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  maxLength={6}
-                  className="flex-1 px-4 py-3 bg-white border-2 border-green-600 rounded-2xl text-center tracking-[0.5em] font-black text-lg focus:ring-4 focus:ring-green-50 outline-none"
-                  placeholder="000000"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                />
-                <button
-                  type="button"
-                  onClick={handleVerifyCode}
-                  disabled={verifying || verificationCode.length < 6}
-                  className="px-6 bg-green-600 text-white rounded-2xl text-xs font-black hover:bg-green-700 disabled:opacity-50 transition-all"
-                >
-                  {verifying ? <Loader2 size={16} className="animate-spin" /> : 'Verify'}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Business Bio */}
@@ -349,7 +300,7 @@ const ProfileStep = ({ onComplete, initialData, loading }) => {
 
       <button
         type="submit"
-        disabled={loading || !isVerified}
+        disabled={loading}
         className="w-full py-4 bg-green-600 text-white rounded-2xl text-lg font-black shadow-xl shadow-green-100 hover:bg-green-700 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:scale-100 mt-6 flex items-center justify-center gap-2"
       >
         {loading ? <><Loader2 size={20} className="animate-spin" /> Finalizing...</> : 'Complete Setup'}
