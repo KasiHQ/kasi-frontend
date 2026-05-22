@@ -41,7 +41,7 @@ const AdminInvoices = () => {
     const fetchInvoices = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/api/admin/invoices');
+        const response = await api.get('/api/kasisalienceadministration/invoices');
         if (isMounted) {
           if (response.data && response.data.status === 'success') {
             setInvoices(response.data.data);

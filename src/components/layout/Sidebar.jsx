@@ -29,23 +29,44 @@ const Sidebar = ({ onWidthChange }) => {
     onWidthChange?.(collapsed ? 72 : 220);
   }, []);
 
-  const navItems = isService ? [
-    { icon: Home, label: 'Home', path: '/dashboard' },
-    { icon: Calendar, label: 'Schedule', path: '/bookings' },
-    { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
-    { icon: Users, label: 'Clients', path: '/customers' },
-    { icon: Briefcase, label: 'Services', path: '/services' },
-  ] : [
-    { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-    { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
-    { icon: Package, label: 'Store', path: '/products' },
-    { icon: Truck, label: 'Logistics', path: '/logistics', badge: true },
-    { icon: Users, label: 'Customers', path: '/customers' },
-    { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
-  ];
-
-  // Admin overrides
   const isAdmin = user?.is_admin;
+  const adminRole = user?.admin_role;
+
+  let navItems = [];
+  if (isAdmin) {
+    navItems.push({ icon: Home, label: 'Admin Dashboard', path: '/kasisalienceadministration' });
+    
+    if (adminRole === 'Super Admin' || adminRole === 'Support Admin') {
+      navItems.push({ icon: Users, label: 'Vendors', path: '/kasisalienceadministration/users' });
+    }
+    if (adminRole === 'Super Admin' || adminRole === 'Finance Admin') {
+      navItems.push({ icon: BarChart3, label: 'Invoices', path: '/kasisalienceadministration/invoices' });
+      navItems.push({ icon: TrendingUp, label: 'Transactions', path: '/kasisalienceadministration/transactions' });
+    }
+    if (adminRole === 'Super Admin' || adminRole === 'Support Admin') {
+      navItems.push({ icon: MessageSquare, label: 'Broadcasts', path: '/kasisalienceadministration/broadcasts' });
+      navItems.push({ icon: PanelTop, label: 'Audit Logs', path: '/kasisalienceadministration/audit-logs' });
+    }
+    if (adminRole === 'Super Admin') {
+      navItems.push({ icon: Calendar, label: 'Waitlist', path: '/kasisalienceadministration/waitlist' });
+      navItems.push({ icon: Settings, label: 'Staff Panel', path: '/kasisalienceadministration/staff' });
+    }
+  } else {
+    navItems = isService ? [
+      { icon: Home, label: 'Home', path: '/dashboard' },
+      { icon: Calendar, label: 'Schedule', path: '/bookings' },
+      { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
+      { icon: Users, label: 'Clients', path: '/customers' },
+      { icon: Briefcase, label: 'Services', path: '/services' },
+    ] : [
+      { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
+      { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
+      { icon: Package, label: 'Store', path: '/products' },
+      { icon: Truck, label: 'Logistics', path: '/logistics', badge: true },
+      { icon: Users, label: 'Customers', path: '/customers' },
+      { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
+    ];
+  }
 
   return (
     <div
@@ -73,8 +94,8 @@ const Sidebar = ({ onWidthChange }) => {
         </button>
       </div>
 
-      {/* Global Search (Hidden when collapsed) */}
-      {!collapsed && (
+      {/* Global Search (Hidden when collapsed or for admin) */}
+      {!collapsed && !isAdmin && (
         <div className="px-3 pb-3">
           <GlobalSearch />
         </div>
@@ -86,6 +107,7 @@ const Sidebar = ({ onWidthChange }) => {
           <NavLink
             key={item.path}
             to={item.path}
+            end={item.path === '/kasisalienceadministration' || item.path === '/dashboard'}
             title={collapsed ? item.label : undefined}
             className={({ isActive }) =>
               clsx(
@@ -114,35 +136,28 @@ const Sidebar = ({ onWidthChange }) => {
 
       {/* Bottom Section */}
       <div className={clsx('border-t border-gray-100 space-y-1', collapsed ? 'p-2' : 'p-3')}>
-        {/* Settings */}
-        <NavLink
-          to="/settings"
-          title={collapsed ? 'Settings' : undefined}
-          className={({ isActive }) =>
-            clsx(
-              'kasi-nav-item flex items-center rounded-xl transition-all duration-200 font-semibold text-sm',
-              collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-4 py-2.5',
-              isActive
-                ? 'kasi-nav-active bg-primary text-white shadow-md'
-                : 'text-gray-500 hover:text-dark hover:bg-gray-100/80'
-            )
-          }
-        >
-          <Settings size={19} />
-          {!collapsed && <span>Settings</span>}
-        </NavLink>
+        {/* Settings - Only for standard users */}
+        {!isAdmin && (
+          <NavLink
+            to="/settings"
+            title={collapsed ? 'Settings' : undefined}
+            className={({ isActive }) =>
+              clsx(
+                'kasi-nav-item flex items-center rounded-xl transition-all duration-200 font-semibold text-sm',
+                collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-4 py-2.5',
+                isActive
+                  ? 'kasi-nav-active bg-primary text-white shadow-md'
+                  : 'text-gray-500 hover:text-dark hover:bg-gray-100/80'
+              )
+            }
+          >
+            <Settings size={19} />
+            {!collapsed && <span>Settings</span>}
+          </NavLink>
+        )}
 
         {/* Utility Row */}
         <div className={clsx('flex gap-1 pt-1', collapsed ? 'flex-col items-center' : 'items-center')}>
-          {/*
-          <button
-            onClick={toggleTheme}
-            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-all duration-200"
-          >
-            {isDark ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
-          */}
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}
@@ -159,11 +174,11 @@ const Sidebar = ({ onWidthChange }) => {
           <div className="mt-2 px-3 py-3 bg-gray-50 rounded-xl">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
-                {(user.business_name || 'K').charAt(0).toUpperCase()}
+                {(isAdmin ? 'Kasi Admin' : (user.business_name || 'K')).charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-dark truncate">{user.business_name || 'My Business'}</p>
-                <p className="text-[11px] text-gray-400 truncate">Pro Plan · Active</p>
+                <p className="text-sm font-bold text-dark truncate">{isAdmin ? 'Kasi Admin' : (user.business_name || 'My Business')}</p>
+                <p className="text-[11px] text-gray-400 truncate">{isAdmin ? adminRole : 'Pro Plan · Active'}</p>
               </div>
             </div>
           </div>

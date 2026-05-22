@@ -95,7 +95,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user?.is_admin) {
-      navigate('/admin');
+      navigate('/kasisalienceadministration');
     }
   }, [user, navigate]);
 

@@ -9,7 +9,7 @@ const ImpersonationBanner = () => {
   const handleReturnToAdmin = () => {
     localStorage.setItem('token', adminToken);
     localStorage.removeItem('admin_token');
-    window.location.href = '/admin/users';
+    window.location.href = '/kasisalienceadministration/users';
   };
 
   return (

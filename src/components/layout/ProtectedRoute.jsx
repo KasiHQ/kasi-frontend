@@ -31,7 +31,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
     const userRole = user.admin_role || 'Super Admin'; // Fallback for early users
     if (!allowedRoles.includes(userRole)) {
-        return <Navigate to="/admin" replace />; // Admins kicked back to admin dashboard
+        return <Navigate to="/kasisalienceadministration" replace />; // Admins kicked back to admin dashboard
     }
   }
 

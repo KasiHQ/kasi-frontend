@@ -20,7 +20,7 @@ const Login = () => {
     try {
       const user = await login(email, password);
       if (user?.is_admin) {
-        navigate('/admin');
+        navigate('/kasisalienceadministration');
       } else {
         navigate('/dashboard');
       }

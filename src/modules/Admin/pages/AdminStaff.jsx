@@ -18,7 +18,7 @@ const AdminStaff = () => {
   const fetchStaff = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/admin/list-admins');
+      const response = await api.get('/api/kasisalienceadministration/list-admins');
       if (response.data?.status === 'success') {
         setStaff(response.data.data);
       } else {
@@ -42,7 +42,7 @@ const AdminStaff = () => {
       setFormSuccess(null);
 
       try {
-          const res = await api.post('/api/admin/create-admin', formData);
+          const res = await api.post('/api/kasisalienceadministration/create-admin', formData);
           if (res.data?.status === 'success') {
               setFormSuccess(res.data.message + (res.data.temp_password ? ` Temp Password: ${res.data.temp_password}` : ''));
               setFormData({ email: '', admin_role: 'Finance Admin', first_name: '' });
@@ -158,7 +158,6 @@ const AdminStaff = () => {
                       >
                           <option value="Finance Admin">Finance Admin</option>
                           <option value="Support Admin">Support Admin</option>
-                          <option value="Super Admin">Super Admin</option>
                       </select>
                   </div>
                   <div>

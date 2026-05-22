@@ -17,7 +17,7 @@ const AdminTransactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const res = await api.get('/api/admin/transactions');
+      const res = await api.get('/api/kasisalienceadministration/transactions');
       setTransactions(res.data.data);
     } catch (err) {
       addToast(err.response?.data?.message || 'Failed to load transactions', 'error');

@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, Package, Users, FileText, Ban, ShieldAlert, CheckCircle, LogIn } from 'lucide-react';
+import { X, Loader2, Package, Users, FileText, Ban, ShieldAlert, CheckCircle, LogIn, Trash2, AlertTriangle } from 'lucide-react';
 import api from '../../../api/axios';
 
 const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(0); // 0 = none, 1 = step 1, 2 = step 2
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
-    if (!isOpen || !userId) return;
+    if (!isOpen || !userId) {
+      setConfirmDelete(0);
+      return;
+    }
 
     let isMounted = true;
     const fetchDetail = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get(`/api/admin/users/${userId}`);
+        const response = await api.get(`/api/kasisalienceadministration/users/${userId}`);
         if (isMounted) {
           if (response.data?.status === 'success') {
             setData(response.data.data);
@@ -37,7 +42,7 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
   const handleStatusChange = async (newStatus) => {
     try {
       setLoading(true);
-      const res = await api.post(`/api/admin/users/${userId}/status`, { account_status: newStatus });
+      const res = await api.post(`/api/kasisalienceadministration/users/${userId}/status`, { account_status: newStatus });
       if (res.data.status === 'success') {
          setData(res.data.data);
       }
@@ -48,9 +53,27 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    try {
+      setDeleteLoading(true);
+      setError(null);
+      const res = await api.delete(`/api/kasisalienceadministration/users/${userId}`);
+      if (res.data.status === 'success') {
+        setConfirmDelete(0);
+        onClose();
+        window.location.reload();
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete user");
+      setConfirmDelete(0);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleImpersonate = async () => {
       try {
-          const res = await api.post(`/api/admin/users/${userId}/impersonate`);
+          const res = await api.post(`/api/kasisalienceadministration/users/${userId}/impersonate`);
           if (res.data.status === 'success') {
               // Save the current admin token securely before swapping
               const currentToken = localStorage.getItem('token');
@@ -139,6 +162,9 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
                   <button onClick={handleImpersonate} className="flex items-center justify-center gap-2 w-full mt-2 py-2 px-3 bg-gray-900 hover:bg-black text-white dark:bg-gray-100 dark:text-gray-900 rounded-lg text-sm font-bold transition-colors">
                     <LogIn size={16} /> Login As User
                   </button>
+                  <button onClick={() => setConfirmDelete(1)} className="flex items-center justify-center gap-2 w-full mt-4 py-2 px-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition-colors">
+                    <Trash2 size={16} /> Delete User
+                  </button>
                 </div>
               </div>
 
@@ -214,6 +240,76 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
           ) : null}
         </div>
       </div>
+
+      {/* Double Confirmation Modal for Delete */}
+      {confirmDelete > 0 && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setConfirmDelete(0)} />
+          <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl relative z-10 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <AlertTriangle className="w-8 h-8 animate-bounce" />
+              <h3 className="text-lg font-bold">
+                {confirmDelete === 1 ? 'Step 1: Soft Delete Vendor?' : 'Step 2: Irreversible Social Cleanup'}
+              </h3>
+            </div>
+            
+            {confirmDelete === 1 ? (
+              <div className="space-y-4">
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  You are about to soft delete this vendor account (<span className="font-bold text-gray-900 dark:text-white">{data?.business_name}</span>).
+                </p>
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 p-3 rounded-lg text-xs text-amber-800 dark:text-amber-300">
+                  <strong>What stays:</strong> Financial/revenue history (for accounting) and conversation transcript logs (for AI training) are retained for 90 days.
+                </div>
+                <div className="flex justify-end gap-3 mt-6">
+                  <button 
+                    onClick={() => setConfirmDelete(0)}
+                    className="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={() => setConfirmDelete(2)}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Continue to Step 2
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  <strong>CRITICAL WARNING:</strong> Proceeding will immediately and permanently destroy:
+                </p>
+                <ul className="list-disc pl-5 text-xs text-red-600 dark:text-red-400 space-y-1">
+                  <li>WhatsApp Evolution API instances</li>
+                  <li>Telegram Bot webhooks and associations</li>
+                  <li>Facebook/Instagram Meta connection tokens</li>
+                </ul>
+                <p className="text-gray-500 text-xs italic">
+                  This action is irreversible. All linked integrations are destroyed.
+                </p>
+                <div className="flex justify-end gap-3 mt-6">
+                  <button 
+                    onClick={() => setConfirmDelete(0)}
+                    className="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleDeleteUser}
+                    disabled={deleteLoading}
+                    className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {deleteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                    Confirm Irreversible Delete
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

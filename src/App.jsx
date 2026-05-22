@@ -161,42 +161,42 @@ function App() {
 
 
 
-              <Route path="/admin" element={
+              <Route path="/kasisalienceadministration" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Finance Admin', 'Support Admin']}>
                   <AdminDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/users" element={
+              <Route path="/kasisalienceadministration/users" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Support Admin']}>
                   <AdminUsers />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/invoices" element={
+              <Route path="/kasisalienceadministration/invoices" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Finance Admin']}>
                   <AdminInvoices />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/transactions" element={
+              <Route path="/kasisalienceadministration/transactions" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Finance Admin']}>
                   <AdminTransactions />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/waitlist" element={
+              <Route path="/kasisalienceadministration/waitlist" element={
                 <ProtectedRoute allowedRoles={['Super Admin']}>
                   <AdminWaitlist />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/audit-logs" element={
+              <Route path="/kasisalienceadministration/audit-logs" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Support Admin']}>
                   <AdminAuditLogs />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/broadcasts" element={
+              <Route path="/kasisalienceadministration/broadcasts" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Support Admin']}>
                   <AdminBroadcasts />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/staff" element={
+              <Route path="/kasisalienceadministration/staff" element={
                 <ProtectedRoute allowedRoles={['Super Admin']}>
                   <AdminStaff />
                 </ProtectedRoute>

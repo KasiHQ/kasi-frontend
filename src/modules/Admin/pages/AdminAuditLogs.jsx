@@ -22,7 +22,7 @@ const AdminAuditLogs = () => {
     const fetchLogs = async (pageNumber, filter) => {
         try {
             setLoading(true);
-            const queryURL = `/api/admin/audit-logs?page=${pageNumber}&per_page=50${filter ? `&action=${filter}` : ''}`;
+            const queryURL = `/api/kasisalienceadministration/audit-logs?page=${pageNumber}&per_page=50${filter ? `&action=${filter}` : ''}`;
             const res = await api.get(queryURL);
             setLogs(res.data.logs);
             setTotalPages(res.data.pages);

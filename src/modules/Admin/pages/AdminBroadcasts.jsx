@@ -14,7 +14,7 @@ const AdminBroadcasts = () => {
   const fetchAnnouncements = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/api/admin/announcements');
+      const res = await api.get('/api/kasisalienceadministration/announcements');
       if (res.data.status === 'success') {
         setAnnouncements(res.data.data);
       }
@@ -34,7 +34,7 @@ const AdminBroadcasts = () => {
     try {
       setSubmitLoading(true);
       const payload = { ...formData, is_active: true }; // New broadcasts are active by default
-      await api.post('/api/admin/announcements', payload);
+      await api.post('/api/kasisalienceadministration/announcements', payload);
       setIsDrafting(false);
       setFormData({ title: '', message: '', type: 'info', is_active: false });
       fetchAnnouncements();
@@ -47,7 +47,7 @@ const AdminBroadcasts = () => {
 
   const toggleStatus = async (id) => {
     try {
-      await api.post(`/api/admin/announcements/${id}/toggle`);
+      await api.post(`/api/kasisalienceadministration/announcements/${id}/toggle`);
       fetchAnnouncements();
     } catch (err) {
       setError('Failed to toggle broadcast status');

@@ -24,7 +24,7 @@ const AdminInvoiceDetailModal = ({ isOpen, onClose, invoiceId }) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await api.get(`/api/admin/invoices/${invoiceId}`);
+        const response = await api.get(`/api/kasisalienceadministration/invoices/${invoiceId}`);
         if (isMounted) {
           if (response.data?.status === 'success') {
             setData(response.data.data);

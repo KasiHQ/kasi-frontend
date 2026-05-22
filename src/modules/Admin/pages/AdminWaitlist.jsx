@@ -17,7 +17,7 @@ const AdminWaitlist = () => {
 
   const fetchWaitlist = async () => {
     try {
-      const response = await api.get('/api/admin/waitlist');
+      const response = await api.get('/api/kasisalienceadministration/waitlist');
       setWaitlist(response.data);
       setFilteredWaitlist(response.data);
     } catch (error) {

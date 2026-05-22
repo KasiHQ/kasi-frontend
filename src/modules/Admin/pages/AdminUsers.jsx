@@ -31,7 +31,7 @@ const AdminUsers = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/api/admin/users');
+        const response = await api.get('/api/kasisalienceadministration/users');
         if (isMounted) {
           if (response.data && response.data.status === 'success') {
             setUsers(response.data.data);
