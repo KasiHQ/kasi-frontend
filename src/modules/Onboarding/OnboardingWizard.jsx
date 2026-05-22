@@ -54,6 +54,10 @@ const OnboardingWizard = () => {
   const [accountName, setAccountName] = useState('');
   const [verifyingAccount, setVerifyingAccount] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [bankCode, setBankCode] = useState('');
+  const [banksList, setBanksList] = useState([]);
+  const [bankLoading, setBankLoading] = useState(false);
+  const [isBankVerified, setIsBankVerified] = useState(false);
 
   useEffect(() => {
     if (user && !initialized) {
@@ -103,6 +107,27 @@ const OnboardingWizard = () => {
     const interval = setInterval(fetchStatus, 5000);
     return () => clearInterval(interval);
   }, [currentStep, isWhatsappConnected]);
+
+  // Load Nigeria Banks list for Step 5
+  useEffect(() => {
+    if (currentStep === 5 && banksList.length === 0) {
+      const fetchBanks = async () => {
+        setBankLoading(true);
+        try {
+          const res = await api.get('/api/billing/banks');
+          if (res.data && res.data.data) {
+            setBanksList(res.data.data);
+          }
+        } catch (err) {
+          console.error('Failed to load banks:', err);
+          addToast('Could not load bank list. Please check your internet connection.', 'error');
+        } finally {
+          setBankLoading(false);
+        }
+      };
+      fetchBanks();
+    }
+  }, [currentStep, banksList.length]);
 
   const leftPanelHeadlines = {
     1: "Choose your path to commerce autonomy.",
@@ -189,18 +214,20 @@ const OnboardingWizard = () => {
       // Channels step: we proceed
       setCurrentStep(5);
     } else if (currentStep === 5) {
+      if (!isBankVerified || !accountNumber || !bankCode) {
+        setError('Please verify your bank account details before continuing.');
+        return;
+      }
       setLoading(true);
       try {
-        if (paymentOption === 'bank' && accountNumber && bankName) {
-          await onboardingAPI.updateProfile({
-            bank_account_number: accountNumber,
-            bank_name: bankName,
-            bank_account_name: accountName
-          });
-        }
+        await onboardingAPI.connectPaystack({
+          bank_code: bankCode,
+          account_number: accountNumber,
+          bank_name: bankName
+        });
         setCurrentStep(6); // Launch Screen!
       } catch (err) {
-        setError('Failed to finalize setup.');
+        setError(err.response?.data?.message || 'Failed to connect settlement account. Please verify details and try again.');
       } finally {
         setLoading(false);
       }
@@ -268,19 +295,28 @@ const OnboardingWizard = () => {
       addToast('Nigerian bank account numbers must be 10 digits.', 'error');
       return;
     }
-    if (!bankName) {
+    if (!bankCode) {
       addToast('Please select a bank first.', 'error');
       return;
     }
     setVerifyingAccount(true);
+    setIsBankVerified(false);
+    setAccountName('');
     try {
-      // Verify account mock / check callback
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      // Populate account name dynamically
-      setAccountName(`${user?.business_name || 'Kasi Store'} Reconcile Account`);
-      addToast('Bank account successfully verified!', 'success');
+      const res = await api.post('/api/billing/resolve-bank', {
+        account_number: accountNumber,
+        bank_code: bankCode
+      });
+      if (res.data && res.data.data) {
+        setAccountName(res.data.data.account_name);
+        setIsBankVerified(true);
+        addToast('Bank account successfully verified!', 'success');
+      } else {
+        addToast('Account verification failed. Please check account details.', 'error');
+      }
     } catch (err) {
-      addToast('Account verification failed.', 'error');
+      console.error(err);
+      addToast(err.response?.data?.error || 'Account verification failed.', 'error');
     } finally {
       setVerifyingAccount(false);
     }
@@ -857,135 +893,89 @@ const OnboardingWizard = () => {
               <div className="space-y-6 animate-in fade-in duration-300">
                 <div className="space-y-2">
                   <h2 className="text-3xl font-bold tracking-tight text-[#101828]">
-                    Where should Kasi send your money?
+                    Settlement Bank Account
                   </h2>
                   <p className="text-[#667085] text-sm">
-                    Connect a payment method so Kasi can automatically collect and reconcile customer payments.
+                    Set up your payout destination. When customers purchase from your WhatsApp or AI agents, payments are split instantly. Your funds land directly in this bank account.
                   </p>
                 </div>
 
+                <div className="bg-[#ECFDF3] border border-[#B0D9C1] rounded-xl p-4 flex gap-3 text-xs text-[#027A48] select-none">
+                  <ShieldCheck size={18} className="shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold">Direct & Safe Settlement:</span> Kasi facilitates immediate split payments via Paystack. ZERO funds are held in escrow. Payouts arrive instantly, minus the 2.0% platform fee.
+                  </div>
+                </div>
+
                 <div className="space-y-4 pt-2">
-                  {/* Paystack Option Card */}
-                  <div
-                    onClick={() => setPaymentOption('paystack')}
-                    className={`flex items-start gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
-                      paymentOption === 'paystack'
-                        ? 'border-[#0066FF] bg-white shadow-xs'
-                        : 'border-[#EAECF0] bg-white hover:border-[#D0D5DD]'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      checked={paymentOption === 'paystack'}
-                      onChange={() => setPaymentOption('paystack')}
-                      className="text-[#0066FF] focus:ring-[#0066FF] mt-1"
-                    />
-                    <div className="space-y-3 flex-1">
-                      <div>
-                        <h4 className="font-bold text-sm text-[#101828] flex items-center gap-1.5">
-                          Connect Paystack
-                          <span className="bg-[#0066FF]/10 text-[#0066FF] px-2 py-0.5 rounded-full text-[10px] font-bold">
-                            RECOMMENDED
-                          </span>
-                        </h4>
-                        <p className="text-xs text-[#667085] leading-relaxed">
-                          Customers pay directly via Paystack. Funds arrive in your Paystack balance automatically.
-                        </p>
-                      </div>
-                      
-                      {paymentOption === 'paystack' && (
-                        <button
-                          type="button"
-                          onClick={() => addToast('Redirecting to Paystack secure OAuth...', 'info')}
-                          className="w-full py-2.5 bg-[#0066FF] text-white text-xs font-bold rounded-lg hover:bg-[#0052cc] transition-colors"
-                        >
-                          Connect Paystack Account
-                        </button>
-                      )}
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#344054]">SELECT BANK</label>
+                    <select
+                      value={bankCode}
+                      onChange={(e) => {
+                        setBankCode(e.target.value);
+                        const selected = banksList.find(b => b.code === e.target.value);
+                        setBankName(selected ? selected.name : '');
+                        setIsBankVerified(false);
+                        setAccountName('');
+                      }}
+                      className="w-full h-11 px-3.5 border border-[#D0D5DD] bg-white rounded-lg text-sm text-[#101828] outline-none focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 transition-all bg-no-repeat"
+                    >
+                      <option value="">{bankLoading ? 'Loading Nigerian banks...' : 'Choose your bank...'}</option>
+                      {banksList.map(b => (
+                        <option key={b.code} value={b.code}>{b.name}</option>
+                      ))}
+                    </select>
                   </div>
 
-                  {/* Bank Transfer Option Card */}
-                  <div
-                    onClick={() => setPaymentOption('bank')}
-                    className={`flex items-start gap-4 p-5 rounded-xl border cursor-pointer transition-all ${
-                      paymentOption === 'bank'
-                        ? 'border-[#1A7A4A] bg-white shadow-xs'
-                        : 'border-[#EAECF0] bg-white hover:border-[#D0D5DD]'
-                    }`}
-                  >
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#344054]">ACCOUNT NUMBER (10 DIGITS)</label>
                     <input
-                      type="radio"
-                      checked={paymentOption === 'bank'}
-                      onChange={() => setPaymentOption('bank')}
-                      className="text-[#1A7A4A] focus:ring-[#1A7A4A] mt-1"
+                      type="text"
+                      maxLength={10}
+                      value={accountNumber}
+                      onChange={(e) => {
+                        setAccountNumber(e.target.value.replace(/\D/g, ''));
+                        setIsBankVerified(false);
+                        setAccountName('');
+                      }}
+                      placeholder="e.g. 0123456789"
+                      className="w-full h-11 px-3.5 border border-[#D0D5DD] bg-white rounded-lg text-sm text-[#101828] outline-none focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 transition-all font-mono tracking-widest"
                     />
-                    <div className="space-y-3 flex-1">
-                      <div>
-                        <h4 className="font-bold text-sm text-[#101828]">Use Bank Transfer</h4>
-                        <p className="text-xs text-[#667085] leading-relaxed">
-                          Kasi shares your bank details with customers and verifies incoming transfers via callback.
-                        </p>
-                      </div>
+                  </div>
 
-                      {paymentOption === 'bank' && (
-                        <div className="space-y-3 pt-2 border-t border-[#EAECF0] animate-in slide-in-from-top-2 duration-200" onClick={(e) => e.stopPropagation()}>
-                          <div className="grid grid-cols-2 gap-3">
-                            {/* Bank Name */}
-                            <div className="space-y-1">
-                              <label className="text-[10px] font-semibold text-[#344054]">BANK NAME</label>
-                              <select
-                                value={bankName}
-                                onChange={(e) => setBankName(e.target.value)}
-                                className="w-full h-10 px-2.5 border border-[#D0D5DD] bg-white rounded-lg text-xs outline-none"
-                              >
-                                <option value="">Select Bank</option>
-                                {banks.map(b => (
-                                  <option key={b} value={b}>{b}</option>
-                                ))}
-                              </select>
-                            </div>
-                            
-                            {/* Account Number */}
-                            <div className="space-y-1">
-                              <label className="text-[10px] font-semibold text-[#344054]">ACCOUNT NUMBER</label>
-                              <input
-                                type="text"
-                                maxLength={10}
-                                value={accountNumber}
-                                onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                                placeholder="0123456789"
-                                className="w-full h-10 px-2.5 border border-[#D0D5DD] bg-white rounded-lg text-xs outline-none"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Verify Bank Account button */}
-                          <div className="flex gap-2 items-end">
-                            <div className="flex-1 space-y-1">
-                              <label className="text-[10px] font-semibold text-[#344054]">ACCOUNT NAME</label>
-                              <input
-                                type="text"
-                                readOnly
-                                value={accountName}
-                                placeholder="Verify to fetch name..."
-                                className="w-full h-10 px-2.5 border border-[#EAECF0] bg-[#F9FAFB] rounded-lg text-xs text-[#667085] outline-none"
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={verifyBankAccount}
-                              disabled={verifyingAccount || accountNumber.length !== 10 || !bankName}
-                              className="h-10 px-4 border border-[#D0D5DD] hover:bg-[#F9FAFB] text-[#344054] text-xs font-semibold rounded-lg transition-colors shrink-0 disabled:opacity-50 flex items-center justify-center gap-1"
-                            >
-                              {verifyingAccount && <Loader2 size={12} className="animate-spin" />}
-                              Verify
-                            </button>
-                          </div>
+                  {accountName && (
+                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex justify-between items-center animate-in fade-in duration-300">
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] font-semibold text-[#667085] tracking-wider uppercase">RESOLVED ACCOUNT NAME</span>
+                        <div className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                          <CheckCircle size={14} className="text-[#1A7A4A]" />
+                          {accountName}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {!isBankVerified && (
+                    <button
+                      type="button"
+                      onClick={verifyBankAccount}
+                      disabled={verifyingAccount || accountNumber.length !== 10 || !bankCode}
+                      className="w-full h-11 bg-white border border-[#D0D5DD] hover:bg-slate-50 text-[#344054] text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                    >
+                      {verifyingAccount ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin text-[#1A7A4A]" />
+                          <span>Verifying with NIBSS...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Landmark size={16} className="text-[#1A7A4A]" />
+                          <span>Verify Bank Account</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
 
                 <div className="text-center pt-2">
@@ -994,7 +984,7 @@ const OnboardingWizard = () => {
                     onClick={() => setCurrentStep(6)}
                     className="text-xs font-semibold text-[#667085] hover:underline"
                   >
-                    I'll set up payments later →
+                    I'll configure payments later from settings →
                   </button>
                 </div>
               </div>

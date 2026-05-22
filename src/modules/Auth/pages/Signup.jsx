@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Check, Mail, Lock, ShieldCheck, Eye, EyeOff, ShoppingBag, Briefcase } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
+import { PRELAUNCH_WAITLIST_MODE } from '../../../config';
 
 const Signup = () => {
   const [step, setStep] = useState(1); // 1 = Seller Profile, 2 = Credential details
@@ -19,6 +20,16 @@ const Signup = () => {
   const { signup, login } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (PRELAUNCH_WAITLIST_MODE) {
+      const isBypass = searchParams.get('admin') === 'true' || searchParams.get('bypass') === 'true';
+      if (!isBypass) {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [searchParams, navigate]);
 
   const handleRoleSelect = (type) => {
     setBusinessType(type);

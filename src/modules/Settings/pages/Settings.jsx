@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import { useTheme, THEMES } from '../../../context/ThemeContext';
 import Button from '../../../components/ui/Button';
 import api from '../../../api/axios';
-import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout } from 'lucide-react';
+import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout, Wallet, ShieldCheck, Landmark, CheckCircle, AlertTriangle } from 'lucide-react';
 import ActivityLogsTable from '../components/ActivityLogsTable';
 import IntegrationsTab from '../components/IntegrationsTab';
 import { X } from 'lucide-react';
@@ -120,7 +121,11 @@ const Settings = () => {
     const { addToast } = useToast();
     const { theme: currentTheme, setTheme } = useTheme();
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState('integrations'); // Default to integrations per user request
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') || 'integrations';
+    const setActiveTab = (tab) => {
+        setSearchParams({ tab });
+    };
     const [selectedPlatform, setSelectedPlatform] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -129,6 +134,15 @@ const Settings = () => {
     const [igStatus, setIgStatus] = useState({ connected: false });
     const [paystackStatus, setPaystackStatus] = useState({ connected: false });
     const [loadingIntegrations, setLoadingIntegrations] = useState(true);
+
+    // Subscription & Billing details states
+    const [billingDetails, setBillingDetails] = useState(null);
+    const [billingLoading, setBillingLoading] = useState(true);
+    const [banksList, setBanksList] = useState([]);
+    const [bankCode, setBankCode] = useState('');
+    const [verifyingBank, setVerifyingBank] = useState(false);
+    const [isBankVerified, setIsBankVerified] = useState(false);
+    const [connectingSubaccount, setConnectingSubaccount] = useState(false);
 
     const [formData, setFormData] = useState({
         business_name: '',
@@ -176,7 +190,83 @@ const Settings = () => {
 
     useEffect(() => {
         fetchIntegrationStatuses();
+        fetchBillingDetails();
     }, []);
+
+    const fetchBillingDetails = async () => {
+        setBillingLoading(true);
+        try {
+            const res = await api.get('/api/billing/subscription-details');
+            if (res.data && res.data.data) {
+                setBillingDetails(res.data.data);
+                // Pre-verify bank if details exist in response
+                if (res.data.data.account_number && res.data.data.bank_name) {
+                    setIsBankVerified(true);
+                }
+            }
+        } catch (err) {
+            console.error('Failed to fetch billing details:', err);
+        } finally {
+            setBillingLoading(false);
+        }
+    };
+
+    // Load Nigeria Banks list for Payment Settlement
+    useEffect(() => {
+        if (activeTab === 'payment' && banksList.length === 0) {
+            const fetchBanks = async () => {
+                try {
+                    const res = await api.get('/api/billing/banks');
+                    if (res.data && res.data.data) {
+                        setBanksList(res.data.data);
+                    }
+                } catch (err) {
+                    console.error('Failed to load banks:', err);
+                }
+            };
+            fetchBanks();
+        }
+    }, [activeTab, banksList.length]);
+
+    const handleInitializeSubscription = async (tier) => {
+        setLoading(true);
+        try {
+            const res = await api.post('/api/billing/initialize-subscription', {
+                tier,
+                type: billingDetails?.subscription_type || formData.business_type || 'product',
+                callback_url: window.location.origin + '/billing/callback'
+            });
+            if (res.data && res.data.authorization_url) {
+                window.location.href = res.data.authorization_url;
+            } else {
+                addToast('Failed to initialize subscription checkout.', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            addToast(err.response?.data?.error || 'Failed to initialize subscription.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancelSubscription = async () => {
+        if (!window.confirm('Are you sure you want to cancel your active subscription? You will retain access until the end of your billing cycle.')) {
+            return;
+        }
+        setLoading(true);
+        try {
+            const res = await api.post('/api/billing/cancel');
+            if (res.data && res.data.status === 'success') {
+                addToast('Subscription successfully cancelled.', 'success');
+                fetchBillingDetails();
+            }
+        } catch (err) {
+            console.error(err);
+            addToast(err.response?.data?.error || 'Failed to cancel subscription.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchIntegrationStatuses = async () => {
         try {
@@ -224,7 +314,8 @@ const Settings = () => {
             <div className="flex gap-2 bg-white dark:bg-gray-800/50 rounded-2xl p-2 shadow-sm border border-gray-100 dark:border-gray-700 overflow-x-auto scrollbar-hide">
                 <TabButton active={activeTab === 'integrations'} icon={Zap} label="Integrations" onClick={() => setActiveTab('integrations')} />
                 <TabButton active={activeTab === 'general'} icon={Building} label="General" onClick={() => setActiveTab('general')} />
-                <TabButton active={activeTab === 'payment'} icon={CreditCard} label="Payment" onClick={() => setActiveTab('payment')} />
+                <TabButton active={activeTab === 'payment'} icon={Wallet} label="Settlement & Payouts" onClick={() => setActiveTab('payment')} />
+                <TabButton active={activeTab === 'billing'} icon={CreditCard} label="Billing & Subscriptions" onClick={() => setActiveTab('billing')} />
                 <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
                 {/* <TabButton active={activeTab === 'appearance'} icon={Palette} label="Appearance" onClick={() => setActiveTab('appearance')} /> */}
                 <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
@@ -376,90 +467,201 @@ const Settings = () => {
                         </form>
                     </div>
 
-                    {/* Subscription */}
+                    {/* Subscription Quick Info */}
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-bold text-dark mb-2">Subscription</h2>
+                        <h2 className="text-lg font-bold text-dark mb-2">Subscription & Plan</h2>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="font-semibold text-dark">Pro Plan</p>
-                                <p className="text-sm text-gray-500">All features · Renews 9 June 2026</p>
+                                <p className="font-semibold text-dark capitalize">{billingDetails?.subscription_tier === 'free_trial' ? '14-Day Free Trial' : `${billingDetails?.subscription_tier || 'starter'} Plan`}</p>
+                                <p className="text-sm text-gray-500">
+                                    {billingDetails?.subscription_status === 'trialing' 
+                                        ? `${billingDetails?.days_remaining} days remaining in trial` 
+                                        : `Active billing plan managed via Paystack`
+                                    }
+                                </p>
                             </div>
-                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Active</span>
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 capitalize">{billingDetails?.subscription_status || 'trialing'}</span>
                         </div>
                         <div className="flex gap-3 mt-4">
-                            <button className="px-4 py-2 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors">
-                                View Invoice
-                            </button>
-                            <button className="px-4 py-2 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors">
-                                Change Plan
+                            <button onClick={() => setActiveTab('billing')} className="px-4 py-2 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors">
+                                Manage Billing & Upgrades
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* ── PAYMENT TAB ─────────────────────── */}
+            {/* ── SETTLEMENT & PAYOUTS TAB ─────────────────────── */}
             {activeTab === 'payment' && (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-6 animate-in fade-in duration-300">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-6">
                         <h2 className="text-xl font-bold text-dark flex items-center gap-2">
-                            <CreditCard className="text-primary" size={24} />
-                            Payment Information
+                            <Wallet className="text-primary" size={24} />
+                            Settlement & Payouts
                         </h2>
-                        <p className="text-sm text-gray-500 -mt-3">This info appears on your invoices so customers know where to send payment.</p>
+                        <p className="text-sm text-gray-500 -mt-3">
+                            When customers buy from your WhatsApp catalog or AI agents, payments are split instantly. Your revenue lands directly in your bank account minus Kasi's 2.0% platform fee.
+                        </p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Bank Name</label>
-                                <input type="text" name="bank_name" value={formData.bank_name} onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium"
-                                    placeholder="GTBank, Zenith, Opay..." />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Account Number</label>
-                                <input type="text" name="account_number" value={formData.account_number} onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium"
-                                    placeholder="0123456789" />
-                            </div>
-                            <div className="space-y-2 md:col-span-2">
-                                <label className="text-sm font-medium text-gray-700">Account Name</label>
-                                <input type="text" name="account_name" value={formData.account_name} onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium"
-                                    placeholder="Must match your business name" />
-                            </div>
-                        </div>
-                    </div>
+                        {billingDetails?.account_number ? (
+                            <div className="space-y-6">
+                                <div className="bg-[#ECFDF3] border border-[#B0D9C1] rounded-2xl p-5 flex gap-4 text-sm text-[#027A48]">
+                                    <ShieldCheck size={24} className="shrink-0 mt-0.5" />
+                                    <div className="space-y-1">
+                                        <h4 className="font-bold text-base">Direct Settlement Enabled</h4>
+                                        <p className="text-xs text-[#027A48]/80 leading-relaxed">
+                                            Your bank account is fully verified. Payments made by your customers are split instantly at the payment processor level via your custom Paystack Subaccount. Kasi holds zero vendor funds.
+                                        </p>
+                                    </div>
+                                </div>
 
-                    {/* Payment Preview */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
-                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Invoice Preview</h3>
-                        <div className="bg-green-50 rounded-xl p-5 border border-green-100">
-                            <p className="text-xs text-green-600 font-medium uppercase tracking-wider mb-3">Payment Details</p>
-                            <div className="grid grid-cols-3 gap-4 text-sm">
-                                <div>
-                                    <p className="text-gray-400 text-xs mb-0.5">Bank</p>
-                                    <p className="font-semibold text-gray-800">{formData.bank_name || '—'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-400 text-xs mb-0.5">Account</p>
-                                    <p className="font-semibold text-gray-800">{formData.account_number || '—'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-400 text-xs mb-0.5">Name</p>
-                                    <p className="font-semibold text-gray-800">{formData.account_name || '—'}</p>
+                                <div className="border border-gray-100 rounded-2xl p-5 space-y-4 bg-gray-50/50">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Settlement Bank Details</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                                        <div className="space-y-1">
+                                            <p className="text-gray-400 text-xs">Bank Name</p>
+                                            <p className="font-bold text-gray-800">{billingDetails?.bank_name}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-gray-400 text-xs">Account Number</p>
+                                            <p className="font-bold text-gray-800 font-mono tracking-wider">{billingDetails?.account_number}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-gray-400 text-xs">Resolved Account Name</p>
+                                            <p className="font-bold text-gray-800">{billingDetails?.account_name}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        ) : (
+                            <div className="space-y-6">
+                                <div className="bg-[#FEF3F2] border border-[#FECDCA] rounded-2xl p-5 flex gap-4 text-sm text-[#B42318]">
+                                    <AlertTriangle size={24} className="shrink-0 mt-0.5" />
+                                    <div className="space-y-1">
+                                        <h4 className="font-bold text-base">No Settlement Bank Connected</h4>
+                                        <p className="text-xs text-[#B42318]/80 leading-relaxed">
+                                            You must set up a settlement account to start collecting payments. Kasi cannot initialize checkout links for your items without a payout destination.
+                                        </p>
+                                    </div>
+                                </div>
 
-                    <div className="flex justify-end">
-                        <Button type="submit" disabled={loading}
-                            className="bg-primary hover:bg-green-700 text-white px-8 py-3 rounded-xl shadow-lg shadow-green-200 inline-flex items-center gap-2">
-                            {loading ? 'Saving...' : 'Save Changes'}
-                            <Save size={20} className="ml-2" />
-                        </Button>
+                                <div className="space-y-4 border border-gray-100 rounded-2xl p-6 bg-white shadow-xs">
+                                    <h3 className="font-bold text-gray-800 text-sm">Connect settlement destination</h3>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-[#344054]">SELECT BANK</label>
+                                            <select
+                                                value={bankCode}
+                                                onChange={(e) => {
+                                                    setBankCode(e.target.value);
+                                                    const selected = banksList.find(b => b.code === e.target.value);
+                                                    setFormData({ ...formData, bank_name: selected ? selected.name : '' });
+                                                    setIsBankVerified(false);
+                                                    setFormData(prev => ({ ...prev, account_name: '' }));
+                                                }}
+                                                className="w-full h-11 px-3.5 border border-[#D0D5DD] bg-white rounded-xl text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                                            >
+                                                <option value="">Choose bank...</option>
+                                                {banksList.map(b => (
+                                                    <option key={b.code} value={b.code}>{b.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-semibold text-[#344054]">ACCOUNT NUMBER (10 DIGITS)</label>
+                                            <input
+                                                type="text"
+                                                maxLength={10}
+                                                value={formData.account_number}
+                                                onChange={(e) => {
+                                                    setFormData({ ...formData, account_number: e.target.value.replace(/\D/g, '') });
+                                                    setIsBankVerified(false);
+                                                    setFormData(prev => ({ ...prev, account_name: '' }));
+                                                }}
+                                                placeholder="e.g. 0123456789"
+                                                className="w-full h-11 px-3.5 border border-[#D0D5DD] bg-white rounded-xl text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all font-mono tracking-widest"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {formData.account_name && (
+                                        <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex justify-between items-center animate-in fade-in duration-300">
+                                            <div className="space-y-0.5">
+                                                <span className="text-[10px] font-semibold text-[#667085] tracking-wider uppercase font-sans">RESOLVED ACCOUNT NAME</span>
+                                                <div className="text-sm font-bold text-slate-800 flex items-center gap-1.5 font-sans">
+                                                    <CheckCircle size={14} className="text-[#1A7A4A]" />
+                                                    {formData.account_name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {!isBankVerified ? (
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                if (formData.account_number.length !== 10) {
+                                                    addToast('Nigerian bank account numbers must be 10 digits.', 'error');
+                                                    return;
+                                                }
+                                                if (!bankCode) {
+                                                    addToast('Please select a bank first.', 'error');
+                                                    return;
+                                                }
+                                                setVerifyingBank(true);
+                                                try {
+                                                    const res = await api.post('/api/billing/resolve-bank', {
+                                                        account_number: formData.account_number,
+                                                        bank_code: bankCode
+                                                    });
+                                                    if (res.data && res.data.data) {
+                                                        setFormData(prev => ({ ...prev, account_name: res.data.data.account_name }));
+                                                        setIsBankVerified(true);
+                                                        addToast('Bank account successfully verified!', 'success');
+                                                    }
+                                                } catch (err) {
+                                                    addToast(err.response?.data?.error || 'Verification failed.', 'error');
+                                                } finally {
+                                                    setVerifyingBank(false);
+                                                }
+                                            }}
+                                            disabled={verifyingBank || formData.account_number.length !== 10 || !bankCode}
+                                            className="w-full h-11 bg-white border border-[#D0D5DD] hover:bg-slate-50 text-[#344054] text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                                        >
+                                            {verifyingBank ? 'Resolving NIBSS Details...' : 'Verify Bank Details'}
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                setConnectingSubaccount(true);
+                                                try {
+                                                    await api.post('/api/onboarding/paystack/connect', {
+                                                        bank_code: bankCode,
+                                                        account_number: formData.account_number,
+                                                        bank_name: formData.bank_name
+                                                    });
+                                                    addToast('Settlement destination connected successfully!', 'success');
+                                                    fetchBillingDetails();
+                                                } catch (err) {
+                                                    addToast(err.response?.data?.message || 'Failed to connect subaccount.', 'error');
+                                                } finally {
+                                                    setConnectingSubaccount(false);
+                                                }
+                                            }}
+                                            disabled={connectingSubaccount}
+                                            className="w-full h-11 bg-primary text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                                        >
+                                            {connectingSubaccount ? 'Connecting Payout Subaccount...' : 'Save & Enable Split Payouts'}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                </form>
+                </div>
             )}
 
             {/* ── AI RULES TAB ─────────────────────── */}
@@ -556,6 +758,222 @@ const Settings = () => {
             {/* ── ACTIVITY LOGS TAB ──────────────────── */}
             {activeTab === 'activity' && (
                 <ActivityLogsTable />
+            )}
+
+            {/* ── BILLING & SUBSCRIPTIONS TAB ─────────────────────── */}
+            {activeTab === 'billing' && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                    {/* Active Plan Banner */}
+                    <div className="bg-[#0F1F0F] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden select-none">
+                        <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+                        
+                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div className="space-y-1.5">
+                                <span className="text-[10px] font-semibold tracking-wider text-[#D4F263] uppercase bg-[#D4F263]/10 border border-[#D4F263]/25 px-2.5 py-1 rounded-full">
+                                    CURRENT SUBSCRIPTION STATUS
+                                </span>
+                                <h2 className="text-2xl font-black tracking-tight leading-tight capitalize">
+                                    {billingDetails?.subscription_tier === 'free_trial' ? '14-Day Free Trial' : `${billingDetails?.subscription_tier || 'starter'} Plan`}
+                                </h2>
+                                <p className="text-white/60 text-xs leading-relaxed">
+                                    {billingDetails?.subscription_status === 'trialing' ? (
+                                        <>Your free trial has <span className="text-white font-bold">{billingDetails?.days_remaining} days</span> remaining. Upgrade below to keep selling without interruption.</>
+                                    ) : billingDetails?.subscription_status === 'active' ? (
+                                        <>Renews on <span className="text-white font-bold">{billingDetails?.subscription_expires_at ? new Date(billingDetails.subscription_expires_at).toLocaleDateString() : 'N/A'}</span>. Managed securely via Paystack.</>
+                                    ) : billingDetails?.subscription_status === 'cancelled' ? (
+                                        <>Your plan is cancelled but remains active until <span className="text-white font-bold">{billingDetails?.subscription_expires_at ? new Date(billingDetails.subscription_expires_at).toLocaleDateString() : 'N/A'}</span>.</>
+                                    ) : (
+                                        <>No active subscription. Upgrade to a premium plan below.</>
+                                    )}
+                                </p>
+                            </div>
+                            
+                            {billingDetails?.subscription_status === 'active' && (
+                                <button
+                                    onClick={handleCancelSubscription}
+                                    disabled={loading}
+                                    className="px-4 py-2 border border-white/20 hover:border-red-400 hover:text-red-400 rounded-xl text-xs font-bold transition-all text-white/80 shrink-0"
+                                >
+                                    Cancel Subscription
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Subscription Plans Selection Card Grid */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-base font-bold text-gray-800">Available Plans ({billingDetails?.subscription_type === 'service' ? 'Service Kasi' : 'Product Kasi'})</h3>
+                            <span className="text-xs text-gray-400">Monthly auto-renew billing via Paystack</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                            {[
+                                {
+                                    id: 'starter',
+                                    name: 'Starter',
+                                    price: billingDetails?.subscription_type === 'service' ? '₦15,000' : '₦18,000',
+                                    features: billingDetails?.subscription_type === 'service' ? [
+                                        'AI booking agent on WhatsApp',
+                                        '1 Active Booking Schedule/Calendar',
+                                        'Appointment booking directly in DM',
+                                        'Paystack subaccount integration',
+                                        'Basic analytics & dashboard summary'
+                                    ] : [
+                                        'AI sales agent on WhatsApp',
+                                        'Unlimited catalog with voice pitch',
+                                        'Automatic inventory tracking',
+                                        'Paystack subaccount integration',
+                                        'Basic analytics & dashboard summary'
+                                    ]
+                                },
+                                {
+                                    id: 'growth',
+                                    name: 'Growth',
+                                    price: billingDetails?.subscription_type === 'service' ? '₦24,000' : '₦29,000',
+                                    badge: 'MOST POPULAR',
+                                    isPopular: true,
+                                    features: billingDetails?.subscription_type === 'service' ? [
+                                        'Everything in Starter',
+                                        'Connect all DMs (WhatsApp, IG, Messenger)',
+                                        'Google Calendar two-way sync',
+                                        'Automated booking reminders',
+                                        'Broadcast marketing campaigns'
+                                    ] : [
+                                        'Everything in Starter',
+                                        'Connect all DMs (WhatsApp, IG, Messenger)',
+                                        'Full margin & deal value analytics',
+                                        'Voice pitch audio generation',
+                                        'Broadcast marketing campaigns'
+                                    ]
+                                },
+                                {
+                                    id: 'premium',
+                                    name: 'Premium',
+                                    price: billingDetails?.subscription_type === 'service' ? '₦32,000' : '₦40,000',
+                                    features: billingDetails?.subscription_type === 'service' ? [
+                                        'Everything in Growth',
+                                        'Full client interaction database',
+                                        'Proactive lead re-engagement in DM',
+                                        'Social comments auto-outreach',
+                                        '24/7 dedicated hosting & priority support'
+                                    ] : [
+                                        'Everything in Growth',
+                                        'Full customer interaction database',
+                                        'Proactive lead re-engagement in DM',
+                                        'Social comments auto-outreach',
+                                        '24/7 dedicated hosting & priority support'
+                                    ]
+                                }
+                            ].map((plan) => {
+                                const isCurrent = billingDetails?.subscription_tier === plan.id;
+                                return (
+                                    <div
+                                        key={plan.id}
+                                        className={`rounded-2xl p-6 flex flex-col justify-between text-left transition-all duration-300 relative border ${
+                                            plan.isPopular
+                                                ? 'bg-green-50/40 border-primary shadow-md shadow-green-50'
+                                                : 'bg-white border-gray-100 hover:border-gray-200'
+                                        }`}
+                                    >
+                                        {plan.badge && (
+                                            <span className="absolute top-0 right-6 -translate-y-1/2 bg-[#D4F263] border border-black/15 text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                                {plan.badge}
+                                            </span>
+                                        )}
+
+                                        <div className="space-y-4">
+                                            <div>
+                                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest block">{plan.name}</span>
+                                                <div className="flex items-baseline mt-1">
+                                                    <span className="text-3xl font-black text-gray-800 tracking-tight">{plan.price}</span>
+                                                    <span className="text-xs text-gray-400 ml-1 font-semibold">/month</span>
+                                                </div>
+                                            </div>
+
+                                            {isCurrent ? (
+                                                <button
+                                                    disabled
+                                                    className="w-full py-2.5 bg-gray-100 text-gray-400 font-bold text-xs rounded-xl border border-gray-200 select-none"
+                                                >
+                                                    Current Plan
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleInitializeSubscription(plan.id)}
+                                                    disabled={loading}
+                                                    className={`w-full py-2.5 font-bold text-xs rounded-xl transition-all shadow-xs border ${
+                                                        plan.isPopular
+                                                            ? 'bg-primary hover:bg-green-700 text-white border-primary'
+                                                            : 'bg-white hover:bg-gray-50 text-gray-800 border-gray-200 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    Upgrade to {plan.name}
+                                                </button>
+                                            )}
+
+                                            <hr className="border-t border-gray-100" />
+
+                                            <ul className="space-y-2.5">
+                                                {plan.features.map((f, idx) => (
+                                                    <li key={idx} className="flex gap-2 items-start text-xs text-gray-600 leading-normal">
+                                                        <Check size={14} className="text-[#1A7A4A] shrink-0 mt-0.5" strokeWidth={2.5} />
+                                                        <span>{f}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Ledger Entries Audit Logs */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                        <div>
+                            <h3 className="text-base font-bold text-gray-800">Billing History & Audit Ledger</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">Every transaction is recorded transparently on our system immutable database.</p>
+                        </div>
+
+                        {billingDetails?.ledger_entries && billingDetails.ledger_entries.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-gray-100 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                                            <th className="py-3 px-1">Date</th>
+                                            <th className="py-3 px-1">Description</th>
+                                            <th className="py-3 px-1">Amount</th>
+                                            <th className="py-3 px-1">Reference ID</th>
+                                            <th className="py-3 px-1 text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {billingDetails.ledger_entries.map((entry) => (
+                                            <tr key={entry.id} className="text-xs text-gray-600 hover:bg-gray-50/50">
+                                                <td className="py-3 px-1 font-medium">{new Date(entry.created_at).toLocaleDateString()}</td>
+                                                <td className="py-3 px-1">{entry.description}</td>
+                                                <td className="py-3 px-1 font-bold text-gray-800">
+                                                    {entry.currency === 'NGN' ? '₦' : entry.currency}{entry.amount.toLocaleString()}
+                                                </td>
+                                                <td className="py-3 px-1 font-mono">{entry.reference_id}</td>
+                                                <td className="py-3 px-1 text-right">
+                                                    <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 capitalize">
+                                                        {entry.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-400 text-xs bg-gray-50/50 rounded-xl border border-dashed border-gray-200 select-none">
+                                No billing records found.
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
         </div>
     );

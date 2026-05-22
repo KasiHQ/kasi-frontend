@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
 import clsx from "clsx";
+import { PRELAUNCH_WAITLIST_MODE } from "../../../config";
 
 const NAV_LINKS = [
   { id: "dms", label: "DMs" },
@@ -13,7 +14,7 @@ const NAV_LINKS = [
   { id: "faq", label: "FAQ" },
 ];
 
-export const LandingNavbar = ({ activeSection, scrolled }) => {
+export const LandingNavbar = ({ activeSection, scrolled, onJoinWaitlistClick }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLinkClick = (e, id) => {
@@ -96,19 +97,30 @@ export const LandingNavbar = ({ activeSection, scrolled }) => {
 
         {/* Desktop Right Side CTAs */}
         <div className="hidden md:flex items-center gap-6">
-          <Link
-            to="/login"
-            className="text-[15px] font-medium text-grey-700 hover:text-black transition-colors"
-          >
-            Sign in
-          </Link>
+          {PRELAUNCH_WAITLIST_MODE ? (
+            <button
+              onClick={onJoinWaitlistClick}
+              className="text-[15px] font-bold text-white bg-[#1A7A4A] hover:bg-[#15603A] px-5 py-2.5 rounded-full active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,0.1)] border border-black"
+            >
+              Join Waitlist
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-[15px] font-medium text-grey-700 hover:text-black transition-colors"
+              >
+                Sign in
+              </Link>
 
-          <Link
-            to="/signup"
-            className="text-[15px] font-bold text-white bg-black px-5 py-2.5 rounded-full hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,0.1)]"
-          >
-            Get started →
-          </Link>
+              <Link
+                to="/signup"
+                className="text-[15px] font-bold text-white bg-black px-5 py-2.5 rounded-full hover:bg-neutral-800 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,0.1)]"
+              >
+                Get started →
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -180,20 +192,34 @@ export const LandingNavbar = ({ activeSection, scrolled }) => {
 
           {/* Bottom Actions inside Full Screen menu */}
           <div className="flex flex-col gap-3 mt-auto">
-            <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-4 font-bold text-lg text-black border-[1.5px] border-black rounded-full bg-white hover:bg-bg-subtle transition-all duration-150"
-            >
-              Sign in
-            </Link>
-            <Link
-              to="/signup"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-4 font-bold text-lg text-white bg-black rounded-full hover:bg-neutral-800 transition-all duration-150"
-            >
-              Get started
-            </Link>
+            {PRELAUNCH_WAITLIST_MODE ? (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onJoinWaitlistClick();
+                }}
+                className="w-full text-center py-4 font-bold text-lg text-white bg-[#1A7A4A] hover:bg-[#15603A] rounded-full transition-all duration-150 border-[1.5px] border-black"
+              >
+                Join Waitlist
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-4 font-bold text-lg text-black border-[1.5px] border-black rounded-full bg-white hover:bg-bg-subtle transition-all duration-150"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-4 font-bold text-lg text-white bg-black rounded-full hover:bg-neutral-800 transition-all duration-150"
+                >
+                  Get started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -32,6 +32,7 @@ import AdminWaitlist from './modules/Admin/pages/AdminWaitlist';
 import AdminAuditLogs from './modules/Admin/pages/AdminAuditLogs';
 import BillingDashboard from './modules/Billing/pages/BillingDashboard';
 import PaymentCallback from './modules/Billing/pages/PaymentCallback';
+import BillingCallback from './modules/Billing/pages/BillingCallback';
 import Services from './modules/Services/pages/Services';
 import Bookings from './modules/Services/pages/Bookings';
 import Chats from './modules/Conversations/pages/Chats';
@@ -120,6 +121,12 @@ function App() {
               <Route path="/payment/callback" element={
                 <ProtectedRoute>
                   <PaymentCallback />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/billing/callback" element={
+                <ProtectedRoute>
+                  <BillingCallback />
                 </ProtectedRoute>
               } />
 

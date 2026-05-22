@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Play } from "lucide-react";
+import { CountdownTimer } from "./CountdownTimer";
+import { PRELAUNCH_WAITLIST_MODE } from "../../../config";
 
-export const HeroSection = () => {
+export const HeroSection = ({ onJoinWaitlistClick }) => {
   return (
     <section
       id="hero"
@@ -12,6 +14,17 @@ export const HeroSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* LEFT COLUMN — 50% (lg:col-span-6) */}
           <div className="lg:col-span-6 space-y-8 text-left">
+            {PRELAUNCH_WAITLIST_MODE && (
+              <div className="space-y-4 pb-2 animate-in fade-in slide-in-from-top duration-300">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4F263] border-[1.5px] border-black text-black text-[11px] font-black uppercase tracking-wider rounded-full shadow-[2px_2px_0px_#000]">
+                  Launching June 5, 2026
+                </div>
+                <div>
+                  <CountdownTimer />
+                </div>
+              </div>
+            )}
+
             {/* H1 headline (3 lines) */}
             <h1 className="text-4xl md:text-5.5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-[#0A0A0A] font-bricolage select-none">
               <span className="block text-[#0A0A0A]">AI-Powered</span>
@@ -30,12 +43,21 @@ export const HeroSection = () => {
 
             {/* CTA Row */}
             <div className="flex flex-row items-center gap-4 pt-2 font-sans select-none">
-              <Link
-                to="/signup"
-                className="text-[15px] font-bold text-white bg-black px-6 py-3.5 rounded-full hover:bg-neutral-800 active:scale-95 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.15)] flex items-center gap-1 cursor-pointer"
-              >
-                Get Kasi for Free →
-              </Link>
+              {PRELAUNCH_WAITLIST_MODE ? (
+                <button
+                  onClick={onJoinWaitlistClick}
+                  className="text-[15px] font-bold text-white bg-[#1A7A4A] hover:bg-[#15603A] px-6 py-3.5 rounded-full active:scale-95 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.15)] flex items-center gap-1 cursor-pointer border border-black"
+                >
+                  Join Beta Waitlist →
+                </button>
+              ) : (
+                <Link
+                  to="/signup"
+                  className="text-[15px] font-bold text-white bg-black px-6 py-3.5 rounded-full hover:bg-neutral-800 active:scale-95 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.15)] flex items-center gap-1 cursor-pointer"
+                >
+                  Get Kasi for Free →
+                </Link>
+              )}
               <a
                 href="#dms"
                 className="text-[15px] font-bold text-black border-[1.5px] border-black bg-white px-6 py-3.5 rounded-full hover:bg-bg-subtle active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"

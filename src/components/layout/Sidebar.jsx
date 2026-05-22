@@ -20,6 +20,37 @@ const Sidebar = ({ onWidthChange }) => {
 
   const isService = user?.business_type === 'service';
 
+  const getPlanName = (tier) => {
+    if (tier === 'starter') return 'Starter Plan';
+    if (tier === 'growth') return 'Growth Plan';
+    if (tier === 'premium') return 'Premium Plan';
+    return 'Free Trial';
+  };
+
+  const getTrialDaysLeft = (expiryDate) => {
+    if (!expiryDate) return 0;
+    const now = new Date();
+    const expiry = new Date(expiryDate);
+    const diffTime = expiry - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  const getPlanStatusText = () => {
+    if (isAdmin) return adminRole || 'Admin';
+    
+    const tier = user?.subscription_tier || 'free_trial';
+    const status = user?.subscription_status || 'trialing';
+    
+    if (status === 'trialing') {
+      const days = getTrialDaysLeft(user?.subscription_expires_at);
+      return `${getPlanName(tier)} · ${days}d left`;
+    }
+    
+    const formattedStatus = status ? (status.charAt(0).toUpperCase() + status.slice(1)) : 'Active';
+    return `${getPlanName(tier)} · ${formattedStatus}`;
+  };
+
   useEffect(() => {
     try { localStorage.setItem(SIDEBAR_KEY, collapsed); } catch {}
     onWidthChange?.(collapsed ? 72 : 220);
@@ -171,15 +202,34 @@ const Sidebar = ({ onWidthChange }) => {
 
         {/* Business Card */}
         {!collapsed && user && (
-          <div className="mt-2 px-3 py-3 bg-gray-50 rounded-xl">
+          <div className="mt-2 px-3 py-3 bg-gray-50 dark:bg-gray-800/80 rounded-xl border border-gray-100/50 dark:border-gray-700/50">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
                 {(isAdmin ? 'Kasi Admin' : (user.business_name || 'K')).charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-dark truncate">{isAdmin ? 'Kasi Admin' : (user.business_name || 'My Business')}</p>
-                <p className="text-[11px] text-gray-400 truncate">{isAdmin ? adminRole : 'Pro Plan · Active'}</p>
+                <p className="text-sm font-bold text-dark dark:text-white truncate">{isAdmin ? 'Kasi Admin' : (user.business_name || 'My Business')}</p>
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
+                  {getPlanStatusText()}
+                </p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Upgrade Plan CTA Card */}
+        {!collapsed && user && !isAdmin && user.subscription_tier !== 'premium' && (
+          <div className="mt-2.5 px-3 py-3 bg-gradient-to-tr from-primary/10 via-emerald-500/5 to-transparent border border-primary/20 rounded-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-xl group-hover:scale-150 transition-all duration-500" />
+            <div className="relative">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">Upgrade to Premium</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">Unlock maximum payout routing split limits & premium features.</p>
+              <button
+                onClick={() => navigate('/settings?tab=billing')}
+                className="w-full text-center py-1.5 px-3 bg-primary hover:bg-green-700 text-white rounded-lg text-[10px] font-bold shadow-md shadow-green-100 dark:shadow-none transition-all duration-200 hover:scale-[1.02]"
+              >
+                Upgrade Plan
+              </button>
             </div>
           </div>
         )}

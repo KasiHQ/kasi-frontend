@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PRELAUNCH_WAITLIST_MODE } from '../../../config';
 
-export const PricingSection = () => {
+export const PricingSection = ({ onJoinWaitlistClick }) => {
   const [vendorType, setVendorType] = useState('product'); // 'product' or 'service'
 
   const productPlans = [
     {
       name: 'Starter',
-      price: '₦7,500',
+      price: '₦18,000',
       priceSub: '/month',
       isDark: false,
       ctaBg: 'bg-[#0A0A0A] hover:bg-[#2A2A2A] text-white',
@@ -24,7 +25,7 @@ export const PricingSection = () => {
     },
     {
       name: 'Growth',
-      price: '₦15,000',
+      price: '₦29,000',
       priceSub: '/month',
       isDark: true,
       badge: 'MOST POPULAR',
@@ -39,7 +40,7 @@ export const PricingSection = () => {
     },
     {
       name: 'Premium',
-      price: '₦28,000',
+      price: '₦40,000',
       priceSub: '/month',
       isDark: false,
       ctaBg: 'bg-[#0A0A0A] hover:bg-[#2A2A2A] text-white',
@@ -56,7 +57,7 @@ export const PricingSection = () => {
   const servicePlans = [
     {
       name: 'Starter',
-      price: '₦5,000',
+      price: '₦15,000',
       priceSub: '/month',
       isDark: false,
       ctaBg: 'bg-[#0A0A0A] hover:bg-[#2A2A2A] text-white',
@@ -72,7 +73,7 @@ export const PricingSection = () => {
     },
     {
       name: 'Growth',
-      price: '₦11,000',
+      price: '₦24,000',
       priceSub: '/month',
       isDark: true,
       badge: 'MOST POPULAR',
@@ -88,7 +89,7 @@ export const PricingSection = () => {
     },
     {
       name: 'Premium',
-      price: '₦22,000',
+      price: '₦32,000',
       priceSub: '/month',
       isDark: false,
       ctaBg: 'bg-[#0A0A0A] hover:bg-[#2A2A2A] text-white',
@@ -184,13 +185,21 @@ export const PricingSection = () => {
                   </span>
                 </div>
 
-                {/* CTA Button */}
-                <Link
-                  to="/signup"
-                  className={`w-full py-4 rounded-full font-black text-center text-[15px] block border-[1.5px] border-black shadow-[3px_3px_0px_#0A0A0A] transition-all hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#0A0A0A] active:translate-y-[0px] ${plan.ctaBg}`}
-                >
-                  Get started
-                </Link>
+                {PRELAUNCH_WAITLIST_MODE ? (
+                  <button
+                    onClick={onJoinWaitlistClick}
+                    className={`w-full py-4 rounded-full font-black text-center text-[15px] block border-[1.5px] border-black shadow-[3px_3px_0px_#0A0A0A] transition-all hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#0A0A0A] active:translate-y-[0px] ${plan.ctaBg}`}
+                  >
+                    Join Waitlist
+                  </button>
+                ) : (
+                  <Link
+                    to="/signup"
+                    className={`w-full py-4 rounded-full font-black text-center text-[15px] block border-[1.5px] border-black shadow-[3px_3px_0px_#0A0A0A] transition-all hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#0A0A0A] active:translate-y-[0px] ${plan.ctaBg}`}
+                  >
+                    Get started
+                  </Link>
+                )}
 
                 <hr className={`my-7 border-t ${plan.isDark ? 'border-white/10' : 'border-[#E5E5E5]'}`} />
 
