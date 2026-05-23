@@ -573,17 +573,7 @@ const Clients = () => {
                     Your message has been queued and dispatched to {targetRecipients.length} customer{targetRecipients.length !== 1 ? 's' : ''} in the background.
                   </p>
                 </div>
-                
-                {/* Throttling/Queue Warning */}
-                <div className="w-full bg-blue-50 border border-blue-100 rounded-xl p-4 text-left text-xs text-blue-800 space-y-2 mt-4">
-                  <p className="font-semibold flex items-center gap-1.5">
-                    <span className="inline-block w-1.5 h-1.5 bg-blue-600 rounded-full animate-ping"></span>
-                    System Design Info (Celery & Redis Active)
-                  </p>
-                  <p className="text-blue-700 leading-relaxed">
-                    To prevent WhatsApp from banning your phone number, the bulk dispatch is fully managed by our background task queue (**Celery & Redis**) with a throttled delay (2–5 seconds per message).
-                  </p>
-                </div>
+
 
                 <button
                   onClick={() => {
