@@ -114,29 +114,6 @@ const MainLayout = () => {
     <div className="min-h-screen bg-[#F7F8FA] kasi-app text-[#101828] flex flex-col w-full overflow-x-hidden">
       <ImpersonationBanner />
       <BroadcastBanner />
-      {isInstallable && (
-        <div className="bg-[#D4F263] border-b border-black py-2.5 px-4 md:px-10 flex items-center justify-between text-xs font-bold text-black animate-in slide-in-from-top-4 duration-300 select-none shrink-0 shadow-sm">
-          <div className="flex items-center gap-2">
-            <span role="img" aria-label="phone">📱</span>
-            <span>Install Kasi on your device for real-time notifications and faster access!</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={handleInstallClick}
-              className="px-3 py-1 bg-[#1A7A4A] text-white hover:bg-[#0F5533] rounded-lg transition-all border border-black shadow-[2px_2px_0px_#0A0A0A] font-bold text-[10px] cursor-pointer"
-            >
-              Install App
-            </button>
-            <button 
-              onClick={() => setIsInstallable(false)}
-              className="text-black/60 hover:text-black cursor-pointer shrink-0 p-1"
-              title="Dismiss"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        </div>
-      )}
       <div className="flex flex-1 min-w-0">
         <Sidebar onWidthChange={setSidebarWidth} />
         
@@ -146,6 +123,30 @@ const MainLayout = () => {
           style={{ marginLeft: undefined }}
         >
           <style>{`@media(min-width:768px){.main-content-area{margin-left:${sidebarWidth}px !important;transition:margin-left 0.25s ease}}`}</style>
+          
+          {isInstallable && (
+            <div className="bg-[#D4F263] border-b border-black py-2.5 px-4 md:px-10 flex items-center justify-between text-xs font-bold text-black animate-in slide-in-from-top-4 duration-300 select-none shrink-0 shadow-sm">
+              <div className="flex items-center gap-2">
+                <span role="img" aria-label="phone">📱</span>
+                <span>Install Kasi on your device for real-time notifications and faster access!</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={handleInstallClick}
+                  className="px-3 py-1 bg-[#1A7A4A] text-white hover:bg-[#0F5533] rounded-lg transition-all border border-black shadow-[2px_2px_0px_#0A0A0A] font-bold text-[10px] cursor-pointer"
+                >
+                  Install App
+                </button>
+                <button 
+                  onClick={() => setIsInstallable(false)}
+                  className="text-black/60 hover:text-black cursor-pointer shrink-0 p-1"
+                  title="Dismiss"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+          )}
           
           {/* Top Bar of Main Content */}
           <header className="h-16 bg-white border-b border-[#EAECF0] px-4 md:px-10 flex items-center justify-between sticky top-0 z-40 shrink-0">
