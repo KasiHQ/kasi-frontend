@@ -14,6 +14,7 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreeConsent, setAgreeConsent] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -61,6 +62,10 @@ const Signup = () => {
     }
     if (!agreeTerms) {
       setError('You must agree to the Terms of Service and Privacy Policy');
+      return;
+    }
+    if (!agreeConsent) {
+      setError('You must consent to allow Kasi to process data to help serve your customers better');
       return;
     }
     setError('');
@@ -404,9 +409,24 @@ const Signup = () => {
                   </label>
                 </div>
 
+                {/* Consent Checkbox */}
+                <div className="flex items-start gap-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    id="consent"
+                    required
+                    checked={agreeConsent}
+                    onChange={(e) => setAgreeConsent(e.target.checked)}
+                    className="w-4 h-4 rounded border-[#D0D5DD] text-[#1A7A4A] focus:ring-[#1A7A4A] mt-0.5"
+                  />
+                  <label htmlFor="consent" className="text-xs text-[#344054] leading-normal select-none">
+                    I allow Kasi to process my sales interactions and use my business data to help serve my customers better.
+                  </label>
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading || !agreeTerms}
+                  disabled={loading || !agreeTerms || !agreeConsent}
                   className="w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
                 >
                   {loading ? 'Creating Account...' : 'Create Account →'}

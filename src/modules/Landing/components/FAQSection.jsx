@@ -7,8 +7,8 @@ export const FAQSection = () => {
 
   const FAQS = [
     {
-      q: "How exactly does the Credit System work?",
-      a: "Kasi uses success-based credits. Load your account with tokens (e.g. 50 Credits for ₦1,000, which works out to just ₦20 per successfully closed sale). Answering customer questions, AI haggling, and catalog browsing inside DMs are 100% free. Credits are ONLY deducted when Kasi closes the deal and delivers a paid invoice."
+      q: "How exactly does Kasi's pricing work?",
+      a: "Kasi offers simple, predictable pricing. You start with a free trial to explore all automation tools, and can upgrade to a flat monthly subscription tier that best fits your business volume. There are no surprise fees or success cuts per transaction."
     },
     {
       q: "Can I connect my own Naira bank details directly?",
@@ -19,8 +19,8 @@ export const FAQSection = () => {
       a: "Absolutely. You can link your WhatsApp Business line, Telegram bot, or Instagram comments panel straight from the onboarding wizard in your dashboard in under 5 minutes."
     },
     {
-      q: "Do you charge setup fees or custom onboarding expenses?",
-      a: "No. Creating your Kasi account and setting up integrations is completely free. We do not charge setup fees or recurring monthly subscription rates. You only purchase credits when you are ready to automate your orders."
+      q: "Do you charge setup fees or commission on my sales?",
+      a: "Never. Your hard-earned revenue belongs 100% to you. We do not charge custom setup fees or take commissions/percentages of your transactions."
     }
   ];
 
@@ -37,7 +37,7 @@ export const FAQSection = () => {
             Frequently asked <span className="text-brand">questions.</span>
           </h2>
           <p className="font-body-large text-grey-700 max-w-xl mx-auto mt-2">
-            Everything you need to know about Kasi AI's credit features, direct bank integrations, and social chat channel connections.
+            Everything you need to know about Kasi AI's subscription pricing, direct bank integrations, and social chat channel connections.
           </p>
         </div>
 
