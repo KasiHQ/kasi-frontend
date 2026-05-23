@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
@@ -6,12 +6,92 @@ import ImpersonationBanner from './ImpersonationBanner';
 import BroadcastBanner from './BroadcastBanner';
 import { useLayout } from '../../context/LayoutContext';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, X } from 'lucide-react';
+import api from '../../api/axios';
 
 const MainLayout = () => {
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const { user } = useAuth();
   const location = useLocation();
+
+  // PWA Installation Trigger States
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      setIsInstallable(false);
+    }
+
+    const handleAppInstalled = () => {
+      setDeferredPrompt(null);
+      setIsInstallable(false);
+      console.log('Kasi PWA was installed successfully!');
+    };
+
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User choice: ${outcome}`);
+    setDeferredPrompt(null);
+    setIsInstallable(false);
+  };
+
+  // HTML5 Web Notifications Polling
+  useEffect(() => {
+    if (!user) return;
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    const notifiedConversations = new Set();
+
+    const checkAttentionNeeded = async () => {
+      try {
+        const response = await api.get('/api/conversations');
+        const convs = response.data || [];
+        
+        convs.forEach(conv => {
+          if (conv.status === 'Requires Attention' && !notifiedConversations.has(conv.id)) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification("⚠️ Kasi: Attention Needed", {
+                body: `Customer "${conv.customer_name || 'Guest'}" requires your urgent attention!`,
+                icon: "/kasi.png",
+                tag: `attention-${conv.id}`,
+                requireInteraction: true
+              });
+            }
+            notifiedConversations.add(conv.id);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to check push notifications:", err);
+      }
+    };
+
+    checkAttentionNeeded();
+    const interval = setInterval(checkAttentionNeeded, 12000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const isDashboard = location.pathname === '/dashboard' || location.pathname === '/';
 
@@ -34,6 +114,29 @@ const MainLayout = () => {
     <div className="min-h-screen bg-[#F7F8FA] kasi-app text-[#101828] flex flex-col w-full overflow-x-hidden">
       <ImpersonationBanner />
       <BroadcastBanner />
+      {isInstallable && (
+        <div className="bg-[#D4F263] border-b border-black py-2.5 px-4 md:px-10 flex items-center justify-between text-xs font-bold text-black animate-in slide-in-from-top-4 duration-300 select-none shrink-0 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span role="img" aria-label="phone">📱</span>
+            <span>Install Kasi on your device for real-time notifications and faster access!</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={handleInstallClick}
+              className="px-3 py-1 bg-[#1A7A4A] text-white hover:bg-[#0F5533] rounded-lg transition-all border border-black shadow-[2px_2px_0px_#0A0A0A] font-bold text-[10px] cursor-pointer"
+            >
+              Install App
+            </button>
+            <button 
+              onClick={() => setIsInstallable(false)}
+              className="text-black/60 hover:text-black cursor-pointer shrink-0 p-1"
+              title="Dismiss"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex flex-1 min-w-0">
         <Sidebar onWidthChange={setSidebarWidth} />
         

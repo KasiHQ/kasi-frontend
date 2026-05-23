@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, Users, CheckCircle, AlertTriangle, 
-  ArrowRight, MessageSquare, DollarSign, Cpu 
+  ArrowRight, MessageSquare, DollarSign, Cpu,
+  Package, ShoppingBag, Clock, UserPlus, Tag, Share2, BarChart3, Briefcase, Calendar,
+  Megaphone, Settings, GraduationCap, UserCheck
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { DashboardSkeleton } from '../../../components/ui/Skeleton';
@@ -10,6 +12,11 @@ import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { conversationAPI } from '../../../api/conversations';
 import useNetwork from '../../../hooks/useNetwork';
+
+// Naira Icon for Settlement payouts
+const NairaIcon = ({ className }) => (
+  <span className={`font-extrabold flex items-center justify-center select-none ${className}`} style={{ fontStyle: 'normal', fontSize: '18px', fontWeight: '900', lineHeight: 1 }}>₦</span>
+);
 
 // Dynamic Color Mapping for Avatars (B -> Green, T -> Pink, O -> Purple)
 const getAvatarTheme = (name) => {
@@ -303,6 +310,36 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
         ))}
       </div>
 
+      {/* Quick Actions Grid */}
+      <div className="bg-white rounded-2xl p-5 md:p-6 border border-[#EAECF0] shadow-none">
+        <h3 className="text-sm font-bold text-gray-700 mb-6">Quick actions</h3>
+        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+          {[
+            { label: 'Train Kasi AI', icon: GraduationCap, path: '/settings?tab=ai_rules' },
+            { label: 'Link WhatsApp', icon: MessageSquare, path: '/settings?tab=integrations' },
+            { label: 'Setup Payouts', icon: NairaIcon, path: '/settings?tab=payment' },
+            { label: 'Send Broadcast', icon: Megaphone, path: '/customers' },
+            { label: 'Live Takeover', icon: UserCheck, path: '/chats' },
+            { label: 'Manage Services', icon: Briefcase, path: '/services' },
+            { label: 'Client Directory', icon: Users, path: '/customers' },
+            { label: 'Store Settings', icon: Settings, path: '/settings?tab=general' },
+          ].map((act, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => navigate(act.path)}
+              className="flex flex-col items-center group cursor-pointer"
+            >
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-gray-100 bg-white shadow-xs flex items-center justify-center text-gray-600 group-hover:text-[#1A7A4A] group-hover:bg-[#E8F5EE] group-hover:border-[#B0D9C1] group-hover:scale-105 transition-all duration-200">
+                <act.icon className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <span className="text-[10px] md:text-[11px] font-bold text-gray-500 group-hover:text-dark mt-2.5 text-center leading-normal">
+                {act.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
            <div className="flex items-center justify-between">
@@ -506,6 +543,36 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
         ))}
       </div>
 
+      {/* Quick Actions Grid */}
+      <div className="bg-white rounded-2xl p-5 md:p-6 border border-[#EAECF0] shadow-none">
+        <h3 className="text-sm font-bold text-gray-700 mb-6">Quick actions</h3>
+        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+          {[
+            { label: 'Train Kasi AI', icon: GraduationCap, path: '/settings?tab=ai_rules' },
+            { label: 'Link WhatsApp', icon: MessageSquare, path: '/settings?tab=integrations' },
+            { label: 'Setup Payouts', icon: NairaIcon, path: '/settings?tab=payment' },
+            { label: 'Send Broadcast', icon: Megaphone, path: '/customers' },
+            { label: 'Live Takeover', icon: UserCheck, path: '/chats' },
+            { label: 'Manage Products', icon: Package, path: '/products' },
+            { label: 'Client Directory', icon: Users, path: '/customers' },
+            { label: 'Store Settings', icon: Settings, path: '/settings?tab=general' },
+          ].map((act, idx) => (
+            <div 
+              key={idx} 
+              onClick={() => navigate(act.path)}
+              className="flex flex-col items-center group cursor-pointer"
+            >
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-gray-100 bg-white shadow-xs flex items-center justify-center text-gray-600 group-hover:text-[#1A7A4A] group-hover:bg-[#E8F5EE] group-hover:border-[#B0D9C1] group-hover:scale-105 transition-all duration-200">
+                <act.icon className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <span className="text-[10px] md:text-[11px] font-bold text-gray-500 group-hover:text-dark mt-2.5 text-center leading-normal">
+                {act.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* Revenue Chart Card (~65% width) */}
         <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
@@ -631,7 +698,7 @@ const ActionAlerts = ({ user }) => {
   };
 
   const hasWhatsApp = integrations.some(i => i.platform === 'whatsapp' && i.connection_status === 'connected');
-  const hasPaystack = !!user?.paystack_integration;
+  const hasPaystack = !!user?.account_number;
 
   if (loading) return null;
 
@@ -659,7 +726,7 @@ const ActionAlerts = ({ user }) => {
           </div>
           <div className="flex items-center justify-between gap-2 shrink-0 border-t border-[#D1E9FF]/40 pt-2 mt-1">
             <button
-              onClick={() => navigate('/settings/integrations')}
+              onClick={() => navigate('/settings?tab=payment')}
               className="px-2.5 py-1 bg-[#175CD3] hover:bg-[#114B9E] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
             >
               Link Account
@@ -694,7 +761,7 @@ const ActionAlerts = ({ user }) => {
           </div>
           <div className="flex items-center justify-between gap-2 shrink-0 border-t border-[#D1FADF]/40 pt-2 mt-1">
             <button
-              onClick={() => navigate('/settings/integrations')}
+              onClick={() => navigate('/settings?tab=integrations')}
               className="px-2.5 py-1 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
             >
               Connect Now
