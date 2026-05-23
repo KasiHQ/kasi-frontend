@@ -308,22 +308,51 @@ const Clients = () => {
     return false;
   });
 
-  // Execute Broadcast Simulation
+  // Execute Broadcast Campaign (Connected to Backend Celery & Redis)
   const handleSendBroadcast = async () => {
     if (!broadcastMessage.trim() || targetRecipients.length === 0) return;
     setIsBroadcasting(true);
     setBroadcastProgress(0);
+    setBroadcastStatus('Queuing campaign on server...');
 
-    for (let i = 0; i < targetRecipients.length; i++) {
-      const recipient = targetRecipients[i];
-      setBroadcastStatus(`Sending to ${recipient.name}...`);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setBroadcastProgress(prev => prev + 1);
+    try {
+      // Map frontend segment filter to backend customer segmentation categories
+      let backendSegments = ["New", "Regular", "VIP"];
+      if (broadcastSegment === 'Buyers') {
+        backendSegments = ["Regular", "VIP"];
+      }
+
+      const payload = {
+        message_text: broadcastMessage,
+        segment_filter: {
+          segments: backendSegments
+        }
+      };
+
+      // Dispatch to real backend endpoint
+      const response = await api.post('/api/whatsapp/broadcast', payload);
+
+      if (response.data?.status === 'queued' || response.data?.status === 'scheduled') {
+        // Perform a responsive client-side progress visualization while Celery dispatches in background
+        for (let i = 0; i < targetRecipients.length; i++) {
+          const recipient = targetRecipients[i];
+          setBroadcastStatus(`Dispatching to ${recipient.name}...`);
+          await new Promise(resolve => setTimeout(resolve, 300));
+          setBroadcastProgress(prev => prev + 1);
+        }
+
+        setIsBroadcasting(false);
+        setBroadcastSuccess(true);
+        addToast(`Broadcast successfully queued for ${targetRecipients.length} customers!`, 'success');
+      } else {
+        throw new Error(response.data?.error || 'Failed to initialize broadcast campaign');
+      }
+    } catch (err) {
+      console.error('Broadcast dispatch error:', err);
+      const errMsg = err.response?.data?.error || err.message || 'Failed to dispatch broadcast';
+      addToast(errMsg, 'error');
+      setIsBroadcasting(false);
     }
-
-    setIsBroadcasting(false);
-    setBroadcastSuccess(true);
-    addToast(`Broadcast successfully sent to ${targetRecipients.length} customers!`, 'success');
   };
 
   return (
