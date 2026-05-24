@@ -42,6 +42,27 @@ const AdminWaitlist = () => {
     }
   };
 
+  const [deletingId, setDeletingId] = useState(null);
+
+  const handleDeleteEntry = async (entryId) => {
+    if (!window.confirm("Are you sure you want to permanently delete this candidate from the waitlist? This action cannot be undone.")) {
+      return;
+    }
+    
+    try {
+      setDeletingId(entryId);
+      await api.delete(`/api/kasisalienceadministration/waitlist/${entryId}`);
+      addToast("Waitlist candidate deleted successfully.", "success");
+      setSelectedEntry(null);
+      fetchWaitlist();
+    } catch (error) {
+      console.error("Error deleting waitlist entry:", error);
+      addToast(error.response?.data?.message || "Failed to delete waitlist candidate.", "error");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   useEffect(() => {
     const term = searchTerm.toLowerCase();
     const filtered = waitlist.filter(entry => 
@@ -487,12 +508,20 @@ const AdminWaitlist = () => {
             </div>
             
             {/* Footer */}
-            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 flex gap-3">
+            <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 flex gap-3 select-none">
                <button 
                  onClick={() => setSelectedEntry(null)}
                  className="flex-1 py-2.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-855 text-gray-700 dark:text-light font-bold rounded-xl transition-all cursor-pointer shadow-sm text-center"
                >
                  Dismiss Panel
+               </button>
+               <button 
+                 onClick={() => handleDeleteEntry(selectedEntry.id)}
+                 disabled={deletingId === selectedEntry.id}
+                 className="py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-sm text-center cursor-pointer transition-all disabled:opacity-50 text-sm flex items-center justify-center gap-1.5"
+               >
+                 <AlertTriangle size={15} />
+                 <span>{deletingId === selectedEntry.id ? "Deleting..." : "Delete Candidate"}</span>
                </button>
             </div>
           </div>
