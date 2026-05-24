@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Users, Search, X, Mail, Phone, Instagram, Clock, 
+  Users, Search, X, Mail, Phone, Clock, 
   MessageSquare, Award, TrendingUp, AlertTriangle, 
-  Crown, Lightbulb, Zap, BarChart3 
+  Crown, Lightbulb, Zap, BarChart3, Settings
 } from 'lucide-react';
 import api from '../../../api/axios';
 import { useToast } from '../../../context/ToastContext';
@@ -10,7 +10,7 @@ import { useToast } from '../../../context/ToastContext';
 const AdminWaitlist = () => {
   const [waitlist, setWaitlist] = useState([]);
   const [filteredWaitlist, setFilteredWaitlist] = useState([]);
-  const [analyticsData, setAnalyticsData] = useState({ platforms: {}, struggles: {} });
+  const [analyticsData, setAnalyticsData] = useState({ platforms: {}, struggles: {}, heard_about: {}, categories: {} });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEntry, setSelectedEntry] = useState(null);
@@ -28,11 +28,11 @@ const AdminWaitlist = () => {
       if (data && data.entries) {
         setWaitlist(data.entries);
         setFilteredWaitlist(data.entries);
-        setAnalyticsData(data.analytics || { platforms: {}, struggles: {} });
+        setAnalyticsData(data.analytics || { platforms: {}, struggles: {}, heard_about: {}, categories: {} });
       } else {
         setWaitlist(data || []);
         setFilteredWaitlist(data || []);
-        setAnalyticsData({ platforms: {}, struggles: {} });
+        setAnalyticsData({ platforms: {}, struggles: {}, heard_about: {}, categories: {} });
       }
     } catch (error) {
       console.error('Error fetching waitlist:', error);
@@ -48,9 +48,9 @@ const AdminWaitlist = () => {
       entry.name?.toLowerCase().includes(term) ||
       entry.email?.toLowerCase().includes(term) ||
       entry.phone_number?.toLowerCase().includes(term) ||
-      entry.business_name?.toLowerCase().includes(term) ||
-      entry.primary_platform?.toLowerCase().includes(term) ||
-      entry.biggest_struggle?.toLowerCase().includes(term)
+      entry.category?.toLowerCase().includes(term) ||
+      entry.commerce_platform?.toLowerCase().includes(term) ||
+      entry.heard_about?.toLowerCase().includes(term)
     );
     setFilteredWaitlist(filtered);
   }, [searchTerm, waitlist]);
@@ -68,7 +68,7 @@ const AdminWaitlist = () => {
     sortedPlatforms[2] || { name: 'N/A', count: 0 }  // 3rd Place
   ];
 
-  // Aggregate struggles for progress charts
+  // Aggregate categories (bound as struggles fallback from backend)
   const struggles = analyticsData?.struggles || {};
   const totalEntries = waitlist.length || 1;
   const sortedStruggles = Object.entries(struggles)
@@ -110,8 +110,8 @@ const AdminWaitlist = () => {
             <Users className="w-8 h-8" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight font-bricolage">Merchant Beta Waitlist</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Review prospects & details for the June 5th Pre-Launch Beta</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight font-bricolage">Kasi Beta Waitlist</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Review prospects & details for the Kasi Beta waitlist campaign</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ const AdminWaitlist = () => {
             <Users className="w-4 h-4 text-green-600 group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-3xl font-black text-gray-900 dark:text-white font-bricolage">{waitlist.length}</div>
-          <div className="mt-2 text-[10px] font-bold text-gray-400">Total interested merchants</div>
+          <div className="mt-2 text-[10px] font-bold text-gray-400">Total interested signups</div>
         </div>
 
         {/* KPI 2: Top Selling Platform */}
@@ -146,22 +146,22 @@ const AdminWaitlist = () => {
             {sortedPlatforms[0]?.name || 'None'}
           </div>
           <div className="mt-2 text-[10px] font-bold text-gray-400">
-            {sortedPlatforms[0]?.count || 0} merchants ({Math.round(((sortedPlatforms[0]?.count || 0) / totalEntries) * 100)}%)
+            {sortedPlatforms[0]?.count || 0} candidates ({Math.round(((sortedPlatforms[0]?.count || 0) / totalEntries) * 100)}%)
           </div>
         </div>
 
-        {/* KPI 3: Top Sales Struggle */}
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-850 relative overflow-hidden group hover:border-red-200 dark:hover:border-red-900 transition-all duration-300">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-red-50/20 dark:bg-red-950/5 rounded-bl-full pointer-events-none" />
+        {/* KPI 3: Top User Segment */}
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-850 relative overflow-hidden group hover:border-[#7A5AF8]/30 dark:hover:border-[#7A5AF8]/50 transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-50/25 dark:bg-purple-950/5 rounded-bl-full pointer-events-none" />
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Key Painpoint</span>
-            <AlertTriangle className="w-4 h-4 text-red-500 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Key User Persona</span>
+            <Crown className="w-4 h-4 text-purple-500 group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-2xl font-black text-gray-900 dark:text-white font-bricolage truncate">
             {sortedStruggles[0]?.name || 'None'}
           </div>
-          <div className="mt-2 text-[10px] font-bold text-red-500">
-            {sortedStruggles[0]?.count || 0} merchants ({sortedStruggles[0]?.percentage || 0}%)
+          <div className="mt-2 text-[10px] font-bold text-purple-500">
+            {sortedStruggles[0]?.count || 0} signups ({sortedStruggles[0]?.percentage || 0}%)
           </div>
         </div>
       </div>
@@ -175,7 +175,7 @@ const AdminWaitlist = () => {
             <h3 className="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-50 dark:border-gray-800 pb-2 flex items-center gap-2 font-bricolage">
               <Award className="text-green-600" size={18} /> Top Selling Channels
             </h3>
-            <p className="text-[11px] text-gray-400 mt-2 font-sans font-medium">Platforms merchants currently utilize for closing their retail sales.</p>
+            <p className="text-[11px] text-gray-400 mt-2 font-sans font-medium">Primary platforms candidates currently utilize for conducting commerce.</p>
           </div>
 
           <div className="flex items-end justify-center gap-4 h-[210px] mt-6 font-sans">
@@ -230,18 +230,18 @@ const AdminWaitlist = () => {
           </div>
         </div>
 
-        {/* Struggles Chart */}
+        {/* User Categories Chart */}
         <div className="bg-white dark:bg-gray-900 p-6 md:p-8 rounded-3xl border border-gray-100 dark:border-gray-850 shadow-sm flex flex-col justify-between">
           <div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-50 dark:border-gray-800 pb-2 flex items-center gap-2 font-bricolage">
-              <AlertTriangle className="text-red-500" size={18} /> Primary Sales Roadblocks
+              <Users className="text-purple-500" size={18} /> User Segment Distribution
             </h3>
-            <p className="text-[11px] text-gray-400 mt-2 font-sans font-medium">Core operational struggles merchants want Kasi to automate and solve.</p>
+            <p className="text-[11px] text-gray-400 mt-2 font-sans font-medium">Breakdown of registered waitlist candidates across different user personas.</p>
           </div>
 
           <div className="space-y-4.5 mt-6 font-sans">
             {sortedStruggles.length > 0 ? (
-              sortedStruggles.slice(0, 4).map((st, idx) => (
+              sortedStruggles.map((st, idx) => (
                 <div key={idx} className="space-y-1">
                   <div className="flex justify-between text-xs font-bold text-gray-700 dark:text-gray-300">
                     <span className="truncate max-w-[70%]">{st.name}</span>
@@ -249,14 +249,14 @@ const AdminWaitlist = () => {
                   </div>
                   <div className="w-full h-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-1000" 
+                      className="h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full transition-all duration-1000" 
                       style={{ width: `${st.percentage}%` }}
                     />
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-xs text-gray-500 text-center py-10">No roadblocks aggregated yet.</p>
+              <p className="text-xs text-gray-500 text-center py-10">No segments aggregated yet.</p>
             )}
           </div>
         </div>
@@ -267,7 +267,7 @@ const AdminWaitlist = () => {
         <Search className="text-gray-400" size={20} />
         <input 
           type="text" 
-          placeholder="Search by name, email, business, platform, or roadblocks..." 
+          placeholder="Search by name, email, category, platform, or lead source..." 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="bg-transparent border-none focus:outline-none flex-1 text-gray-900 dark:text-white placeholder-gray-400 text-sm font-medium"
@@ -279,7 +279,7 @@ const AdminWaitlist = () => {
         <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-850 flex justify-between items-center select-none">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight font-bricolage">Registered Beta Candidates</h2>
-            <p className="text-xs text-gray-400">Click any row to examine detailed merchant business discovery profiles.</p>
+            <p className="text-xs text-gray-400">Click any row to examine detailed candidate profiles, shopping spend, and online biz orders.</p>
           </div>
           <span className="bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 text-xs font-bold px-2.5 py-1 rounded-full">
             {filteredWaitlist.length} entries
@@ -291,10 +291,10 @@ const AdminWaitlist = () => {
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800 select-none">
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date Joined</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Business / Name</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Contact Info</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Platform</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Key Struggle</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Candidate / Info</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Online Biz?</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Main Platform</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -318,28 +318,35 @@ const AdminWaitlist = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="font-extrabold text-gray-900 dark:text-white leading-none">
-                        {entry.business_name || 'N/A'}
+                        {entry.name}
                       </div>
                       <div className="text-xs text-gray-400 font-medium mt-1">
-                        Owner: {entry.name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="text-gray-700 dark:text-gray-300 flex items-center gap-1.5 font-medium">
-                        <Mail size={13} className="text-gray-400"/> {entry.email}
-                      </div>
-                      <div className="text-xs text-gray-400 flex items-center gap-1.5 mt-1 font-bold">
-                        <Phone size={13} className="text-gray-400"/> {entry.phone_number}
+                        {entry.email}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30">
-                        {entry.primary_platform || 'Other'}
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-900/30">
+                        {entry.category ? {
+                          'product_vendor': 'Product Vendor',
+                          'service_provider': 'Service Provider',
+                          'professional': 'Professional',
+                          'investor': 'Investor',
+                          'regular_user': 'Regular User'
+                        }[entry.category] || entry.category : 'Regular User'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30 max-w-[200px] truncate block">
-                        {entry.biggest_struggle || 'None'}
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-black border ${
+                        entry.runs_online_biz === 'Yes' 
+                          ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400 dark:border-green-900/30' 
+                          : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-850 dark:text-gray-400 dark:border-gray-800'
+                      }`}>
+                        {entry.runs_online_biz || 'No'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30">
+                        {entry.commerce_platform || entry.primary_platform || 'None'}
                       </span>
                     </td>
                   </tr>
@@ -363,13 +370,13 @@ const AdminWaitlist = () => {
           <div className="fixed inset-y-0 right-0 w-full md:w-[480px] bg-white dark:bg-gray-900 shadow-2xl z-[160] transform transition-transform duration-300 ease-in-out flex flex-col border-l border-gray-200 dark:border-gray-800 text-left">
             
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-955">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 flex items-center justify-center shadow-inner">
                   <Users size={20} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-white font-bricolage">Merchant Assessment</h2>
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-white font-bricolage">Waitlist Assessment</h2>
                   <p className="text-xs text-gray-400">Prospect ID: #{selectedEntry.id}</p>
                 </div>
               </div>
@@ -398,32 +405,60 @@ const AdminWaitlist = () => {
                {/* Complete Data Details */}
                <div className="space-y-5 font-sans">
                  
-                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 dark:border-gray-800 pb-1.5 select-none">Business Profile</h4>
+                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 dark:border-gray-800 pb-1.5 select-none">Commerce Assessment</h4>
 
                  <div className="grid grid-cols-2 gap-4">
                    <div>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Business Name</p>
-                     <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{selectedEntry.business_name || 'N/A'}</p>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">User Category</p>
+                     <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-955 dark:text-purple-400 dark:border-purple-900/30 mt-0.5">
+                       {selectedEntry.category ? {
+                         'product_vendor': 'Product Vendor',
+                         'service_provider': 'Service Provider',
+                         'professional': 'Professional',
+                         'investor': 'Investor',
+                         'regular_user': 'Regular User'
+                       }[selectedEntry.category] || selectedEntry.category : 'Regular User'}
+                     </span>
                    </div>
                    <div>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Primary Channel</p>
-                     <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-955 dark:text-blue-400 dark:border-blue-900/30 mt-0.5">
-                       {selectedEntry.primary_platform || 'Other'}
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Online Business?</p>
+                     <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border mt-0.5 ${
+                       selectedEntry.runs_online_biz === 'Yes' 
+                         ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-955 dark:text-green-400 dark:border-green-900/30' 
+                         : 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-850 dark:text-gray-400 dark:border-gray-800'
+                     }`}>
+                       {selectedEntry.runs_online_biz || 'No'}
                      </span>
                    </div>
                  </div>
 
                  <div className="grid grid-cols-2 gap-4 border-t border-gray-50 dark:border-gray-800 pt-4">
                    <div>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Sales Volume</p>
-                     <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{selectedEntry.sales_volume || 'Not provided'}</p>
-                   </div>
-                   <div>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Key Roadblock</p>
-                     <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-red-50 text-red-700 border border-red-200 dark:bg-red-955 dark:text-red-400 dark:border-red-900/30 mt-0.5">
-                       {selectedEntry.biggest_struggle || 'None'}
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Commerce Channel</p>
+                     <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-955 dark:text-blue-400 dark:border-blue-900/30 mt-0.5">
+                       {selectedEntry.commerce_platform || selectedEntry.primary_platform || 'None'}
                      </span>
                    </div>
+                   <div>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Lead Source</p>
+                     <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-955 dark:text-orange-400 dark:border-orange-900/30 mt-0.5">
+                       {selectedEntry.heard_about || 'Other'}
+                     </span>
+                   </div>
+                 </div>
+
+                 <div className="border-t border-gray-50 dark:border-gray-800 pt-4">
+                   {selectedEntry.business_orders && selectedEntry.business_orders !== 'None' ? (
+                     <div>
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Monthly Volume (Orders/Bookings)</p>
+                       <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{selectedEntry.business_orders}</p>
+                     </div>
+                   ) : (
+                     <div>
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Monthly Online Shopping Spend</p>
+                       <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{selectedEntry.customer_spend || 'Not provided'}</p>
+                     </div>
+                   )}
                  </div>
 
                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 dark:border-gray-800 pt-4 pb-1.5 select-none">Contact Discovery</h4>
@@ -442,22 +477,10 @@ const AdminWaitlist = () => {
                      href={`https://wa.me/${selectedEntry.phone_number.replace(/[^0-9]/g, '')}`} 
                      target="_blank" 
                      rel="noopener noreferrer"
-                     className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-black rounded-lg transition-colors cursor-pointer shadow-sm"
+                     className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-black rounded-lg transition-colors cursor-pointer shadow-sm no-underline"
                    >
-                     Message Merchant
+                     Message Candidate
                    </a>
-                 </div>
-
-                 <div className="space-y-2 pt-2">
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider select-none">Game-Changer feature wish</p>
-                   <div className="bg-[#D4F263]/10 dark:bg-[#D4F263]/5 text-black dark:text-white border-[1.5px] border-black dark:border-[#D4F263]/25 p-4 rounded-xl shadow-[3px_3px_0px_#000] dark:shadow-none flex items-start gap-3">
-                     <Lightbulb className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
-                     <div>
-                       <p className="text-xs font-bold italic leading-relaxed">
-                         "{selectedEntry.game_changer_feature || 'No feature request entered by merchant.'}"
-                       </p>
-                     </div>
-                   </div>
                  </div>
 
                </div>
@@ -467,7 +490,7 @@ const AdminWaitlist = () => {
             <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 flex gap-3">
                <button 
                  onClick={() => setSelectedEntry(null)}
-                 className="flex-1 py-2.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-850 text-gray-700 dark:text-light font-bold rounded-xl transition-all cursor-pointer shadow-sm text-center"
+                 className="flex-1 py-2.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-855 text-gray-700 dark:text-light font-bold rounded-xl transition-all cursor-pointer shadow-sm text-center"
                >
                  Dismiss Panel
                </button>
