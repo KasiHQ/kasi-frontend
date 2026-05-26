@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './modules/Dashboard/pages/Dashboard';
 import LandingPage from './modules/Landing/pages/LandingPage';
 import MainLayout from './components/layout/MainLayout';
+import NotFound from './components/layout/NotFound';
 
 import { AuthProvider } from './context/AuthContext';
 import { LayoutProvider } from './context/LayoutContext';
@@ -216,6 +217,8 @@ function App() {
                 </ProtectedRoute>
               } />
           </Route>
+          {/* Catch-all 404 Route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
       </LayoutProvider>
