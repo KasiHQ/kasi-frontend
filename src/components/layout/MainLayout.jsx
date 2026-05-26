@@ -67,7 +67,9 @@ const MainLayout = () => {
     const checkAttentionNeeded = async () => {
       try {
         const response = await api.get('/api/conversations');
-        const convs = response.data || [];
+        const convs = Array.isArray(response.data) 
+          ? response.data 
+          : (response.data && Array.isArray(response.data.data) ? response.data.data : []);
         
         convs.forEach(conv => {
           if (conv.status === 'Requires Attention' && !notifiedConversations.has(conv.id)) {

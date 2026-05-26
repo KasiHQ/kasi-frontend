@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 // Helper to generate a fast, clean client session UUID
 const generateSessionId = () => {
@@ -39,7 +39,7 @@ export const usePageTracker = () => {
 
     const logVisit = async () => {
       try {
-        await axios.post('/api/analytics/track', {
+        await api.post('/api/analytics/track', {
           path: location.pathname,
           referrer: document.referrer || 'Direct',
           session_id: sessionId
