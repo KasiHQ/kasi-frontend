@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, MapPin, Phone, User } from 'lucide-react';
 import { conversationAPI } from '../../../api/conversations';
+import { useAuth } from '../../../context/AuthContext';
+import api from '../../../api/axios';
 
 const Logistics = () => {
+  const { user, fetchUser } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [riderPhone, setRiderPhone] = useState(user?.logistics_phone || '');
+  const [savingRider, setSavingRider] = useState(false);
 
   useEffect(() => {
     fetchConversations();
   }, []);
+
+  useEffect(() => {
+    if (user?.logistics_phone) {
+      setRiderPhone(user.logistics_phone);
+    }
+  }, [user]);
 
   const fetchConversations = async () => {
     try {
@@ -18,6 +29,24 @@ const Logistics = () => {
       console.error('Failed to fetch logistics data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveRider = async () => {
+    if (!riderPhone.strip && !riderPhone.trim()) {
+      alert('Please enter a valid phone number');
+      return;
+    }
+    setSavingRider(true);
+    try {
+      await api.patch('/api/auth/profile', { logistics_phone: riderPhone });
+      await fetchUser();
+      alert('Logistics rider phone number updated successfully! 🏍️');
+    } catch (err) {
+      console.error('Failed to save rider phone:', err);
+      alert('Failed to save rider settings');
+    } finally {
+      setSavingRider(false);
     }
   };
 
@@ -83,10 +112,37 @@ const Logistics = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-dark mb-1">Logistics</h1>
-        <p className="text-gray-500 text-sm">Track paid orders from packing to customer delivery</p>
+      {/* Header & Rider Quick Config */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <div>
+          <h1 className="text-2xl font-bold text-dark mb-1">Logistics</h1>
+          <p className="text-gray-500 text-sm">Track paid orders from packing to customer delivery</p>
+        </div>
+        
+        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 max-w-sm w-full">
+          <div className="w-10 h-10 rounded-full bg-green-100 text-primary flex items-center justify-center">
+            <Truck size={18} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Default Rider Phone</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={riderPhone}
+                onChange={(e) => setRiderPhone(e.target.value)}
+                placeholder="Rider phone (e.g. 080...)"
+                className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 focus:border-green-500 focus:ring-0 transition-all text-xs font-semibold"
+              />
+              <button
+                onClick={handleSaveRider}
+                disabled={savingRider}
+                className="px-3 py-1.5 bg-primary hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm shadow-green-100"
+              >
+                {savingRider ? '...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Kanban Board */}

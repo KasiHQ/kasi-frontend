@@ -161,7 +161,8 @@ const Settings = () => {
         payment_details: '',
         opening_hours: '',
         business_type: '',
-        agent_name: ''
+        agent_name: '',
+        logistics_phone: ''
     });
 
     useEffect(() => {
@@ -183,7 +184,8 @@ const Settings = () => {
                 payment_details: user.payment_details || '',
                 opening_hours: user.opening_hours || '',
                 business_type: user.business_type || 'product',
-                agent_name: user.agent_name || 'Kasi'
+                agent_name: user.agent_name || 'Kasi',
+                logistics_phone: user.logistics_phone || ''
             });
         }
     }, [user]);
@@ -445,7 +447,7 @@ const Settings = () => {
                                 <p className="text-xs text-gray-400">Kasi reads this to understand your brand voice.</p>
                             </div>
 
-                            <div className="space-y-2">
+                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-gray-700">Physical store address (optional)</label>
                                 <input
                                     type="text"
@@ -455,6 +457,19 @@ const Settings = () => {
                                     className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
                                     placeholder="e.g. Shop 4, Ikeja Computer Village, Lagos"
                                 />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Logistics Rider Phone Number</label>
+                                <input
+                                    type="text"
+                                    name="logistics_phone"
+                                    value={formData.logistics_phone}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
+                                    placeholder="e.g. 08031234567 or 2348031234567"
+                                />
+                                <p className="text-xs text-gray-400">This number will receive automated WhatsApp requests for delivery confirmations when customers make product orders.</p>
                             </div>
 
                             <Button
