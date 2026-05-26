@@ -8,8 +8,9 @@ const Logistics = () => {
   const { user, fetchUser } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [riderPhone, setRiderPhone] = useState(user?.logistics_phone || '');
   const [savingRider, setSavingRider] = useState(false);
+  const [riders, setRiders] = useState([]);
+  const [newRider, setNewRider] = useState('');
 
   useEffect(() => {
     fetchConversations();
@@ -17,7 +18,9 @@ const Logistics = () => {
 
   useEffect(() => {
     if (user?.logistics_phone) {
-      setRiderPhone(user.logistics_phone);
+      setRiders(user.logistics_phone.split(',').map(r => r.trim()).filter(Boolean));
+    } else {
+      setRiders([]);
     }
   }, [user]);
 
@@ -32,22 +35,33 @@ const Logistics = () => {
     }
   };
 
-  const handleSaveRider = async () => {
-    if (!riderPhone.strip && !riderPhone.trim()) {
-      alert('Please enter a valid phone number');
-      return;
-    }
+  const saveRidersList = async (list) => {
     setSavingRider(true);
     try {
-      await api.patch('/api/auth/profile', { logistics_phone: riderPhone });
+      const listString = list.join(', ');
+      await api.patch('/api/auth/profile', { logistics_phone: listString });
       await fetchUser();
-      alert('Logistics rider phone number updated successfully! 🏍️');
     } catch (err) {
-      console.error('Failed to save rider phone:', err);
+      console.error('Failed to save riders list:', err);
       alert('Failed to save rider settings');
     } finally {
       setSavingRider(false);
     }
+  };
+
+  const handleAddRider = async (e) => {
+    e.preventDefault();
+    if (!newRider.trim()) return;
+    const updatedRiders = [...riders, newRider.trim()];
+    setRiders(updatedRiders);
+    setNewRider('');
+    await saveRidersList(updatedRiders);
+  };
+
+  const handleDeleteRider = async (indexToDelete) => {
+    const updatedRiders = riders.filter((_, index) => index !== indexToDelete);
+    setRiders(updatedRiders);
+    await saveRidersList(updatedRiders);
   };
 
   const handleStatusUpdate = async (conversationId, newStatus) => {
@@ -119,29 +133,51 @@ const Logistics = () => {
           <p className="text-gray-500 text-sm">Track paid orders from packing to customer delivery</p>
         </div>
         
-        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 max-w-sm w-full">
-          <div className="w-10 h-10 rounded-full bg-green-100 text-primary flex items-center justify-center">
-            <Truck size={18} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Default Rider Phone</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={riderPhone}
-                onChange={(e) => setRiderPhone(e.target.value)}
-                placeholder="Rider phone (e.g. 080...)"
-                className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 focus:border-green-500 focus:ring-0 transition-all text-xs font-semibold"
-              />
-              <button
-                onClick={handleSaveRider}
-                disabled={savingRider}
-                className="px-3 py-1.5 bg-primary hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm shadow-green-100"
-              >
-                {savingRider ? '...' : 'Save'}
-              </button>
+        <div className="flex flex-col bg-gray-50 p-4 rounded-xl border border-gray-100 max-w-sm w-full gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Truck size={16} className="text-primary" />
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Manage Riders List</label>
             </div>
+            {savingRider && <span className="text-[10px] text-primary animate-pulse font-semibold">Saving...</span>}
           </div>
+          
+          {/* Riders Badges List */}
+          <div className="flex flex-wrap gap-1.5 max-h-[70px] overflow-y-auto pr-1">
+            {riders.length === 0 ? (
+              <span className="text-[10px] text-gray-400 italic">No riders added yet</span>
+            ) : (
+              riders.map((rider, index) => (
+                <div key={index} className="flex items-center gap-1 bg-white border border-gray-200 px-2 py-0.5 rounded-full text-xs font-semibold text-dark shadow-sm">
+                  <span>{rider}</span>
+                  <button 
+                    type="button"
+                    onClick={() => handleDeleteRider(index)}
+                    className="text-gray-400 hover:text-red-500 transition-colors text-[10px] ml-0.5 font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Add Rider Form */}
+          <form onSubmit={handleAddRider} className="flex gap-2 mt-1">
+            <input
+              type="text"
+              value={newRider}
+              onChange={(e) => setNewRider(e.target.value)}
+              placeholder="Add rider phone (e.g. 080...)"
+              className="w-full px-2.5 py-1 rounded-lg bg-white border border-gray-200 focus:border-green-500 focus:ring-0 transition-all text-xs font-semibold"
+            />
+            <button
+              type="submit"
+              className="px-3 py-1 bg-primary hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+            >
+              Add
+            </button>
+          </form>
         </div>
       </div>
 
