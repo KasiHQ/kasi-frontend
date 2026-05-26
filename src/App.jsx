@@ -39,6 +39,12 @@ import Chats from './modules/Conversations/pages/Chats';
 import Logistics from './modules/Logistics/pages/Logistics';
 
 import { OnboardingWizard } from './modules/Onboarding';
+import { usePageTracker } from './hooks/usePageTracker';
+
+function AnalyticsTracker() {
+  usePageTracker();
+  return null;
+}
 
 function App() {
   return (
@@ -47,6 +53,7 @@ function App() {
         <ThemeProvider>
         <LayoutProvider>
         <Router>
+          <AnalyticsTracker />
           <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
