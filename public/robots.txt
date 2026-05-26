@@ -1,0 +1,150 @@
+# Kasi Robots Txt file
+# Optimized for search engines and Generative Engine Optimization (GEO)
+# https://usekasi.com/
+
+# 1. Global Search Crawlers
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Disallow: /dashboard
+Disallow: /chats
+Disallow: /logistics
+Disallow: /customers
+Disallow: /clients
+Disallow: /sales
+Disallow: /invoices
+Disallow: /payments
+Disallow: /billing
+Disallow: /products
+Disallow: /services
+Disallow: /bookings
+Disallow: /analytics
+Disallow: /settings
+Disallow: /help
+Disallow: /onboarding
+Disallow: /kasisalienceadministration
+
+# 2. ChatGPT (OpenAI) Crawler
+User-agent: GPTBot
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Disallow: /dashboard
+Disallow: /chats
+Disallow: /logistics
+Disallow: /customers
+Disallow: /clients
+Disallow: /sales
+Disallow: /invoices
+Disallow: /payments
+Disallow: /billing
+Disallow: /products
+Disallow: /services
+Disallow: /bookings
+Disallow: /analytics
+Disallow: /settings
+Disallow: /help
+Disallow: /onboarding
+Disallow: /kasisalienceadministration
+
+# 3. Claude (Anthropic) Crawler
+User-agent: ClaudeBot
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Disallow: /dashboard
+Disallow: /chats
+Disallow: /logistics
+Disallow: /customers
+Disallow: /clients
+Disallow: /sales
+Disallow: /invoices
+Disallow: /payments
+Disallow: /billing
+Disallow: /products
+Disallow: /services
+Disallow: /bookings
+Disallow: /analytics
+Disallow: /settings
+Disallow: /help
+Disallow: /onboarding
+Disallow: /kasisalienceadministration
+
+# 4. Google Generative AI / SGE / Gemini Crawler
+User-agent: Google-Extended
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Disallow: /dashboard
+Disallow: /chats
+Disallow: /logistics
+Disallow: /customers
+Disallow: /clients
+Disallow: /sales
+Disallow: /invoices
+Disallow: /payments
+Disallow: /billing
+Disallow: /products
+Disallow: /services
+Disallow: /bookings
+Disallow: /analytics
+Disallow: /settings
+Disallow: /help
+Disallow: /onboarding
+Disallow: /kasisalienceadministration
+
+# 5. Perplexity AI Crawler
+User-agent: PerplexityBot
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Disallow: /dashboard
+Disallow: /chats
+Disallow: /logistics
+Disallow: /customers
+Disallow: /clients
+Disallow: /sales
+Disallow: /invoices
+Disallow: /payments
+Disallow: /billing
+Disallow: /products
+Disallow: /services
+Disallow: /bookings
+Disallow: /analytics
+Disallow: /settings
+Disallow: /help
+Disallow: /onboarding
+Disallow: /kasisalienceadministration
+
+# 6. Apple Intelligence / Applebot Crawler
+User-agent: Applebot-Extended
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Disallow: /dashboard
+Disallow: /chats
+Disallow: /logistics
+Disallow: /customers
+Disallow: /clients
+Disallow: /sales
+Disallow: /invoices
+Disallow: /payments
+Disallow: /billing
+Disallow: /products
+Disallow: /services
+Disallow: /bookings
+Disallow: /analytics
+Disallow: /settings
+Disallow: /help
+Disallow: /onboarding
+Disallow: /kasisalienceadministration
+
+# Sitemap Location
+Sitemap: https://usekasi.com/sitemap.xml
