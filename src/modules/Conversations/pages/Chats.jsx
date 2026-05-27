@@ -411,16 +411,32 @@ const Chats = () => {
 
               {/* AI Instructions card */}
               {selectedConversation.vendor_instructions && (
-                <div className="bg-[#F0FDF4] border border-[#D1FAE5] rounded-xl py-4 px-5 my-4 mx-6">
-                  <div className="flex items-start gap-2.5">
+                <div className="bg-[#F0FDF4] dark:bg-emerald-950/20 border border-[#D1FAE5] dark:border-emerald-900/50 rounded-xl py-4 px-5 my-4 mx-6">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-[#1A7A4A] flex items-center gap-1.5">
+                      <p className="text-sm font-semibold text-[#1A7A4A] dark:text-emerald-400 flex items-center gap-1.5">
                         <span>✦</span> Active AI Instructions
                       </p>
-                      <p className="text-[13px] text-[#344054] mt-1.5 italic font-medium leading-relaxed">
+                      <p className="text-[13px] text-[#344054] dark:text-slate-300 mt-1.5 italic font-medium leading-relaxed">
                         "{selectedConversation.vendor_instructions}"
                       </p>
                     </div>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await conversationAPI.clearInstructions(selectedConversation.id);
+                          setSelectedConversation(prev => ({ ...prev, vendor_instructions: null }));
+                          setInstructions('');
+                          fetchData();
+                        } catch (err) {
+                          console.error('Failed to clear instructions:', err);
+                        }
+                      }}
+                      className="text-xs font-bold text-[#b42318] hover:text-[#912018] bg-[#fef3f2] hover:bg-[#fee4e2] px-2.5 py-1 rounded-md transition-all cursor-pointer border border-[#fda29b]/35 shrink-0"
+                      title="Clear Active Instruction"
+                    >
+                      Clear
+                    </button>
                   </div>
                 </div>
               )}

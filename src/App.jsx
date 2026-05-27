@@ -60,6 +60,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/onboarding" element={
             <ProtectedRoute>
               <OnboardingWizard />
@@ -133,7 +134,6 @@ function App() {
                 </ProtectedRoute>
               } />
 
-              <Route path="/payment/success" element={<PaymentSuccess />} />
 
               <Route path="/billing/callback" element={
                 <ProtectedRoute>

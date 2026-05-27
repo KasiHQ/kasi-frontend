@@ -48,5 +48,11 @@ export const conversationAPI = {
   setInstructions: async (conversationId, instructions) => {
     const response = await api.post(`/api/conversations/${conversationId}/instructions`, { instructions });
     return response.data;
+  },
+
+  // Clear vendor instructions for a conversation
+  clearInstructions: async (conversationId) => {
+    const response = await api.delete(`/api/conversations/${conversationId}/instructions`);
+    return response.data;
   }
 };
