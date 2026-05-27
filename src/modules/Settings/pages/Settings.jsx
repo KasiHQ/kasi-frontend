@@ -659,6 +659,7 @@ const Settings = () => {
                                                         bank_name: formData.bank_name
                                                     });
                                                     addToast('Settlement destination connected successfully!', 'success');
+                                                    if (fetchUser) await fetchUser();
                                                     fetchBillingDetails();
                                                 } catch (err) {
                                                     addToast(err.response?.data?.message || 'Failed to connect subaccount.', 'error');
@@ -817,9 +818,21 @@ const Settings = () => {
 
                     {/* Subscription Plans Selection Card Grid */}
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-base font-bold text-gray-800">Available Plans ({billingDetails?.subscription_type === 'service' ? 'Service Kasi' : 'Product Kasi'})</h3>
-                            <span className="text-xs text-gray-400">Monthly auto-renew billing via Paystack</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h3 className="text-base font-bold text-gray-800">Available Plans ({billingDetails?.subscription_type === 'service' ? 'Service Kasi' : 'Product Kasi'})</h3>
+                                <p className="text-xs text-gray-400">Upgrade to unlock advanced conversational AI capabilities</p>
+                            </div>
+                            <span className="text-xs text-gray-400 font-semibold shrink-0">Monthly auto-renew billing via Paystack</span>
+                        </div>
+
+                        {/* Automated Billing Disclaimer Banner */}
+                        <div className="bg-[#FFF9E6] border border-[#FFE199] rounded-xl p-4 flex gap-3 text-xs text-[#805B00] leading-relaxed font-sans shadow-2xs">
+                            <AlertTriangle size={18} className="text-[#B27F00] shrink-0 mt-0.5" />
+                            <div>
+                                <span className="font-bold uppercase tracking-wider text-[10px] block mb-0.5">⚠️ Recurring Auto-Debit Notice</span>
+                                Selecting a plan below will establish a secure **automated monthly subscription** via Paystack. Your card will be charged automatically every 30 days. You have full self-service control and can cancel this auto-renewal at any time instantly below.
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">

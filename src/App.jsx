@@ -33,6 +33,7 @@ import AdminWaitlist from './modules/Admin/pages/AdminWaitlist';
 import AdminAuditLogs from './modules/Admin/pages/AdminAuditLogs';
 import BillingDashboard from './modules/Billing/pages/BillingDashboard';
 import PaymentCallback from './modules/Billing/pages/PaymentCallback';
+import PaymentSuccess from './modules/Payments/pages/PaymentSuccess';
 import BillingCallback from './modules/Billing/pages/BillingCallback';
 import Services from './modules/Services/pages/Services';
 import Bookings from './modules/Services/pages/Bookings';
@@ -131,6 +132,8 @@ function App() {
                   <PaymentCallback />
                 </ProtectedRoute>
               } />
+
+              <Route path="/payment/success" element={<PaymentSuccess />} />
 
               <Route path="/billing/callback" element={
                 <ProtectedRoute>
