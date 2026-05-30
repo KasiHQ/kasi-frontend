@@ -123,7 +123,7 @@ const MainLayout = () => {
     setIsInstallable(false);
   };
 
-  // HTML5 Web Notifications Polling
+  // HTML5 Web Notifications Polling (Dynamic push notifications for all vendor alerts)
   useEffect(() => {
     if (!user) return;
 
@@ -131,26 +131,24 @@ const MainLayout = () => {
       Notification.requestPermission();
     }
 
-    const notifiedConversations = new Set();
+    const notifiedIds = new Set();
 
-    const checkAttentionNeeded = async () => {
+    const checkNewNotifications = async () => {
       try {
-        const response = await api.get('/api/conversations');
-        const convs = Array.isArray(response.data) 
-          ? response.data 
-          : (response.data && Array.isArray(response.data.data) ? response.data.data : []);
+        const response = await api.get('/api/notifications');
+        const notis = response.data?.data || [];
         
-        convs.forEach(conv => {
-          if (conv.status === 'Requires Attention' && !notifiedConversations.has(conv.id)) {
+        notis.forEach(noti => {
+          if (!noti.is_read && !notifiedIds.has(noti.id)) {
             if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification("⚠️ Kasi: Attention Needed", {
-                body: `Customer "${conv.customer_name || 'Guest'}" requires your urgent attention!`,
+              new Notification(noti.title, {
+                body: noti.message,
                 icon: "/kasi.png",
-                tag: `attention-${conv.id}`,
+                tag: `noti-${noti.id}`,
                 requireInteraction: true
               });
             }
-            notifiedConversations.add(conv.id);
+            notifiedIds.add(noti.id);
           }
         });
       } catch (err) {
@@ -158,8 +156,8 @@ const MainLayout = () => {
       }
     };
 
-    checkAttentionNeeded();
-    const interval = setInterval(checkAttentionNeeded, 12000);
+    checkNewNotifications();
+    const interval = setInterval(checkNewNotifications, 12000);
 
     return () => clearInterval(interval);
   }, [user]);

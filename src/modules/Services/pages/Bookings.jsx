@@ -54,13 +54,14 @@ const Schedule = () => {
 
   const getWeekDates = () => {
     const today = new Date();
-    const day = today.getDay(); 
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1) + (weekOffset * 7); 
-    const monday = new Date(today.setDate(diff));
+    const day = today.getDay();
+    const mondayDiff = day === 0 ? -6 : 1 - day;
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() + mondayDiff + (weekOffset * 7));
     
     return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
+      const d = new Date(startOfWeek);
+      d.setDate(startOfWeek.getDate() + i);
       return {
         date: d.toISOString().split('T')[0],
         dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
@@ -90,6 +91,56 @@ const Schedule = () => {
     return `${hour12}:${m} ${ampm}`;
   };
 
+  const getDepositBreakdown = (booking) => {
+    const service = booking?.service;
+    if (!service) return { deposit: 0, balance: 0 };
+    let deposit = service.price;
+    let balance = 0;
+    if (service.deposit_type === 'percentage') {
+      deposit = service.price * (service.deposit_value / 100);
+      balance = service.price - deposit;
+    } else if (service.deposit_type === 'fixed') {
+      deposit = service.deposit_value;
+      balance = service.price - deposit;
+    } else if (service.deposit_type === 'none') {
+      deposit = service.price;
+      balance = 0;
+    }
+    return { deposit, balance };
+  };
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const upcomingBookings = bookings
+    .filter(b => (b.status === 'Confirmed' || b.status === 'Pending') && b.booking_date >= todayStr)
+    .sort((a, b) => {
+      if (a.booking_date !== b.booking_date) {
+        return a.booking_date.localeCompare(b.booking_date);
+      }
+      return a.booking_time.localeCompare(b.booking_time);
+    });
+
+  const activeBookingsCount = bookings.filter(b => b.status === 'Confirmed').length;
+  const completedBookingsCount = bookings.filter(b => b.status === 'Completed').length;
+  const totalRevenue = bookings
+    .filter(b => b.status === 'Completed' || b.status === 'Confirmed')
+    .reduce((sum, b) => sum + (b.service?.price || 0), 0);
+
+  const pendingDeposits = bookings
+    .filter(b => b.status === 'Confirmed')
+    .reduce((sum, b) => {
+      const service = b.service;
+      if (!service) return sum;
+      let dep = service.price;
+      if (service.deposit_type === 'percentage') {
+        dep = service.price * (service.deposit_value / 100);
+      } else if (service.deposit_type === 'fixed') {
+        dep = service.deposit_value;
+      } else if (service.deposit_type === 'none') {
+        dep = service.price;
+      }
+      return sum + dep;
+    }, 0);
+
   return (
     <div className="space-y-6">
       {/* HEADER */}
@@ -97,6 +148,49 @@ const Schedule = () => {
         <div>
           <h1 className="text-2xl font-bold text-dark dark:text-white">Your Schedule</h1>
           <p className="text-gray-500 text-sm">Track and manage your upcoming service appointments.</p>
+        </div>
+      </div>
+
+      {/* STATS OVERVIEW */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="bg-white dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+            📅
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Active Bookings</p>
+            <p className="text-lg font-black text-dark dark:text-white mt-0.5">{activeBookingsCount}</p>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">
+            ✅
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Completed Sessions</p>
+            <p className="text-lg font-black text-dark dark:text-white mt-0.5">{completedBookingsCount}</p>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold">
+            💰
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Estimated Revenue</p>
+            <p className="text-lg font-black text-dark dark:text-white mt-0.5">₦{totalRevenue.toLocaleString()}</p>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center font-bold">
+            💳
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pending Deposits</p>
+            <p className="text-lg font-black text-dark dark:text-white mt-0.5">₦{pendingDeposits.toLocaleString()}</p>
+          </div>
         </div>
       </div>
 
@@ -131,6 +225,46 @@ const Schedule = () => {
                   </button>
                 ))}
               </div>
+           </div>
+
+           {/* UPCOMING APPOINTMENTS LIST */}
+           <div className="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col max-h-[420px]">
+             <h3 className="font-bold text-dark dark:text-white mb-4 flex items-center justify-between">
+               <span className="text-sm">Upcoming Appointments</span>
+               <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">{upcomingBookings.length}</span>
+             </h3>
+
+             <div className="space-y-3 overflow-y-auto pr-1 flex-1 custom-scrollbar">
+               {upcomingBookings.length === 0 ? (
+                 <div className="py-8 text-center text-gray-400 text-xs font-semibold">
+                   No upcoming sessions. 🎉
+                 </div>
+               ) : (
+                 upcomingBookings.map((b) => (
+                   <button
+                     key={b.id}
+                     onClick={() => {
+                       setSelectedBooking(b);
+                       setIsDetailsOpen(true);
+                     }}
+                     className="w-full text-left p-3.5 bg-gray-50 dark:bg-gray-800/80 hover:bg-primary/5 dark:hover:bg-primary/5 border border-gray-100 dark:border-gray-700 hover:border-primary/20 dark:hover:border-primary/20 rounded-xl transition-all flex gap-3.5 items-center group"
+                   >
+                     <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-[10px] shrink-0 group-hover:scale-105 transition-transform">
+                       {getInitials(b.customer?.name)}
+                     </div>
+                     <div className="min-w-0 flex-1">
+                       <p className="text-xs font-black text-dark dark:text-white truncate">{b.customer?.name || 'Client'}</p>
+                       <p className="text-[10px] text-gray-500 font-bold truncate mt-0.5">{b.service?.name}</p>
+                       <div className="flex items-center gap-1.5 mt-1 text-[9px] text-primary font-black">
+                         <CalendarIcon size={10} />
+                         <span>{new Date(b.booking_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · {formatTime(b.booking_time)}</span>
+                       </div>
+                     </div>
+                     <ChevronRight size={14} className="text-gray-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                   </button>
+                 ))
+               )}
+             </div>
            </div>
         </div>
 
@@ -228,12 +362,12 @@ const Schedule = () => {
                     </div>
                  </div>
                  <div className="flex flex-col items-end gap-2">
-                   <div className="px-4 py-1.5 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-600 text-xs font-bold border border-orange-200 dark:border-orange-500/20">
-                      Deposit paid
-                   </div>
-                   {selectedBooking.reference && (
-                     <span className="text-[10px] font-bold text-gray-400">REF: {selectedBooking.reference}</span>
-                   )}
+                    <div className="px-4 py-1.5 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-600 text-xs font-bold border border-orange-200 dark:border-orange-500/20">
+                       {selectedBooking.service?.deposit_type === 'none' ? 'Paid Full' : 'Deposit paid'}
+                    </div>
+                    {selectedBooking.reference && (
+                      <span className="text-[10px] font-bold text-gray-400">REF: {selectedBooking.reference}</span>
+                    )}
                  </div>
               </div>
 
@@ -248,11 +382,11 @@ const Schedule = () => {
                  </div>
                  <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex flex-col gap-1">
                     <p className="text-[11px] font-bold text-gray-400 flex items-center gap-2"><CreditCard size={14} /> Deposit paid</p>
-                    <p className="text-sm font-black text-dark dark:text-white">₦{(selectedBooking.service?.price / 2 || 0).toLocaleString()}</p>
+                    <p className="text-sm font-black text-dark dark:text-white">₦{getDepositBreakdown(selectedBooking).deposit.toLocaleString()}</p>
                  </div>
                  <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex flex-col gap-1">
                     <p className="text-[11px] font-bold text-gray-400 flex items-center gap-2">💰 Balance due</p>
-                    <p className="text-sm font-black text-dark dark:text-white">₦{(selectedBooking.service?.price / 2 || 0).toLocaleString()}</p>
+                    <p className="text-sm font-black text-dark dark:text-white">₦{getDepositBreakdown(selectedBooking).balance.toLocaleString()}</p>
                  </div>
               </div>
 
