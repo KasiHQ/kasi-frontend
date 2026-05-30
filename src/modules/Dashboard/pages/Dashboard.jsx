@@ -233,27 +233,69 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
   const paidInvoices = invoices.filter(i => i.status === 'Paid');
   const totalRevenue = paidInvoices.reduce((s, i) => s + (i.total_amount || 0), 0);
 
+  // Calculate real week-over-week revenue
+  const thisWeekRevenue = React.useMemo(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); 
+    startOfWeek.setHours(0,0,0,0);
+    return paidInvoices
+      .filter(inv => new Date(inv.date_issued) >= startOfWeek)
+      .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+  }, [paidInvoices]);
+
+  const lastWeekRevenue = React.useMemo(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); 
+    startOfWeek.setHours(0,0,0,0);
+    const startOfLastWeek = new Date(startOfWeek);
+    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+    return paidInvoices
+      .filter(inv => {
+        const d = new Date(inv.date_issued);
+        return d >= startOfLastWeek && d < startOfWeek;
+      })
+      .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+  }, [paidInvoices]);
+
+  const trendText = React.useMemo(() => {
+    const diff = thisWeekRevenue - lastWeekRevenue;
+    return diff >= 0 
+      ? `+₦${diff.toLocaleString()} vs last week`
+      : `-₦${Math.abs(diff).toLocaleString()} vs last week`;
+  }, [thisWeekRevenue, lastWeekRevenue]);
+
   const topServices = React.useMemo(() => {
     if (!services || services.length === 0) return [];
     
+    // Count real appointments booked from bookings state
+    const serviceBookingsMap = {};
+    bookings.forEach(b => {
+      if (b.status === 'Confirmed' || b.status === 'Paid') {
+        const sName = b.service?.name;
+        if (sName) {
+          serviceBookingsMap[sName] = (serviceBookingsMap[sName] || 0) + 1;
+        }
+      }
+    });
+
     return services.map(s => {
-      const unitsSold = (s.id * 11) % 35 + 3; 
+      const unitsSold = serviceBookingsMap[s.name] || 0; 
       const margin = s.cost_price && s.price ? 
         Math.round(((s.price - s.cost_price) / s.price) * 100) : 
-        Math.round((s.id * 5) % 25 + 40);
+        100;
         
       return { ...s, unitsSold, margin };
     }).sort((a, b) => b.unitsSold - a.unitsSold).slice(0, 4);
-  }, [services]);
+  }, [services, bookings]);
 
   const stats = [
     { 
       label: 'REVENUE THIS WEEK', 
-      value: formatNaira(analytics?.total_agent_revenue || totalRevenue), 
+      value: formatNaira(thisWeekRevenue), 
       icon: TrendingUp, 
       color: 'text-[#F97316]', 
       bg: 'bg-[#FFF4ED]',
-      trend: '+₦24,500 vs last week'
+      trend: trendText
     },
     { 
       label: 'CONFIRMED SESSIONS', 
@@ -281,10 +323,18 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
     },
   ];
 
-  const platformSplit = [
-    { name: 'WhatsApp', value: 75, color: '#1A7A4A' },
-    { name: 'Instagram', value: 25, color: '#F97316' }
-  ];
+  const platformSplit = React.useMemo(() => {
+    if (analytics?.platform_split && analytics.platform_split.length > 0) {
+      return analytics.platform_split.map(p => {
+        const color = p.name.toLowerCase() === 'whatsapp' ? '#1A7A4A' : '#F97316';
+        return { name: p.name, value: p.value, color };
+      });
+    }
+    return [
+      { name: 'WhatsApp', value: 75, color: '#1A7A4A' },
+      { name: 'Instagram', value: 25, color: '#F97316' }
+    ];
+  }, [analytics]);
 
   return (
     <div className="space-y-6">
@@ -352,7 +402,7 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
            </div>
            <div className="h-[240px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={getMockWeeklyData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={getWeeklyRevenueData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="serviceRev" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="rgba(249, 115, 22, 0.12)" />
@@ -468,14 +518,45 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
   const deliveredCount = (pipeline['Delivered'] || 0) + (pipeline['Paid'] || 0);
   const needsAttention = pipeline['Requires Attention'] || 0;
 
+  // Calculate real week-over-week revenue
+  const thisWeekRevenue = React.useMemo(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); 
+    startOfWeek.setHours(0,0,0,0);
+    return paidInvoices
+      .filter(inv => new Date(inv.date_issued) >= startOfWeek)
+      .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+  }, [paidInvoices]);
+
+  const lastWeekRevenue = React.useMemo(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))); 
+    startOfWeek.setHours(0,0,0,0);
+    const startOfLastWeek = new Date(startOfWeek);
+    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+    return paidInvoices
+      .filter(inv => {
+        const d = new Date(inv.date_issued);
+        return d >= startOfLastWeek && d < startOfWeek;
+      })
+      .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+  }, [paidInvoices]);
+
+  const trendText = React.useMemo(() => {
+    const diff = thisWeekRevenue - lastWeekRevenue;
+    return diff >= 0 
+      ? `+₦${diff.toLocaleString()} vs last week`
+      : `-₦${Math.abs(diff).toLocaleString()} vs last week`;
+  }, [thisWeekRevenue, lastWeekRevenue]);
+
   const stats = [
     { 
       label: 'REVENUE THIS WEEK', 
-      value: formatNaira(analytics?.total_agent_revenue || totalRevenue), 
+      value: formatNaira(thisWeekRevenue), 
       icon: TrendingUp, 
       bg: 'bg-[#FFF4ED]', 
       color: 'text-[#F97316]',
-      trend: '+₦24,500 vs last week'
+      trend: trendText
     },
     { 
       label: 'CUSTOMERS REACHED', 
@@ -509,15 +590,27 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
   const topProducts = React.useMemo(() => {
     if (!products || products.length === 0) return [];
     
+    // Count real units sold from paid invoices
+    const productSalesMap = {};
+    paidInvoices.forEach(inv => {
+      if (inv.items) {
+        inv.items.forEach(item => {
+          const desc = item.description || "";
+          const qty = item.quantity || 1;
+          productSalesMap[desc] = (productSalesMap[desc] || 0) + qty;
+        });
+      }
+    });
+
     return products.map(p => {
-      const unitsSold = (p.id * 13) % 45 + 5; 
+      const unitsSold = productSalesMap[p.name] || 0; 
       const margin = p.cost_price && p.price ? 
         Math.round(((p.price - p.cost_price) / p.price) * 100) : 
-        Math.round((p.id * 7) % 30 + 15);
+        0;
         
       return { ...p, unitsSold, margin };
     }).sort((a, b) => b.unitsSold - a.unitsSold).slice(0, 4);
-  }, [products]);
+  }, [products, paidInvoices]);
 
   return (
     <div className="space-y-6">
@@ -586,7 +679,7 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
           </div>
           <div className="h-[240px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={getMockWeeklyData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={getWeeklyRevenueData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="rgba(249, 115, 22, 0.12)" />
@@ -784,16 +877,26 @@ const ActionAlerts = ({ user }) => {
 
 /* ── HELPERS ───────────────────────────────────────────────────────────── */
 
-const getMockWeeklyData = (paidInvoices) => {
+const getWeeklyRevenueData = (paidInvoices) => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const now = new Date();
+  
+  // Calculate Monday of the current week
+  const currentDay = now.getDay();
+  const distance = currentDay === 0 ? -6 : 1 - currentDay;
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() + distance);
+  startOfWeek.setHours(0, 0, 0, 0);
+
   return days.map((day, i) => {
     const dayRevenue = paidInvoices
       .filter(inv => {
         const d = new Date(inv.date_issued);
-        return d.getDay() === (i + 1) % 7;
+        const targetDay = (i + 1) % 7;
+        return d >= startOfWeek && d.getDay() === targetDay;
       })
-      .reduce((s, inv) => s + inv.total_amount, 0);
-    return { name: day, value: dayRevenue || Math.floor(Math.random() * 50000) }; 
+      .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+    return { name: day, value: dayRevenue }; 
   });
 };
 

@@ -1,18 +1,87 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import ImpersonationBanner from './ImpersonationBanner';
 import BroadcastBanner from './BroadcastBanner';
 import { useLayout } from '../../context/LayoutContext';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Bell, X } from 'lucide-react';
+import { Search, Bell, X, DollarSign, Calendar, AlertTriangle } from 'lucide-react';
 import api from '../../api/axios';
 
 const MainLayout = () => {
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Notification States
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await api.get('/api/notifications');
+      const data = response.data?.data || [];
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.is_read).length);
+    } catch (err) {
+      console.error("Failed to fetch notifications:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 15000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const handleNotificationClick = async (noti) => {
+    try {
+      await api.patch(`/api/notifications/${noti.id}/read`);
+      // Update local state
+      setNotifications(prev => prev.map(n => n.id === noti.id ? { ...n, is_read: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+      
+      // Route if link exists
+      if (noti.link) {
+        navigate(noti.link);
+      }
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+    }
+    setShowNotifications(false);
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await api.post('/api/notifications/read-all');
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("Failed to mark all as read:", err);
+    }
+  };
+
+  const formatTimeAgo = (dateStr) => {
+    try {
+      const now = new Date();
+      const date = new Date(dateStr);
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      
+      if (diffMins < 1) return 'just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch (e) {
+      return '';
+    }
+  };
 
   // PWA Installation Trigger States
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -175,10 +244,95 @@ const MainLayout = () => {
                 />
               </div>
               
-              {/* Notification bell icon (36px button) */}
-              <button className="w-9 h-9 rounded-lg flex items-center justify-center text-[#667085] hover:bg-[#F2F4F7] hover:text-[#101828] transition-colors shrink-0">
-                <Bell size={18} />
-              </button>
+              {/* Notification bell icon container */}
+              <div className="relative">
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#667085] hover:bg-[#F2F4F7] hover:text-[#101828] transition-colors shrink-0 relative cursor-pointer"
+                >
+                  <Bell size={18} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#E53E3E] ring-2 ring-white animate-pulse" />
+                  )}
+                </button>
+                
+                {showNotifications && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40 bg-transparent" 
+                      onClick={() => setShowNotifications(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-md border border-[#EAECF0] rounded-2xl shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {/* header */}
+                      <div className="px-4 py-3 border-b border-[#EAECF0] flex items-center justify-between select-none">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-[#101828]">Notifications</span>
+                          {unreadCount > 0 && (
+                            <span className="bg-[#1A7A4A] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </div>
+                        {unreadCount > 0 && (
+                          <button 
+                            onClick={handleMarkAllAsRead}
+                            className="text-[10px] font-semibold text-[#1A7A4A] hover:underline cursor-pointer"
+                          >
+                            Mark all as read
+                          </button>
+                        )}
+                      </div>
+
+                      {/* list */}
+                      <div className="max-h-[300px] overflow-y-auto divide-y divide-[#EAECF0] custom-scrollbar">
+                        {notifications.length === 0 ? (
+                          <div className="py-8 px-4 text-center text-[#667085] text-xs font-medium select-none">
+                            No notifications yet
+                          </div>
+                        ) : (
+                          notifications.map(noti => {
+                            const Icon = noti.type === 'invoice_paid' ? DollarSign 
+                                       : noti.type === 'booking_created' ? Calendar
+                                       : noti.type === 'attention_needed' ? AlertTriangle
+                                       : Bell;
+                            const bgClass = noti.type === 'invoice_paid' ? 'bg-[#ECFDF3] text-[#027A48]'
+                                          : noti.type === 'booking_created' ? 'bg-[#F4F3FF] text-[#7A5AF8]'
+                                          : noti.type === 'attention_needed' ? 'bg-[#FFFAEB] text-[#B54708]'
+                                          : 'bg-[#F2F4F7] text-[#667085]';
+                            return (
+                              <div 
+                                key={noti.id}
+                                onClick={() => handleNotificationClick(noti)}
+                                className={`px-4 py-3 hover:bg-[#F8F9FC] transition-colors cursor-pointer flex gap-3 ${!noti.is_read ? 'bg-[#F8F9FC]/60' : ''}`}
+                              >
+                                <div className={`w-8 h-8 rounded-full ${bgClass} flex items-center justify-center shrink-0`}>
+                                  <Icon size={14} />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-start justify-between gap-1">
+                                    <p className={`text-xs truncate ${!noti.is_read ? 'font-bold text-[#101828]' : 'font-semibold text-[#344054]'}`}>
+                                      {noti.title}
+                                    </p>
+                                    {!noti.is_read && (
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#12B76A] shrink-0 mt-1" />
+                                    )}
+                                  </div>
+                                  <p className="text-[11px] text-[#667085] mt-0.5 line-clamp-2 leading-relaxed">
+                                    {noti.message}
+                                  </p>
+                                  <span className="text-[10px] text-[#98A2B3] mt-1 block">
+                                    {formatTimeAgo(noti.created_at)}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
               
               {/* Avatar (32px circle) */}
               <div className="w-8 h-8 rounded-full bg-[#1A7A4A] text-white flex items-center justify-center font-bold text-xs shrink-0 select-none">
