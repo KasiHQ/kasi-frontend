@@ -32,33 +32,32 @@ import { formatCurrency } from "../../../utils/formatters";
 import clsx from "clsx";
 
 const CATEGORIES = [
-  { id: "Nails", label: "Nails", icon: Sparkles, color: "#0F8C55" },
-  { id: "Lashes", label: "Lashes", icon: Eye, color: "#FF4D8D" },
-  { id: "Makeup", label: "Makeup", icon: Zap, color: "#FF9500" },
-  { id: "Massage", label: "Massage", icon: Flower2, color: "#00D1FF" },
-  { id: "Hair", label: "Hair", icon: Scissors, color: "#B54DFF" },
-  { id: "Skin", label: "Skin", icon: Heart, color: "#00D97E" },
-  { id: "Brows", label: "Brows", icon: Sparkles, color: "#FFD600" },
+  { id: "Consulting", label: "Consulting", icon: User, color: "#0F8C55" },
+  { id: "Lessons", label: "Lessons", icon: Zap, color: "#FF9500" },
+  { id: "Events", label: "Events", icon: Sparkles, color: "#FFD600" },
+  { id: "Performance", label: "Performance", icon: Heart, color: "#FF4D8D" },
+  { id: "Photography", label: "Photography", icon: Eye, color: "#00D1FF" },
+  { id: "Hair & Beauty", label: "Hair & Beauty", icon: Scissors, color: "#B54DFF" },
   { id: "Fitness", label: "Fitness", icon: Dumbbell, color: "#FF3B30" },
   { id: "Therapy", label: "Therapy", icon: User, color: "#AF52DE" },
 ];
 
 const CLIENT_QUESTIONS = [
-  "Nail shape",
-  "Nail length",
-  "Design reference",
-  "Colour preference",
-  "Lash style",
-  "Curl type",
-  "Skin tone",
-  "Look reference",
-  "Occasion",
-  "Pressure (light/medium/firm)",
-  "Focus areas",
-  "Any allergies?",
-  "Hair type",
-  "Style reference",
-  "Client's address",
+  "Preferred date/time",
+  "Number of attendees",
+  "Session duration",
+  "Event location",
+  "Online or In-Person?",
+  "Special requests",
+  "Pre-requirements",
+  "Reference links/files",
+  "Preferred style",
+  "Age of attendee(s)",
+  "Experience level (Beginner/Intermediate/Advanced)",
+  "Topic/Focus area",
+  "Budget range",
+  "Any allergies/conditions?",
+  "Client's phone/email",
 ];
 
 const DAYS_OF_WEEK = [
@@ -90,7 +89,7 @@ const Services = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    category: "Nails",
+    category: "Consulting",
     description: "",
     price: "",
     duration: 60,
@@ -209,7 +208,7 @@ const Services = () => {
       setEditingService(service);
       setFormData({
         name: service.name || "",
-        category: service.category || "Nails",
+        category: service.category || "Consulting",
         description: service.description || "",
         price: service.price || "",
         duration: service.duration || 60,
@@ -228,7 +227,7 @@ const Services = () => {
       setEditingService(null);
       setFormData({
         name: "",
-        category: "Nails",
+        category: "Consulting",
         description: "",
         price: "",
         duration: 60,
@@ -347,7 +346,9 @@ const Services = () => {
                               {service.name}
                             </h4>
                             <span className="font-black text-primary text-sm whitespace-nowrap">
-                              ₦{(service.price / 1000).toFixed(0)}k
+                              {service.price >= 1000 
+                                ? `₦${(service.price / 1000).toFixed(0)}k` 
+                                : `₦${service.price.toLocaleString()}`}
                             </span>
                           </div>
                           <p className="text-[11px] text-gray-500 font-bold uppercase tracking-tight mt-0.5">
@@ -513,14 +514,14 @@ const Services = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="e.g. Traditional Massage"
+                    placeholder="e.g. 1-on-1 Music Lesson or Consulting Session"
                     className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-dark dark:text-white text-sm focus:bg-white dark:focus:bg-gray-700 focus:border-primary focus:ring-0 transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                    Starting Price (₦)
+                    Service Price (₦)
                   </label>
                   <input
                     type="number"
