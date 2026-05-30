@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { BarChart3, Settings, LogOut, MessageSquare, Package, Truck, Users, TrendingUp, ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, Briefcase, Calendar, Home } from 'lucide-react';
+import { BarChart3, Settings, LogOut, MessageSquare, Package, Truck, Users, TrendingUp, ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, Briefcase, Calendar, Home, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
 import { useLayout } from '../../context/LayoutContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -89,6 +89,7 @@ const Sidebar = ({ onWidthChange }) => {
       { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
       { icon: Users, label: 'Clients', path: '/customers' },
       { icon: Briefcase, label: 'Services', path: '/services' },
+      { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
     ] : [
       { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
       { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
@@ -96,6 +97,7 @@ const Sidebar = ({ onWidthChange }) => {
       { icon: Truck, label: 'Logistics', path: '/logistics', badge: true },
       { icon: Users, label: 'Customers', path: '/customers' },
       { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
+      { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
     ];
   }
 

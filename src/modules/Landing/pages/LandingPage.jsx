@@ -113,7 +113,11 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans tracking-tight antialiased selection:bg-green-500/10 selection:text-green-600 overflow-x-hidden w-full relative">
       {/* Dynamic Header */}
-      <LandingNavbar activeSection={activeSection} scrolled={scrolled} onJoinWaitlistClick={openWaitlist} />
+      <LandingNavbar
+        activeSection={activeSection}
+        scrolled={scrolled}
+        onJoinWaitlistClick={openWaitlist}
+      />
 
       {/* Main Core Sections */}
       <HeroSection onJoinWaitlistClick={openWaitlist} />
@@ -342,7 +346,7 @@ const LandingPage = () => {
               <ul className="space-y-3 text-[15px] font-medium text-white/70">
                 <li>
                   <a href="#" className="hover:text-white transition-colors">
-                    About Salience
+                    About Endogenous
                   </a>
                 </li>
                 <li>
@@ -380,7 +384,7 @@ const LandingPage = () => {
           {/* Bottom Bar */}
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <span className="text-[13px] text-white/40 font-medium">
-              © 2026 Salience Technologies. All rights reserved.
+              © 2026 Endogenous Technologies. All rights reserved.
             </span>
 
             {/* Social icons */}
@@ -404,7 +408,10 @@ const LandingPage = () => {
       </footer>
 
       {/* Waitlist Modal */}
-      <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
+      <WaitlistModal
+        isOpen={isWaitlistOpen}
+        onClose={() => setIsWaitlistOpen(false)}
+      />
     </div>
   );
 };
