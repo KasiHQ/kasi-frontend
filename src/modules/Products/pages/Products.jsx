@@ -57,6 +57,7 @@ const Products = () => {
     external_knowledge: '',
     bulk_discount_quantity: '',
     bulk_discount_percentage: '',
+    specifications: [],
   });
 
   useEffect(() => {
@@ -83,7 +84,8 @@ const Products = () => {
   const resetForm = () => {
     setForm({ 
       name: '', brand: '', category: '', description: '', price: '', happy_price: '', min_price: '', cost_price: '', in_stock: true, stock_quantity: '',
-      variants: '', weight: '', dimensions: '', expiry_date: '', voice_pitch: '', instagram_links: '', external_knowledge: '', bulk_discount_quantity: '', bulk_discount_percentage: ''
+      variants: '', weight: '', dimensions: '', expiry_date: '', voice_pitch: '', instagram_links: '', external_knowledge: '', bulk_discount_quantity: '', bulk_discount_percentage: '',
+      specifications: []
     });
     setEditing(null);
     setImages([]);
@@ -143,6 +145,7 @@ const Products = () => {
       external_knowledge: product.external_knowledge || '',
       bulk_discount_quantity: product.bulk_discount_quantity || '',
       bulk_discount_percentage: product.bulk_discount_percentage || '',
+      specifications: product.specifications || [],
     });
     setEditing(product.id);
     setImages(product.images || []);
@@ -167,6 +170,70 @@ const Products = () => {
       setIsDeleting(false);
       setDeletingId(null);
     }
+  };
+
+  // --- Specifications Handlers & Constants ---
+  const CORE_CATEGORIES = {
+    "Fashion & Accessories": [
+      "Fabric", "Pattern", "Gender", "Occasion", "Season", "Shoe Size", "Ring Size", "Chain Length"
+    ],
+    "Electronics & Devices": [
+      "Storage Capacity", "RAM", "Battery Capacity", "Screen Size", "Connectivity", "Compatibility"
+    ],
+    "Beauty & Personal Care": [
+      "Skin Type", "Hair Type", "Fragrance / Scent", "Ingredients", "Expiry Date"
+    ],
+    "Food & Consumables": [
+      "Ingredients", "Expiry Date", "Shelf Life", "Storage Instructions", "Serving Size"
+    ],
+    "Logistics & Fulfilment": [
+      "Delivery Time", "Packaging Type", "Fragile", "Perishable", "Minimum Order Quantity"
+    ]
+  };
+
+  const GENERAL_SPECS = [
+    "Brand", "Model", "Condition", "Colour", "Material", "Size", "Weight", "Dimensions", "Quantity / Pack Size", "Warranty", "Country of Origin"
+  ];
+
+  const SPEC_UNIT_PLACEHOLDERS = {
+    "Weight": "e.g. kg, g",
+    "Storage Capacity": "e.g. GB, TB",
+    "RAM": "e.g. GB",
+    "Battery Capacity": "e.g. mAh",
+    "Screen Size": "e.g. inches",
+    "Shelf Life": "e.g. months",
+    "Delivery Time": "e.g. days",
+    "Shoe Size": "e.g. EU",
+    "Ring Size": "e.g. US",
+    "Chain Length": "e.g. cm",
+  };
+
+  const handleAddSpec = (name = '', value = '', unit = '') => {
+    if (form.specifications.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+      addToast(`"${name}" is already added.`, 'info');
+      return;
+    }
+    // Auto-suggest unit placeholder if known
+    const autoUnit = SPEC_UNIT_PLACEHOLDERS[name] ? SPEC_UNIT_PLACEHOLDERS[name].replace("e.g. ", "").split(",")[0].trim() : '';
+    setForm(prev => ({
+      ...prev,
+      specifications: [...prev.specifications, { name, value, unit: unit || autoUnit }]
+    }));
+  };
+
+  const handleUpdateSpec = (index, field, val) => {
+    setForm(prev => {
+      const updated = [...prev.specifications];
+      updated[index] = { ...updated[index], [field]: val };
+      return { ...prev, specifications: updated };
+    });
+  };
+
+  const handleDeleteSpec = (index) => {
+    setForm(prev => ({
+      ...prev,
+      specifications: prev.specifications.filter((_, i) => i !== index)
+    }));
   };
 
   // --- Image Gallery Handlers ---
@@ -484,6 +551,18 @@ const Products = () => {
                       <Truck size={15} />
                       Inventory
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveFormTab('specifications')}
+                      className={`pb-2 text-sm font-semibold transition-all relative flex items-center gap-1.5 cursor-pointer ${
+                        activeFormTab === 'specifications'
+                          ? 'text-primary border-b-2 border-primary font-bold'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      <Grid size={15} />
+                      Specifications
+                    </button>
                   </div>
 
                   <form id="productForm" onSubmit={handleSubmit} className="space-y-4">
@@ -711,6 +790,180 @@ const Products = () => {
                               className="w-full px-2 py-2 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-xs outline-none transition-all h-[44px]" 
                             />
                           </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tab 4: Dynamic Specifications */}
+                    {activeFormTab === 'specifications' && (
+                      <div className="space-y-4 transition-all duration-200">
+                        {/* Category Selector */}
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Product Category *</label>
+                          <select
+                            value={Object.keys(CORE_CATEGORIES).includes(form.category) ? form.category : (form.category ? 'Other' : '')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === 'Other') {
+                                setForm(prev => ({ ...prev, category: '' }));
+                              } else {
+                                setForm(prev => ({ ...prev, category: val }));
+                              }
+                            }}
+                            className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none bg-white transition-all font-semibold"
+                          >
+                            <option value="">-- Select Category --</option>
+                            {Object.keys(CORE_CATEGORIES).map(cat => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                            <option value="Other">Other (Custom Name)</option>
+                          </select>
+                        </div>
+
+                        {/* Custom Category Input if selected */}
+                        {(!Object.keys(CORE_CATEGORIES).includes(form.category) || form.category === '') && (
+                          <div className="animate-fadeIn">
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Custom Category Name</label>
+                            <input
+                              type="text"
+                              value={form.category}
+                              onChange={(e) => setForm({ ...form, category: e.target.value })}
+                              placeholder="e.g. Handmade Goods"
+                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all"
+                            />
+                          </div>
+                        )}
+
+                        {/* Quick Add Section */}
+                        <div className="bg-gray-50 border border-gray-150 rounded-xl p-4 space-y-3 select-none">
+                          <span className="text-xs font-bold text-gray-600 uppercase tracking-wider block">⚡ Click to Quick-Add Specifications</span>
+                          
+                          {/* General Specifications */}
+                          <div className="space-y-1.5">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">General</span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {GENERAL_SPECS.map(spec => {
+                                const added = form.specifications.some(s => s.name.toLowerCase() === spec.toLowerCase());
+                                return (
+                                  <button
+                                    key={spec}
+                                    type="button"
+                                    onClick={() => handleAddSpec(spec)}
+                                    disabled={added}
+                                    className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
+                                      added 
+                                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+                                        : 'bg-white hover:bg-green-50 text-gray-700 hover:text-primary border-gray-300 hover:border-primary cursor-pointer active:scale-95'
+                                    }`}
+                                  >
+                                    + {spec}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Category Specific Specifications */}
+                          {CORE_CATEGORIES[form.category] && (
+                            <div className="space-y-1.5 pt-2 border-t border-gray-200/60 animate-fadeIn">
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">{form.category}</span>
+                              <div className="flex flex-wrap gap-1.5">
+                                {CORE_CATEGORIES[form.category].map(spec => {
+                                  const added = form.specifications.some(s => s.name.toLowerCase() === spec.toLowerCase());
+                                  return (
+                                    <button
+                                      key={spec}
+                                      type="button"
+                                      onClick={() => handleAddSpec(spec)}
+                                      disabled={added}
+                                      className={`text-xs px-2.5 py-1 rounded-full border transition-all ${
+                                        added 
+                                          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+                                          : 'bg-white hover:bg-green-50 text-gray-700 hover:text-primary border-gray-300 hover:border-primary cursor-pointer active:scale-95'
+                                      }`}
+                                    >
+                                      + {spec}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Specifications List */}
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">Active Specifications ({form.specifications.length})</label>
+                            <button
+                              type="button"
+                              onClick={() => handleAddSpec('', '', '')}
+                              className="text-xs font-bold text-primary hover:text-green-700 flex items-center gap-1 cursor-pointer"
+                            >
+                              + Add Custom Spec
+                            </button>
+                          </div>
+
+                          {form.specifications.length === 0 ? (
+                            <div className="text-center py-8 border border-dashed border-gray-200 rounded-xl bg-white select-none">
+                              <p className="text-sm text-gray-400 font-medium">No specifications added yet</p>
+                              <p className="text-xs text-gray-400 mt-1">Select a category or click a quick-add chip above to begin.</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
+                              {form.specifications.map((spec, index) => (
+                                <div key={index} className="flex gap-2 items-center bg-white border border-gray-200 p-2.5 rounded-xl animate-fadeIn group relative">
+                                  {/* Spec Name */}
+                                  <div className="flex-1">
+                                    <input
+                                      type="text"
+                                      value={spec.name}
+                                      onChange={(e) => handleUpdateSpec(index, 'name', e.target.value)}
+                                      placeholder="Spec Name (e.g. Weight)"
+                                      className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all font-semibold text-gray-700"
+                                    />
+                                  </div>
+
+                                  {/* Arrow indicator */}
+                                  <span className="text-gray-400 font-bold select-none text-xs">→</span>
+
+                                  {/* Spec Value */}
+                                  <div className="flex-1">
+                                    <input
+                                      type="text"
+                                      value={spec.value}
+                                      onChange={(e) => handleUpdateSpec(index, 'value', e.target.value)}
+                                      placeholder="Value (e.g. 2)"
+                                      className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all text-gray-700"
+                                    />
+                                  </div>
+
+                                  {/* Arrow indicator */}
+                                  <span className="text-gray-400 font-bold select-none text-xs">→</span>
+
+                                  {/* Spec Unit */}
+                                  <div className="w-[100px]">
+                                    <input
+                                      type="text"
+                                      value={spec.unit || ''}
+                                      onChange={(e) => handleUpdateSpec(index, 'unit', e.target.value)}
+                                      placeholder={SPEC_UNIT_PLACEHOLDERS[spec.name] ? SPEC_UNIT_PLACEHOLDERS[spec.name].replace("e.g. ", "") : "unit"}
+                                      className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all text-gray-500"
+                                    />
+                                  </div>
+
+                                  {/* Trash action */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteSpec(index)}
+                                    className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

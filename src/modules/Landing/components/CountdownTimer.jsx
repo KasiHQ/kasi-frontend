@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 
 export const CountdownTimer = () => {
   const calculateTimeLeft = () => {
-    // June 5, 2026 at 00:00:00 UTC+1 (Nigerian Time)
-    const targetDate = new Date("2026-06-05T00:00:00+01:00");
+    // June 12, 2026 at 00:00:00 UTC+1 (Nigerian Time)
+    const targetDate = new Date("2026-06-12T00:00:00+01:00");
     const difference = +targetDate - +new Date();
     
     let timeLeft = {

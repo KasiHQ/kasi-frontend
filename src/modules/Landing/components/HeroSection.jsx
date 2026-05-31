@@ -17,7 +17,7 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
             {PRELAUNCH_WAITLIST_MODE && (
               <div className="space-y-4 pb-2 animate-in fade-in slide-in-from-top duration-300">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4F263] border-[1.5px] border-black text-black text-[11px] font-black uppercase tracking-wider rounded-full shadow-[2px_2px_0px_#000]">
-                  Launching June 5, 2026
+                  Launching June 12, 2026
                 </div>
                 <div>
                   <CountdownTimer />
