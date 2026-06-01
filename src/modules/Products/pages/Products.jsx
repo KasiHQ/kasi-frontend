@@ -105,8 +105,25 @@ const Products = () => {
     try {
       let productId = editing;
       
+      // Auto-extract brand from specifications if present
+      const brandSpec = form.specifications.find(s => s.name.toLowerCase() === 'brand');
+      const extractedBrand = brandSpec ? brandSpec.value.trim() : '';
+      
+      // Auto-enrich specifications with 'type' (text or number_unit)
+      const enrichedSpecs = form.specifications.map(spec => {
+        const hasUnit = SPECS_WITH_UNITS.includes((spec.name || '').toLowerCase());
+        return {
+          name: spec.name,
+          value: spec.value,
+          unit: hasUnit ? (spec.unit || '') : '',
+          type: hasUnit ? 'number_unit' : 'text'
+        };
+      });
+      
       const payload = {
         ...form,
+        brand: extractedBrand,
+        specifications: enrichedSpecs,
         variants: form.variants ? form.variants.split(',').map(v => v.trim()).filter(Boolean) : [],
         instagram_links: form.instagram_links ? form.instagram_links.split(',').map(v => v.trim()).filter(Boolean) : [],
       };
@@ -131,6 +148,12 @@ const Products = () => {
   };
 
   const handleEdit = (product) => {
+    // Sync brand into specifications if not present
+    let specs = product.specifications || [];
+    if (product.brand && !specs.some(s => s.name.toLowerCase() === 'brand')) {
+      specs = [...specs, { name: 'Brand', value: product.brand, unit: '' }];
+    }
+    
     setForm({
       name: product.name || '',
       brand: product.brand || '',
@@ -151,7 +174,7 @@ const Products = () => {
       external_knowledge: product.external_knowledge || '',
       bulk_discount_quantity: product.bulk_discount_quantity || '',
       bulk_discount_percentage: product.bulk_discount_percentage || '',
-      specifications: product.specifications || [],
+      specifications: specs,
       delivery_available: product.delivery_available !== undefined ? product.delivery_available : true,
       delivery_cost_inside_city: product.delivery_cost_inside_city !== null && product.delivery_cost_inside_city !== undefined ? product.delivery_cost_inside_city : '',
       delivery_cost_outside_city: product.delivery_cost_outside_city !== null && product.delivery_cost_outside_city !== undefined ? product.delivery_cost_outside_city : '',
@@ -216,6 +239,12 @@ const Products = () => {
     "Ring Size": "e.g. US",
     "Chain Length": "e.g. cm",
   };
+
+  const SPECS_WITH_UNITS = [
+    "weight", "storage capacity", "ram", "battery capacity", "screen size", 
+    "shelf life", "delivery time", "shoe size", "ring size", "chain length", 
+    "dimensions", "size", "quantity / pack size"
+  ];
 
   const handleAddSpec = (name = '', value = '', unit = '') => {
     if (form.specifications.some(s => s.name.toLowerCase() === name.toLowerCase())) {
@@ -590,28 +619,7 @@ const Products = () => {
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3.5">
-                          <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Brand</label>
-                            <input 
-                              type="text" 
-                              value={form.brand} 
-                              onChange={(e) => setForm({ ...form, brand: e.target.value })} 
-                              placeholder="e.g. HP" 
-                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Category</label>
-                            <input 
-                              type="text" 
-                              value={form.category} 
-                              onChange={(e) => setForm({ ...form, category: e.target.value })} 
-                              placeholder="e.g. Budget/Student" 
-                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
-                            />
-                          </div>
-                        </div>
+                        {/* Brand and Category are configured under the Specifications tab to keep the interface clean and avoid duplication */}
 
                         <div>
                           <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Description</label>
@@ -980,57 +988,64 @@ const Products = () => {
                             </div>
                           ) : (
                             <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
-                              {form.specifications.map((spec, index) => (
-                                <div key={index} className="flex gap-2 items-center bg-white border border-gray-200 p-2.5 rounded-xl animate-fadeIn group relative">
-                                  {/* Spec Name */}
-                                  <div className="flex-1">
-                                    <input
-                                      type="text"
-                                      value={spec.name}
-                                      onChange={(e) => handleUpdateSpec(index, 'name', e.target.value)}
-                                      placeholder="Spec Name (e.g. Weight)"
-                                      className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all font-semibold text-gray-700"
-                                    />
+                              {form.specifications.map((spec, index) => {
+                                const hasUnit = SPECS_WITH_UNITS.includes((spec.name || '').toLowerCase());
+                                return (
+                                  <div key={index} className="flex gap-2 items-center bg-white border border-gray-200 p-2.5 rounded-xl animate-fadeIn group relative">
+                                    {/* Spec Name */}
+                                    <div className="flex-1">
+                                      <input
+                                        type="text"
+                                        value={spec.name}
+                                        onChange={(e) => handleUpdateSpec(index, 'name', e.target.value)}
+                                        placeholder="Spec Name (e.g. Weight)"
+                                        className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all font-semibold text-gray-700"
+                                      />
+                                    </div>
+
+                                    {/* Arrow indicator */}
+                                    <span className="text-gray-400 font-bold select-none text-xs">→</span>
+
+                                    {/* Spec Value */}
+                                    <div className={hasUnit ? "flex-1" : "flex-[2] transition-all duration-300"}>
+                                      <input
+                                        type="text"
+                                        value={spec.value}
+                                        onChange={(e) => handleUpdateSpec(index, 'value', e.target.value)}
+                                        placeholder={spec.name.toLowerCase() === 'brand' ? "e.g. HP" : "Value (e.g. Red)"}
+                                        className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all text-gray-700"
+                                      />
+                                    </div>
+
+                                    {hasUnit && (
+                                      <>
+                                        {/* Arrow indicator */}
+                                        <span className="text-gray-400 font-bold select-none text-xs">→</span>
+
+                                        {/* Spec Unit */}
+                                        <div className="w-[100px] animate-fadeIn">
+                                          <input
+                                            type="text"
+                                            value={spec.unit || ''}
+                                            onChange={(e) => handleUpdateSpec(index, 'unit', e.target.value)}
+                                            placeholder={SPEC_UNIT_PLACEHOLDERS[spec.name] ? SPEC_UNIT_PLACEHOLDERS[spec.name].replace("e.g. ", "") : "unit"}
+                                            className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all text-gray-500"
+                                          />
+                                        </div>
+                                      </>
+                                    )}
+
+                                    {/* Trash action */}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteSpec(index)}
+                                      className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
                                   </div>
-
-                                  {/* Arrow indicator */}
-                                  <span className="text-gray-400 font-bold select-none text-xs">→</span>
-
-                                  {/* Spec Value */}
-                                  <div className="flex-1">
-                                    <input
-                                      type="text"
-                                      value={spec.value}
-                                      onChange={(e) => handleUpdateSpec(index, 'value', e.target.value)}
-                                      placeholder="Value (e.g. 2)"
-                                      className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all text-gray-700"
-                                    />
-                                  </div>
-
-                                  {/* Arrow indicator */}
-                                  <span className="text-gray-400 font-bold select-none text-xs">→</span>
-
-                                  {/* Spec Unit */}
-                                  <div className="w-[100px]">
-                                    <input
-                                      type="text"
-                                      value={spec.unit || ''}
-                                      onChange={(e) => handleUpdateSpec(index, 'unit', e.target.value)}
-                                      placeholder={SPEC_UNIT_PLACEHOLDERS[spec.name] ? SPEC_UNIT_PLACEHOLDERS[spec.name].replace("e.g. ", "") : "unit"}
-                                      className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all text-gray-500"
-                                    />
-                                  </div>
-
-                                  {/* Trash action */}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteSpec(index)}
-                                    className="text-gray-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer shrink-0"
-                                  >
-                                    <Trash2 size={14} />
-                                  </button>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           )}
                         </div>
