@@ -46,7 +46,9 @@ const MainLayout = () => {
       setUnreadCount(prev => Math.max(0, prev - 1));
       
       // Route if link exists
-      if (noti.link) {
+      if (noti.type === 'invoice_paid' || (noti.link && noti.link.startsWith('/invoices'))) {
+        navigate('/payments');
+      } else if (noti.link) {
         navigate(noti.link);
       }
     } catch (err) {

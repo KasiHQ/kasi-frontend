@@ -162,7 +162,9 @@ const Settings = () => {
         opening_hours: '',
         business_type: '',
         agent_name: '',
-        logistics_phone: ''
+        logistics_phone: '',
+        store_google_maps_link: '',
+        general_enquiry_phone: ''
     });
 
     useEffect(() => {
@@ -185,7 +187,9 @@ const Settings = () => {
                 opening_hours: user.opening_hours || '',
                 business_type: user.business_type || 'product',
                 agent_name: user.agent_name || 'Kasi',
-                logistics_phone: user.logistics_phone || ''
+                logistics_phone: user.logistics_phone || '',
+                store_google_maps_link: user.store_google_maps_link || '',
+                general_enquiry_phone: user.general_enquiry_phone || ''
             });
         }
     }, [user]);
@@ -459,6 +463,32 @@ const Settings = () => {
                                 />
                             </div>
 
+                             <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Store Google Maps Link (optional)</label>
+                                <input
+                                    type="text"
+                                    name="store_google_maps_link"
+                                    value={formData.store_google_maps_link}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
+                                    placeholder="e.g. https://maps.app.goo.gl/..."
+                                />
+                                <p className="text-xs text-gray-400">Shared by Kasi when customers choose store pickup.</p>
+                            </div>
+
+                             <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">General Enquiry Phone Line (optional)</label>
+                                <input
+                                    type="text"
+                                    name="general_enquiry_phone"
+                                    value={formData.general_enquiry_phone}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
+                                    placeholder="e.g. +234 803 123 4567"
+                                />
+                                <p className="text-xs text-gray-400">Shared by Kasi for general offline pickup calls.</p>
+                            </div>
+
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-gray-700">Logistics Rider Phone Number</label>
                                 <input
@@ -702,35 +732,11 @@ const Settings = () => {
                             />
                         </div>
 
-                        {/* Business Brain fields */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Delivery Information</label>
-                                <textarea name="delivery_details" value={formData.delivery_details} onChange={handleChange} rows={3}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium text-sm"
-                                    placeholder="Cost, timeline, and coverage." />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Payment Instructions</label>
-                                <textarea name="payment_details" value={formData.payment_details} onChange={handleChange} rows={3}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium text-sm"
-                                    placeholder="How should customers pay?" />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Instagram Handle</label>
-                                <input type="text" name="instagram_handle" value={formData.instagram_handle} onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium"
-                                    placeholder="@yourstore" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Opening Hours</label>
-                                <input type="text" name="opening_hours" value={formData.opening_hours} onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium"
-                                    placeholder="Mon-Fri, 9AM-6PM" />
-                            </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Instagram Handle</label>
+                            <input type="text" name="instagram_handle" value={formData.instagram_handle} onChange={handleChange}
+                                className="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-green-500 focus:ring-0 transition-all font-medium text-sm"
+                                placeholder="@yourstore" />
                         </div>
                     </div>
 

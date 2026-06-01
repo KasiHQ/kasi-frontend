@@ -58,6 +58,9 @@ const Products = () => {
     bulk_discount_quantity: '',
     bulk_discount_percentage: '',
     specifications: [],
+    delivery_available: true,
+    delivery_cost_inside_city: '',
+    delivery_cost_outside_city: '',
   });
 
   useEffect(() => {
@@ -85,7 +88,10 @@ const Products = () => {
     setForm({ 
       name: '', brand: '', category: '', description: '', price: '', happy_price: '', min_price: '', cost_price: '', in_stock: true, stock_quantity: '',
       variants: '', weight: '', dimensions: '', expiry_date: '', voice_pitch: '', instagram_links: '', external_knowledge: '', bulk_discount_quantity: '', bulk_discount_percentage: '',
-      specifications: []
+      specifications: [],
+      delivery_available: true,
+      delivery_cost_inside_city: '',
+      delivery_cost_outside_city: '',
     });
     setEditing(null);
     setImages([]);
@@ -146,6 +152,9 @@ const Products = () => {
       bulk_discount_quantity: product.bulk_discount_quantity || '',
       bulk_discount_percentage: product.bulk_discount_percentage || '',
       specifications: product.specifications || [],
+      delivery_available: product.delivery_available !== undefined ? product.delivery_available : true,
+      delivery_cost_inside_city: product.delivery_cost_inside_city !== null && product.delivery_cost_inside_city !== undefined ? product.delivery_cost_inside_city : '',
+      delivery_cost_outside_city: product.delivery_cost_outside_city !== null && product.delivery_cost_outside_city !== undefined ? product.delivery_cost_outside_city : '',
     });
     setEditing(product.id);
     setImages(product.images || []);
@@ -497,7 +506,7 @@ const Products = () => {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col transition-all duration-300">
             <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
               <h2 className="text-xl font-bold text-dark flex items-center gap-2">
                 <Package size={22} className="text-primary" />
@@ -723,8 +732,9 @@ const Products = () => {
 
                     {/* Tab 3: Inventory & Shipping */}
                     {activeFormTab === 'inventory' && (
-                      <div className="space-y-4 transition-all duration-200">
-                        <div className="grid grid-cols-2 gap-3.5">
+                      <div className="space-y-6 transition-all duration-200">
+                        {/* Stock & Status Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Stock Quantity</label>
                             <input 
@@ -749,6 +759,7 @@ const Products = () => {
                           </div>
                         </div>
 
+                        {/* Variants Input */}
                         <div>
                           <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Variants (comma separated)</label>
                           <input 
@@ -760,36 +771,94 @@ const Products = () => {
                           />
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2.5">
+                        {/* Physical Details Grid */}
+                        <div className="grid grid-cols-3 gap-3">
                           <div>
-                            <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Weight</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Weight</label>
                             <input 
                               type="text" 
                               value={form.weight} 
                               onChange={(e) => setForm({ ...form, weight: e.target.value })} 
                               placeholder="e.g. 500g" 
-                              className="w-full px-2.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Dimensions</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Dimensions</label>
                             <input 
                               type="text" 
                               value={form.dimensions} 
                               onChange={(e) => setForm({ ...form, dimensions: e.target.value })} 
                               placeholder="e.g. 10x10x5 cm" 
-                              className="w-full px-2.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
+                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Expiry Date</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Expiry Date</label>
                             <input 
                               type="date" 
                               value={form.expiry_date} 
                               onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} 
-                              className="w-full px-2 py-2 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-xs outline-none transition-all h-[44px]" 
+                              className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-xs outline-none transition-all h-[44px]" 
                             />
                           </div>
+                        </div>
+
+                        {/* Delivery Settings Section */}
+                        <div className="border-t border-gray-100 pt-4 mt-2">
+                          <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                            <Truck size={14} className="text-primary" /> Delivery Logistics Settings
+                          </h3>
+                          
+                          <label className="flex items-center gap-2.5 p-3 border border-gray-200 hover:border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all select-none mb-4">
+                            <input
+                              type="checkbox"
+                              checked={form.delivery_available}
+                              onChange={(e) => setForm({ ...form, delivery_available: e.target.checked })}
+                              className="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300 cursor-pointer"
+                            />
+                            <div>
+                              <span className="text-sm font-semibold text-gray-700 block">Enable Delivery for this Product</span>
+                              <span className="text-xs text-gray-400">Allow Kasi to quote delivery and dispatch riders automatically for this item</span>
+                            </div>
+                          </label>
+
+                          {form.delivery_available && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
+                              <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Inside City Delivery Fee</label>
+                                <div className="relative rounded-xl shadow-sm">
+                                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 text-sm font-semibold">₦</span>
+                                  </div>
+                                  <input
+                                    type="number"
+                                    value={form.delivery_cost_inside_city}
+                                    onChange={(e) => setForm({ ...form, delivery_cost_inside_city: e.target.value })}
+                                    placeholder="e.g. 1500"
+                                    min="0"
+                                    className="w-full pl-8 pr-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Outside City Delivery Fee</label>
+                                <div className="relative rounded-xl shadow-sm">
+                                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 text-sm font-semibold">₦</span>
+                                  </div>
+                                  <input
+                                    type="number"
+                                    value={form.delivery_cost_outside_city}
+                                    onChange={(e) => setForm({ ...form, delivery_cost_outside_city: e.target.value })}
+                                    placeholder="e.g. 4000"
+                                    min="0"
+                                    className="w-full pl-8 pr-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

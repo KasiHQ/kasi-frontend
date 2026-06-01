@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Package, Truck, MoreHorizontal, Users, Settings, TrendingUp, LogOut, X, Sun, Moon, PanelLeft, PanelTop, Briefcase, Calendar } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Package, Truck, MoreHorizontal, Users, Settings, TrendingUp, LogOut, X, Sun, Moon, PanelLeft, PanelTop, Briefcase, Calendar, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
 import { useLayout } from '../../context/LayoutContext';
@@ -29,6 +29,7 @@ const BottomNav = () => {
 
   const moreItems = [
     { icon: Users, label: 'Customers', path: '/customers' },
+    { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
     { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];

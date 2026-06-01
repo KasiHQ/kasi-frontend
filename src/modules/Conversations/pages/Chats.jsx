@@ -495,7 +495,7 @@ const Chats = () => {
                 <span>Instruct Kasi</span>
               </button>
               <button
-                onClick={() => selectedConversation && handleStatusUpdate(selectedConversation.id, 'Delivered')}
+                onClick={() => selectedConversation && handleStatusUpdate(selectedConversation.id, 'In Progress')}
                 className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-[#FFFAEB] text-[#B54708] border border-[#FEC84B] rounded-lg text-xs md:text-sm font-semibold hover:bg-[#FEF3C7] transition-colors ml-auto cursor-pointer"
               >
                 <span>Resolve</span>
