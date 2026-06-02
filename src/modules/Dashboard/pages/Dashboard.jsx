@@ -4,7 +4,7 @@ import {
   TrendingUp, Users, CheckCircle, AlertTriangle, 
   ArrowRight, MessageSquare, DollarSign, Cpu,
   Package, ShoppingBag, Clock, UserPlus, Tag, Share2, BarChart3, Briefcase, Calendar,
-  Megaphone, Settings, GraduationCap, UserCheck
+  Megaphone, Settings, GraduationCap, UserCheck, Truck, MapPin
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { DashboardSkeleton } from '../../../components/ui/Skeleton';
@@ -774,6 +774,8 @@ const ActionAlerts = ({ user }) => {
   // States to manage local banner dismissals
   const [dismissedPaystack, setDismissedPaystack] = useState(false);
   const [dismissedWhatsApp, setDismissedWhatsApp] = useState(false);
+  const [dismissedRiders, setDismissedRiders] = useState(false);
+  const [dismissedStoreProfile, setDismissedStoreProfile] = useState(false);
 
   useEffect(() => {
     fetchIntegrations();
@@ -792,39 +794,39 @@ const ActionAlerts = ({ user }) => {
 
   const hasWhatsApp = integrations.some(i => i.platform === 'whatsapp' && i.connection_status === 'connected');
   const hasPaystack = !!user?.account_number;
+  const hasRiders = !!user?.logistics_phone;
+  const hasStoreProfile = !!user?.address && !!user?.store_google_maps_link && !!user?.general_enquiry_phone;
 
   if (loading) return null;
 
   const showPaystack = !hasPaystack && !dismissedPaystack;
   const showWhatsApp = !hasWhatsApp && !dismissedWhatsApp;
+  const showRiders = !hasRiders && !dismissedRiders;
+  const showStoreProfile = !hasStoreProfile && !dismissedStoreProfile;
 
-  if (!showPaystack && !showWhatsApp) return null;
+  if (!showPaystack && !showWhatsApp && !showRiders && !showStoreProfile) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
-      {/* 3.2 — PAYMENTS BANNER */}
+    <div className="flex flex-wrap gap-3 mb-4 animate-in fade-in slide-in-from-top-4 duration-500 w-full">
+      {/* PAYMENTS BANNER */}
       {showPaystack && (
-        <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-xl p-3 flex flex-col justify-between gap-3 shadow-none">
-          <div className="flex gap-2.5 min-w-0">
-            {/* Dollar icon in blue circle, 24px */}
-            <div className="w-6 h-6 rounded-full bg-[#D1E9FF] text-[#175CD3] flex items-center justify-center shrink-0 mt-0.5">
-              <DollarSign size={12} />
+        <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-5 h-5 rounded-full bg-[#D1E9FF] text-[#175CD3] flex items-center justify-center shrink-0">
+              <DollarSign size={10} />
             </div>
-            <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-bold text-[#175CD3] tracking-wider uppercase block mb-0.5">PAYMENTS NOT CONNECTED</span>
-              <p className="text-[11px] text-[#344054] leading-relaxed">
-                Link your Paystack account to receive payments from customers.
-              </p>
+            <div className="flex flex-col gap-0.5 min-w-0 text-xs">
+              <span className="font-bold text-[#175CD3] tracking-wide shrink-0">PAYMENTS NOT CONNECTED</span>
+              <span className="text-[#344054] text-[11px] leading-relaxed font-medium">Link your Paystack account to receive payments from customers.</span>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-2 shrink-0 border-t border-[#D1E9FF]/40 pt-2 mt-1">
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
               onClick={() => navigate('/settings?tab=payment')}
-              className="px-2.5 py-1 bg-[#175CD3] hover:bg-[#114B9E] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+              className="px-2.5 py-1 bg-[#175CD3] hover:bg-[#114B9E] text-white rounded-md text-[10px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
             >
               Link Account
             </button>
-            {/* Dismiss button */}
             <button
               onClick={() => setDismissedPaystack(true)}
               className="text-[#98A2B3] hover:text-[#667085] p-0.5 rounded transition-colors cursor-pointer shrink-0"
@@ -840,27 +842,89 @@ const ActionAlerts = ({ user }) => {
 
       {/* WHATSAPP BANNER */}
       {showWhatsApp && (
-        <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-xl p-3 flex flex-col justify-between gap-3 shadow-none">
-          <div className="flex gap-2.5 min-w-0">
-            <div className="w-6 h-6 rounded-full bg-[#D1FADF] text-[#027A48] flex items-center justify-center shrink-0 mt-0.5">
-              <MessageSquare size={12} />
+        <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-5 h-5 rounded-full bg-[#D1FADF] text-[#027A48] flex items-center justify-center shrink-0">
+              <MessageSquare size={10} />
             </div>
-            <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-bold text-[#027A48] tracking-wider uppercase block mb-0.5">WHATSAPP NOT CONNECTED</span>
-              <p className="text-[11px] text-[#344054] leading-relaxed">
-                Connect your WhatsApp so Kasi can start chatting with customers.
-              </p>
+            <div className="flex flex-col gap-0.5 min-w-0 text-xs">
+              <span className="font-bold text-[#027A48] tracking-wide shrink-0">WHATSAPP NOT CONNECTED</span>
+              <span className="text-[#344054] text-[11px] leading-relaxed font-medium">Connect your WhatsApp so Kasi can start chatting with customers.</span>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-2 shrink-0 border-t border-[#D1FADF]/40 pt-2 mt-1">
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
               onClick={() => navigate('/settings?tab=integrations')}
-              className="px-2.5 py-1 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-md text-[11px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+              className="px-2.5 py-1 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-md text-[10px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
             >
               Connect Now
             </button>
             <button
               onClick={() => setDismissedWhatsApp(true)}
+              className="text-[#98A2B3] hover:text-[#667085] p-0.5 rounded transition-colors cursor-pointer shrink-0"
+              title="Dismiss"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* RIDERS BANNER */}
+      {showRiders && (
+        <div className="relative bg-[#FFF4ED] border border-[#FCD2C1] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-5 h-5 rounded-full bg-[#FFE4D6] text-[#F97316] flex items-center justify-center shrink-0">
+              <Truck size={10} />
+            </div>
+            <div className="flex flex-col gap-0.5 min-w-0 text-xs">
+              <span className="font-bold text-[#D46B18] tracking-wide shrink-0">RIDERS NOT ADDED</span>
+              <span className="text-[#344054] text-[11px] leading-relaxed font-medium">Add your logistics rider's contact details so Kasi can automatically dispatch requests.</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={() => navigate('/logistics')}
+              className="px-2.5 py-1 bg-[#F97316] hover:bg-[#EA580C] text-white rounded-md text-[10px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+            >
+              Add Riders
+            </button>
+            <button
+              onClick={() => setDismissedRiders(true)}
+              className="text-[#98A2B3] hover:text-[#667085] p-0.5 rounded transition-colors cursor-pointer shrink-0"
+              title="Dismiss"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STORE PROFILE BANNER */}
+      {showStoreProfile && (
+        <div className="relative bg-[#F4F3FF] border border-[#D9D6FE] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-5 h-5 rounded-full bg-[#EBE9FE] text-[#7A5AF8] flex items-center justify-center shrink-0">
+              <MapPin size={10} />
+            </div>
+            <div className="flex flex-col gap-0.5 min-w-0 text-xs">
+              <span className="font-bold text-[#6938EF] tracking-wide shrink-0">PICKUP PROFILE INCOMPLETE</span>
+              <span className="text-[#344054] text-[11px] leading-relaxed font-medium">Complete your store's address, Google Maps link, and enquiry line to support pickups.</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={() => navigate('/settings?tab=general')}
+              className="px-2.5 py-1 bg-[#7A5AF8] hover:bg-[#6938EF] text-white rounded-md text-[10px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+            >
+              Complete Profile
+            </button>
+            <button
+              onClick={() => setDismissedStoreProfile(true)}
               className="text-[#98A2B3] hover:text-[#667085] p-0.5 rounded transition-colors cursor-pointer shrink-0"
               title="Dismiss"
             >
