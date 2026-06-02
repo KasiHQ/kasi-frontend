@@ -15,6 +15,14 @@ import ForgotPassword from './modules/Auth/pages/ForgotPassword';
 import CreateInvoice from './modules/Invoices/pages/CreateInvoice';
 import Invoices from './modules/Invoices/pages/Invoices';
 import ProtectedRoute from './components/layout/ProtectedRoute';
+import SubscriptionGate from './components/layout/SubscriptionGate';
+
+const SubscriptionProtected = ({ children }) => (
+  <ProtectedRoute>
+    <SubscriptionGate>{children}</SubscriptionGate>
+  </ProtectedRoute>
+);
+
 import { ToastProvider } from './context/ToastContext';
 import Settings from './modules/Settings/pages/Settings';
 import SalesNotebook from './modules/Sales/pages/SalesNotebook';
@@ -71,55 +79,55 @@ function App() {
           
           <Route element={<MainLayout />}>
               <Route path="/dashboard" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Dashboard />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
 
               {/* New primary pages */}
               <Route path="/chats" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Chats />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
               <Route path="/logistics" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Logistics />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
               <Route path="/customers" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Clients />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
 
               {/* Keep old /clients route working as alias */}
               <Route path="/clients" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Clients />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
 
               <Route path="/sales" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <SalesNotebook />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
               <Route path="/invoices" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Invoices />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
               <Route path="/invoices/create" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <CreateInvoice />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
               
               <Route path="/payments" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Payments />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
 
               <Route path="/billing" element={
@@ -142,27 +150,27 @@ function App() {
               } />
 
               <Route path="/products" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Products />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
 
               <Route path="/services" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Services />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
 
               <Route path="/bookings" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Bookings />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
 
               <Route path="/analytics" element={
-                <ProtectedRoute>
+                <SubscriptionProtected>
                   <Analytics />
-                </ProtectedRoute>
+                </SubscriptionProtected>
               } />
               
               <Route path="/settings" element={
