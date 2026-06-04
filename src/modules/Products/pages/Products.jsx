@@ -61,6 +61,7 @@ const Products = () => {
     delivery_available: true,
     delivery_cost_inside_city: '',
     delivery_cost_outside_city: '',
+    is_fixed_price: false,
   });
 
   useEffect(() => {
@@ -92,6 +93,7 @@ const Products = () => {
       delivery_available: true,
       delivery_cost_inside_city: '',
       delivery_cost_outside_city: '',
+      is_fixed_price: false,
     });
     setEditing(null);
     setImages([]);
@@ -112,9 +114,12 @@ const Products = () => {
       // Auto-enrich specifications with 'type' (text or number_unit)
       const enrichedSpecs = form.specifications.map(spec => {
         const hasUnit = SPECS_WITH_UNITS.includes((spec.name || '').toLowerCase());
+        const valuesArray = typeof spec.value === 'string' 
+          ? spec.value.split(',').map(v => v.trim()).filter(Boolean)
+          : (Array.isArray(spec.values) ? spec.values : []);
         return {
           name: spec.name,
-          value: spec.value,
+          values: valuesArray,
           unit: hasUnit ? (spec.unit || '') : '',
           type: hasUnit ? 'number_unit' : 'text'
         };
@@ -150,6 +155,12 @@ const Products = () => {
   const handleEdit = (product) => {
     // Sync brand into specifications if not present
     let specs = product.specifications || [];
+    specs = specs.map(s => ({
+      name: s.name,
+      value: Array.isArray(s.values) ? s.values.join(', ') : (s.value || ''),
+      unit: s.unit || ''
+    }));
+
     if (product.brand && !specs.some(s => s.name.toLowerCase() === 'brand')) {
       specs = [...specs, { name: 'Brand', value: product.brand, unit: '' }];
     }
@@ -178,6 +189,7 @@ const Products = () => {
       delivery_available: product.delivery_available !== undefined ? product.delivery_available : true,
       delivery_cost_inside_city: product.delivery_cost_inside_city !== null && product.delivery_cost_inside_city !== undefined ? product.delivery_cost_inside_city : '',
       delivery_cost_outside_city: product.delivery_cost_outside_city !== null && product.delivery_cost_outside_city !== undefined ? product.delivery_cost_outside_city : '',
+      is_fixed_price: (product.is_fixed_price !== null && product.is_fixed_price !== undefined) ? product.is_fixed_price : false,
     });
     setEditing(product.id);
     setImages(product.images || []);
@@ -377,6 +389,16 @@ const Products = () => {
     
     return matchesSearch && matchesTab;
   });
+
+  const getSpecValuePlaceholder = (specName) => {
+    const name = (specName || '').toLowerCase().trim();
+    if (name === 'colour' || name === 'color') return 'e.g. Midnight Black, Cherry Red, Space Grey';
+    if (name === 'size') return 'e.g. S, M, L, XL or 40, 41, 42';
+    if (name === 'material') return 'e.g. 100% Cotton, Leather, Silk';
+    if (name === 'condition') return 'e.g. Brand New, Gently Used';
+    if (name === 'brand') return 'e.g. HP, Nike, Gucci';
+    return 'Value (e.g. Red, Blue)';
+  };
 
   return (
     <div>
@@ -648,9 +670,31 @@ const Products = () => {
                     {/* Tab 2: Smart Pricing */}
                     {activeFormTab === 'pricing' && (
                       <div className="space-y-4 transition-all duration-200">
+                        {/* Fixed Price Toggle */}
+                        <label className="flex items-center gap-2.5 p-3 border border-gray-200 hover:border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all select-none">
+                          <input
+                            type="checkbox"
+                            checked={form.is_fixed_price}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setForm(prev => ({
+                                ...prev,
+                                is_fixed_price: checked,
+                                happy_price: checked ? '' : prev.happy_price,
+                                min_price: checked ? '' : prev.min_price
+                              }));
+                            }}
+                            className="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300 cursor-pointer"
+                          />
+                          <div>
+                            <span className="text-sm font-semibold text-gray-700 block">Enable Fixed Price</span>
+                            <span className="text-xs text-gray-400">Disable negotiation for this product. Kasi will sell it only at the Starting Price.</span>
+                          </div>
+                        </label>
+
                         {/* 3-tier pricing */}
                         <div className="grid grid-cols-3 gap-3">
-                          <div>
+                          <div className={form.is_fixed_price ? "col-span-3 animate-fadeIn" : "col-span-1"}>
                             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Starting (₦) *</label>
                             <input 
                               type="number" 
@@ -662,37 +706,43 @@ const Products = () => {
                               className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
                             />
                           </div>
-                          <div>
-                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Happy (₦)</label>
-                            <input 
-                              type="number" 
-                              value={form.happy_price} 
-                              onChange={(e) => setForm({ ...form, happy_price: e.target.value })} 
-                              placeholder="14500" 
-                              min="0" 
-                              className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Last (₦)</label>
-                            <input 
-                              type="number" 
-                              value={form.min_price} 
-                              onChange={(e) => setForm({ ...form, min_price: e.target.value })} 
-                              placeholder="800000" 
-                              min="0" 
-                              className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
-                            />
-                          </div>
+                          {!form.is_fixed_price && (
+                            <>
+                              <div className="animate-fadeIn">
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Happy (₦)</label>
+                                <input 
+                                  type="number" 
+                                  value={form.happy_price} 
+                                  onChange={(e) => setForm({ ...form, happy_price: e.target.value })} 
+                                  placeholder="14500" 
+                                  min="0" 
+                                  className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
+                                />
+                              </div>
+                              <div className="animate-fadeIn">
+                                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Last (₦)</label>
+                                <input 
+                                  type="number" 
+                                  value={form.min_price} 
+                                  onChange={(e) => setForm({ ...form, min_price: e.target.value })} 
+                                  placeholder="800000" 
+                                  min="0" 
+                                  className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm font-semibold outline-none transition-all" 
+                                />
+                              </div>
+                            </>
+                          )}
                         </div>
 
                         {/* Guideline helper card */}
-                        <div className="bg-gray-50 border border-gray-200/60 rounded-xl p-3 text-[11px] text-gray-500 leading-normal select-none">
-                          <span className="font-semibold text-dark block mb-0.5">ℹ️ Kasi AI Negotiation Rules:</span>
-                          <span className="block font-medium">· <strong className="text-gray-700">Starting Price</strong>: Open quote first offered to buyers.</span>
-                          <span className="block font-medium">· <strong className="text-gray-700">Happy Price</strong>: Target price AI handles to maximize deal value.</span>
-                          <span className="block font-medium">· <strong className="text-gray-700">Last Price</strong>: Absolute floor limit AI is barred from bypassing.</span>
-                        </div>
+                        {!form.is_fixed_price && (
+                          <div className="bg-gray-50 border border-gray-200/60 rounded-xl p-3 text-[11px] text-gray-500 leading-normal select-none">
+                            <span className="font-semibold text-dark block mb-0.5">ℹ️ Kasi AI Negotiation Rules:</span>
+                            <span className="block font-medium">· <strong className="text-gray-700">Starting Price</strong>: Open quote first offered to buyers.</span>
+                            <span className="block font-medium">· <strong className="text-gray-700">Happy Price</strong>: Target price AI handles to maximize deal value.</span>
+                            <span className="block font-medium">· <strong className="text-gray-700">Last Price</strong>: Absolute floor limit AI is barred from bypassing.</span>
+                          </div>
+                        )}
 
                         <div>
                           <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Cost Price (₦)</label>
@@ -767,51 +817,6 @@ const Products = () => {
                           </div>
                         </div>
 
-                        {/* Variants Input */}
-                        <div>
-                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Variants (comma separated)</label>
-                          <input 
-                            type="text" 
-                            value={form.variants} 
-                            onChange={(e) => setForm({ ...form, variants: e.target.value })} 
-                            placeholder="e.g. Red, Blue, XL" 
-                            className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
-                          />
-                        </div>
-
-                        {/* Physical Details Grid */}
-                        <div className="grid grid-cols-3 gap-3">
-                          <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Weight</label>
-                            <input 
-                              type="text" 
-                              value={form.weight} 
-                              onChange={(e) => setForm({ ...form, weight: e.target.value })} 
-                              placeholder="e.g. 500g" 
-                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Dimensions</label>
-                            <input 
-                              type="text" 
-                              value={form.dimensions} 
-                              onChange={(e) => setForm({ ...form, dimensions: e.target.value })} 
-                              placeholder="e.g. 10x10x5 cm" 
-                              className="w-full px-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all" 
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Expiry Date</label>
-                            <input 
-                              type="date" 
-                              value={form.expiry_date} 
-                              onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} 
-                              className="w-full px-3 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-xs outline-none transition-all h-[44px]" 
-                            />
-                          </div>
-                        </div>
-
                         {/* Delivery Settings Section */}
                         <div className="border-t border-gray-100 pt-4 mt-2">
                           <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -830,43 +835,6 @@ const Products = () => {
                               <span className="text-xs text-gray-400">Allow Kasi to quote delivery and dispatch riders automatically for this item</span>
                             </div>
                           </label>
-
-                          {form.delivery_available && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
-                              <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Inside City Delivery Fee</label>
-                                <div className="relative rounded-xl shadow-sm">
-                                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <span className="text-gray-500 text-sm font-semibold">₦</span>
-                                  </div>
-                                  <input
-                                    type="number"
-                                    value={form.delivery_cost_inside_city}
-                                    onChange={(e) => setForm({ ...form, delivery_cost_inside_city: e.target.value })}
-                                    placeholder="e.g. 1500"
-                                    min="0"
-                                    className="w-full pl-8 pr-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all"
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Outside City Delivery Fee</label>
-                                <div className="relative rounded-xl shadow-sm">
-                                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <span className="text-gray-500 text-sm font-semibold">₦</span>
-                                  </div>
-                                  <input
-                                    type="number"
-                                    value={form.delivery_cost_outside_city}
-                                    onChange={(e) => setForm({ ...form, delivery_cost_outside_city: e.target.value })}
-                                    placeholder="e.g. 4000"
-                                    min="0"
-                                    className="w-full pl-8 pr-3.5 py-2.5 border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 rounded-xl text-sm outline-none transition-all"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       </div>
                     )}
@@ -1012,7 +980,7 @@ const Products = () => {
                                         type="text"
                                         value={spec.value}
                                         onChange={(e) => handleUpdateSpec(index, 'value', e.target.value)}
-                                        placeholder={spec.name.toLowerCase() === 'brand' ? "e.g. HP" : "Value (e.g. Red)"}
+                                        placeholder={getSpecValuePlaceholder(spec.name)}
                                         className="w-full px-2.5 py-1.5 border border-gray-150 rounded-lg text-xs outline-none focus:border-primary transition-all text-gray-700"
                                       />
                                     </div>

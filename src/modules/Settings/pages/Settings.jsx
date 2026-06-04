@@ -5,10 +5,17 @@ import { useToast } from '../../../context/ToastContext';
 import { useTheme, THEMES } from '../../../context/ThemeContext';
 import Button from '../../../components/ui/Button';
 import api from '../../../api/axios';
-import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout, Wallet, ShieldCheck, Landmark, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout, Wallet, ShieldCheck, Landmark, CheckCircle, AlertTriangle, Truck } from 'lucide-react';
 import ActivityLogsTable from '../components/ActivityLogsTable';
 import IntegrationsTab from '../components/IntegrationsTab';
 import { X } from 'lucide-react';
+
+const CITY_AREAS = {
+  'Lagos': ["Ikeja", "Lekki", "Victoria Island", "Surulere", "Yaba", "Ajah", "Gbagada", "Maryland", "Ikoyi", "Apapa", "Ogba", "Agege"],
+  'Abuja': ["Wuse", "Garki", "Maitama", "Asokoro", "Gwarinpa", "Kubwa", "Apo", "Lugbe"],
+  'Port Harcourt': ["GRA Phase 1-3", "Choba", "Diobu", "Trans Amadi", "Rumuokwuta", "Rumuola", "Rumuigbo", "Ada George"],
+  'Ibadan': ["Bodija", "Akobo", "Samonda", "Apata", "Challenge", "Ring Road", "Oluyole", "UI / Agbowo"]
+};
 
 /* ── Tab Button ───────────────────────────────────── */
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
@@ -128,6 +135,82 @@ const Settings = () => {
     };
     const [selectedPlatform, setSelectedPlatform] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Logistics Rate Sheet states
+    const [deliveryCity, setDeliveryCity] = useState('');
+    const [deliveryRates, setDeliveryRates] = useState({});
+    const [customAreaName, setCustomAreaName] = useState('');
+
+    useEffect(() => {
+        if (user) {
+            setDeliveryCity(user.delivery_city || '');
+            let rates = {};
+            if (user.delivery_rates) {
+                if (typeof user.delivery_rates === 'object') {
+                    rates = user.delivery_rates;
+                } else {
+                    try {
+                        rates = JSON.parse(user.delivery_rates);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+            setDeliveryRates(rates);
+        }
+    }, [user]);
+
+    const handleCityChange = (city) => {
+        setDeliveryCity(city);
+        const areas = CITY_AREAS[city] || [];
+        const newRates = { ...deliveryRates };
+        areas.forEach(area => {
+            if (newRates[area] === undefined) {
+                newRates[area] = '';
+            }
+        });
+        setDeliveryRates(newRates);
+    };
+
+    const handleAddCustomArea = (e) => {
+        e.preventDefault();
+        if (!customAreaName.trim()) return;
+        const name = customAreaName.trim();
+        if (deliveryRates[name] !== undefined) {
+            addToast('Area already exists', 'info');
+            return;
+        }
+        setDeliveryRates(prev => ({
+            ...prev,
+            [name]: ''
+        }));
+        setCustomAreaName('');
+    };
+
+    const handleSaveLogistics = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const cleanedRates = {};
+            Object.keys(deliveryRates).forEach(area => {
+                const val = deliveryRates[area];
+                if (val !== '') {
+                    cleanedRates[area] = Number(val);
+                }
+            });
+            await api.patch('/api/auth/profile', {
+                delivery_city: deliveryCity,
+                delivery_rates: cleanedRates
+            });
+            if (fetchUser) await fetchUser();
+            addToast('Logistics settings updated successfully', 'success');
+        } catch (err) {
+            console.error(err);
+            addToast('Failed to save logistics settings', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Integration states
     const [waStatus, setWaStatus] = useState({ connected: false });
@@ -323,6 +406,7 @@ const Settings = () => {
                 <TabButton active={activeTab === 'payment'} icon={Wallet} label="Settlement & Payouts" onClick={() => setActiveTab('payment')} />
                 <TabButton active={activeTab === 'billing'} icon={CreditCard} label="Billing & Subscriptions" onClick={() => setActiveTab('billing')} />
                 <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
+                <TabButton active={activeTab === 'logistics'} icon={Truck} label="Logistics Settings" onClick={() => setActiveTab('logistics')} />
                 {/* <TabButton active={activeTab === 'appearance'} icon={Palette} label="Appearance" onClick={() => setActiveTab('appearance')} /> */}
                 <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
             </div>
@@ -780,6 +864,115 @@ const Settings = () => {
             {/* ── ACTIVITY LOGS TAB ──────────────────── */}
             {activeTab === 'activity' && (
                 <ActivityLogsTable />
+            )}
+
+            {/* ── LOGISTICS TAB ─────────────────────── */}
+            {activeTab === 'logistics' && (
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-6 animate-in fade-in duration-300">
+                    <h2 className="text-xl font-bold text-dark flex items-center gap-2">
+                        <Truck className="text-primary" size={24} />
+                        Delivery Rate Sheet
+                    </h2>
+                    <p className="text-sm text-gray-500 -mt-3">
+                        Set up delivery pricing rules for your city. Kasi AI will quote these fees to customers dynamically based on their delivery areas.
+                    </p>
+
+                    <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Your Base City</label>
+                          <select
+                            value={deliveryCity}
+                            onChange={(e) => handleCityChange(e.target.value)}
+                            className="w-full h-11 px-3.5 border border-[#D0D5DD] bg-white rounded-xl text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all font-semibold"
+                          >
+                            <option value="">-- Select base city --</option>
+                            <option value="Lagos">Lagos</option>
+                            <option value="Abuja">Abuja</option>
+                            <option value="Port Harcourt">Port Harcourt</option>
+                            <option value="Ibadan">Ibadan</option>
+                          </select>
+                        </div>
+
+                        {deliveryCity && (
+                          <div className="space-y-4 animate-fadeIn">
+                            <div className="border-t border-gray-100 pt-4">
+                              <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">
+                                Delivery Prices for {deliveryCity} Areas/LGAs
+                              </h3>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {Object.keys(deliveryRates).map(area => (
+                                  <div key={area} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200/60 gap-3">
+                                    <span className="text-xs font-semibold text-gray-700 truncate">{area}</span>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <div className="relative rounded-lg shadow-sm w-32">
+                                        <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                          <span className="text-gray-400 text-xs">₦</span>
+                                        </div>
+                                        <input
+                                          type="number"
+                                          value={deliveryRates[area]}
+                                          onChange={(e) => {
+                                            setDeliveryRates(prev => ({
+                                              ...prev,
+                                              [area]: e.target.value
+                                            }));
+                                          }}
+                                          placeholder="Price"
+                                          className="w-full pl-6 pr-2 py-1.5 border border-gray-300 rounded-lg text-xs outline-none focus:border-primary transition-all font-semibold"
+                                          min="0"
+                                        />
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const updated = { ...deliveryRates };
+                                          delete updated[area];
+                                          setDeliveryRates(updated);
+                                        }}
+                                        className="text-gray-400 hover:text-red-500 font-bold text-xs p-1"
+                                        title="Remove Area"
+                                      >
+                                        ×
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Add Custom Area Input */}
+                            <form onSubmit={handleAddCustomArea} className="flex gap-2 items-center bg-gray-50 p-3 rounded-xl border border-gray-200/60 max-w-md">
+                              <input
+                                type="text"
+                                value={customAreaName}
+                                onChange={(e) => setCustomAreaName(e.target.value)}
+                                placeholder="Add custom area/LGA (e.g. Ikotun)"
+                                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs outline-none focus:border-primary font-semibold"
+                              />
+                              <button
+                                type="submit"
+                                disabled={!customAreaName.trim()}
+                                className="px-4 py-1.5 bg-primary hover:bg-[#125D37] text-white disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-xs font-bold rounded-lg transition-colors border border-black shadow-[2px_2px_0px_#0A0A0A] cursor-pointer"
+                              >
+                                Add Area
+                              </button>
+                            </form>
+
+                            {/* Save Button */}
+                            <div className="pt-2">
+                              <button
+                                onClick={handleSaveLogistics}
+                                disabled={loading}
+                                className="w-full bg-primary hover:bg-[#125D37] text-white py-3 rounded-xl shadow-lg shadow-green-200 font-bold border border-black shadow-[2px_2px_0px_#0A0A0A] cursor-pointer"
+                              >
+                                {loading ? 'Saving Settings...' : 'Save Rate Sheet'}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                </div>
             )}
 
             {/* ── BILLING & SUBSCRIPTIONS TAB ─────────────────────── */}

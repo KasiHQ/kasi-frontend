@@ -11,9 +11,43 @@ import api from '../../api/axios';
 
 const MainLayout = () => {
   const [sidebarWidth, setSidebarWidth] = useState(240);
-  const { user } = useAuth();
+  const { user, fetchUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Legacy Rider Migration States
+  const [showRiderMigrator, setShowRiderMigrator] = useState(false);
+  const [legacyRiders, setLegacyRiders] = useState([]);
+
+  useEffect(() => {
+    if (user?.logistics_phone) {
+      const trimmed = user.logistics_phone.trim();
+      if (trimmed && !trimmed.startsWith('[')) {
+        const phones = trimmed.split(',').map(p => p.trim()).filter(Boolean);
+        if (phones.length > 0) {
+          setLegacyRiders(phones.map(phone => ({ name: '', phone })));
+          setShowRiderMigrator(true);
+        }
+      }
+    }
+  }, [user]);
+
+  const handleMigrateRiders = async (e) => {
+    e.preventDefault();
+    if (legacyRiders.some(r => !r.name.trim())) {
+      alert("Please enter names for all riders.");
+      return;
+    }
+    try {
+      const ridersJSON = JSON.stringify(legacyRiders.map(r => ({ name: r.name.trim(), phone: r.phone })));
+      await api.patch('/api/auth/profile', { logistics_phone: ridersJSON });
+      await fetchUser();
+      setShowRiderMigrator(false);
+    } catch (err) {
+      console.error("Failed to migrate legacy riders:", err);
+      alert("Failed to save riders. Please try again.");
+    }
+  };
 
   // Notification States
   const [notifications, setNotifications] = useState([]);
@@ -349,6 +383,56 @@ const MainLayout = () => {
         </div>
         <BottomNav />
       </div>
+
+      {showRiderMigrator && (
+        <div className="fixed inset-0 z-50 bg-[#101828]/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md border border-[#EAECF0] p-6 animate-in scale-in duration-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-[#ECFDF3] text-[#027A48] flex items-center justify-center shrink-0">
+                <AlertTriangle size={20} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[#101828]">Logistics Update</h3>
+                <p className="text-xs text-[#667085]">Add names to your existing riders list</p>
+              </div>
+            </div>
+            
+            <form onSubmit={handleMigrateRiders} className="space-y-4">
+              <div className="max-h-[300px] overflow-y-auto pr-1 space-y-3 custom-scrollbar">
+                {legacyRiders.map((rider, idx) => (
+                  <div key={idx} className="p-3 bg-[#F8F9FC] border border-[#EAECF0] rounded-xl space-y-2">
+                    <label className="text-[10px] font-bold text-[#667085] block">
+                      Rider Phone: {rider.phone}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter Rider Name"
+                      value={rider.name}
+                      onChange={(e) => {
+                        const updated = [...legacyRiders];
+                        updated[idx].name = e.target.value;
+                        setLegacyRiders(updated);
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-[#D0D5DD] rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#1A7A4A] transition-all"
+                      required
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={legacyRiders.some(r => !r.name.trim())}
+                  className="w-full py-2 bg-[#1A7A4A] text-white hover:bg-[#125D37] disabled:bg-[#D0D5DD] disabled:text-[#98A2B3] disabled:cursor-not-allowed rounded-lg transition-all border border-black shadow-[2px_2px_0px_#0A0A0A] font-bold text-xs cursor-pointer text-center"
+                >
+                  Save & Update Riders
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

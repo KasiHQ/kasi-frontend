@@ -10,7 +10,15 @@ const Logistics = () => {
   const [loading, setLoading] = useState(true);
   const [savingRider, setSavingRider] = useState(false);
   const [riders, setRiders] = useState([]);
-  const [newRider, setNewRider] = useState('');
+  
+  // Two input fields for adding riders
+  const [riderName, setRiderName] = useState('');
+  const [riderPhone, setRiderPhone] = useState('');
+
+  // Dispatch assignment modal state
+  const [dispatchItem, setDispatchItem] = useState(null);
+  const [dispatchRiderName, setDispatchRiderName] = useState('');
+  const [dispatchRiderPhone, setDispatchRiderPhone] = useState('');
 
   useEffect(() => {
     fetchConversations();
@@ -18,7 +26,18 @@ const Logistics = () => {
 
   useEffect(() => {
     if (user?.logistics_phone) {
-      setRiders(user.logistics_phone.split(',').map(r => r.trim()).filter(Boolean));
+      const trimmed = user.logistics_phone.trim();
+      if (trimmed.startsWith('[')) {
+        try {
+          setRiders(JSON.parse(trimmed));
+        } catch (e) {
+          console.error("Failed to parse riders list:", e);
+          setRiders([]);
+        }
+      } else {
+        const legacy = trimmed.split(',').map(p => p.trim()).filter(Boolean);
+        setRiders(legacy.map(phone => ({ name: 'Legacy Rider', phone })));
+      }
     } else {
       setRiders([]);
     }
@@ -38,7 +57,7 @@ const Logistics = () => {
   const saveRidersList = async (list) => {
     setSavingRider(true);
     try {
-      const listString = list.join(', ');
+      const listString = JSON.stringify(list);
       await api.patch('/api/auth/profile', { logistics_phone: listString });
       await fetchUser();
     } catch (err) {
@@ -51,10 +70,11 @@ const Logistics = () => {
 
   const handleAddRider = async (e) => {
     e.preventDefault();
-    if (!newRider.trim()) return;
-    const updatedRiders = [...riders, newRider.trim()];
+    if (!riderName.trim() || !riderPhone.trim()) return;
+    const updatedRiders = [...riders, { name: riderName.trim(), phone: riderPhone.trim() }];
     setRiders(updatedRiders);
-    setNewRider('');
+    setRiderName('');
+    setRiderPhone('');
     await saveRidersList(updatedRiders);
   };
 
@@ -64,12 +84,27 @@ const Logistics = () => {
     await saveRidersList(updatedRiders);
   };
 
-  const handleStatusUpdate = async (conversationId, newStatus) => {
+  const handleStatusUpdate = async (conversationId, newStatus, assignedRiderName = null, assignedRiderPhone = null) => {
     try {
-      await conversationAPI.updateStatus(conversationId, { status: newStatus });
+      const payload = { status: newStatus };
+      if (assignedRiderName && assignedRiderPhone) {
+        payload.rider_name = assignedRiderName;
+        payload.rider_phone = assignedRiderPhone;
+      }
+      await conversationAPI.updateStatus(conversationId, payload);
       fetchConversations();
     } catch (err) {
       console.error('Failed to update status:', err);
+    }
+  };
+
+  const handleDispatchClick = (item) => {
+    if (riders.length > 0) {
+      handleStatusUpdate(item.id, 'In Transit');
+    } else {
+      setDispatchItem(item);
+      setDispatchRiderName('');
+      setDispatchRiderPhone('');
     }
   };
 
@@ -149,11 +184,11 @@ const Logistics = () => {
             ) : (
               riders.map((rider, index) => (
                 <div key={index} className="flex items-center gap-1 bg-white border border-gray-200 px-2 py-0.5 rounded-full text-xs font-semibold text-dark shadow-sm">
-                  <span>{rider}</span>
+                  <span>{rider.name} — {rider.phone}</span>
                   <button 
                     type="button"
                     onClick={() => handleDeleteRider(index)}
-                    className="text-gray-400 hover:text-red-500 transition-colors text-[10px] ml-0.5 font-bold"
+                    className="text-gray-400 hover:text-red-500 transition-colors text-[10px] ml-1 font-bold cursor-pointer"
                   >
                     ×
                   </button>
@@ -163,19 +198,31 @@ const Logistics = () => {
           </div>
 
           {/* Add Rider Form */}
-          <form onSubmit={handleAddRider} className="flex gap-2 mt-1">
-            <input
-              type="text"
-              value={newRider}
-              onChange={(e) => setNewRider(e.target.value)}
-              placeholder="Add rider phone (e.g. 080...)"
-              className="w-full px-2.5 py-1 rounded-lg bg-white border border-gray-200 focus:border-green-500 focus:ring-0 transition-all text-xs font-semibold"
-            />
+          <form onSubmit={handleAddRider} className="flex flex-col gap-2 mt-1">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={riderName}
+                onChange={(e) => setRiderName(e.target.value)}
+                placeholder="Rider Name"
+                className="w-1/2 px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 focus:border-green-500 focus:ring-0 transition-all text-xs font-semibold"
+                required
+              />
+              <input
+                type="text"
+                value={riderPhone}
+                onChange={(e) => setRiderPhone(e.target.value)}
+                placeholder="Rider Phone (e.g. 080...)"
+                className="w-1/2 px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 focus:border-green-500 focus:ring-0 transition-all text-xs font-semibold"
+                required
+              />
+            </div>
             <button
               type="submit"
-              className="px-3 py-1 bg-primary hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+              disabled={!riderName.trim() || !riderPhone.trim()}
+              className="w-full py-1.5 bg-primary hover:bg-[#125D37] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all border border-black shadow-[2px_2px_0px_#0A0A0A] cursor-pointer"
             >
-              Add
+              Add Rider
             </button>
           </form>
         </div>
@@ -246,11 +293,17 @@ const Logistics = () => {
                       {/* Action Button */}
                       {col.action && (
                         <button
-                          onClick={() => handleStatusUpdate(item.id, col.action.status)}
+                          onClick={() => {
+                            if (col.color === 'amber') {
+                              handleDispatchClick(item);
+                            } else {
+                              handleStatusUpdate(item.id, col.action.status);
+                            }
+                          }}
                           className={`w-full mt-3 py-2.5 rounded-xl text-sm font-semibold text-white transition-all ${
                             col.color === 'amber'
-                              ? 'bg-primary hover:bg-green-700 shadow-sm shadow-green-200'
-                              : 'bg-blue-500 hover:bg-blue-600 shadow-sm shadow-blue-200'
+                              ? 'bg-primary hover:bg-green-700 shadow-sm shadow-green-200 cursor-pointer'
+                              : 'bg-blue-500 hover:bg-blue-600 shadow-sm shadow-blue-200 cursor-pointer'
                           }`}
                         >
                           {col.action.label}
@@ -271,6 +324,64 @@ const Logistics = () => {
           );
         })}
       </div>
+
+      {dispatchItem && (
+        <div className="fixed inset-0 z-50 bg-[#101828]/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md border border-[#EAECF0] p-6 animate-in scale-in duration-200">
+            <h3 className="text-sm font-bold text-[#101828] mb-1">Rider Assignment</h3>
+            <p className="text-xs text-[#667085] mb-4">No riders are saved in your settings. Please provide the rider details for this delivery:</p>
+            
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!dispatchRiderName.trim() || !dispatchRiderPhone.trim()) return;
+              await handleStatusUpdate(dispatchItem.id, 'In Transit', dispatchRiderName.trim(), dispatchRiderPhone.trim());
+              setDispatchItem(null);
+            }} className="space-y-4">
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[10px] font-bold text-[#667085] block mb-1">Rider Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Chidi"
+                    value={dispatchRiderName}
+                    onChange={(e) => setDispatchRiderName(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#F8F9FC] border border-[#D0D5DD] rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#1A7A4A] transition-all font-semibold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-[#667085] block mb-1">Rider Phone Number</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 08081150873"
+                    value={dispatchRiderPhone}
+                    onChange={(e) => setDispatchRiderPhone(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#F8F9FC] border border-[#D0D5DD] rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#1A7A4A] transition-all font-semibold"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDispatchItem(null)}
+                  className="px-4 py-2 border border-[#EAECF0] hover:bg-gray-50 text-gray-500 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!dispatchRiderName.trim() || !dispatchRiderPhone.trim()}
+                  className="px-4 py-2 bg-[#1A7A4A] hover:bg-[#125D37] text-white rounded-lg text-xs font-bold transition-all border border-black shadow-[2px_2px_0px_#0A0A0A] cursor-pointer"
+                >
+                  Assign & Dispatch
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
