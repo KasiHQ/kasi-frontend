@@ -30,17 +30,15 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   const [codeCopied, setCodeCopied] = useState(false);
 
   // Instagram state
-  const [igUsername, setIgUsername] = useState('');
   const [connectingIG, setConnectingIG] = useState(false);
   const [disconnectingIG, setDisconnectingIG] = useState(false);
-  const [igStatus, setIgStatus] = useState({ connected: false, status: 'disconnected' });
+  const [igStatus, setIgStatus] = useState({ connected: false, status: 'disconnected', pageId: '' });
   const [loadingIG, setLoadingIG] = useState(true);
 
   // Facebook state
-  const [fbPage, setFbPage] = useState('');
   const [connectingFB, setConnectingFB] = useState(false);
   const [disconnectingFB, setDisconnectingFB] = useState(false);
-  const [fbStatus, setFbStatus] = useState({ connected: false, status: 'disconnected' });
+  const [fbStatus, setFbStatus] = useState({ connected: false, status: 'disconnected', pageId: '' });
   const [loadingFB, setLoadingFB] = useState(true);
 
   const pairingCodeRef = useRef(pairingCode);
@@ -59,6 +57,18 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
     }, 5000);
     return () => clearInterval(interval);
   }, [waStatus.connected]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state'); // 'instagram' or 'facebook'
+
+    if (code && (state === 'instagram' || state === 'facebook')) {
+      // Clear query params to prevent reload loop
+      window.history.replaceState({}, document.title, window.location.pathname);
+      completeOAuthConnection(code, state);
+    }
+  }, []);
 
   const fetchTelegramStatus = async () => {
     try {
@@ -87,10 +97,11 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
       const instagramIntegration = integrations.find(int => int.platform === 'instagram');
       setIgStatus({ 
         connected: instagramIntegration?.connection_status === 'connected' && instagramIntegration?.instance_name,
-        status: instagramIntegration?.connection_status || 'disconnected'
+        status: instagramIntegration?.connection_status || 'disconnected',
+        pageId: instagramIntegration?.instance_name || ''
       });
     } catch {
-      setIgStatus({ connected: false, status: 'disconnected' });
+      setIgStatus({ connected: false, status: 'disconnected', pageId: '' });
     } finally { setLoadingIG(false); }
   };
 
@@ -102,10 +113,11 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
       const facebookIntegration = integrations.find(int => int.platform === 'facebook');
       setFbStatus({ 
         connected: facebookIntegration?.connection_status === 'connected' && facebookIntegration?.instance_name,
-        status: facebookIntegration?.connection_status || 'disconnected'
+        status: facebookIntegration?.connection_status || 'disconnected',
+        pageId: facebookIntegration?.instance_name || ''
       });
     } catch {
-      setFbStatus({ connected: false, status: 'disconnected' });
+      setFbStatus({ connected: false, status: 'disconnected', pageId: '' });
     } finally { setLoadingFB(false); }
   };
 
@@ -169,50 +181,63 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
     setTimeout(() => setCodeCopied(false), 2000);
   };
 
-  const connectInstagram = async () => {
-    if (!igUsername.trim()) { addToast('Please enter your Instagram username', 'error'); return; }
-    setConnectingIG(true);
-    try {
-      await api.post('/api/whatsapp/instagram/connect', { instagram_username: igUsername.trim() });
-      setIgStatus({ connected: true, status: 'In Progress' });
-      setIgUsername('');
-      addToast('Instagram instance created!', 'success');
-    } catch (err) {
-      addToast(err.response?.data?.error || 'Failed to connect', 'error');
-    } finally { setConnectingIG(false); }
+  const handleFacebookAuth = (platform) => {
+    const clientId = '2200339807370917';
+    const redirectUri = window.location.origin + '/settings';
+    const scope = 'pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages,pages_read_engagement';
+    const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=code&state=${platform}`;
+    window.location.href = authUrl;
   };
+
+  const connectInstagram = () => handleFacebookAuth('instagram');
 
   const disconnectInstagram = async () => {
     if (!confirm('Disconnect Instagram?')) return;
     setDisconnectingIG(true);
     try {
-      await api.post('/api/whatsapp/disconnect');
-      setIgStatus({ connected: false, status: 'disconnected' });
-      addToast('Instagram disconnected', 'success');
-    } catch { addToast('Failed to disconnect', 'error'); } finally { setDisconnectingIG(false); }
+      await api.delete('/api/meta/disconnect', { data: { platform: 'instagram' } });
+      setIgStatus({ connected: false, status: 'disconnected', pageId: '' });
+      addToast('Instagram disconnected successfully', 'success');
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to disconnect', 'error');
+    } finally { setDisconnectingIG(false); }
   };
 
-  const connectFacebook = async () => {
-    if (!fbPage.trim()) { addToast('Please enter your Facebook page name', 'error'); return; }
-    setConnectingFB(true);
-    try {
-      await api.post('/api/whatsapp/facebook/connect', { facebook_page: fbPage.trim() });
-      setFbStatus({ connected: true, status: 'In Progress' });
-      setFbPage('');
-      addToast('Facebook instance created!', 'success');
-    } catch (err) {
-      addToast(err.response?.data?.error || 'Failed to connect', 'error');
-    } finally { setConnectingFB(false); }
-  };
+  const connectFacebook = () => handleFacebookAuth('facebook');
 
   const disconnectFacebook = async () => {
-    if (!confirm('Disconnect Facebook?')) return;
+    if (!confirm('Disconnect Facebook Messenger?')) return;
     setDisconnectingFB(true);
     try {
-      await api.post('/api/whatsapp/disconnect');
-      setFbStatus({ connected: false, status: 'disconnected' });
-      addToast('Facebook disconnected', 'success');
-    } catch { addToast('Failed to disconnect', 'error'); } finally { setDisconnectingFB(false); }
+      await api.delete('/api/meta/disconnect', { data: { platform: 'facebook' } });
+      setFbStatus({ connected: false, status: 'disconnected', pageId: '' });
+      addToast('Facebook Messenger disconnected successfully', 'success');
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to disconnect', 'error');
+    } finally { setDisconnectingFB(false); }
+  };
+
+  const completeOAuthConnection = async (code, platform) => {
+    if (platform === 'instagram') setConnectingIG(true);
+    else setConnectingFB(true);
+
+    try {
+      const redirectUri = window.location.origin + '/settings';
+      await api.post('/api/meta/oauth/callback', {
+        code,
+        platform,
+        redirect_uri: redirectUri
+      });
+      addToast(`${platform === 'instagram' ? 'Instagram' : 'Facebook Messenger'} connected successfully!`, 'success');
+      
+      if (platform === 'instagram') fetchInstagramStatus();
+      else fetchFacebookStatus();
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to complete connection', 'error');
+    } finally {
+      setConnectingIG(false);
+      setConnectingFB(false);
+    }
   };
 
   const formatCode = (code) => {
@@ -357,19 +382,30 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
               <div className="bg-pink-50 dark:bg-pink-500/10 border border-pink-200 dark:border-pink-500/20 rounded-2xl p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-pink-100 dark:bg-pink-500/20 rounded-lg text-pink-700 dark:text-pink-400"><CheckCircle size={18} /></div>
-                  <p className="font-bold text-pink-800 dark:text-pink-300 text-sm">Instagram Connected!</p>
+                  <div>
+                    <p className="font-bold text-pink-800 dark:text-pink-300 text-sm">Instagram is active!</p>
+                    {igStatus.pageId && <p className="text-xs text-pink-600 dark:text-pink-400 mt-0.5">Account ID: {igStatus.pageId}</p>}
+                  </div>
                 </div>
               </div>
-              <button onClick={disconnectInstagram} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors">
-                Disconnect Instagram
+              <button onClick={disconnectInstagram} disabled={disconnectingIG} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
+                {disconnectingIG ? 'Disconnecting...' : 'Disconnect Instagram'}
               </button>
             </div>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input type="text" value={igUsername} onChange={(e) => setIgUsername(e.target.value)} placeholder="Instagram username" className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm outline-none focus:border-primary" />
-              <button onClick={connectInstagram} disabled={connectingIG || !igUsername.trim()} className="px-6 py-2 bg-pink-500 text-white rounded-xl text-sm font-medium hover:bg-pink-600 disabled:opacity-50">
-                {connectingIG ? 'Connecting...' : 'Connect'}
-              </button>
+            <div className="space-y-4">
+              {connectingIG ? (
+                <div className="flex items-center gap-2 text-pink-500 text-sm py-4 justify-center font-medium">
+                  <Loader2 size={18} className="animate-spin text-pink-500" /> Authenticating & linking Instagram...
+                </div>
+              ) : (
+                <button 
+                  onClick={connectInstagram} 
+                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md shadow-pink-500/10 flex items-center justify-center gap-2"
+                >
+                  <Zap size={16} /> Connect with Facebook
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -400,19 +436,30 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
               <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-2xl p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-700 dark:text-blue-400"><CheckCircle size={18} /></div>
-                  <p className="font-bold text-blue-800 dark:text-blue-300 text-sm">Facebook Connected!</p>
+                  <div>
+                    <p className="font-bold text-blue-800 dark:text-blue-300 text-sm">Facebook Messenger is active!</p>
+                    {fbStatus.pageId && <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">Page ID: {fbStatus.pageId}</p>}
+                  </div>
                 </div>
               </div>
-              <button onClick={disconnectFacebook} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors">
-                Disconnect Facebook
+              <button onClick={disconnectFacebook} disabled={disconnectingFB} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
+                {disconnectingFB ? 'Disconnecting...' : 'Disconnect Facebook'}
               </button>
             </div>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input type="text" value={fbPage} onChange={(e) => setFbPage(e.target.value)} placeholder="Facebook Page name" className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm outline-none focus:border-primary" />
-              <button onClick={connectFacebook} disabled={connectingFB || !fbPage.trim()} className="px-6 py-2 bg-blue-700 text-white rounded-xl text-sm font-medium hover:bg-blue-800 disabled:opacity-50">
-                {connectingFB ? 'Connecting...' : 'Connect'}
-              </button>
+            <div className="space-y-4">
+              {connectingFB ? (
+                <div className="flex items-center gap-2 text-blue-600 text-sm py-4 justify-center font-medium">
+                  <Loader2 size={18} className="animate-spin text-blue-600" /> Authenticating & linking Page...
+                </div>
+              ) : (
+                <button 
+                  onClick={connectFacebook} 
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md shadow-blue-500/10 flex items-center justify-center gap-2"
+                >
+                  <Zap size={16} /> Connect with Facebook
+                </button>
+              )}
             </div>
           )}
         </div>
