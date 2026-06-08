@@ -53,6 +53,15 @@ const MainLayout = () => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationTab, setNotificationTab] = useState('all');
+
+  const filteredNotifications = notifications.filter(noti => {
+    if (notificationTab === 'all') return true;
+    if (notificationTab === 'unread') return !noti.is_read;
+    if (notificationTab === 'attention') return noti.type === 'attention_needed';
+    if (notificationTab === 'paid') return noti.type === 'invoice_paid';
+    return true;
+  });
 
   const fetchNotifications = async () => {
     try {
@@ -290,82 +299,7 @@ const MainLayout = () => {
                   )}
                 </button>
                 
-                {showNotifications && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-40 bg-transparent" 
-                      onClick={() => setShowNotifications(false)}
-                    />
-                    <div className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-md border border-[#EAECF0] rounded-2xl shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                      {/* header */}
-                      <div className="px-4 py-3 border-b border-[#EAECF0] flex items-center justify-between select-none">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-[#101828]">Notifications</span>
-                          {unreadCount > 0 && (
-                            <span className="bg-[#1A7A4A] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0">
-                              {unreadCount}
-                            </span>
-                          )}
-                        </div>
-                        {unreadCount > 0 && (
-                          <button 
-                            onClick={handleMarkAllAsRead}
-                            className="text-[10px] font-semibold text-[#1A7A4A] hover:underline cursor-pointer"
-                          >
-                            Mark all as read
-                          </button>
-                        )}
-                      </div>
-
-                      {/* list */}
-                      <div className="max-h-[300px] overflow-y-auto divide-y divide-[#EAECF0] custom-scrollbar">
-                        {notifications.length === 0 ? (
-                          <div className="py-8 px-4 text-center text-[#667085] text-xs font-medium select-none">
-                            No notifications yet
-                          </div>
-                        ) : (
-                          notifications.map(noti => {
-                            const Icon = noti.type === 'invoice_paid' ? DollarSign 
-                                       : noti.type === 'booking_created' ? Calendar
-                                       : noti.type === 'attention_needed' ? AlertTriangle
-                                       : Bell;
-                            const bgClass = noti.type === 'invoice_paid' ? 'bg-[#ECFDF3] text-[#027A48]'
-                                          : noti.type === 'booking_created' ? 'bg-[#F4F3FF] text-[#7A5AF8]'
-                                          : noti.type === 'attention_needed' ? 'bg-[#FFFAEB] text-[#B54708]'
-                                          : 'bg-[#F2F4F7] text-[#667085]';
-                            return (
-                              <div 
-                                key={noti.id}
-                                onClick={() => handleNotificationClick(noti)}
-                                className={`px-4 py-3 hover:bg-[#F8F9FC] transition-colors cursor-pointer flex gap-3 ${!noti.is_read ? 'bg-[#F8F9FC]/60' : ''}`}
-                              >
-                                <div className={`w-8 h-8 rounded-full ${bgClass} flex items-center justify-center shrink-0`}>
-                                  <Icon size={14} />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-start justify-between gap-1">
-                                    <p className={`text-xs truncate ${!noti.is_read ? 'font-bold text-[#101828]' : 'font-semibold text-[#344054]'}`}>
-                                      {noti.title}
-                                    </p>
-                                    {!noti.is_read && (
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#12B76A] shrink-0 mt-1" />
-                                    )}
-                                  </div>
-                                  <p className="text-[11px] text-[#667085] mt-0.5 line-clamp-2 leading-relaxed">
-                                    {noti.message}
-                                  </p>
-                                  <span className="text-[10px] text-[#98A2B3] mt-1 block">
-                                    {formatTimeAgo(noti.created_at)}
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
+                {/* Dropdown removed - now handled via Off-Canvas */}
               </div>
               
               {/* Avatar (32px circle) */}
@@ -383,6 +317,138 @@ const MainLayout = () => {
         </div>
         <BottomNav />
       </div>
+
+      {/* Notifications Off-Canvas Panel */}
+      {showNotifications && (
+        <>
+          {/* Backdrop/Overlay */}
+          <div 
+            className="fixed inset-0 z-50 bg-[#101828]/45 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
+            onClick={() => setShowNotifications(false)}
+          />
+          {/* Off-canvas Panel */}
+          <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-[#EAECF0] shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-350 ease-out">
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-[#EAECF0] flex items-center justify-between select-none">
+              <div>
+                <h2 className="text-base font-extrabold text-[#101828] flex items-center gap-2">
+                  <Bell size={18} className="text-[#1A7A4A]" />
+                  Notifications
+                  {unreadCount > 0 && (
+                    <span className="bg-[#1A7A4A] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0">
+                      {unreadCount}
+                    </span>
+                  )}
+                </h2>
+                <p className="text-xs text-[#667085] mt-0.5">Stay updated with customer activity and system alerts</p>
+              </div>
+              <div className="flex items-center gap-3">
+                {unreadCount > 0 && (
+                  <button 
+                    onClick={handleMarkAllAsRead}
+                    className="text-xs font-bold text-[#1A7A4A] hover:text-[#0F5533] cursor-pointer hover:underline"
+                  >
+                    Mark all read
+                  </button>
+                )}
+                <button 
+                  onClick={() => setShowNotifications(false)}
+                  className="p-1.5 hover:bg-[#F2F4F7] rounded-lg text-[#667085] hover:text-[#101828] transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Compartment Tabs: all | unread | attention | paid */}
+            <div className="px-6 py-3 border-b border-[#EAECF0] bg-[#F8F9FC] flex gap-1.5 overflow-x-auto select-none no-scrollbar">
+              {[
+                { id: 'all', label: 'All' },
+                { id: 'unread', label: 'Unread', count: unreadCount },
+                { id: 'attention', label: 'Attention', count: notifications.filter(n => !n.is_read && n.type === 'attention_needed').length },
+                { id: 'paid', label: 'Invoice Paid', count: notifications.filter(n => !n.is_read && n.type === 'invoice_paid').length }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setNotificationTab(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                    notificationTab === tab.id
+                      ? 'bg-white text-[#1A7A4A] shadow-sm border border-[#EAECF0]'
+                      : 'text-[#667085] hover:text-[#101828] hover:bg-[#EAECF0]/50'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    {tab.label}
+                    {tab.count > 0 && (
+                      <span className="bg-[#12B76A]/15 text-[#1A7A4A] text-[9px] font-extrabold px-1.5 py-0.5 rounded-md">
+                        {tab.count}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Notification Items List */}
+            <div className="flex-1 overflow-y-auto divide-y divide-[#EAECF0] custom-scrollbar">
+              {filteredNotifications.length === 0 ? (
+                <div className="py-24 px-6 text-center text-[#667085] flex flex-col items-center justify-center space-y-3 select-none">
+                  <div className="w-12 h-12 rounded-full bg-[#F2F4F7] flex items-center justify-center">
+                    <Bell size={20} className="text-[#98A2B3]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#344054]">No notifications found</p>
+                    <p className="text-xs text-[#667085] mt-1">
+                      {notificationTab === 'unread' ? "You have read all notifications."
+                       : notificationTab === 'attention' ? "No alerts requiring attention."
+                       : notificationTab === 'paid' ? "No invoice payment events."
+                       : "Check back later for client activity."}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                filteredNotifications.map(noti => {
+                  const Icon = noti.type === 'invoice_paid' ? DollarSign 
+                             : noti.type === 'booking_created' ? Calendar
+                             : noti.type === 'attention_needed' ? AlertTriangle
+                             : Bell;
+                  const bgClass = noti.type === 'invoice_paid' ? 'bg-[#ECFDF3] text-[#027A48]'
+                                : noti.type === 'booking_created' ? 'bg-[#F4F3FF] text-[#7A5AF8]'
+                                : noti.type === 'attention_needed' ? 'bg-[#FFFAEB] text-[#B54708]'
+                                : 'bg-[#F2F4F7] text-[#667085]';
+                  return (
+                    <div 
+                      key={noti.id}
+                      onClick={() => handleNotificationClick(noti)}
+                      className={`px-6 py-4 hover:bg-[#F8F9FC] transition-colors cursor-pointer flex gap-4 ${!noti.is_read ? 'bg-[#F8F9FC]/40' : ''}`}
+                    >
+                      <div className={`w-9 h-9 rounded-xl ${bgClass} flex items-center justify-center shrink-0`}>
+                        <Icon size={16} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-1">
+                          <p className={`text-xs leading-normal ${!noti.is_read ? 'font-extrabold text-[#101828]' : 'font-bold text-[#344054]'}`}>
+                            {noti.title}
+                          </p>
+                          {!noti.is_read && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#12B76A] shrink-0 mt-1" />
+                          )}
+                        </div>
+                        <p className="text-[11px] text-[#667085] mt-1 leading-relaxed">
+                          {noti.message}
+                        </p>
+                        <span className="text-[10px] text-[#98A2B3] mt-2 block font-medium">
+                          {formatTimeAgo(noti.created_at)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {showRiderMigrator && (
         <div className="fixed inset-0 z-50 bg-[#101828]/60 backdrop-blur-sm flex items-center justify-center p-4">
