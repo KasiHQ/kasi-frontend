@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Check, Mail, Lock, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
-import { PRELAUNCH_WAITLIST_MODE } from '../../../config';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,14 +15,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  useEffect(() => {
-    if (PRELAUNCH_WAITLIST_MODE) {
-      const isBypass = searchParams.get('admin') === 'true' || searchParams.get('bypass') === 'true';
-      if (!isBypass) {
-        navigate('/', { replace: true });
-      }
-    }
-  }, [searchParams, navigate]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
