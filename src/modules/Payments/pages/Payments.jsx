@@ -7,7 +7,7 @@ import { getLocalInvoices, addInvoiceToLocal } from '../../../db/db';
 import { 
   Search, CheckCircle, Calendar, ArrowUpRight, Eye, CreditCard, 
   ShieldCheck, Landmark, DollarSign, Wallet, FileText, 
-  RefreshCw, Clock, XCircle, ArrowRightLeft, HelpCircle
+  RefreshCw, Clock, XCircle, ArrowRightLeft, HelpCircle, X
 } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import DetailModal from '../../../components/ui/DetailModal';
@@ -545,17 +545,40 @@ const Payments = () => {
         )}
       </div>
 
-      {/* Invoice Detail Modal */}
-      <DetailModal
-        isOpen={!!selectedInvoice}
-        onClose={() => setSelectedInvoice(null)}
-        title="Transaction Breakdown"
-        subtitle={selectedInvoice?.reference}
-        icon={CreditCard}
-        accentColor="primary"
-      >
-        <PaymentDetail invoice={selectedInvoice} user={user} />
-      </DetailModal>
+      {/* Transaction Detail Off-Canvas */}
+      {selectedInvoice && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-50 bg-[#101828]/40 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
+            onClick={() => setSelectedInvoice(null)}
+          />
+          {/* Off-canvas Panel */}
+          <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-900 border-l border-gray-150 dark:border-gray-800 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-350 ease-out">
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between select-none">
+              <div>
+                <h2 className="text-base font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
+                  <CreditCard size={18} className="text-primary dark:text-emerald-400" />
+                  Transaction Breakdown
+                </h2>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Reference: {selectedInvoice.reference}</p>
+              </div>
+              <button 
+                onClick={() => setSelectedInvoice(null)}
+                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+              <PaymentDetail invoice={selectedInvoice} user={user} />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
