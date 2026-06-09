@@ -107,13 +107,14 @@ const AdminUsers = () => {
                         <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined Date</th>
                         <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">Invoices</th>
                         <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Credits</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subscription</th>
                         <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Revenue</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {filteredUsers.length === 0 ? (
                         <tr>
-                            <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                            <td colSpan="8" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                 No users found matching your search.
                             </td>
                         </tr>
@@ -136,6 +137,18 @@ const AdminUsers = () => {
                                     <span className={`px-3 py-1 rounded-full ${u.kasi_credits < 0 ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
                                         {u.kasi_credits}
                                     </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-750 dark:text-gray-300">
+                                  <span className="capitalize">{u.subscription_tier ? u.subscription_tier.replace('_', ' ') : 'Free Trial'}</span>
+                                  <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-bold border ${
+                                    u.subscription_status === 'active' 
+                                      ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400' 
+                                      : u.subscription_status === 'trialing'
+                                      ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400'
+                                      : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400'
+                                  }`}>
+                                    {u.subscription_status || 'Trialing'}
+                                  </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600 dark:text-gray-400">{formatNaira(u.total_revenue)}</td>
                             </tr>

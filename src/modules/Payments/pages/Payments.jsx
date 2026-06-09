@@ -24,17 +24,17 @@ const SplitLedgerCard = ({ total, fee, bankName, accNumber }) => {
       <div className="space-y-2.5">
         {/* Total Collected */}
         <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-500 dark:text-gray-400 font-medium">Customer Payment (Gross)</span>
+          <span className="text-gray-500 dark:text-gray-400 font-medium">Customer Payment (Gross Total)</span>
           <span className="font-semibold text-gray-900 dark:text-white">₦{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
 
         {/* 2% Kasi platform Fee */}
         <div className="flex justify-between items-center text-sm">
           <div className="flex items-center gap-1.5">
-            <span className="text-gray-500 dark:text-gray-400 font-medium">Kasi platform Fee (2%)</span>
+            <span className="text-gray-500 dark:text-gray-400 font-medium">Platform Fee (Paid by Customer)</span>
             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800/50">Auto Routing</span>
           </div>
-          <span className="font-semibold text-red-600 dark:text-red-400">-₦{fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          <span className="font-semibold text-gray-600 dark:text-gray-300">₦{fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
 
         <div className="border-t border-dashed border-gray-200 dark:border-gray-700 my-2" />
@@ -42,8 +42,8 @@ const SplitLedgerCard = ({ total, fee, bankName, accNumber }) => {
         {/* 98% Merchant Net Payout */}
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Instant Vendor Settlement (98%)</span>
-            <span className="text-[10px] text-gray-400 dark:text-gray-500">Dispatched immediately by Paystack</span>
+            <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Instant Vendor Revenue (100% of Product Price)</span>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">100% of product price settled directly</span>
           </div>
           <span className="text-base font-extrabold text-primary dark:text-emerald-400">₦{net.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
@@ -189,10 +189,9 @@ const Payments = () => {
           console.error('API Error, falling back to local DB:', apiError);
           data = await getLocalInvoices();
         }
-      } else {
-        data = await getLocalInvoices();
-      }
-      setInvoices(data);
+      // Filter out non-paid invoices for this Finance Audit view
+      const paidData = data.filter(inv => inv.status === 'Paid');
+      setInvoices(paidData);
     } catch (error) {
       console.error('Error fetching invoices:', error);
       if (error.response && error.response.status === 401) {
@@ -292,7 +291,7 @@ const Payments = () => {
             <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary dark:bg-emerald-950/50 dark:text-emerald-400 flex items-center justify-center">
               <DollarSign size={16} />
             </div>
-            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Gross GMV</p>
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Gross Sales (GMV)</p>
           </div>
           <p className="text-2xl font-extrabold text-gray-900 dark:text-white">₦{totalGrossRevenue.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
         </div>
@@ -304,33 +303,33 @@ const Payments = () => {
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 flex items-center justify-center">
               <ShieldCheck size={16} />
             </div>
-            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Direct Net earnings</p>
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Direct Vendor Revenue (100%)</p>
           </div>
           <p className="text-2xl font-extrabold text-primary dark:text-emerald-400">₦{netVendorEarnings.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
         </div>
 
         {/* Platform Fees */}
         <div className="bg-gradient-to-tr from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-850 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500" />
           <div className="flex items-center gap-3.5 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 dark:bg-red-950/20 dark:text-red-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary dark:bg-emerald-950/50 dark:text-emerald-400 flex items-center justify-center">
               <Wallet size={16} />
             </div>
-            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Platform Commission (2%)</p>
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Platform Fees (Paid by Customer)</p>
           </div>
           <p className="text-2xl font-extrabold text-gray-900 dark:text-white">₦{totalPlatformFees.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
         </div>
 
-        {/* Pending Settlements */}
+        {/* Paid Orders Count */}
         <div className="bg-gradient-to-tr from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-850 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500" />
           <div className="flex items-center gap-3.5 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 dark:bg-amber-950/20 dark:text-amber-400 flex items-center justify-center">
-              <Clock size={16} />
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 flex items-center justify-center">
+              <CheckCircle size={16} />
             </div>
-            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Pending Settlement</p>
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Paid Orders</p>
           </div>
-          <p className="text-2xl font-extrabold text-gray-900 dark:text-white">₦{pendingSettlementVal.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-extrabold text-gray-900 dark:text-white">{paidInvoices.length}</p>
         </div>
       </div>
 
@@ -368,34 +367,17 @@ const Payments = () => {
 
           {/* Filtering Controls */}
           {activeTab === 'audit' && (
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
+            <div className="flex gap-3 w-full sm:w-auto shrink-0">
               {/* Search Bar */}
-              <div className="relative">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                 <input
                   type="text"
                   placeholder="Search ref or client..."
-                  className="w-full sm:w-48 pl-9 pr-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 dark:text-white transition-all shadow-sm"
+                  className="w-full pl-9 pr-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 dark:text-white transition-all shadow-sm"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-              </div>
-
-              {/* Status Selectors */}
-              <div className="flex border border-gray-100 dark:border-gray-700 p-0.5 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
-                {['ALL', 'Paid', 'Pending'].map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all ${
-                      statusFilter === st
-                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white shadow-xs'
-                        : 'text-gray-400 dark:text-gray-500 hover:text-gray-600'
-                    }`}
-                  >
-                    {st}
-                  </button>
-                ))}
               </div>
             </div>
           )}
@@ -410,18 +392,19 @@ const Payments = () => {
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Reference</th>
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Customer</th>
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Date Issued</th>
-                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Commission (2%)</th>
-                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Total Amount</th>
+                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Platform Fee (2%)</th>
+                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Vendor Revenue</th>
+                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Customer Paid</th>
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-center">Status</th>
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-center">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-700/40">
                 {loading ? (
-                  <TableSkeleton rows={5} cols={7} />
+                  <TableSkeleton rows={5} cols={8} />
                 ) : filteredInvoices.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="text-center py-16 text-gray-400 dark:text-gray-500">
+                    <td colSpan="8" className="text-center py-16 text-gray-400 dark:text-gray-500">
                       <FileText size={38} className="mx-auto text-gray-200 dark:text-gray-750 mb-3" />
                       <p className="text-sm font-bold text-gray-700 dark:text-gray-300">No matching audit logs found</p>
                       <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Try refining your search terms or filters.</p>
@@ -431,6 +414,7 @@ const Payments = () => {
                   filteredInvoices.map((inv) => {
                     const isPaid = inv.status === 'Paid';
                     const fee = inv.platform_fee || (inv.total_amount * 0.02);
+                    const vendorNet = inv.total_amount - fee;
                     return (
                       <tr 
                         key={inv.id} 
@@ -440,15 +424,18 @@ const Payments = () => {
                         <td className="px-6 py-4 font-mono text-xs font-bold text-gray-800 dark:text-gray-200">{inv.reference}</td>
                         <td className="px-6 py-4 text-gray-600 dark:text-gray-300 text-sm font-semibold">{inv.customer?.name || 'Walk-in Customer'}</td>
                         <td className="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs font-medium">
-                          <div className="flex items-center gap-2">
-                            <Calendar size={13} />
-                            {inv.date_issued}
-                          </div>
+                           <div className="flex items-center gap-2">
+                             <Calendar size={13} />
+                             {inv.date_issued}
+                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right text-xs font-mono font-bold text-red-500 dark:text-red-400">
-                          -₦{fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <td className="px-6 py-4 text-right text-xs font-mono font-bold text-gray-500 dark:text-gray-400">
+                          ₦{fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                         <td className="px-6 py-4 text-right text-sm font-extrabold text-gray-850 dark:text-white">
+                          ₦{vendorNet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td className="px-6 py-4 text-right text-sm font-bold text-gray-700 dark:text-gray-300">
                           ₦{inv.total_amount?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                         <td className="px-6 py-4 text-center">
@@ -488,8 +475,8 @@ const Payments = () => {
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Settlement Date</th>
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Audit Ref</th>
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Split Account</th>
-                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Commission (2%)</th>
-                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Payout Amount (98%)</th>
+                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Platform Fee (2%)</th>
+                  <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-right">Vendor Payout (100% of product price)</th>
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider text-center">Payout Routing</th>
                 </tr>
               </thead>
@@ -524,8 +511,8 @@ const Payments = () => {
                         <td className="px-6 py-4 text-gray-600 dark:text-gray-300 text-xs font-mono font-bold">
                           {user?.bank_name ? `Paystack Split [${user.bank_name.slice(0,4).toUpperCase()}]` : 'Checkout Default'}
                         </td>
-                        <td className="px-6 py-4 text-right text-xs font-mono font-bold text-red-500 dark:text-red-400">
-                          -₦{fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <td className="px-6 py-4 text-right text-xs font-mono font-bold text-gray-500 dark:text-gray-400">
+                          ₦{fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                         <td className="px-6 py-4 text-right text-sm font-extrabold text-primary dark:text-emerald-400">
                           ₦{netPayout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
