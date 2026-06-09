@@ -189,6 +189,9 @@ const Payments = () => {
           console.error('API Error, falling back to local DB:', apiError);
           data = await getLocalInvoices();
         }
+      } else {
+        data = await getLocalInvoices();
+      }
       // Filter out non-paid invoices for this Finance Audit view
       const paidData = data.filter(inv => inv.status === 'Paid');
       setInvoices(paidData);
