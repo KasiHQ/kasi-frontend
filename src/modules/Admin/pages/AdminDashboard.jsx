@@ -893,6 +893,7 @@ const AdminDashboard = () => {
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Business Name</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Staff Email</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Credits</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Subscription</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Admin Status</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Account Status</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Joined</th>
@@ -901,7 +902,7 @@ const AdminDashboard = () => {
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan="8" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                     No active accounts resolved.
                   </td>
                 </tr>
@@ -916,8 +917,8 @@ const AdminDashboard = () => {
                     className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-all cursor-pointer animate-in fade-in"
                     style={{ animationDelay: `${i * 30}ms` }}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-black text-gray-950 dark:text-gray-300">#{u.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-950 dark:text-white">{u.business_name || 'Vendor Profile'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-black text-gray-955 dark:text-gray-300">#{u.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-955 dark:text-white">{u.business_name || 'Vendor Profile'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{u.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold">
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${
@@ -926,6 +927,18 @@ const AdminDashboard = () => {
                           : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30'
                       }`}>
                         {u.kasi_credits}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <span className="capitalize">{u.subscription_tier ? u.subscription_tier.replace('_', ' ') : 'Free Trial'}</span>
+                      <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-bold border ${
+                        u.subscription_status === 'active' 
+                          ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400' 
+                          : u.subscription_status === 'trialing'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400'
+                          : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400'
+                      }`}>
+                        {u.subscription_status || 'Trialing'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">

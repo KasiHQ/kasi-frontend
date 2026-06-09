@@ -9,9 +9,16 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
   const [confirmDelete, setConfirmDelete] = useState(0); // 0 = none, 1 = step 1, 2 = step 2
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Manual Subscription state variables
+  const [isEditingSub, setIsEditingSub] = useState(false);
+  const [subForm, setSubForm] = useState({ tier: 'free_trial', type: 'product', status: 'trialing', days: 30 });
+  const [subFormLoading, setSubFormLoading] = useState(false);
+  const [subFormError, setSubFormError] = useState(null);
+
   useEffect(() => {
     if (!isOpen || !userId) {
       setConfirmDelete(0);
+      setIsEditingSub(false);
       return;
     }
 
@@ -86,6 +93,35 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
       } catch (err) {
           setError(err.response?.data?.message || "Failed to impersonate user.");
       }
+  };
+
+  const handleSubSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setSubFormLoading(true);
+      setSubFormError(null);
+      const res = await api.post(`/api/kasisalienceadministration/users/${userId}/manual-subscription`, {
+        tier: subForm.tier,
+        type: subForm.type,
+        status: subForm.status,
+        days: subForm.days
+      });
+      if (res.data.status === 'success') {
+        setIsEditingSub(false);
+        // Direct state update so we see changes immediately without full modal refetch
+        setData(prev => ({
+          ...prev,
+          subscription_tier: subForm.tier,
+          subscription_type: subForm.type,
+          subscription_status: subForm.status,
+          subscription_expires_at: new Date(Date.now() + subForm.days * 24 * 60 * 60 * 1000).toISOString()
+        }));
+      }
+    } catch (err) {
+      setSubFormError(err.response?.data?.message || "Failed to update subscription");
+    } finally {
+      setSubFormLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -166,6 +202,147 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
                     <Trash2 size={16} /> Delete User
                   </button>
                 </div>
+              </div>
+
+              {/* Subscription Management Card */}
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700/60 shadow-sm space-y-4">
+                <div className="flex justify-between items-center border-b border-gray-50 dark:border-gray-800 pb-2">
+                  <h4 className="font-bold text-gray-905 dark:text-white flex items-center gap-2">
+                    <Package className="text-green-600 animate-pulse" size={18} />
+                    Subscription Plan Details
+                  </h4>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                    data.subscription_status === 'active' 
+                      ? 'bg-green-150 text-green-750 dark:bg-green-950/30 dark:text-green-400' 
+                      : data.subscription_status === 'trialing'
+                      ? 'bg-blue-150 text-blue-750 dark:bg-blue-950/30 dark:text-blue-400'
+                      : 'bg-red-150 text-red-750 dark:bg-red-950/30 dark:text-red-400'
+                  }`}>
+                    {data.subscription_status ? data.subscription_status.toUpperCase() : 'INACTIVE'}
+                  </span>
+                </div>
+
+                {!isEditingSub ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-1">
+                      <p className="text-gray-400 text-xs">Plan Tier</p>
+                      <p className="font-semibold text-gray-850 dark:text-gray-200 capitalize">
+                        {data.subscription_tier ? data.subscription_tier.replace('_', ' ') : 'Free Trial'}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-gray-400 text-xs">Plan Type</p>
+                      <p className="font-semibold text-gray-850 dark:text-gray-200 capitalize">
+                        {data.subscription_type || 'Product'}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-gray-400 text-xs">Expires At</p>
+                      <p className="font-semibold text-gray-850 dark:text-gray-200">
+                        {data.subscription_expires_at 
+                          ? new Date(data.subscription_expires_at).toLocaleString() 
+                          : 'Never'}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-gray-400 text-xs">Status</p>
+                      <p className="font-semibold text-gray-850 dark:text-gray-200 capitalize">
+                        {data.subscription_status || 'Trialing'}
+                      </p>
+                    </div>
+                    
+                    <button 
+                      onClick={() => {
+                        setSubForm({
+                          tier: data.subscription_tier || 'free_trial',
+                          type: data.subscription_type || 'product',
+                          status: data.subscription_status || 'trialing',
+                          days: 30
+                        });
+                        setIsEditingSub(true);
+                      }}
+                      className="col-span-1 sm:col-span-2 mt-2 py-2 w-full text-center border border-green-600 hover:bg-green-700 hover:text-white dark:hover:bg-green-950/20 text-green-600 rounded-xl font-bold transition-all text-xs"
+                    >
+                      Modify Plan Override
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubSubmit} className="space-y-4 text-xs font-semibold">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-gray-400 mb-1">Tier</label>
+                        <select 
+                          value={subForm.tier} 
+                          onChange={(e) => setSubForm({ ...subForm, tier: e.target.value })}
+                          className="w-full p-2.5 border rounded-xl dark:bg-gray-800 dark:border-gray-750 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500"
+                        >
+                          <option value="free_trial">Free Trial</option>
+                          <option value="starter">Starter Plan</option>
+                          <option value="growth">Growth Plan</option>
+                          <option value="premium">Premium Plan</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-gray-400 mb-1">Type</label>
+                        <select 
+                          value={subForm.type} 
+                          onChange={(e) => setSubForm({ ...subForm, type: e.target.value })}
+                          className="w-full p-2.5 border rounded-xl dark:bg-gray-800 dark:border-gray-750 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500"
+                        >
+                          <option value="product">Product</option>
+                          <option value="service">Service</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-400 mb-1">Status</label>
+                        <select 
+                          value={subForm.status} 
+                          onChange={(e) => setSubForm({ ...subForm, status: e.target.value })}
+                          className="w-full p-2.5 border rounded-xl dark:bg-gray-800 dark:border-gray-750 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500"
+                        >
+                          <option value="active">Active</option>
+                          <option value="trialing">Trialing</option>
+                          <option value="past_due">Past Due</option>
+                          <option value="cancelled">Cancelled</option>
+                          <option value="expired">Expired</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-400 mb-1">Duration (Days)</label>
+                        <input 
+                          type="number" 
+                          value={subForm.days} 
+                          onChange={(e) => setSubForm({ ...subForm, days: parseInt(e.target.value) || 30 })}
+                          className="w-full p-2.5 border rounded-xl dark:bg-gray-800 dark:border-gray-750 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500"
+                          min="1"
+                        />
+                      </div>
+                    </div>
+
+                    {subFormError && <p className="text-red-500 text-xs">{subFormError}</p>}
+
+                    <div className="flex gap-3 pt-2">
+                      <button 
+                        type="button" 
+                        onClick={() => setIsEditingSub(false)}
+                        className="flex-1 py-2.5 text-center bg-gray-100 hover:bg-gray-200 text-gray-750 dark:bg-gray-800 dark:hover:bg-gray-750 dark:text-gray-300 rounded-xl transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit" 
+                        disabled={subFormLoading}
+                        className="flex-1 py-2.5 text-center bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors flex justify-center items-center gap-1 disabled:opacity-50"
+                      >
+                        {subFormLoading && <Loader2 size={12} className="animate-spin" />}
+                        Apply Changes
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
