@@ -360,14 +360,19 @@ const LandingPage = () => {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <Link to="/privacy" className="hover:text-white transition-colors">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <Link to="/terms" className="hover:text-white transition-colors">
                     Terms of Service
-                  </a>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/data-deletion" className="hover:text-white transition-colors">
+                    Data Deletion
+                  </Link>
                 </li>
                 <li>
                   <a

@@ -7,6 +7,7 @@ import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import useNetwork from '../../../hooks/useNetwork';
+import { META_APP_ID } from '../../../config';
 
 const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   const { token } = useAuth();
@@ -182,9 +183,9 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   };
 
   const handleFacebookAuth = (platform) => {
-    const clientId = '2200339807370917';
+    const clientId = META_APP_ID;
     const redirectUri = window.location.origin + '/settings';
-    const scope = 'pages_show_list,pages_messaging,instagram_basic,instagram_manage_messages,pages_read_engagement';
+    const scope = 'pages_show_list,pages_messaging,pages_manage_metadata,instagram_basic,instagram_manage_messages,pages_read_engagement';
     const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=code&state=${platform}`;
     window.location.href = authUrl;
   };

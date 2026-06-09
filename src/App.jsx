@@ -47,6 +47,9 @@ import Services from './modules/Services/pages/Services';
 import Bookings from './modules/Services/pages/Bookings';
 import Chats from './modules/Conversations/pages/Chats';
 import Logistics from './modules/Logistics/pages/Logistics';
+import PrivacyPolicy from './modules/Legal/pages/PrivacyPolicy';
+import TermsOfService from './modules/Legal/pages/TermsOfService';
+import DataDeletion from './modules/Legal/pages/DataDeletion';
 
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
@@ -68,6 +71,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/data-deletion" element={<DataDeletion />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/onboarding" element={
             <ProtectedRoute>
