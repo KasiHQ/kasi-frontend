@@ -12,6 +12,7 @@ const Logistics = () => {
   const { addToast } = useToast();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState('board'); // 'board' | 'spreadsheet'
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState(null);
@@ -20,9 +21,13 @@ const Logistics = () => {
     fetchConversations();
   }, []);
 
-  const fetchConversations = async () => {
+  const fetchConversations = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      } else {
+        setRefreshing(true);
+      }
       const res = await conversationAPI.getConversations();
       // Only retain orders that are Paid, In Transit, or Delivered
       const logisticsStatuses = ['Paid', 'In Transit', 'Delivered'];
@@ -33,18 +38,27 @@ const Logistics = () => {
       addToast('Failed to load logistics records', 'error');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   const handleStatusUpdate = async (conversationId, newStatus) => {
+    // Optimistic UI Update: transition the order state locally immediately
+    const originalConversations = [...conversations];
+    setConversations(prev => 
+      prev.map(c => c.id === conversationId ? { ...c, status: newStatus } : c)
+    );
+
     try {
       await conversationAPI.updateStatus(conversationId, { status: newStatus });
       addToast(`Status updated to ${newStatus}`, 'success');
-      // Refetch to update all views
-      await fetchConversations();
+      // Silently sync with backend in the background to ensure data consistency
+      await fetchConversations(true);
     } catch (err) {
       console.error('Failed to update status:', err);
       addToast('Failed to update logistics stage', 'error');
+      // Rollback to original state on network failure
+      setConversations(originalConversations);
     }
   };
 
@@ -175,11 +189,11 @@ const Logistics = () => {
 
           {/* Refresh Button */}
           <button
-            onClick={fetchConversations}
+            onClick={() => fetchConversations(true)}
             className="p-2 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl transition-colors cursor-pointer"
             title="Refresh Order List"
           >
-            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={15} className={loading || refreshing ? 'animate-spin' : ''} />
           </button>
         </div>
       </div>
