@@ -808,8 +808,6 @@ const ActionAlerts = ({ user }) => {
 
   const hasStoreProfile = !!user?.address && !!user?.store_google_maps_link && !!user?.general_enquiry_phone;
 
-  if (loading) return null;
-
   const showPaystack = !hasPaystack && !dismissedPaystack;
   const showWhatsApp = !hasWhatsApp && !dismissedWhatsApp;
   const showRateSheet = !hasRateSheet && !dismissedRateSheet;
@@ -817,13 +815,16 @@ const ActionAlerts = ({ user }) => {
   const daysRemaining = user?.trial_days_remaining ?? 0;
   const showTrial = user?.subscription_status === 'trialing' && daysRemaining > 0 && !dismissedTrial;
 
-  if (!showPaystack && !showWhatsApp && !showRateSheet && !showStoreProfile && !showTrial) return null;
+  const scrollRef = React.useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  return (
-    <div className="flex flex-wrap gap-3 mb-4 animate-in fade-in slide-in-from-top-4 duration-500 w-full">
-      {/* TRIAL COUNTDOWN BANNER */}
-      {showTrial && (
-        <div className="relative bg-[#FFFBEB] border border-[#FEF08A] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+  const alertItems = [];
+
+  if (showTrial) {
+    alertItems.push({
+      id: 'trial',
+      element: (
+        <div className="relative bg-[#FFFBEB] border border-[#FEF08A] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#FEF3C7] text-[#D97706] flex items-center justify-center shrink-0">
               <Clock size={10} />
@@ -855,11 +856,15 @@ const ActionAlerts = ({ user }) => {
             </button>
           </div>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* PAYMENTS BANNER */}
-      {showPaystack && (
-        <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+  if (showPaystack) {
+    alertItems.push({
+      id: 'paystack',
+      element: (
+        <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#D1E9FF] text-[#175CD3] flex items-center justify-center shrink-0">
               <DollarSign size={10} />
@@ -887,11 +892,15 @@ const ActionAlerts = ({ user }) => {
             </button>
           </div>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* WHATSAPP BANNER */}
-      {showWhatsApp && (
-        <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+  if (showWhatsApp) {
+    alertItems.push({
+      id: 'whatsapp',
+      element: (
+        <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#D1FADF] text-[#027A48] flex items-center justify-center shrink-0">
               <MessageSquare size={10} />
@@ -919,11 +928,15 @@ const ActionAlerts = ({ user }) => {
             </button>
           </div>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* RATE SHEET BANNER */}
-      {showRateSheet && (
-        <div className="relative bg-[#FFF4ED] border border-[#FCD2C1] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+  if (showRateSheet) {
+    alertItems.push({
+      id: 'ratesheet',
+      element: (
+        <div className="relative bg-[#FFF4ED] border border-[#FCD2C1] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#FFE4D6] text-[#F97316] flex items-center justify-center shrink-0">
               <Truck size={10} />
@@ -951,11 +964,15 @@ const ActionAlerts = ({ user }) => {
             </button>
           </div>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* STORE PROFILE BANNER */}
-      {showStoreProfile && (
-        <div className="relative bg-[#F4F3FF] border border-[#D9D6FE] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
+  if (showStoreProfile) {
+    alertItems.push({
+      id: 'storeprofile',
+      element: (
+        <div className="relative bg-[#F4F3FF] border border-[#D9D6FE] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#EBE9FE] text-[#7A5AF8] flex items-center justify-center shrink-0">
               <MapPin size={10} />
@@ -982,6 +999,66 @@ const ActionAlerts = ({ user }) => {
               </svg>
             </button>
           </div>
+        </div>
+      )
+    });
+  }
+
+  // Cap currentSlide if elements are dismissed
+  useEffect(() => {
+    if (currentSlide >= alertItems.length && alertItems.length > 0) {
+      setCurrentSlide(alertItems.length - 1);
+    }
+  }, [alertItems.length, currentSlide]);
+
+  const handleScroll = (e) => {
+    const container = e.target;
+    const scrollLeft = container.scrollLeft;
+    const clientWidth = container.clientWidth;
+    if (clientWidth > 0) {
+      const index = Math.round(scrollLeft / clientWidth);
+      setCurrentSlide(index);
+    }
+  };
+
+  if (loading) return null;
+  if (alertItems.length === 0) return null;
+
+  return (
+    <div className="w-full mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
+      <div 
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex flex-nowrap md:flex-wrap gap-3 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory no-scrollbar w-full py-1 -my-1"
+      >
+        {alertItems.map((item, idx) => (
+          <div 
+            key={item.id} 
+            className="snap-start shrink-0 w-full md:w-auto md:flex-1 md:min-w-[280px] md:max-w-[400px]"
+          >
+            {item.element}
+          </div>
+        ))}
+      </div>
+      
+      {alertItems.length > 1 && (
+        <div className="flex md:hidden justify-center gap-1.5 mt-2.5 shrink-0 w-full">
+          {alertItems.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                const cardElement = scrollRef.current?.children[idx];
+                if (cardElement) {
+                  cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                  setCurrentSlide(idx);
+                }
+              }}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                currentSlide === idx ? 'bg-[#1A7A4A] w-4' : 'bg-gray-300'
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
         </div>
       )}
     </div>
