@@ -7,6 +7,6 @@ const isLocalOrStaging = typeof window !== 'undefined' && (
 
 export const PRELAUNCH_WAITLIST_MODE = import.meta.env.VITE_PRELAUNCH_WAITLIST_MODE !== undefined
   ? import.meta.env.VITE_PRELAUNCH_WAITLIST_MODE === 'true'
-  : !isLocalOrStaging;
+  : false;
 
 export const META_APP_ID = import.meta.env.VITE_META_APP_ID || '2200339807370917';
