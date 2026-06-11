@@ -688,14 +688,14 @@ const Products = () => {
                           />
                           <div>
                             <span className="text-sm font-semibold text-gray-700 block">Enable Fixed Price</span>
-                            <span className="text-xs text-gray-400">Disable negotiation for this product. Kasi will sell it only at the Starting Price.</span>
+                            <span className="text-xs text-gray-400">Disable negotiation for this product. Kasi will sell it only at the Happy Price.</span>
                           </div>
                         </label>
 
                         {/* 3-tier pricing */}
                         <div className="grid grid-cols-3 gap-3">
                           <div className={form.is_fixed_price ? "col-span-3 animate-fadeIn" : "col-span-1"}>
-                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Starting (₦) *</label>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">{form.is_fixed_price ? "Happy (₦) *" : "Starting (₦) *"}</label>
                             <input 
                               type="number" 
                               value={form.price} 
@@ -832,7 +832,7 @@ const Products = () => {
                             />
                             <div>
                               <span className="text-sm font-semibold text-gray-700 block">Enable Delivery for this Product</span>
-                              <span className="text-xs text-gray-400">Allow Kasi to quote delivery and dispatch riders automatically for this item</span>
+                              <span className="text-xs text-gray-400">Allow Kasi to quote delivery for this item using your rate sheet</span>
                             </div>
                           </label>
                         </div>
