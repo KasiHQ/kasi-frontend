@@ -21,14 +21,14 @@ const CITY_AREAS = {
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold rounded-xl transition-all whitespace-nowrap
+        className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all md:w-full text-left whitespace-nowrap
             ${active
                 ? 'bg-primary text-white shadow-md shadow-green-200 dark:shadow-none'
                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
             }`}
     >
         <Icon size={18} className="shrink-0" />
-        {label}
+        <span>{label}</span>
     </button>
 );
 
@@ -122,6 +122,120 @@ const PlatformModal = ({ isOpen, onClose, platform }) => {
         </div>
     );
 };
+
+/* ── Support Ticket Tab Component ────────────────── */
+const SupportTab = () => {
+    const { user } = useAuth();
+    const { addToast } = useToast();
+    const [ticketType, setTicketType] = useState('bug');
+    const [subject, setSubject] = useState('');
+    const [message, setMessage] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+
+    const handleSubmitTicket = async (e) => {
+        e.preventDefault();
+        if (!subject.trim() || !message.trim()) {
+            addToast('Subject and message are required', 'warning');
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            await api.post('/api/auth/support/ticket', {
+                ticket_type: ticketType,
+                subject: subject.trim(),
+                message: message.trim()
+            });
+            setSubmitted(true);
+            addToast('Ticket submitted successfully!', 'success');
+        } catch (err) {
+            console.error(err);
+            addToast(err.response?.data?.message || 'Failed to submit support ticket', 'error');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (submitted) {
+        return (
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center space-y-4 animate-in fade-in duration-300">
+                <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto">
+                    <CheckCircle size={36} />
+                </div>
+                <h3 className="text-xl font-bold text-dark">Ticket Submitted!</h3>
+                <p className="text-gray-500 max-w-md mx-auto text-sm leading-relaxed">
+                    Thank you for reaching out. We have created a ticket for <strong>{user?.email}</strong> and sent the details to our support team. We'll get back to you shortly.
+                </p>
+                <button
+                    onClick={() => {
+                        setSubject('');
+                        setMessage('');
+                        setSubmitted(false);
+                    }}
+                    className="px-6 py-2.5 bg-primary hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-green-100"
+                >
+                    Submit Another Ticket
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <form onSubmit={handleSubmitTicket} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
+            <div>
+                <h2 className="text-lg font-bold text-dark mb-1">Open a Support Ticket</h2>
+                <p className="text-xs text-gray-400">Need help or found a bug? Send us a ticket and our team will get right on it.</p>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Ticket Type</label>
+                <select
+                    value={ticketType}
+                    onChange={(e) => setTicketType(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm font-medium"
+                >
+                    <option value="bug">Report a Bug 🐛</option>
+                    <option value="billing">Billing & Subscriptions 💳</option>
+                    <option value="integration">Integration Issues 🔌</option>
+                    <option value="feature">Request a Feature 💡</option>
+                    <option value="other">Other Support Inquiry ✉️</option>
+                </select>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Subject</label>
+                <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="e.g. WhatsApp integration disconnecting frequently"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm font-medium"
+                />
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Message / Description</label>
+                <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    rows={6}
+                    placeholder="Please provide details about your issue. If reporting a bug, describe the steps to reproduce it."
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
+                />
+            </div>
+
+            <Button
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-primary hover:bg-green-700 text-white py-3 rounded-xl shadow-lg shadow-green-200 font-semibold"
+            >
+                {submitting ? 'Submitting Ticket...' : 'Submit Ticket'}
+            </Button>
+        </form>
+    );
+};
+
 /* ── Main Settings Page ───────────────────────────── */
 const Settings = () => {
     const { user, token, fetchUser } = useAuth();
@@ -392,24 +506,28 @@ const Settings = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-dark mb-1">Settings</h1>
                 <p className="text-gray-500 text-sm">Manage integrations, AI persona, and account details.</p>
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-2 bg-white dark:bg-gray-800/50 rounded-2xl p-2 shadow-sm border border-gray-100 dark:border-gray-700 overflow-x-auto scrollbar-hide">
-                <TabButton active={activeTab === 'integrations'} icon={Zap} label="Integrations" onClick={() => setActiveTab('integrations')} />
-                <TabButton active={activeTab === 'general'} icon={Building} label="General" onClick={() => setActiveTab('general')} />
-                <TabButton active={activeTab === 'payment'} icon={Wallet} label="Settlement & Payouts" onClick={() => setActiveTab('payment')} />
-                <TabButton active={activeTab === 'billing'} icon={CreditCard} label="Billing & Subscriptions" onClick={() => setActiveTab('billing')} />
-                <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
-                <TabButton active={activeTab === 'logistics'} icon={Truck} label="Logistics Settings" onClick={() => setActiveTab('logistics')} />
-                {/* <TabButton active={activeTab === 'appearance'} icon={Palette} label="Appearance" onClick={() => setActiveTab('appearance')} /> */}
-                <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
-            </div>
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+                {/* Secondary Sidebar (Left Navigation) */}
+                <aside className="w-full md:w-64 shrink-0 bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl p-2.5 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible scrollbar-hide select-none animate-in fade-in slide-in-from-left-4 duration-300">
+                    <TabButton active={activeTab === 'integrations'} icon={Zap} label="Integrations" onClick={() => setActiveTab('integrations')} />
+                    <TabButton active={activeTab === 'general'} icon={Building} label="General" onClick={() => setActiveTab('general')} />
+                    <TabButton active={activeTab === 'payment'} icon={Wallet} label="Settlement & Payouts" onClick={() => setActiveTab('payment')} />
+                    <TabButton active={activeTab === 'billing'} icon={CreditCard} label="Billing & Subscriptions" onClick={() => setActiveTab('billing')} />
+                    <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
+                    <TabButton active={activeTab === 'logistics'} icon={Truck} label="Logistics Settings" onClick={() => setActiveTab('logistics')} />
+                    <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
+                    <TabButton active={activeTab === 'support'} icon={HelpCircle} label="Support & Help" onClick={() => setActiveTab('support')} />
+                </aside>
+
+                {/* Main Settings Content Area (Right Column) */}
+                <div className="flex-1 min-w-0 w-full space-y-6">
 
             {/* Platform Modal */}
             <PlatformModal
@@ -573,19 +691,6 @@ const Settings = () => {
                                 <p className="text-xs text-gray-400">Shared by Kasi for general offline pickup calls.</p>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Logistics Rider Phone Number</label>
-                                <input
-                                    type="text"
-                                    name="logistics_phone"
-                                    value={formData.logistics_phone}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
-                                    placeholder="e.g. 08031234567 or 2348031234567"
-                                />
-                                <p className="text-xs text-gray-400">This number will receive automated WhatsApp requests for delivery confirmations when customers make product orders.</p>
-                            </div>
-
                             <Button
                                 type="submit"
                                 disabled={loading}
@@ -601,7 +706,7 @@ const Settings = () => {
                         <h2 className="text-lg font-bold text-dark mb-2">Subscription & Plan</h2>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="font-semibold text-dark capitalize">{billingDetails?.subscription_tier === 'free_trial' ? '14-Day Free Trial' : `${billingDetails?.subscription_tier || 'starter'} Plan`}</p>
+                                <p className="font-semibold text-dark capitalize">{billingDetails?.subscription_tier === 'free_trial' ? '7-Day Free Trial' : `${billingDetails?.subscription_tier || 'starter'} Plan`}</p>
                                 <p className="text-sm text-gray-500">
                                     {billingDetails?.subscription_status === 'trialing' 
                                         ? `${billingDetails?.days_remaining} days remaining in trial` 
@@ -988,7 +1093,7 @@ const Settings = () => {
                                     CURRENT SUBSCRIPTION STATUS
                                 </span>
                                 <h2 className="text-2xl font-black tracking-tight leading-tight capitalize">
-                                    {billingDetails?.subscription_tier === 'free_trial' ? '14-Day Free Trial' : `${billingDetails?.subscription_tier || 'starter'} Plan`}
+                                    {billingDetails?.subscription_tier === 'free_trial' ? '7-Day Free Trial' : `${billingDetails?.subscription_tier || 'starter'} Plan`}
                                 </h2>
                                 <p className="text-white/60 text-xs leading-relaxed">
                                     {billingDetails?.subscription_status === 'trialing' ? (
@@ -1202,6 +1307,14 @@ const Settings = () => {
                     </div>
                 </div>
             )}
+
+            {activeTab === 'support' && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <SupportTab />
+                </div>
+            )}
+                </div>
+            </div>
         </div>
     );
 };

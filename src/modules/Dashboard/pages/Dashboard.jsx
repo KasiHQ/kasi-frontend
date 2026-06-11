@@ -774,7 +774,7 @@ const ActionAlerts = ({ user }) => {
   // States to manage local banner dismissals
   const [dismissedPaystack, setDismissedPaystack] = useState(false);
   const [dismissedWhatsApp, setDismissedWhatsApp] = useState(false);
-  const [dismissedRiders, setDismissedRiders] = useState(false);
+  const [dismissedRateSheet, setDismissedRateSheet] = useState(false);
   const [dismissedStoreProfile, setDismissedStoreProfile] = useState(false);
   const [dismissedTrial, setDismissedTrial] = useState(false);
 
@@ -795,19 +795,29 @@ const ActionAlerts = ({ user }) => {
 
   const hasWhatsApp = integrations.some(i => i.platform === 'whatsapp' && i.connection_status === 'connected');
   const hasPaystack = !!user?.account_number;
-  const hasRiders = !!user?.logistics_phone;
+  
+  let hasRateSheet = false;
+  if (user?.delivery_rates) {
+    try {
+      const rates = typeof user.delivery_rates === 'object' ? user.delivery_rates : JSON.parse(user.delivery_rates);
+      hasRateSheet = rates && Object.keys(rates).length > 0;
+    } catch (e) {
+      hasRateSheet = false;
+    }
+  }
+
   const hasStoreProfile = !!user?.address && !!user?.store_google_maps_link && !!user?.general_enquiry_phone;
 
   if (loading) return null;
 
   const showPaystack = !hasPaystack && !dismissedPaystack;
   const showWhatsApp = !hasWhatsApp && !dismissedWhatsApp;
-  const showRiders = !hasRiders && !dismissedRiders;
+  const showRateSheet = !hasRateSheet && !dismissedRateSheet;
   const showStoreProfile = !hasStoreProfile && !dismissedStoreProfile;
   const daysRemaining = user?.trial_days_remaining ?? 0;
   const showTrial = user?.subscription_status === 'trialing' && daysRemaining > 0 && !dismissedTrial;
 
-  if (!showPaystack && !showWhatsApp && !showRiders && !showStoreProfile && !showTrial) return null;
+  if (!showPaystack && !showWhatsApp && !showRateSheet && !showStoreProfile && !showTrial) return null;
 
   return (
     <div className="flex flex-wrap gap-3 mb-4 animate-in fade-in slide-in-from-top-4 duration-500 w-full">
@@ -911,27 +921,27 @@ const ActionAlerts = ({ user }) => {
         </div>
       )}
 
-      {/* RIDERS BANNER */}
-      {showRiders && (
+      {/* RATE SHEET BANNER */}
+      {showRateSheet && (
         <div className="relative bg-[#FFF4ED] border border-[#FCD2C1] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none flex-1 min-w-[280px] max-w-[400px] transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#FFE4D6] text-[#F97316] flex items-center justify-center shrink-0">
               <Truck size={10} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0 text-xs">
-              <span className="font-bold text-[#D46B18] tracking-wide shrink-0">RIDERS NOT ADDED</span>
-              <span className="text-[#344054] text-[11px] leading-relaxed font-medium">Add your logistics rider's contact details so Kasi can automatically dispatch requests.</span>
+              <span className="font-bold text-[#D46B18] tracking-wide shrink-0">RATE SHEET NOT ADDED</span>
+              <span className="text-[#344054] text-[11px] leading-relaxed font-medium">Set up your delivery rate sheet so Kasi can quote delivery fees dynamically to customers.</span>
             </div>
           </div>
           <div className="flex items-center gap-2.5 shrink-0">
             <button
-              onClick={() => navigate('/logistics')}
+              onClick={() => navigate('/settings?tab=logistics')}
               className="px-2.5 py-1 bg-[#F97316] hover:bg-[#EA580C] text-white rounded-md text-[10px] font-bold transition-colors whitespace-nowrap shadow-sm cursor-pointer"
             >
-              Add Riders
+              Add Rate Sheet
             </button>
             <button
-              onClick={() => setDismissedRiders(true)}
+              onClick={() => setDismissedRateSheet(true)}
               className="text-[#98A2B3] hover:text-[#667085] p-0.5 rounded transition-colors cursor-pointer shrink-0"
               title="Dismiss"
             >
