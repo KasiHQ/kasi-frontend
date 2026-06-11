@@ -286,7 +286,7 @@ const Payments = () => {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Gross Revenue */}
         <div className="bg-gradient-to-tr from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-850 p-5 rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:scale-150 transition-all duration-500" />
