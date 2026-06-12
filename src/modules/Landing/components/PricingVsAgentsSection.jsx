@@ -29,9 +29,9 @@ export const PricingVsAgentsSection = () => {
       kasi: 'Automated to your account'
     },
     {
-      feature: 'Gateway fees',
+      feature: 'Sales commission',
       human: 'Variable',
-      kasi: '₦0'
+      kasi: '0%'
     }
   ];
 

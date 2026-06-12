@@ -395,13 +395,15 @@ const LandingPage = () => {
             {/* Social icons */}
             <div className="flex items-center gap-3">
               {[
-                { icon: <Instagram size={16} />, url: "#" },
-                { icon: <Twitter size={16} />, url: "#" },
-                { icon: <Linkedin size={16} />, url: "#" },
+                { icon: <Instagram size={16} />, url: "https://www.instagram.com/official_kasi247/" },
+                { icon: <Twitter size={16} />, url: "https://x.com/hq_kasi" },
+                { icon: <Linkedin size={16} />, url: "https://www.linkedin.com/company/122863967/" },
               ].map((soc, idx) => (
                 <a
                   key={idx}
                   href={soc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all"
                 >
                   {soc.icon}

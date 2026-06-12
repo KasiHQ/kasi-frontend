@@ -110,8 +110,8 @@ export const LogisticsSection = () => {
                   {/* Shipment Dispatch Tracker */}
                   <div className="border-t border-dashed border-black pt-3">
                     <div className="flex justify-between text-[9px] font-bold text-grey-700">
-                      <span>Logistics Endpoint:</span>
-                      <span className="font-black text-[#1A7A4A] uppercase">Gokada Dispatch API</span>
+                      <span>Logistics Engine:</span>
+                      <span className="font-black text-[#1A7A4A] uppercase">Kasi Rate Sheet Engine</span>
                     </div>
                   </div>
 
@@ -121,7 +121,7 @@ export const LogisticsSection = () => {
                 <div className="bg-[#0A0A0A] border-hard rounded-xl p-2.5 text-center flex items-center justify-center gap-2">
                   <Truck size={12} className="text-[#D4F263]" />
                   <span className="text-[9px] font-black text-white uppercase tracking-wider">
-                    Rider Booking Auto-Triggered 🚀
+                    Delivery Fee Auto-Calculated 🚀
                   </span>
                 </div>
 

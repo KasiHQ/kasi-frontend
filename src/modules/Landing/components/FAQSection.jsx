@@ -12,7 +12,7 @@ export const FAQSection = () => {
     },
     {
       q: "Can I connect my own Naira bank details directly?",
-      a: "Yes! You do not need expensive payment gateways. You can configure Kasi to display your direct GTBank, Zenith, or Access bank details. Kasi creates invoice PDFs showing your account, and uses secure bank callback checks to verify when transfers clear."
+      a: "Yes! You can link your bank details (GTBank, Zenith, Access, etc.) directly in settings. Kasi will route your earnings into your account automatically when customers pay through your secure checkout links."
     },
     {
       q: "Is there support for WhatsApp Business and Instagram DMs?",

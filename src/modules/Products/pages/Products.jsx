@@ -8,6 +8,9 @@ import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
 import useNetwork from '../../../hooks/useNetwork';
 
 const MAX_IMAGES = 5;
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
 const Products = () => {
   const { token } = useAuth();
@@ -302,6 +305,18 @@ const Products = () => {
       return;
     }
     
+    const invalidType = files.find(file => !ALLOWED_IMAGE_TYPES.includes(file.type));
+    if (invalidType) {
+      addToast(`${invalidType.name} is not a supported image. Please upload PNG, JPG, GIF, or WEBP.`, 'error');
+      return;
+    }
+    
+    const oversized = files.find(file => file.size > MAX_IMAGE_SIZE_BYTES);
+    if (oversized) {
+      addToast(`${oversized.name} is too large. Please upload an image smaller than ${MAX_IMAGE_SIZE_MB}MB.`, 'error');
+      return;
+    }
+    
     setUploadingImages(true);
     
     // Upload files sequentially to avoid rate limits
@@ -318,7 +333,8 @@ const Products = () => {
         setImages(prev => [...prev, res.data.image]);
       } catch (err) {
         console.error('Image upload failed', err);
-        addToast(`Failed to upload ${file.name}`, 'error');
+        const message = err.response?.data?.error || `We could not upload ${file.name}. Please try again.`;
+        addToast(message, 'error');
       }
     }
     
@@ -1066,7 +1082,7 @@ const Products = () => {
                             <div className="flex flex-col items-center">
                               <Upload className="text-gray-400 mb-2" size={24} />
                               <p className="text-sm font-medium text-dark">Click or drag images here</p>
-                              <p className="text-xs text-gray-500 mt-1">Up to {MAX_IMAGES - images.length} more images (Max {MAX_IMAGES})</p>
+                              <p className="text-xs text-gray-500 mt-1">Up to {MAX_IMAGES - images.length} more images, {MAX_IMAGE_SIZE_MB}MB each</p>
                             </div>
                           )}
                         </div>
