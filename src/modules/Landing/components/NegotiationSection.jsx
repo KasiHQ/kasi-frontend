@@ -115,7 +115,7 @@ export const NegotiationSection = () => {
                     </div>
                     <div className="text-black">
                       <p className="text-[9px] text-brand font-black mb-0.5">KASI AGENT</p>
-                      I'd love to help, but ₦900 is below our limit. Since you are ordering now, I can counter at <span className="underline decoration-brand font-black text-brand">₦1,100</span>. Shall we seal the deal?
+                      I'd love to help, but ₦900 is a bit low, dear. The best I can do is ₦1,100. Let me know if that works for you!
                     </div>
                   </div>
 

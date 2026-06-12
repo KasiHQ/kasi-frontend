@@ -111,7 +111,7 @@ export const InvoiceSection = () => {
             </h2>
             
             <p className="text-base md:text-lg text-grey-700 max-w-xl leading-relaxed font-sans font-medium">
-              Never type out your bank details again or chase screenshots of transfers. Kasi automatically generates receipts and matches payments inside chats — instantly. Connect Paystack or your raw Naira bank account. Zero gateway fees.
+              Never type out your bank details again or chase screenshots of transfers. Kasi automatically generates secure checkout links and confirms payments inside chats — instantly. Customers can pay via card or bank transfer, and payouts are routed straight to your linked bank account. Zero Kasi commission fees.
             </p>
 
             {/* 2 Side-by-Side Highlight Blocks */}
@@ -135,7 +135,7 @@ export const InvoiceSection = () => {
                 </div>
                 <h4 className="text-lg font-bold leading-tight font-bricolage">Your Conversational Finance Command Centre</h4>
                 <p className="text-[14px] text-grey-200/80 leading-relaxed font-medium">
-                  Connect Paystack or configure your raw Naira bank account details. Kasi handles invoice payouts effortlessly.
+                  Link your bank details and connect Paystack. Kasi handles invoice generation and split payouts automatically.
                 </p>
               </div>
 

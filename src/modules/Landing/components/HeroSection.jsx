@@ -98,10 +98,10 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               {/* Stat 3 */}
               <div className="space-y-1 text-left">
                 <div className="text-[32px] font-black text-[#0A0A0A] leading-none font-bricolage">
-                  ₦0
+                  24/7
                 </div>
                 <div className="text-[12px] font-bold tracking-wider text-grey-500 uppercase font-sans">
-                  Gateway Fee
+                  Runs 24/7
                 </div>
               </div>
             </div>

@@ -146,7 +146,7 @@ export const AutomationSection = () => {
                   </div>
 
                   <div className="self-start max-w-[85%] bg-[#E8F5EE] text-black p-2 rounded-2xl rounded-tl-none shadow-xs font-semibold leading-relaxed border border-[#1A7A4A]/20">
-                    ₦2,000 is slightly below our minimum, but since you are ordering right now, the absolute lowest I can do is ₦2,450. How does that sound?
+                    Ah, we can't do ₦2,000, my friend. The best price I can give you today is ₦2,450. How does that sound?
                   </div>
 
                   <div className="self-end max-w-[85%] bg-black text-white p-2 rounded-2xl rounded-tr-none shadow-xs font-semibold leading-relaxed">
@@ -198,9 +198,9 @@ export const AutomationSection = () => {
                   </div>
 
                   <div className="self-end max-w-[85%] bg-[#EFFDDE] text-black p-2 rounded-lg rounded-tr-none shadow-xs font-bold leading-relaxed border border-[#1A7A4A]/20">
-                    Gokada dispatch rider booked! 🏍️ <br />
-                    Rider: Ibrahim Musa <br />
-                    ETA: 35 minutes.
+                    Delivery fee calculated: ₦1,500 🏍️ <br />
+                    Address matches rate sheet rules. <br />
+                    Order ready for packing!
                   </div>
 
                   <div className="self-start max-w-[85%] bg-white text-black p-2 rounded-lg rounded-tl-none shadow-xs font-bold leading-relaxed text-[#1A7A4A]">
