@@ -74,72 +74,26 @@ export const NegotiationSection = () => {
               🤝
             </div>
 
-            {/* Dark Mockup Container */}
-            <div className="w-full max-w-[380px] bg-[#0A0A0A] border-hard rounded-[40px] p-6 shadow-hard relative overflow-hidden flex flex-col items-center">
-              
-              {/* Speaker & Camera notch */}
-              <div className="w-32 h-4 bg-black border-b border-gray-800 rounded-full mb-6 flex items-center justify-center">
-                <span className="w-12 h-1 bg-gray-800 rounded-full inline-block mr-2" />
-                <span className="w-2 h-2 bg-gray-800 rounded-full inline-block" />
+            {/* Browser Mockup */}
+            <div className="w-full max-w-[500px] bg-white border-[2.5px] border-black rounded-2xl shadow-[6px_6px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[1deg] hover:rotate-0 transition-transform duration-500 z-10">
+              {/* Browser Header */}
+              <div className="bg-[#F5F5F0] border-b-[2px] border-black px-4 py-2.5 flex items-center justify-between shrink-0">
+                <div className="flex gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-black/35" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-black/35" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-black/35" />
+                </div>
+                <div className="bg-white border border-black rounded-md px-4 py-0.5 text-[9px] font-bold text-grey-500 font-sans tracking-wide">
+                  usekasi.com/products/edit
+                </div>
+                <div className="w-6 h-6" /> {/* Spacer */}
               </div>
-
-              {/* Chat screen */}
-              <div className="w-full bg-white border-hard rounded-3xl p-4 flex flex-col h-[400px] justify-between relative overflow-hidden font-prompt">
-                
-                {/* Chat Header */}
-                <div className="flex items-center gap-2 border-b-1.5 border-black pb-3">
-                  <div className="w-8 h-8 rounded-full bg-brand-light border border-black flex items-center justify-center">
-                    <span className="text-[14px] font-black text-brand">K</span>
-                  </div>
-                  <div>
-                    <div className="text-xs font-black text-black">Kasi Negotiation Agent</div>
-                    <div className="text-[9px] text-brand font-black flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 bg-brand rounded-full animate-pulse" />
-                      Online • Auto-Negotiating
-                    </div>
-                  </div>
-                </div>
-
-                {/* Chat Messages */}
-                <div className="flex-1 flex flex-col gap-3.5 py-4 overflow-y-auto scrollbar-hide text-left">
-                  {/* Msg 1: Customer */}
-                  <div className="self-end max-w-[85%] bg-black text-white border border-black px-3.5 py-2.5 rounded-2xl rounded-tr-none text-[11px] font-bold leading-relaxed shadow-[2px_2px_0px_#0A0A0A]">
-                    <p className="text-[9px] text-gray-400 font-black mb-0.5">CUSTOMER • 02:44 PM</p>
-                    Hey, can I get the Premium Hibiscus Tea? But ₦1,200 is too high. Can you do ₦900?
-                  </div>
-
-                  {/* Msg 2: Kasi counter */}
-                  <div className="self-start max-w-[85%] bg-brand-light border border-black text-black px-3.5 py-2.5 rounded-2xl rounded-tl-none text-[11px] font-bold leading-relaxed shadow-[2px_2px_0px_#1A7A4A] flex gap-2">
-                    <div className="w-5 h-5 rounded-full bg-brand border border-black flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-[8px] font-black text-white">K</span>
-                    </div>
-                    <div className="text-black">
-                      <p className="text-[9px] text-brand font-black mb-0.5">KASI AGENT</p>
-                      I'd love to help, but ₦900 is a bit low, dear. The best I can do is ₦1,100. Let me know if that works for you!
-                    </div>
-                  </div>
-
-                  {/* Msg 3: Customer Accepted */}
-                  <div className="self-end max-w-[85%] bg-black text-white border border-black px-3.5 py-2.5 rounded-2xl rounded-tr-none text-[11px] font-bold leading-relaxed shadow-[2px_2px_0px_#0A0A0A]">
-                    <p className="text-[9px] text-gray-400 font-black mb-0.5">CUSTOMER • 02:45 PM</p>
-                    Okay, that works! I'll take it at ₦1,100.
-                  </div>
-                </div>
-
-                {/* Final Agreed Price Banner */}
-                <div className="bg-[#1A7A4A] border-hard rounded-xl p-3 shadow-[2px_2px_0px_#0A0A0A] text-center flex items-center justify-between">
-                  <span className="text-[10px] font-black text-white uppercase tracking-wider">
-                    Deal Agreed 🎉
-                  </span>
-                  <span className="text-[13px] font-black text-[#D4F263] bg-[#0A0A0A] border border-black px-2 py-0.5 rounded-md">
-                    ₦1,100
-                  </span>
-                </div>
-
-              </div>
-              
-              {/* Home Indicator */}
-              <div className="w-24 h-1 bg-gray-800 rounded-full mt-4" />
+              {/* Image */}
+              <img 
+                src="/images/product-negotiation-limits-desktop.png" 
+                alt="Kasi AI Auto-Negotiation Limits Configuration" 
+                className="w-full h-auto object-cover select-none" 
+              />
             </div>
 
           </div>

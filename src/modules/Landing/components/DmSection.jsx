@@ -30,35 +30,19 @@ export const DmSection = () => {
             <div className="relative w-full max-w-[420px] aspect-[4/5] bg-[#1A7A4A] rounded-2xl flex items-center justify-center p-8 border-[1.5px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-visible">
               <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none rounded-2xl" />
               
-              {/* Phone screen showing catalog management UI */}
-              <div className="w-[210px] h-[370px] bg-white rounded-[24px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 z-10">
-                {/* Screen Header */}
-                <div className="bg-white border-b-[1.5px] border-black px-4 py-2.5 flex justify-between items-center shrink-0 text-left">
-                  <span className="text-[10px] font-black text-black font-bricolage">Add Product</span>
-                  <span className="text-[7.5px] font-bold text-brand bg-brand-light border border-brand px-1.5 py-0.2 rounded-full uppercase leading-none font-sans">Active</span>
-                </div>
-
-                {/* Form fields simulator */}
-                <div className="flex-1 bg-bg-subtle p-3.5 flex flex-col gap-2.5 text-left font-sans">
-                  <div className="space-y-0.5">
-                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Product Name</label>
-                    <div className="bg-white border border-black rounded-[6px] px-2 py-1 text-[9px] font-bold text-black leading-none">Bitter Kola Premium</div>
-                  </div>
-                  <div className="space-y-0.5">
-                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Retail Price (₦)</label>
-                    <div className="bg-white border border-black rounded-[6px] px-2 py-1 text-[9px] font-bold text-black leading-none">₦1,250</div>
-                  </div>
-                  <div className="space-y-0.5">
-                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Floor Price (₦)</label>
-                    <div className="bg-white border border-black rounded-[6px] px-2 py-1 text-[9px] font-bold text-[#1A7A4A] leading-none">₦950</div>
-                  </div>
-                  <div className="space-y-0.5">
-                    <label className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Auto-Negotiation Limits</label>
-                    <div className="bg-[#E8F5EE] border border-[#1A7A4A] rounded-[6px] p-1.5 text-[7.5px] font-bold text-[#1A7A4A] leading-tight">
-                      Accept offers ≥ ₦950. Reject offers below automatically.
-                    </div>
-                  </div>
-                </div>
+              {/* Phone screen showing real WhatsApp conversation */}
+              <div className="w-[220px] h-[380px] bg-white rounded-[28px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 z-10 relative">
+                {/* Notch */}
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-3 bg-black rounded-full z-30" />
+                {/* Video */}
+                <video 
+                  src="/images/KASIVID.mp4" 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  className="w-full h-full object-cover select-none pt-1" 
+                />
               </div>
 
               {/* Floating Props */}

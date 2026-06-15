@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = async (credential, businessType = 'product') => {
+  const loginWithGoogle = async (credential, businessType = null) => {
     try {
       const res = await api.post('/api/auth/google', { credential, business_type: businessType });
       const data = res.data;

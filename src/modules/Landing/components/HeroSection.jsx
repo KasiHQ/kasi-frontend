@@ -114,70 +114,40 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               {/* White dot grid pattern overlay */}
               <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none rounded-[24px]" />
 
-              {/* Phone Mockup (Rotated +4deg) */}
-              <div className="relative w-[250px] h-[460px] bg-white rounded-[32px] border-[3.5px] border-black shadow-[4px_4px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[4deg] hover:rotate-0 transition-transform duration-500 z-10">
+
+
+              {/* Browser Mockup */}
+              <div className="relative w-full bg-white rounded-2xl border-[3px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[3deg] hover:rotate-0 transition-transform duration-500 z-10">
+                {/* Browser Header */}
+                <div className="bg-[#F5F5F0] border-b-[2px] border-black px-4 py-2.5 flex items-center justify-between shrink-0">
+                  <div className="flex gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-black/35" />
+                  </div>
+                  <div className="bg-white border border-black rounded-md px-4 py-0.5 text-[9px] font-bold text-grey-500 font-sans tracking-wide">
+                    usekasi.com/dashboard
+                  </div>
+                  <div className="w-6 h-6" /> {/* Spacer */}
+                </div>
+                {/* Image */}
+                <img 
+                  src="/images/hero-dashboard-desktop.png" 
+                  alt="Kasi AI Dashboard Overview" 
+                  className="w-full h-auto object-cover select-none" 
+                />
+              </div>
+
+              {/* Mobile Phone Mockup Overlay */}
+              <div className="absolute -bottom-10 -right-8 w-[160px] h-[300px] bg-white rounded-[28px] border-[3px] border-black shadow-[5px_5px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-6deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
                 {/* Notch */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-full z-30 flex items-center justify-center" />
-
-                {/* Status Bar */}
-                <div className="h-8 bg-white border-b border-black px-6 pt-3 flex justify-between items-center z-20 text-[9px] font-bold text-black font-sans">
-                  <span>9:41</span>
-                  <div className="flex items-center gap-1">
-                    <span>5G</span>
-                    <div className="w-4 h-2 border border-black rounded-xs p-0.5 flex items-center">
-                      <div className="h-full w-2 bg-black rounded-[1px]" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Chat App Header */}
-                <div className="bg-white border-b border-black px-4 py-2.5 flex items-center gap-2 z-20 text-left">
-                  <div className="w-7 h-7 rounded-full bg-[#1A7A4A] border border-black flex items-center justify-center shrink-0">
-                    <span className="w-1.5 h-1.5 bg-[#D4F263] rounded-full animate-ping" />
-                  </div>
-                  <div>
-                    <h3 className="text-[11px] font-black text-black leading-none flex items-center gap-1 font-bricolage">
-                      Kasi AI
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    </h3>
-                    <p className="text-[8px] font-bold text-grey-500 mt-0.5 font-sans">
-                      Autonomous Commerce Agent
-                    </p>
-                  </div>
-                </div>
-
-                {/* Chat Stream Body */}
-                <div className="flex-1 bg-bg-subtle p-3 flex flex-col gap-3 overflow-y-auto no-scrollbar">
-                  {/* Customer bubble */}
-                  <div className="self-end max-w-[85%] bg-black text-white border border-black px-3.5 py-2.5 rounded-[16px] rounded-tr-none text-[9.5px] font-bold leading-normal font-sans text-left shadow-sm">
-                    How much for 2 plates of fried rice and 1 wrap of suya?
-                  </div>
-
-                  {/* Kasi automated reply */}
-                  <div className="self-start max-w-[85%] bg-white text-black border border-black px-3.5 py-2.5 rounded-[16px] rounded-tl-none text-[9.5px] font-bold leading-normal font-sans text-left shadow-sm">
-                    Fried rice and suya is ₦5,500. Since you are ordering 2
-                    packs, I can apply a bulk discount and do <b>₦8,000</b>.{" "}
-                    <br />
-                    <br />
-                    Should I confirm this order?
-                  </div>
-                </div>
-
-                {/* Input simulator */}
-                <div className="p-3 bg-white border-t border-black flex items-center gap-2">
-                  <div className="flex-1 bg-bg-subtle border border-black rounded-full px-3 py-1.5 text-[8.5px] text-grey-500 font-bold flex items-center text-left">
-                    Ask Kasi about your order...
-                  </div>
-                  <div className="w-6 h-6 rounded-full bg-[#D4F263] text-black border border-black flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#0A0A0A]">
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="w-3 h-3 fill-current transform rotate-45"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                    </svg>
-                  </div>
-                </div>
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-2.5 bg-black rounded-full z-30" />
+                {/* Image */}
+                <img 
+                  src="/images/hero-dashboard-mobile.jpg" 
+                  alt="Kasi AI Dashboard Mobile View" 
+                  className="w-full h-full object-cover select-none pt-1" 
+                />
               </div>
 
               {/* FLOATING PROPS */}
