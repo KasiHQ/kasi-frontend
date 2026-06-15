@@ -8,19 +8,19 @@ export const FAQSection = () => {
   const FAQS = [
     {
       q: "How exactly does Kasi's pricing work?",
-      a: "Kasi offers simple, predictable pricing. You start with a free trial to explore all automation tools, and can upgrade to a flat monthly subscription tier that best fits your business volume. There are no surprise fees or success cuts per transaction."
+      a: "Kasi offers simple, predictable pricing. You start with a free trial to explore our automation tools, and can upgrade to a flat monthly subscription tier that best fits your business. Kasi does not take a sales commission from your transactions."
     },
     {
       q: "Can I connect my own Naira bank details directly?",
-      a: "Yes! You can link your bank details (GTBank, Zenith, Access, etc.) directly in settings. Kasi will route your earnings into your account automatically when customers pay through your secure checkout links."
+      a: "Yes! You can link your Naira bank account details directly in settings. Through our Paystack integration, earnings from your customers' secure checkout links are routed straight to your linked bank account."
     },
     {
-      q: "Is there support for WhatsApp Business and Instagram DMs?",
-      a: "Absolutely. You can link your WhatsApp Business line, Telegram bot, or Instagram comments panel straight from the onboarding wizard in your dashboard in under 5 minutes."
+      q: "Is there support for WhatsApp Business and other social channels?",
+      a: "Absolutely. You can connect your WhatsApp Business line, Telegram bot, or Instagram Direct Messages straight from the onboarding wizard in your dashboard. Our AI agent will manage customer chats on these platforms."
     },
     {
-      q: "Do you charge setup fees or commission on my sales?",
-      a: "Never. Your hard-earned revenue belongs 100% to you. We do not charge custom setup fees or take commissions/percentages of your transactions."
+      q: "Are there transaction fees or hidden charges?",
+      a: "Kasi does not charge any setup fees or sales commission on transactions. Your flat monthly subscription covers all Kasi AI features. Please note that standard payment gateway processing fees (such as Paystack processing fees) apply to transactions processed through customer checkout links."
     }
   ];
 

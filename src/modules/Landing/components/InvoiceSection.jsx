@@ -111,7 +111,7 @@ export const InvoiceSection = () => {
             </h2>
             
             <p className="text-base md:text-lg text-grey-700 max-w-xl leading-relaxed font-sans font-medium">
-              Never type out your bank details again or chase screenshots of transfers. Kasi automatically generates secure checkout links and confirms payments inside chats — instantly. Customers can pay via card or bank transfer, and payouts are routed straight to your linked bank account. Zero Kasi commission fees.
+              Never type out your bank details again or chase screenshots of transfers. Kasi automatically generates secure checkout links and confirms payments inside chats — instantly. Customers can pay via card or bank transfer, and payouts are routed straight to your linked bank account. Only standard payment processing fees apply.
             </p>
 
             {/* 2 Side-by-Side Highlight Blocks */}

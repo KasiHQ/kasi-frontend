@@ -18,10 +18,65 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { signup, login } = useAuth();
+  const { signup, login, loginWithGoogle } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const handleGoogleSignup = async (response) => {
+    const termsChecked = document.getElementById("terms")?.checked;
+    const consentChecked = document.getElementById("consent")?.checked;
+    
+    if (!termsChecked || !consentChecked) {
+      setError("Please agree to the Terms of Service and Data Consent before continuing.");
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle(response.credential, businessType);
+      addToast('Account created successfully!', 'success');
+      navigate('/onboarding');
+    } catch (err) {
+      setError(err.message || 'Google Sign-Up failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    /* global google */
+    if (window.google && step === 2) {
+      try {
+        google.accounts.id.initialize({
+          client_id: "418652112968-i6bv554036fq1p6stf6ujhsf5qkste3q.apps.googleusercontent.com",
+          callback: handleGoogleSignup,
+          auto_select: true,
+        });
+
+        // Trigger Google One Tap
+        google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed()) {
+            console.log("One Tap not displayed signup:", notification.getNotDisplayedReason());
+          }
+        });
+
+        // Render standard signup button
+        google.accounts.id.renderButton(
+          document.getElementById("google-signup-btn"),
+          { 
+            theme: "outline", 
+            size: "large", 
+            width: Math.min(400, Math.max(200, window.innerWidth - 80)),
+            text: "signup_with",
+            shape: "rectangular"
+          }
+        );
+      } catch (err) {
+        console.error("Google Client Init failed:", err);
+      }
+    }
+  }, [step]);
 
 
 
@@ -424,6 +479,16 @@ const Signup = () => {
                 >
                   {loading ? 'Creating Account...' : 'Create Account →'}
                 </button>
+
+                <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-[#EAECF0]"></div>
+                  <span className="flex-shrink mx-4 text-gray-400 text-[10px] font-bold uppercase tracking-widest">or</span>
+                  <div className="flex-grow border-t border-[#EAECF0]"></div>
+                </div>
+
+                <div className="flex justify-center w-full min-h-[44px]">
+                  <div id="google-signup-btn" className="w-full flex justify-center"></div>
+                </div>
               </form>
             )}
 

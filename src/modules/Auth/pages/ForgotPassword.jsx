@@ -1,28 +1,62 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, Mail, Lock, ShieldCheck, HelpCircle } from 'lucide-react';
-import api from '../../../api/axios';
+import { Link, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Check, Mail, Lock, ShieldCheck, HelpCircle, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [error, setError] = useState('');
+  
   const { addToast } = useToast();
+  const { forgotPassword, resetPassword } = useAuth();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
     try {
-      // In production/MVP, hit password reset endpoint if it exists
-      await api.post('/api/auth/forgot-password', { email }).catch(() => {
-        // Fallback mock success if backend is missing for this secondary path
-        return new Promise(resolve => setTimeout(resolve, 800));
-      });
+      await forgotPassword(email);
       setSuccess(true);
       addToast('Reset instructions sent to your email!', 'success');
     } catch (err) {
+      setError(err.message || 'Failed to send reset link. Please try again.');
       addToast(err.message || 'Failed to send reset link. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      addToast('Passwords do not match', 'error');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      addToast('Password must be at least 8 characters long', 'error');
+      return;
+    }
+    setLoading(true);
+    try {
+      await resetPassword(token, password);
+      setResetSuccess(true);
+      addToast('Password reset successfully!', 'success');
+    } catch (err) {
+      setError(err.message || 'Failed to reset password. The link may have expired.');
+      addToast(err.message || 'Failed to reset password.', 'error');
     } finally {
       setLoading(false);
     }
@@ -45,11 +79,11 @@ const ForgotPassword = () => {
           </Link>
         </div>
 
-        {/* Middle: Headline (changes per step) */}
+        {/* Middle: Headline */}
         <div className="space-y-8 relative z-10 my-auto">
           <div className="space-y-4">
             <h1 className="text-3xl xl:text-4xl font-extrabold tracking-tight leading-tight">
-              Let's get you back in.
+              {token ? "Reset your password." : "Let's get you back in."}
             </h1>
             <p className="text-white/55 text-sm leading-relaxed">
               Deploy your 24/7 AI employee. Automate catalog orders, negotiate within safe floor limits, and reconcile bank payments seamlessly.
@@ -85,7 +119,7 @@ const ForgotPassword = () => {
         </div>
       </div>
 
-      {/* RIGHT PANEL: Recovery Form */}
+      {/* RIGHT PANEL: Recovery/Reset Form */}
       <div className="w-full lg:w-[55%] xl:w-[60%] flex flex-col justify-between min-h-screen p-10 relative">
         
         {/* Top Bar */}
@@ -103,85 +137,198 @@ const ForgotPassword = () => {
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-[400px] space-y-8">
             
-            {success ? (
-              <div className="space-y-6 text-center animate-in fade-in duration-300">
-                <div className="mx-auto w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center text-[#1A7A4A]">
-                  <Check size={28} />
-                </div>
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold text-[#101828]">Check your email</h2>
-                  <p className="text-[#667085] text-sm leading-relaxed">
-                    We've sent a password reset link to <strong className="text-[#101828] font-semibold">{email}</strong>. Please follow the instructions to reset your password.
-                  </p>
-                </div>
-                <div className="pt-2">
-                  <Link
-                    to="/login"
-                    className="inline-flex items-center justify-center w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors"
-                  >
-                    Return to login
-                  </Link>
-                </div>
+            {/* Error message banner */}
+            {error && (
+              <div className="p-4 bg-[#FEF3F2] text-[#F04438] rounded-lg text-xs font-semibold border border-[#FEF3F2] text-center animate-in fade-in duration-300">
+                {error}
               </div>
-            ) : (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="space-y-6">
-                  {/* Icon at top */}
-                  <div className="w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center text-[#1A7A4A]">
-                    <HelpCircle size={28} />
-                  </div>
-                  {/* Mobile Logo */}
-                  <div className="lg:hidden flex items-center gap-2 mb-6">
-                    <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
-                    <span className="font-sans text-xl font-bold tracking-tight text-[#101828]">
-                      Kasi<span className="text-[#1A7A4A]">AI</span>
-                    </span>
+            )}
+
+            {token ? (
+              /* Reset Password View */
+              resetSuccess ? (
+                <div className="space-y-6 text-center animate-in fade-in duration-300">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center text-[#1A7A4A]">
+                    <Check size={28} />
                   </div>
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-[#101828]">Forgot your password?</h2>
+                    <h2 className="text-2xl font-bold text-[#101828]">Password reset complete</h2>
                     <p className="text-[#667085] text-sm leading-relaxed">
-                      No worries. Enter your email and we'll send you reset instructions.
+                      Your password has been successfully updated. You can now log in with your new credentials.
                     </p>
                   </div>
+                  <div className="pt-2">
+                    <Link
+                      to="/login"
+                      className="inline-flex items-center justify-center w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors"
+                    >
+                      Login to your account
+                    </Link>
+                  </div>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Email Field */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[#344054]">EMAIL ADDRESS</label>
-                    <div className="relative">
-                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
-                        <Mail size={18} />
-                      </div>
-                      <input
-                        type="email"
-                        required
-                        className="w-full h-11 pl-[42px] pr-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] placeholder-[#98A2B3] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@example.com"
-                      />
+              ) : (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="space-y-6">
+                    <div className="w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center text-[#1A7A4A]">
+                      <Lock size={28} />
+                    </div>
+                    <div className="lg:hidden flex items-center gap-2 mb-6">
+                      <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
+                      <span className="font-sans text-xl font-bold tracking-tight text-[#101828]">
+                        Kasi<span className="text-[#1A7A4A]">AI</span>
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-bold text-[#101828]">Reset your password</h2>
+                      <p className="text-[#667085] text-sm leading-relaxed">
+                        Please enter your new secure password below.
+                      </p>
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors disabled:opacity-50 flex items-center justify-center"
-                  >
-                    {loading ? 'Sending link...' : 'Send Reset Link'}
-                  </button>
-                </form>
-                
-                <div className="text-center pt-2">
-                  <Link
-                    to="/login"
-                    className="text-sm font-medium text-[#667085] hover:text-[#101828] transition-colors"
-                  >
-                    ← Back to login
-                  </Link>
+                  <form onSubmit={handleResetSubmit} className="space-y-5">
+                    {/* New Password Field */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-[#344054]">NEW PASSWORD</label>
+                      <div className="relative">
+                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
+                          <Lock size={18} />
+                        </div>
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          className="w-full h-11 pl-[42px] pr-11 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] placeholder-[#98A2B3] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3] hover:text-[#101828] transition-colors cursor-pointer"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password Field */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-[#344054]">CONFIRM NEW PASSWORD</label>
+                      <div className="relative">
+                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
+                          <Lock size={18} />
+                        </div>
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          required
+                          className="w-full h-11 pl-[42px] pr-11 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] placeholder-[#98A2B3] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3] hover:text-[#101828] transition-colors cursor-pointer"
+                        >
+                          {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors disabled:opacity-50 flex items-center justify-center cursor-pointer"
+                    >
+                      {loading ? 'Resetting password...' : 'Reset Password'}
+                    </button>
+                  </form>
                 </div>
-              </div>
+              )
+            ) : (
+              /* Forgot Password Email Form View */
+              success ? (
+                <div className="space-y-6 text-center animate-in fade-in duration-300">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center text-[#1A7A4A]">
+                    <Check size={28} />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-bold text-[#101828]">Check your email</h2>
+                    <p className="text-[#667085] text-sm leading-relaxed">
+                      We've sent a password reset link to <strong className="text-[#101828] font-semibold">{email}</strong>. Please follow the instructions to reset your password.
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      to="/login"
+                      className="inline-flex items-center justify-center w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors font-sans"
+                    >
+                      Return to login
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="space-y-6">
+                    {/* Icon at top */}
+                    <div className="w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center text-[#1A7A4A]">
+                      <HelpCircle size={28} />
+                    </div>
+                    {/* Mobile Logo */}
+                    <div className="lg:hidden flex items-center gap-2 mb-6">
+                      <img src="/kasi.png" alt="Kasi" className="w-8 h-8 object-contain shrink-0 select-none" />
+                      <span className="font-sans text-xl font-bold tracking-tight text-[#101828]">
+                        Kasi<span className="text-[#1A7A4A]">AI</span>
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="text-2xl font-bold text-[#101828]">Forgot your password?</h2>
+                      <p className="text-[#667085] text-sm leading-relaxed">
+                        No worries. Enter your email and we'll send you reset instructions.
+                      </p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Email Field */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-[#344054]">EMAIL ADDRESS</label>
+                      <div className="relative">
+                        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
+                          <Mail size={18} />
+                        </div>
+                        <input
+                          type="email"
+                          required
+                          className="w-full h-11 pl-[42px] pr-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] placeholder-[#98A2B3] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@example.com"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full h-11 bg-[#1A7A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#0F5533] transition-colors disabled:opacity-50 flex items-center justify-center cursor-pointer"
+                    >
+                      {loading ? 'Sending link...' : 'Send Reset Link'}
+                    </button>
+                  </form>
+                  
+                  <div className="text-center pt-2">
+                    <Link
+                      to="/login"
+                      className="text-sm font-medium text-[#667085] hover:text-[#101828] transition-colors"
+                    >
+                      ← Back to login
+                    </Link>
+                  </div>
+                </div>
+              )
             )}
 
           </div>
