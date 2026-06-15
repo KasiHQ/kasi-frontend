@@ -31,6 +31,10 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post('/api/auth/login', { email, password });
       const data = res.data;
       
+      if (data.requires_2fa) {
+        return { requires_2fa: true, temp_token: data.temp_token };
+      }
+      
       localStorage.setItem('token', data.access_token);
       setToken(data.access_token);
       setUser(data.user);
@@ -56,6 +60,56 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (credential, businessType = 'product') => {
+    try {
+      const res = await api.post('/api/auth/google', { credential, business_type: businessType });
+      const data = res.data;
+      
+      localStorage.setItem('token', data.access_token);
+      setToken(data.access_token);
+      setUser(data.user);
+      return data.user;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Google authentication failed';
+      throw new Error(message);
+    }
+  };
+
+  const verify2Fa = async (temp_token, code) => {
+    try {
+      const res = await api.post('/api/auth/login/verify-2fa', { temp_token, code });
+      const data = res.data;
+      
+      localStorage.setItem('token', data.access_token);
+      setToken(data.access_token);
+      setUser(data.user);
+      return data.user;
+    } catch (error) {
+      const message = error.response?.data?.message || '2FA Verification failed';
+      throw new Error(message);
+    }
+  };
+
+  const forgotPassword = async (email) => {
+    try {
+      const res = await api.post('/api/auth/forgot-password', { email });
+      return res.data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to send reset email';
+      throw new Error(message);
+    }
+  };
+
+  const resetPassword = async (token, password) => {
+    try {
+      const res = await api.post('/api/auth/reset-password', { token, password });
+      return res.data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to reset password';
+      throw new Error(message);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -63,7 +117,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, logout, loading, fetchUser }}>
+    <AuthContext.Provider value={{ user, token, login, signup, loginWithGoogle, verify2Fa, forgotPassword, resetPassword, logout, loading, fetchUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

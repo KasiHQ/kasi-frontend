@@ -25,15 +25,58 @@ import { FAQSection } from "../components/FAQSection";
 const LandingPage = () => {
   const [activeSection, setActiveSection] = useState("hero");
   const [scrolled, setScrolled] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, loading, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const openWaitlist = () => setIsWaitlistOpen(true);
 
+  const handleGoogleLogin = async (response) => {
+    try {
+      const loggedInUser = await loginWithGoogle(response.credential);
+      if (loggedInUser?.is_admin) {
+        navigate("/kasisalienceadministration");
+      } else {
+        if (!loggedInUser.onboarding_completed) {
+          navigate("/onboarding");
+        } else {
+          navigate("/dashboard");
+        }
+      }
+    } catch (err) {
+      console.error("Google auto-login failed on landing page:", err);
+    }
+  };
+
+  useEffect(() => {
+    /* global google */
+    if (window.google && !user && !loading) {
+      try {
+        google.accounts.id.initialize({
+          client_id: "418652112968-i6bv554036fq1p6stf6ujhsf5qkste3q.apps.googleusercontent.com",
+          callback: handleGoogleLogin,
+          auto_select: true,
+        });
+
+        // Trigger One Tap overlay
+        google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed()) {
+            console.log("One Tap not displayed on landing:", notification.getNotDisplayedReason());
+          }
+        });
+      } catch (err) {
+        console.error("Google One Tap init failed on landing:", err);
+      }
+    }
+  }, [user, loading]);
+
   useEffect(() => {
     if (user && !loading) {
-      navigate("/dashboard");
+      if (user.is_admin) {
+        navigate("/kasisalienceadministration");
+      } else {
+        navigate("/dashboard");
+      }
     }
   }, [user, loading, navigate]);
 

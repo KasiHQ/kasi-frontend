@@ -6,7 +6,7 @@ export const PricingVsAgentsSection = () => {
     {
       feature: 'Monthly cost',
       human: '₦50,000–₦120,000 salary',
-      kasi: 'From ₦7,500/month'
+      kasi: 'From ₦15,000/month'
     },
     {
       feature: 'Availability',
@@ -27,11 +27,6 @@ export const PricingVsAgentsSection = () => {
       feature: 'Payment handling',
       human: 'Manual, error-prone',
       kasi: 'Automated to your account'
-    },
-    {
-      feature: 'Sales commission',
-      human: 'Variable',
-      kasi: '0%'
     }
   ];
 
@@ -56,7 +51,7 @@ export const PricingVsAgentsSection = () => {
             
             <p className="text-base md:text-lg text-grey-700 max-w-xl leading-relaxed font-sans font-medium">
               A human sales agent needs a salary, a phone, data allowance — and still misses messages.
-              Kasi starts at ₦7,500 a month, handles unlimited DMs simultaneously, and sends money straight to your account.
+              Kasi starts at ₦15,000 a month, handles unlimited DMs simultaneously, and sends money straight to your account.
             </p>
           </div>
 

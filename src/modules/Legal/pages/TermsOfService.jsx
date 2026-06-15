@@ -53,9 +53,10 @@ const TermsOfService = () => (
     <LegalSection title="6. Fees and payments">
       <p>
         Paid features, subscriptions, trials, and billing terms will be shown in
-        the product or checkout flow. Payment processing may be handled by
-        third-party providers. You are responsible for taxes, chargebacks, and
-        payment disputes connected to your business.
+        the product or checkout flow. While Kasi AI does not charge additional sales
+        commission, standard payment gateway processing fees (such as Paystack processing fees)
+        apply to customer transactions and are handled directly by the third-party payment provider.
+        You are responsible for taxes, chargebacks, and payment disputes connected to your business.
       </p>
     </LegalSection>
 
