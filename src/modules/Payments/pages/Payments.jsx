@@ -171,6 +171,22 @@ const Payments = () => {
   const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'Paid' | 'Pending'
   const isOnline = useNetwork();
 
+  const [auditPage, setAuditPage] = useState(1);
+  const [payoutsPage, setPayoutsPage] = useState(1);
+
+  useEffect(() => {
+    setAuditPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setPayoutsPage(1);
+  }, [statusFilter]);
+
+  useEffect(() => {
+    setAuditPage(1);
+    setPayoutsPage(1);
+  }, [activeTab]);
+
   useEffect(() => {
     if (token) {
       fetchInvoices();
@@ -388,8 +404,9 @@ const Payments = () => {
 
         {/* Tab 1: Sales Audit Log */}
         {activeTab === 'audit' && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-800/40">
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Reference</th>
@@ -414,7 +431,7 @@ const Payments = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredInvoices.map((inv) => {
+                  filteredInvoices.slice((auditPage - 1) * 15, auditPage * 15).map((inv) => {
                     const isPaid = inv.status === 'Paid';
                     const fee = inv.platform_fee || (inv.total_amount * 0.02);
                     const vendorNet = inv.total_amount - fee;
@@ -467,12 +484,36 @@ const Payments = () => {
               </tbody>
             </table>
           </div>
+          {/* Pagination Controls */}
+          {Math.ceil(filteredInvoices.length / 15) > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 bg-gray-50/20 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-700">
+              <button
+                disabled={auditPage === 1}
+                onClick={() => setAuditPage(prev => Math.max(prev - 1, 1))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 rounded-xl text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-bold font-mono">
+                Page {auditPage} of {Math.ceil(filteredInvoices.length / 15)}
+              </span>
+              <button
+                disabled={auditPage === Math.ceil(filteredInvoices.length / 15)}
+                onClick={() => setAuditPage(prev => Math.min(prev + 1, Math.ceil(filteredInvoices.length / 15)))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 rounded-xl text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Next
+              </button>
+            </div>
+          )}
+          </>
         )}
 
         {/* Tab 2: Payout Settlements */}
         {activeTab === 'payouts' && (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-800/40">
                   <th className="px-6 py-3.5 font-bold text-gray-400 dark:text-gray-500 text-xs uppercase tracking-wider">Settlement Date</th>
@@ -495,7 +536,7 @@ const Payments = () => {
                     </td>
                   </tr>
                 ) : (
-                  paidInvoices.map((inv) => {
+                  paidInvoices.slice((payoutsPage - 1) * 15, payoutsPage * 15).map((inv) => {
                     const fee = inv.platform_fee || (inv.total_amount * 0.02);
                     const netPayout = inv.total_amount - fee;
                     return (
@@ -532,6 +573,29 @@ const Payments = () => {
               </tbody>
             </table>
           </div>
+          {/* Pagination Controls */}
+          {Math.ceil(paidInvoices.length / 15) > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 bg-gray-50/20 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-700">
+              <button
+                disabled={payoutsPage === 1}
+                onClick={() => setPayoutsPage(prev => Math.max(prev - 1, 1))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 rounded-xl text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-bold font-mono">
+                Page {payoutsPage} of {Math.ceil(paidInvoices.length / 15)}
+              </span>
+              <button
+                disabled={payoutsPage === Math.ceil(paidInvoices.length / 15)}
+                onClick={() => setPayoutsPage(prev => Math.min(prev + 1, Math.ceil(paidInvoices.length / 15)))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 rounded-xl text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Next
+              </button>
+            </div>
+          )}
+          </>
         )}
       </div>
 

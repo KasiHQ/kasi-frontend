@@ -124,6 +124,11 @@ const Clients = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeFilter]);
 
   // Broadcast states
   const [showBroadcast, setShowBroadcast] = useState(false);
@@ -466,7 +471,7 @@ const Clients = () => {
                   </td>
                 </tr>
               ) : (
-                filteredCustomers.map((customer) => {
+                filteredCustomers.slice((currentPage - 1) * 15, currentPage * 15).map((customer) => {
                   const pb = platformBadge(customer.platform);
                   const tag = customer.tag || 'Cold Lead';
                   const tc = tagConfig[tag] || tagConfig['Cold Lead'];
@@ -537,6 +542,28 @@ const Clients = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination Controls */}
+        {Math.ceil(filteredCustomers.length / 15) > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 bg-gray-50/50 border-t border-gray-100">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+            >
+              Previous
+            </button>
+            <span className="text-xs text-gray-500 font-semibold font-mono">
+              Page {currentPage} of {Math.ceil(filteredCustomers.length / 15)}
+            </span>
+            <button
+              disabled={currentPage === Math.ceil(filteredCustomers.length / 15)}
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredCustomers.length / 15)))}
+              className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Broadcast Modal */}
