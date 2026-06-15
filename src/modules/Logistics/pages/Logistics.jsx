@@ -70,6 +70,19 @@ const Logistics = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleCopyLogisticsDetails = (item) => {
+    const name = item.customer_name || 'Walk-in Customer';
+    const phone = item.customer_phone || 'N/A';
+    const address = item.delivery_address || 'Store Pickup';
+    
+    const text = `Customer Name: ${name}\nPhone Number: ${phone}\nDelivery Address: ${address}`;
+    navigator.clipboard.writeText(text);
+    
+    setCopiedId(`all-${item.id}`);
+    addToast(`Copied details: ${name} | ${phone} | ${address}`, 'success');
+    setTimeout(() => setCopiedId(null), 2500);
+  };
+
   // Filter conversations by search term
   const searchedConversations = conversations.filter(c => {
     const term = searchTerm.toLowerCase();
@@ -285,6 +298,26 @@ const Logistics = () => {
                           </div>
                         </div>
 
+                        {/* Copy Dispatch Details Button */}
+                        <div className="mb-3">
+                          <button
+                            onClick={() => handleCopyLogisticsDetails(item)}
+                            className="w-full py-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all active:scale-[0.98]"
+                          >
+                            {copiedId === `all-${item.id}` ? (
+                              <>
+                                <Check size={11} className="text-emerald-500" />
+                                <span>Details Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy size={11} className="text-primary" />
+                                <span>Copy Dispatch Details</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
                         {/* Ordered Items List */}
                         {item.invoice_items && item.invoice_items.length > 0 && (
                           <div className="mb-3">
@@ -373,11 +406,20 @@ const Logistics = () => {
                         
                         {/* Customer */}
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-6 h-6 rounded-full ${getAvatarColor(item.customer_name)} text-white flex items-center justify-center font-bold text-[10px]`}>
-                              {getInitials(item.customer_name)}
+                          <div className="flex items-center justify-between gap-2 group">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-6 h-6 rounded-full ${getAvatarColor(item.customer_name)} text-white flex items-center justify-center font-bold text-[10px]`}>
+                                {getInitials(item.customer_name)}
+                              </div>
+                              <span className="font-bold text-gray-900 dark:text-white">{item.customer_name || 'Walk-in Customer'}</span>
                             </div>
-                            <span className="font-bold text-gray-900 dark:text-white">{item.customer_name || 'Walk-in Customer'}</span>
+                            <button
+                              onClick={() => handleCopyLogisticsDetails(item)}
+                              className="text-gray-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shrink-0 ml-2"
+                              title="Copy Dispatch Details"
+                            >
+                              {copiedId === `all-${item.id}` ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                            </button>
                           </div>
                         </td>
                         
