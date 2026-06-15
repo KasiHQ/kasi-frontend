@@ -29,7 +29,10 @@ const getInitials = (name) => {
 
 const timeAgo = (dateString) => {
   if (!dateString) return '';
-  const diff = Date.now() - new Date(dateString).getTime();
+  const cleanDateString = dateString.endsWith('Z') || dateString.includes('+') || dateString.includes('-')
+    ? dateString
+    : `${dateString}Z`;
+  const diff = Date.now() - new Date(cleanDateString).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'Just now';
   if (mins < 60) return `${mins}m ago`;

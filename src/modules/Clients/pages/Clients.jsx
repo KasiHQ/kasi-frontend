@@ -82,7 +82,10 @@ const platformBadge = (platform) => {
 
 const timeAgo = (dateString) => {
   if (!dateString) return '—';
-  const diff = Date.now() - new Date(dateString).getTime();
+  const cleanDateString = dateString.endsWith('Z') || dateString.includes('+') || dateString.includes('-')
+    ? dateString
+    : `${dateString}Z`;
+  const diff = Date.now() - new Date(cleanDateString).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'Just now';
   if (mins < 60) return `${mins}m ago`;
@@ -91,7 +94,7 @@ const timeAgo = (dateString) => {
   const days = Math.floor(hrs / 24);
   if (days === 1) return 'Yesterday';
   if (days < 7) return `${days}d ago`;
-  return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return new Date(cleanDateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
 // Derive a customer tag from their conversation/invoice data
