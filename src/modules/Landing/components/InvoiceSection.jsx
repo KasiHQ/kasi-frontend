@@ -16,63 +16,18 @@ export const InvoiceSection = () => {
             {/* Rectangular green panel */}
             <div className="relative w-full max-w-[420px] aspect-[4/5] bg-[#1A7A4A] rounded-2xl flex items-center justify-center p-8 border-[1.5px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-visible">
               <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none rounded-2xl" />
-              
-              {/* Phone screen showing wallet & invoice UI */}
-              <div className="w-[210px] h-[370px] bg-white rounded-[24px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[3deg] hover:rotate-0 transition-transform duration-500 z-10">
-                {/* Screen Header */}
-                <div className="bg-white border-b-[1.5px] border-black px-4 py-2.5 flex justify-between items-center shrink-0 text-left font-sans">
-                  <span className="text-[7.5px] font-black text-grey-500 tracking-wider">STORE WALLET</span>
-                  <span className="text-[7.5px] font-black text-black bg-[#D4F263] border border-black px-2 py-0.5 rounded-full uppercase leading-none">GTBANK</span>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 bg-bg-subtle p-3.5 flex flex-col gap-3 overflow-y-auto no-scrollbar text-left font-sans">
-                  
-                  {/* Revenue block */}
-                  <div className="space-y-0.5">
-                    <span className="text-[7px] font-black text-grey-500 uppercase tracking-widest block">Total Revenue</span>
-                    <h4 className="text-base font-black text-black leading-none font-bricolage">₦358,400.00</h4>
-                  </div>
-
-                  {/* GTBank Details Card */}
-                  <div className="bg-white border border-black rounded-[12px] p-2.5 shadow-[2px_2px_0px_#0A0A0A] space-y-1">
-                    <div className="flex justify-between text-[7px] font-black text-grey-500">
-                      <span>LINKED ACCOUNT</span>
-                      <span className="text-brand">ACTIVE</span>
-                    </div>
-                    <div className="text-[10px] font-bold text-black leading-none">Salience Tech Ltd</div>
-                    <div className="text-[8px] font-bold text-grey-500 font-mono">012****389</div>
-                  </div>
-
-                  {/* Recent Invoices list */}
-                  <div className="space-y-1.5 flex-1">
-                    <div className="text-[7px] font-black text-grey-500 uppercase tracking-wider block">Recent Invoices</div>
-                    
-                    {[
-                      { id: '#INV-4093', name: 'Zobo Tonic', val: '₦3,500', paid: true },
-                      { id: '#INV-4092', name: 'Bitter Kola', val: '₦2,100', paid: true },
-                      { id: '#INV-4091', name: 'Shea Butter', val: '₦4,800', pending: true }
-                    ].map((inv, idx) => (
-                      <div key={idx} className="bg-white border border-black rounded-[8px] p-2 flex items-center justify-between shadow-[1.5px_1.5px_0px_#0A0A0A]">
-                        <div className="text-[7.5px] leading-tight">
-                          <span className="font-bold text-black block">{inv.id}</span>
-                          <span className="text-[6.5px] font-bold text-grey-500 block">{inv.name}</span>
-                        </div>
-                        <div className="text-right space-y-0.5 leading-none">
-                          <span className="text-[8px] font-bold text-black block">{inv.val}</span>
-                          <span className={`inline-block px-1 rounded-sm text-[5.5px] font-black uppercase border border-black ${
-                            inv.paid ? 'bg-[#E8F5EE] text-[#1A7A4A]' : 'bg-[#D4F263] text-black'
-                          }`}>
-                            {inv.paid ? 'Paid' : 'Pending'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                </div>
+                           {/* Phone screen showing real invoice details */}
+              <div className="w-[220px] h-[380px] bg-white rounded-[28px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[3deg] hover:rotate-0 transition-transform duration-500 z-10 relative">
+                {/* Notch */}
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-3 bg-black rounded-full z-30" />
+                {/* Image */}
+                <img 
+                  src="/images/invoice-details-mobile.jpg" 
+                  alt="Real customer paid invoice details" 
+                  className="w-full h-full object-cover select-none pt-1" 
+                />
               </div>
-
+              
               {/* Floating Props */}
               
               {/* 1. Payment confirmation badge (checkmark + ₦2,100) */}

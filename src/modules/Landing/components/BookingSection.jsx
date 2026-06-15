@@ -14,60 +14,26 @@ export const BookingSection = () => {
             <div className="relative w-full max-w-[420px] aspect-[4/5] bg-[#1A7A4A] rounded-2xl flex items-center justify-center p-8 border-[1.5px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-visible">
               <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none rounded-2xl" />
               
-              {/* Phone Screen Mockup */}
-              <div className="w-[210px] h-[370px] bg-white rounded-[24px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500 z-10 font-sans text-left">
-                {/* Screen Header */}
-                <div className="bg-white border-b-[1.5px] border-black px-4 py-2.5 flex justify-between items-center shrink-0">
-                  <span className="text-[10px] font-black text-black font-bricolage">Today's Bookings</span>
-                  <span className="text-[7.5px] font-bold text-white bg-[#1A7A4A] border border-black px-1.5 py-0.2 rounded-full uppercase leading-none">Live</span>
-                </div>
-
-                {/* Calendar list simulator */}
-                <div className="flex-1 bg-white p-3.5 flex flex-col gap-2.5 overflow-y-auto">
-                  {/* Calendar Mini Bar */}
-                  <div className="flex justify-between items-center bg-[#F5F5F0] border border-black rounded-lg p-1.5 shrink-0">
-                    {['M', 'T', 'W', 'T', 'F'].map((day, i) => (
-                      <div key={i} className={`flex flex-col items-center justify-center w-6 h-8 rounded-md ${i === 2 ? 'bg-[#1A7A4A] text-white border border-black shadow-[1px_1px_0px_#000]' : 'text-grey-500'}`}>
-                        <span className="text-[7px] font-black">{day}</span>
-                        <span className="text-[9px] font-black leading-none mt-0.5">{20 + i}</span>
-                      </div>
-                    ))}
+              {/* Browser Mockup */}
+              <div className="relative w-full bg-white rounded-2xl border-[3px] border-black shadow-[4px_4px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500 z-10">
+                {/* Browser Header */}
+                <div className="bg-[#F5F5F0] border-b-[2px] border-black px-4 py-2 flex items-center justify-between shrink-0">
+                  <div className="flex gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-black/35" />
                   </div>
-
-                  {/* Scheduled Slots */}
-                  <div className="space-y-2 flex-1">
-                    <span className="text-[8px] font-black text-grey-500 uppercase tracking-widest block">Confirmed Slots</span>
-                    
-                    {/* Slot 1 */}
-                    <div className="bg-white border border-black rounded-lg p-2 flex flex-col gap-1 shadow-[1.5px_1.5px_0px_#000] relative">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-black text-black">Skin Fade & Trim</span>
-                        <span className="text-[7px] font-bold text-[#1A7A4A] bg-[#E8F5EE] border border-[#1A7A4A] px-1 rounded-full">Paid</span>
-                      </div>
-                      <div className="flex justify-between text-[7px] text-grey-500 font-bold">
-                        <span>10:00 AM - 10:45 AM</span>
-                        <span>Tobi Adebayo</span>
-                      </div>
-                    </div>
-
-                    {/* Slot 2 */}
-                    <div className="bg-white border border-black rounded-lg p-2 flex flex-col gap-1 shadow-[1.5px_1.5px_0px_#000]">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-black text-black">Bridal Makeup Session</span>
-                        <span className="text-[7px] font-bold text-[#1A7A4A] bg-[#E8F5EE] border border-[#1A7A4A] px-1 rounded-full">Paid</span>
-                      </div>
-                      <div className="flex justify-between text-[7px] text-grey-500 font-bold">
-                        <span>12:15 PM - 1:45 PM</span>
-                        <span>Chioma Okafor</span>
-                      </div>
-                    </div>
-
-                    {/* Slot 3 */}
-                    <div className="bg-[#F5F5F0] border border-dashed border-grey-450 rounded-lg p-2 flex items-center justify-center">
-                      <span className="text-[8px] font-bold text-grey-500">2 Empty Slots Available</span>
-                    </div>
+                  <div className="bg-white border border-black rounded-md px-4 py-0.5 text-[9px] font-bold text-grey-500 font-sans tracking-wide">
+                    usekasi.com/bookings/schedule
                   </div>
+                  <div className="w-6 h-6" /> {/* Spacer */}
                 </div>
+                {/* Image */}
+                <img 
+                  src="/images/booking-schedule-hours-desktop.png" 
+                  alt="Kasi AI Calendar & Bookings Schedule" 
+                  className="w-full h-auto object-cover select-none" 
+                />
               </div>
 
               {/* Floating Props */}

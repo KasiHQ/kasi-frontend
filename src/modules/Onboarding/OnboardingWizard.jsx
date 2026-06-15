@@ -30,7 +30,7 @@ const OnboardingWizard = () => {
   const [error, setError] = useState('');
 
   // Form State
-  const [businessType, setBusinessType] = useState(user?.business_type || 'product');
+  const [businessType, setBusinessType] = useState(user?.business_type || '');
   
   // Step 2 Store Details
   const [storeName, setStoreName] = useState(user?.business_name || '');
