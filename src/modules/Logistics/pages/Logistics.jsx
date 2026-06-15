@@ -16,6 +16,13 @@ const Logistics = () => {
   const [viewMode, setViewMode] = useState('board'); // 'board' | 'spreadsheet'
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+  const [currentPage, setCurrentPage] = useState({ 'Paid': 1, 'In Transit': 1, 'Delivered': 1 });
+  const [spreadsheetPage, setSpreadsheetPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage({ 'Paid': 1, 'In Transit': 1, 'Delivered': 1 });
+    setSpreadsheetPage(1);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchConversations();
@@ -97,6 +104,21 @@ const Logistics = () => {
   const readyToPack = searchedConversations.filter(c => c.status === 'Paid');
   const inTransit = searchedConversations.filter(c => c.status === 'In Transit');
   const delivered = searchedConversations.filter(c => c.status === 'Delivered');
+
+  useEffect(() => {
+    const paidPages = Math.ceil(readyToPack.length / 5) || 1;
+    const transitPages = Math.ceil(inTransit.length / 5) || 1;
+    const deliveredPages = Math.ceil(delivered.length / 5) || 1;
+
+    setCurrentPage(prev => {
+      const next = { ...prev };
+      let changed = false;
+      if (prev['Paid'] > paidPages) { next['Paid'] = paidPages; changed = true; }
+      if (prev['In Transit'] > transitPages) { next['In Transit'] = transitPages; changed = true; }
+      if (prev['Delivered'] > deliveredPages) { next['Delivered'] = deliveredPages; changed = true; }
+      return changed ? next : prev;
+    });
+  }, [readyToPack.length, inTransit.length, delivered.length]);
 
   const columns = [
     {
@@ -250,111 +272,136 @@ const Logistics = () => {
                       <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">{col.emptyText}</p>
                     </div>
                   ) : (
-                    col.items.map((item) => (
-                      <div key={item.id} className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-150 dark:border-gray-800/80 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group">
-                        
-                        {/* Customer Avatar & ID Header */}
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className={`w-8 h-8 rounded-full ${getAvatarColor(item.customer_name)} text-white flex items-center justify-center font-bold text-xs shrink-0`}>
-                              {getInitials(item.customer_name)}
+                    <>
+                      {col.items.slice((currentPage[col.statusValue] - 1) * 5, currentPage[col.statusValue] * 5).map((item) => (
+                        <div key={item.id} className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-150 dark:border-gray-800/80 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group">
+                          
+                          {/* Customer Avatar & ID Header */}
+                          <div className="flex items-start justify-between gap-2 mb-3">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className={`w-8 h-8 rounded-full ${getAvatarColor(item.customer_name)} text-white flex items-center justify-center font-bold text-xs shrink-0`}>
+                                {getInitials(item.customer_name)}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-bold text-gray-900 dark:text-white text-xs truncate">{item.customer_name || 'Walk-in Customer'}</p>
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-mono mt-0.5 truncate">
+                                  {item.invoice_reference ? `#${item.invoice_reference}` : 'No Invoice Ref'}
+                                </p>
+                              </div>
                             </div>
-                            <div className="min-w-0">
-                              <p className="font-bold text-gray-900 dark:text-white text-xs truncate">{item.customer_name || 'Walk-in Customer'}</p>
-                              <p className="text-[10px] text-gray-400 dark:text-gray-500 font-mono mt-0.5 truncate">
-                                {item.invoice_reference ? `#${item.invoice_reference}` : 'No Invoice Ref'}
-                              </p>
+                            <span className="text-[10px] font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-md border border-gray-100 dark:border-gray-700 font-mono">
+                              ₦{(item.agreed_price || 0).toLocaleString()}
+                            </span>
+                          </div>
+
+                          {/* Customer Phone & Address */}
+                          <div className="space-y-1.5 text-xs text-gray-600 dark:text-gray-400 pb-2 border-b border-gray-50 dark:border-gray-800/60 mb-2.5">
+                            {item.customer_phone && (
+                              <div className="flex items-center gap-1.5 text-[11px]">
+                                <Phone size={12} className="text-gray-400" />
+                                <span className="font-semibold">{item.customer_phone}</span>
+                              </div>
+                            )}
+                            <div className="flex items-start gap-1.5 text-[11px]">
+                              <MapPin size={12} className="text-gray-400 shrink-0 mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <p className="line-clamp-2 leading-relaxed">
+                                  {item.delivery_address || <span className="italic text-gray-400">Store Pickup</span>}
+                                </p>
+                                {item.delivery_address && (
+                                  <button
+                                    onClick={() => handleCopyAddress(item.delivery_address, item.id)}
+                                    className="text-[9px] text-primary hover:underline font-bold mt-1 inline-flex items-center gap-0.5 cursor-pointer"
+                                  >
+                                    {copiedId === item.id ? <Check size={8} /> : <Copy size={8} />}
+                                    {copiedId === item.id ? 'Copied' : 'Copy address'}
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          <span className="text-[10px] font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-md border border-gray-100 dark:border-gray-700 font-mono">
-                            ₦{(item.agreed_price || 0).toLocaleString()}
-                          </span>
-                        </div>
 
-                        {/* Customer Phone & Address */}
-                        <div className="space-y-1.5 text-xs text-gray-600 dark:text-gray-400 pb-2 border-b border-gray-50 dark:border-gray-800/60 mb-2.5">
-                          {item.customer_phone && (
-                            <div className="flex items-center gap-1.5 text-[11px]">
-                              <Phone size={12} className="text-gray-400" />
-                              <span className="font-semibold">{item.customer_phone}</span>
+                          {/* Copy Dispatch Details Button */}
+                          <div className="mb-3">
+                            <button
+                              onClick={() => handleCopyLogisticsDetails(item)}
+                              className="w-full py-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all active:scale-[0.98]"
+                            >
+                              {copiedId === `all-${item.id}` ? (
+                                <>
+                                  <Check size={11} className="text-emerald-500" />
+                                  <span>Details Copied!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy size={11} className="text-primary" />
+                                  <span>Copy Dispatch Details</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Ordered Items List */}
+                          {item.invoice_items && item.invoice_items.length > 0 && (
+                            <div className="mb-3">
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Items</p>
+                              <div className="space-y-1 max-h-[70px] overflow-y-auto custom-scrollbar">
+                                {item.invoice_items.map((it, idx) => (
+                                  <div key={idx} className="flex justify-between items-center text-[10px] font-medium bg-gray-50 dark:bg-gray-850 px-2 py-1 rounded border border-gray-100/30 dark:border-gray-800/20">
+                                    <span className="text-gray-750 dark:text-gray-300 truncate mr-2">{it.description}</span>
+                                    <span className="text-gray-400 shrink-0 font-bold">x{it.quantity}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
-                          <div className="flex items-start gap-1.5 text-[11px]">
-                            <MapPin size={12} className="text-gray-400 shrink-0 mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <p className="line-clamp-2 leading-relaxed">
-                                {item.delivery_address || <span className="italic text-gray-400">Store Pickup</span>}
-                              </p>
-                              {item.delivery_address && (
-                                <button
-                                  onClick={() => handleCopyAddress(item.delivery_address, item.id)}
-                                  className="text-[9px] text-primary hover:underline font-bold mt-1 inline-flex items-center gap-0.5 cursor-pointer"
-                                >
-                                  {copiedId === item.id ? <Check size={8} /> : <Copy size={8} />}
-                                  {copiedId === item.id ? 'Copied' : 'Copy address'}
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Copy Dispatch Details Button */}
-                        <div className="mb-3">
+                          {/* Action Buttons */}
+                          {col.action && (
+                            <button
+                              onClick={() => handleStatusUpdate(item.id, col.action.nextStatus)}
+                              className={`w-full py-2 rounded-xl text-xs font-bold text-white transition-all cursor-pointer ${
+                                col.color === 'amber'
+                                  ? 'bg-primary hover:bg-green-700 shadow-xs shadow-green-200 dark:shadow-none'
+                                  : 'bg-blue-500 hover:bg-blue-600 shadow-xs shadow-blue-200 dark:shadow-none'
+                              }`}
+                            >
+                              {col.action.label}
+                            </button>
+                          )}
+
+                          {/* Complete Status Indicator */}
+                          {col.title === 'Delivered' && (
+                            <div className="flex items-center justify-center gap-1 py-1.5 bg-green-50/50 dark:bg-green-950/20 text-green-700 dark:text-green-400 rounded-xl text-xs font-bold border border-green-100/50 dark:border-green-900/30">
+                              <CheckCircle size={12} /> Delivered & Complete
+                            </div>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* Pagination Controls */}
+                      {Math.ceil(col.items.length / 5) > 1 && (
+                        <div className="flex items-center justify-between p-3.5 bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800/80 rounded-xl shadow-xs">
                           <button
-                            onClick={() => handleCopyLogisticsDetails(item)}
-                            className="w-full py-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all active:scale-[0.98]"
+                            disabled={currentPage[col.statusValue] === 1}
+                            onClick={() => setCurrentPage(prev => ({ ...prev, [col.statusValue]: Math.max(prev[col.statusValue] - 1, 1) }))}
+                            className="px-2 py-1 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg text-[10px] font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                           >
-                            {copiedId === `all-${item.id}` ? (
-                              <>
-                                <Check size={11} className="text-emerald-500" />
-                                <span>Details Copied!</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={11} className="text-primary" />
-                                <span>Copy Dispatch Details</span>
-                              </>
-                            )}
+                            Prev
+                          </button>
+                          <span className="text-[10px] text-gray-400 font-bold font-mono">
+                            {currentPage[col.statusValue]} of {Math.ceil(col.items.length / 5)}
+                          </span>
+                          <button
+                            disabled={currentPage[col.statusValue] === Math.ceil(col.items.length / 5)}
+                            onClick={() => setCurrentPage(prev => ({ ...prev, [col.statusValue]: Math.min(prev[col.statusValue] + 1, Math.ceil(col.items.length / 5)) }))}
+                            className="px-2 py-1 bg-gray-50 hover:bg-gray-150 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-lg text-[10px] font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          >
+                            Next
                           </button>
                         </div>
-
-                        {/* Ordered Items List */}
-                        {item.invoice_items && item.invoice_items.length > 0 && (
-                          <div className="mb-3">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Items</p>
-                            <div className="space-y-1 max-h-[70px] overflow-y-auto custom-scrollbar">
-                              {item.invoice_items.map((it, idx) => (
-                                <div key={idx} className="flex justify-between items-center text-[10px] font-medium bg-gray-50 dark:bg-gray-850 px-2 py-1 rounded border border-gray-100/30 dark:border-gray-800/20">
-                                  <span className="text-gray-750 dark:text-gray-300 truncate mr-2">{it.description}</span>
-                                  <span className="text-gray-400 shrink-0 font-bold">x{it.quantity}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Action Buttons */}
-                        {col.action && (
-                          <button
-                            onClick={() => handleStatusUpdate(item.id, col.action.nextStatus)}
-                            className={`w-full py-2 rounded-xl text-xs font-bold text-white transition-all cursor-pointer ${
-                              col.color === 'amber'
-                                ? 'bg-primary hover:bg-green-700 shadow-xs shadow-green-200 dark:shadow-none'
-                                : 'bg-blue-500 hover:bg-blue-600 shadow-xs shadow-blue-200 dark:shadow-none'
-                            }`}
-                          >
-                            {col.action.label}
-                          </button>
-                        )}
-
-                        {/* Complete Status Indicator */}
-                        {col.title === 'Delivered' && (
-                          <div className="flex items-center justify-center gap-1 py-1.5 bg-green-50/50 dark:bg-green-950/20 text-green-700 dark:text-green-400 rounded-xl text-xs font-bold border border-green-100/50 dark:border-green-900/30">
-                            <CheckCircle size={12} /> Delivered & Complete
-                          </div>
-                        )}
-                      </div>
-                    ))
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -393,7 +440,7 @@ const Logistics = () => {
                     </td>
                   </tr>
                 ) : (
-                  searchedConversations.map((item) => {
+                  searchedConversations.slice((spreadsheetPage - 1) * 15, spreadsheetPage * 15).map((item) => {
                     return (
                       <tr 
                         key={item.id} 
@@ -406,53 +453,51 @@ const Logistics = () => {
                         
                         {/* Customer */}
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center justify-between gap-2 group">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-6 h-6 rounded-full ${getAvatarColor(item.customer_name)} text-white flex items-center justify-center font-bold text-[10px]`}>
-                                {getInitials(item.customer_name)}
-                              </div>
-                              <span className="font-bold text-gray-900 dark:text-white">{item.customer_name || 'Walk-in Customer'}</span>
+                          <div className="flex items-center gap-2.5">
+                            <div className={`w-7 h-7 rounded-full ${getAvatarColor(item.customer_name)} text-white flex items-center justify-center font-bold text-[10px] shrink-0`}>
+                              {getInitials(item.customer_name)}
                             </div>
-                            <button
-                              onClick={() => handleCopyLogisticsDetails(item)}
-                              className="text-gray-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shrink-0 ml-2"
-                              title="Copy Dispatch Details"
-                            >
-                              {copiedId === `all-${item.id}` ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
-                            </button>
+                            <span className="font-bold text-gray-850 dark:text-gray-200 text-xs">{item.customer_name || 'Walk-in Customer'}</span>
                           </div>
                         </td>
                         
                         {/* Phone */}
-                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-600 dark:text-gray-400 text-xs">
                           {item.customer_phone || '—'}
                         </td>
                         
-                        {/* Address */}
-                        <td className="px-6 py-4 max-w-[220px]">
-                          <div className="flex items-start gap-1.5 group">
-                            <span className="truncate flex-1">
-                              {item.delivery_address || <span className="italic text-gray-400">Store Pickup</span>}
-                            </span>
+                        {/* Delivery Address */}
+                        <td className="px-6 py-4 text-xs text-gray-600 dark:text-gray-400 max-w-[200px]">
+                          <div className="flex items-center gap-1.5">
+                            <span className="truncate">{item.delivery_address || 'Store Pickup'}</span>
                             {item.delivery_address && (
                               <button
                                 onClick={() => handleCopyAddress(item.delivery_address, item.id)}
-                                className="text-gray-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shrink-0"
-                                title="Copy Address"
+                                className="text-primary hover:underline cursor-pointer shrink-0"
                               >
-                                {copiedId === item.id ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                                {copiedId === item.id ? <Check size={10} /> : <Copy size={10} />}
                               </button>
                             )}
                           </div>
+                          {item.delivery_address && (
+                            <button
+                              onClick={() => handleCopyLogisticsDetails(item)}
+                              className="text-[9px] text-primary hover:underline font-bold mt-1 flex items-center gap-0.5 cursor-pointer"
+                            >
+                              {copiedId === `all-${item.id}` ? <Check size={8} /> : <Copy size={8} />}
+                              Copy details
+                            </button>
+                          )}
                         </td>
                         
-                        {/* Items */}
-                        <td className="px-6 py-4 max-w-[200px]">
-                          <div className="space-y-0.5">
+                        {/* Ordered Items */}
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-1 max-w-[180px] max-h-[60px] overflow-y-auto custom-scrollbar">
                             {item.invoice_items && item.invoice_items.length > 0 ? (
                               item.invoice_items.map((it, idx) => (
-                                <div key={idx} className="text-[10px] font-semibold text-gray-700 dark:text-gray-300 truncate">
-                                  {it.quantity}x {it.description}
+                                <div key={idx} className="flex justify-between items-center text-[10px] font-medium bg-gray-50 dark:bg-gray-850 px-2 py-0.5 rounded border border-gray-100/30 dark:border-gray-800/10">
+                                  <span className="text-gray-700 dark:text-gray-300 truncate mr-2">{it.description}</span>
+                                  <span className="text-gray-400 shrink-0 font-bold">x{it.quantity}</span>
                                 </div>
                               ))
                             ) : (
@@ -516,6 +561,28 @@ const Logistics = () => {
               </tbody>
             </table>
           </div>
+          {/* Pagination Controls */}
+          {Math.ceil(searchedConversations.length / 15) > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-800">
+              <button
+                disabled={spreadsheetPage === 1}
+                onClick={() => setSpreadsheetPage(prev => Math.max(prev - 1, 1))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 rounded-xl text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-bold font-mono">
+                Page {spreadsheetPage} of {Math.ceil(searchedConversations.length / 15)}
+              </span>
+              <button
+                disabled={spreadsheetPage === Math.ceil(searchedConversations.length / 15)}
+                onClick={() => setSpreadsheetPage(prev => Math.min(prev + 1, Math.ceil(searchedConversations.length / 15)))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-750 rounded-xl text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

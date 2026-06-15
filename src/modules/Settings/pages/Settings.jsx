@@ -1027,7 +1027,7 @@ const Settings = () => {
                             Settlement & Payouts
                         </h2>
                         <p className="text-sm text-gray-500 -mt-3">
-                            When customers buy from your WhatsApp catalog or AI agents, payments are split instantly. Your revenue lands directly in your bank account minus Kasi's 2.0% platform fee.
+                            When customers buy from your WhatsApp catalog or AI agents, payments are split instantly. Your revenue lands directly in your bank account.
                         </p>
 
                         {billingDetails?.account_number ? (
@@ -1271,7 +1271,7 @@ const Settings = () => {
                                 Two-Factor Authentication (2FA)
                             </h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                Secure your account by requiring an authenticator code alongside your password when logging in. Kasi strictly follows NDPC compliance regulations.
+                                Secure your account by requiring an authenticator code alongside your password when logging in.
                             </p>
                         </div>
 

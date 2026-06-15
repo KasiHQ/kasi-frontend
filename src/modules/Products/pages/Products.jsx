@@ -24,6 +24,11 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTab, setFilterTab] = useState('All'); // All | In Stock | Out of Stock | Hidden
   const [viewMode, setViewMode] = useState('Grid'); // Grid | List
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterTab]);
   
   // Modal states
   const [showModal, setShowModal] = useState(false);
@@ -439,6 +444,41 @@ const Products = () => {
           Add Product
         </button>
       </div>
+      {/* Control Bar (Filters + Search) */}
+      {products.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {[
+              { label: 'All', count: products.length },
+              { label: 'In Stock', count: products.filter(p => p.in_stock && (p.stock_quantity === null || p.stock_quantity > 0)).length },
+              { label: 'Out of Stock', count: products.filter(p => !p.in_stock || (p.stock_quantity !== null && p.stock_quantity <= 0)).length },
+              { label: 'Hidden', count: products.filter(p => !p.in_stock).length },
+            ].map((f) => (
+              <button
+                key={f.label}
+                onClick={() => setFilterTab(f.label)}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  filterTab === f.label
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                }`}
+              >
+                {f.label} {f.count > 0 && `(${f.count})`}
+              </button>
+            ))}
+          </div>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Products Grid */}
       {loading ? (
@@ -458,116 +498,149 @@ const Products = () => {
             Add Your First Product
           </button>
         </div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
+          <Search size={48} className="mx-auto text-gray-300 mb-4" />
+          <h3 className="text-lg font-semibold text-dark mb-2">No matching products</h3>
+          <p className="text-gray-500 text-sm mb-4">
+            Try adjusting your search query or filters.
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group"
-            >
-              {/* Image area */}
-              <div 
-                className="relative h-48 bg-gray-50 flex items-center justify-center cursor-pointer overflow-hidden"
-                onClick={() => handleEdit(product)}
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredProducts.slice((currentPage - 1) * 12, currentPage * 12).map((product) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group"
               >
-                {product.image_url ? (
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                ) : (
-                  <ImageIcon size={32} className="text-gray-300" />
-                )}
-                
-                {/* Image Count Badge */}
-                {product.images && product.images.length > 1 && (
-                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-md flex items-center gap-1.5 shadow-sm">
-                    <ImageIcon2 size={12} />
-                    {product.images.length}
-                  </div>
-                )}
-                
-                {/* Hover overlay hint */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-white/90 backdrop-blur-sm text-dark text-xs font-medium px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
-                    <Pencil size={12} />
-                    Edit Details
+                {/* Image area */}
+                <div 
+                  className="relative h-48 bg-gray-50 flex items-center justify-center cursor-pointer overflow-hidden"
+                  onClick={() => handleEdit(product)}
+                >
+                  {product.image_url ? (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <ImageIcon size={32} className="text-gray-300" />
+                  )}
+                  
+                  {/* Image Count Badge */}
+                  {product.images && product.images.length > 1 && (
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2 py-1 rounded-md flex items-center gap-1.5 shadow-sm">
+                      <ImageIcon2 size={12} />
+                      {product.images.length}
+                    </div>
+                  )}
+                  
+                  {/* Hover overlay hint */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-white/90 backdrop-blur-sm text-dark text-xs font-medium px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
+                      <Pencil size={12} />
+                      Edit Details
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Info */}
-              <div className="p-4 flex flex-col flex-1">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-semibold text-dark text-base leading-tight">{product.name}</h3>
-                    {product.description && (
-                      <p className="text-gray-500 text-xs mt-1 line-clamp-2">{product.description}</p>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-end gap-1.5 ml-3">
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-                        product.in_stock
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-500'
-                      }`}
-                    >
-                      {product.in_stock ? 'Visible' : 'Hidden'}
-                    </span>
-                    {product.stock_quantity !== null && (
+                {/* Info */}
+                <div className="p-4 flex flex-col flex-1">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-semibold text-dark text-base leading-tight">{product.name}</h3>
+                      {product.description && (
+                        <p className="text-gray-500 text-xs mt-1 line-clamp-2">{product.description}</p>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 ml-3">
                       <span
-                        className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
-                          product.stock_quantity <= 0
-                            ? 'bg-red-100 text-red-600'
-                            : product.stock_quantity <= 5
-                            ? 'bg-orange-100 text-orange-700 animate-pulse'
-                            : 'bg-blue-50 text-blue-600'
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                          product.in_stock
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-500'
                         }`}
                       >
-                        {product.stock_quantity <= 0 
-                          ? 'Out of Stock' 
-                          : product.stock_quantity <= 5 
-                          ? `Low Stock: ${product.stock_quantity}` 
-                          : `${product.stock_quantity} in stock`}
+                        {product.in_stock ? 'Visible' : 'Hidden'}
                       </span>
+                      {product.stock_quantity !== null && (
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${
+                            product.stock_quantity <= 0
+                              ? 'bg-red-100 text-red-600'
+                              : product.stock_quantity <= 5
+                              ? 'bg-orange-100 text-orange-700 animate-pulse'
+                              : 'bg-blue-50 text-blue-600'
+                          }`}
+                        >
+                          {product.stock_quantity <= 0 
+                            ? 'Out of Stock' 
+                            : product.stock_quantity <= 5 
+                            ? `Low Stock: ${product.stock_quantity}` 
+                            : `${product.stock_quantity} in stock`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-auto pt-3">
+                    <span className="text-lg font-bold text-primary">₦{Number(product.price).toLocaleString()}</span>
+                    {product.min_price && (
+                      <span className="text-xs text-gray-400 line-through">₦{Number(product.min_price).toLocaleString()}</span>
                     )}
                   </div>
-                </div>
-
-                <div className="flex items-center gap-3 mt-auto pt-3">
-                  <span className="text-lg font-bold text-primary">₦{Number(product.price).toLocaleString()}</span>
-                  {product.min_price && (
-                    <span className="text-xs text-gray-400 line-through">₦{Number(product.min_price).toLocaleString()}</span>
+                  {product.bulk_discount_quantity && product.bulk_discount_percentage && (
+                    <div className="mt-2 inline-flex items-center self-start bg-green-50 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded border border-green-100">
+                      Buy {product.bulk_discount_quantity}+ get {product.bulk_discount_percentage}% off
+                    </div>
                   )}
-                </div>
-                {product.bulk_discount_quantity && product.bulk_discount_percentage && (
-                  <div className="mt-2 inline-flex items-center self-start bg-green-50 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded border border-green-100">
-                    Buy {product.bulk_discount_quantity}+ get {product.bulk_discount_percentage}% off
-                  </div>
-                )}
 
-                <div className="flex items-center gap-2 border-t border-gray-100 mt-4 pt-3">
-                  <button
-                    onClick={() => handleEdit(product)}
-                    className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 py-1.5 rounded-lg transition-colors"
-                  >
-                    <Pencil size={14} />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(product)}
-                    className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 py-1.5 rounded-lg transition-colors"
-                  >
-                    <Trash2 size={14} />
-                    Delete
-                  </button>
+                  <div className="flex items-center gap-2 border-t border-gray-100 mt-4 pt-3">
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 py-1.5 rounded-lg transition-colors"
+                    >
+                      <Pencil size={14} />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(product)}
+                      className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 py-1.5 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={14} />
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {Math.ceil(filteredProducts.length / 12) > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm mt-6">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Previous
+              </button>
+              <span className="text-xs text-gray-500 font-semibold font-mono">
+                Page {currentPage} of {Math.ceil(filteredProducts.length / 12)}
+              </span>
+              <button
+                disabled={currentPage === Math.ceil(filteredProducts.length / 12)}
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredProducts.length / 12)))}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              >
+                Next
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {/* Add/Edit Modal */}
