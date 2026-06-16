@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   MessageCircle, Send, Instagram, CheckCircle, XCircle,
-  ExternalLink, Copy, Loader2, Wifi, WifiOff, RefreshCw, LogOut, Zap, Facebook
+  ExternalLink, Copy, Loader2, Wifi, WifiOff, RefreshCw, LogOut, Zap, Facebook, Cpu
 } from 'lucide-react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import useNetwork from '../../../hooks/useNetwork';
 import { META_APP_ID } from '../../../config';
+import { conversationAPI } from '../../../api/conversations';
 
 const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   const { token } = useAuth();
@@ -42,6 +43,9 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   const [fbStatus, setFbStatus] = useState({ connected: false, status: 'disconnected', pageId: '' });
   const [loadingFB, setLoadingFB] = useState(true);
 
+  // Global Kasi status state
+  const [isAutomated, setIsAutomated] = useState(true);
+
   const pairingCodeRef = useRef(pairingCode);
   pairingCodeRef.current = pairingCode;
 
@@ -50,6 +54,7 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
     fetchWhatsAppStatus();
     fetchInstagramStatus();
     fetchFacebookStatus();
+    fetchGlobalGatekeeperStatus();
 
     const interval = setInterval(() => {
       if (!waStatus.connected) {
@@ -120,6 +125,28 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
     } catch {
       setFbStatus({ connected: false, status: 'disconnected', pageId: '' });
     } finally { setLoadingFB(false); }
+  };
+
+  const fetchGlobalGatekeeperStatus = async () => {
+    try {
+      const res = await conversationAPI.getGlobalGatekeeperStatus();
+      setIsAutomated(res.is_automated);
+    } catch (err) {
+      console.error('Failed to fetch global gatekeeper status:', err);
+    }
+  };
+
+  const handleToggleAutomated = async () => {
+    try {
+      const nextVal = !isAutomated;
+      setIsAutomated(nextVal);
+      await conversationAPI.toggleGlobalGatekeeper(nextVal);
+      addToast(nextVal ? 'Kasi AI is running!' : 'Kasi AI is paused!', 'success');
+    } catch (err) {
+      console.error('Failed to toggle global gatekeeper:', err);
+      addToast('Failed to toggle automation state', 'error');
+      setIsAutomated(isAutomated);
+    }
   };
 
   const connectTelegram = async () => {
@@ -476,11 +503,41 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
-      {renderWhatsApp()}
-      {renderTelegram()}
-      {renderInstagram()}
-      {renderFacebook()}
+    <div className="space-y-6 pb-20">
+      {/* Global Kasi AI status banner */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${isAutomated ? 'bg-[#ECFDF3]' : 'bg-[#FEF3C7]'}`}>
+            <Cpu size={20} className={isAutomated ? 'text-[#12B76A]' : 'text-[#F79009]'} />
+          </div>
+          <div>
+            <h3 className="font-bold text-dark dark:text-white flex items-center gap-2">
+              Kasi AI Assistant 
+              <span className={`inline-flex items-center w-2 h-2 rounded-full ${isAutomated ? 'bg-[#12B76A] animate-pulse' : 'bg-[#F79009]'}`} />
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {isAutomated 
+                ? "Kasi is actively responding to your customers on all connected platforms." 
+                : "Kasi is paused. Customers will not receive automated responses."}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleToggleAutomated}
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAutomated ? 'bg-[#1A7A4A]' : 'bg-gray-200 dark:bg-gray-700'}`}
+        >
+          <span
+            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isAutomated ? 'translate-x-5' : 'translate-x-0'}`}
+          />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {renderWhatsApp()}
+        {renderTelegram()}
+        {renderInstagram()}
+        {renderFacebook()}
+      </div>
     </div>
   );
 };

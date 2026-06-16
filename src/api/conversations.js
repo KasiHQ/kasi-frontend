@@ -54,5 +54,17 @@ export const conversationAPI = {
   clearInstructions: async (conversationId) => {
     const response = await api.delete(`/api/conversations/${conversationId}/instructions`);
     return response.data;
+  },
+
+  // Get global gatekeeper status
+  getGlobalGatekeeperStatus: async () => {
+    const response = await api.get('/api/conversations/gatekeeper/status');
+    return response.data;
+  },
+
+  // Toggle global gatekeeper
+  toggleGlobalGatekeeper: async (isAutomated) => {
+    const response = await api.post('/api/conversations/gatekeeper/toggle', { is_automated: isAutomated });
+    return response.data;
   }
 };
