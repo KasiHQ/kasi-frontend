@@ -112,21 +112,6 @@ const parseMarkdown = (markdown) => {
   return result.join('\n');
 };
 
-const TIPTAP_EXTENSIONS = [
-  StarterKit,
-  LinkExtension.configure({
-    openOnClick: false,
-    HTMLAttributes: {
-      class: 'text-emerald-600 dark:text-emerald-400 underline font-semibold',
-    },
-  }),
-  ImageExtension.configure({
-    HTMLAttributes: {
-      class: 'rounded-xl max-h-[400px] object-cover mx-auto my-6 shadow-md block max-w-full',
-    },
-  }),
-];
-
 const AdminBlog = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -177,8 +162,23 @@ const AdminBlog = () => {
     return list;
   }, [posts]);
 
+  const tiptapExtensions = useMemo(() => [
+    StarterKit,
+    LinkExtension.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        class: 'text-emerald-600 dark:text-emerald-400 underline font-semibold',
+      },
+    }),
+    ImageExtension.configure({
+      HTMLAttributes: {
+        class: 'rounded-xl max-h-[400px] object-cover mx-auto my-6 shadow-md block max-w-full',
+      },
+    }),
+  ], []);
+
   const editor = useEditor({
-    extensions: TIPTAP_EXTENSIONS,
+    extensions: tiptapExtensions,
     content: formData.content || '',
     onUpdate: ({ editor }) => {
       setFormData(prev => ({ ...prev, content: editor.getHTML() }));
