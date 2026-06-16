@@ -11,6 +11,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import Login from './modules/Auth/pages/Login';
 import Signup from './modules/Auth/pages/Signup';
 import ForgotPassword from './modules/Auth/pages/ForgotPassword';
+import VerifyEmail from './modules/Auth/pages/VerifyEmail';
 
 import CreateInvoice from './modules/Invoices/pages/CreateInvoice';
 import Invoices from './modules/Invoices/pages/Invoices';
@@ -84,6 +85,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/data-deletion" element={<DataDeletion />} />

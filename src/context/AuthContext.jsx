@@ -40,6 +40,12 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       return data.user;
     } catch (error) {
+      if (error.response?.data?.email_unverified) {
+        const customErr = new Error(error.response.data.message || 'Email not verified');
+        customErr.email_unverified = true;
+        customErr.email = error.response.data.email || email;
+        throw customErr;
+      }
       const message = error.response?.data?.message || 'Login failed';
       throw new Error(message);
     }
@@ -71,6 +77,26 @@ export const AuthProvider = ({ children }) => {
       return data.user;
     } catch (error) {
       const message = error.response?.data?.message || 'Google authentication failed';
+      throw new Error(message);
+    }
+  };
+
+  const verifyEmail = async (email, code) => {
+    try {
+      const res = await api.post('/api/auth/verify-email', { email, code });
+      return res.data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Verification failed';
+      throw new Error(message);
+    }
+  };
+
+  const resendVerificationCode = async (email) => {
+    try {
+      const res = await api.post('/api/auth/resend-verification', { email });
+      return res.data;
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to resend code';
       throw new Error(message);
     }
   };
@@ -117,7 +143,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, loginWithGoogle, verify2Fa, forgotPassword, resetPassword, logout, loading, fetchUser }}>
+    <AuthContext.Provider value={{ user, token, login, signup, loginWithGoogle, verifyEmail, resendVerificationCode, verify2Fa, forgotPassword, resetPassword, logout, loading, fetchUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

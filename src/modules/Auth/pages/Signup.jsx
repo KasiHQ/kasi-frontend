@@ -125,13 +125,10 @@ const Signup = () => {
       // 1. Signup user
       await signup(businessName, email, password, businessType);
       
-      // 2. Automate login
-      await login(email, password);
+      addToast('Registration successful! Please verify your email.', 'success');
       
-      addToast('Account created successfully!', 'success');
-      
-      // 3. Route to onboarding
-      navigate('/onboarding');
+      // 2. Route to verification
+      navigate('/verify-email', { state: { email } });
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {

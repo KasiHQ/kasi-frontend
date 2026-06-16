@@ -94,6 +94,10 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
+      if (err.email_unverified) {
+        navigate('/verify-email', { state: { email: err.email || email } });
+        return;
+      }
       setError(err.message || 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
