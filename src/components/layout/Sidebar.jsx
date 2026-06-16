@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { BarChart3, Settings, LogOut, MessageSquare, Package, Truck, Users, TrendingUp, ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, Briefcase, Calendar, Home, DollarSign } from 'lucide-react';
+import { BarChart3, Settings, LogOut, MessageSquare, Package, Truck, Users, TrendingUp, ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, Briefcase, Calendar, Home, DollarSign, FileText } from 'lucide-react';
 import clsx from 'clsx';
 import { useLayout } from '../../context/LayoutContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -69,6 +69,7 @@ const Sidebar = ({ onWidthChange }) => {
     
     if (adminRole === 'Super Admin' || adminRole === 'Support Admin') {
       navItems.push({ icon: Users, label: 'Vendors', path: '/kasisalienceadministration/users' });
+      navItems.push({ icon: FileText, label: 'Blog Posts', path: '/kasisalienceadministration/blog' });
     }
     if (adminRole === 'Super Admin' || adminRole === 'Finance Admin') {
       navItems.push({ icon: BarChart3, label: 'Invoices', path: '/kasisalienceadministration/invoices' });
