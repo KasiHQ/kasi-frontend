@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './modules/Dashboard/pages/Dashboard';
 import LandingPage from './modules/Landing/pages/LandingPage';
 import MainLayout from './components/layout/MainLayout';
@@ -60,6 +60,17 @@ function AnalyticsTracker() {
   return null;
 }
 
+// Helper component to scroll to top on navigation changes
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -68,6 +79,7 @@ function App() {
         <LayoutProvider>
         <Router>
           <AnalyticsTracker />
+          <ScrollToTop />
           <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

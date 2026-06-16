@@ -99,6 +99,7 @@ const Dashboard = () => {
   const [services, setServices] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [analytics, setAnalytics] = useState(null);
+  const [isAutomated, setIsAutomated] = useState(true);
 
   useEffect(() => {
     if (user?.is_admin) {
@@ -120,8 +121,9 @@ const Dashboard = () => {
         api.get('/api/services/').catch(() => ({ data: [] })),
         api.get('/api/analytics/').catch(() => ({ data: { data: {} } })),
         api.get('/api/services/bookings').catch(() => ({ data: [] })),
+        conversationAPI.getGlobalGatekeeperStatus().catch(() => ({ is_automated: true })),
       ];
-      const [invRes, convRes, pipeRes, prodRes, srvRes, analyticsRes, bookRes] = await Promise.all(promises);
+      const [invRes, convRes, pipeRes, prodRes, srvRes, analyticsRes, bookRes, gkRes] = await Promise.all(promises);
       setInvoices(invRes.data || []);
       setConversations(convRes.data || []);
       setPipeline(pipeRes.data || {});
@@ -129,10 +131,22 @@ const Dashboard = () => {
       setServices(srvRes.data || []);
       setAnalytics(analyticsRes.data.data || {});
       setBookings(Array.isArray(bookRes.data) ? bookRes.data : []);
+      setIsAutomated(gkRes?.is_automated ?? true);
     } catch (err) {
       console.error('Dashboard fetch error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleAutomated = async () => {
+    try {
+      const nextVal = !isAutomated;
+      setIsAutomated(nextVal);
+      await conversationAPI.toggleGlobalGatekeeper(nextVal);
+    } catch (err) {
+      console.error('Failed to toggle global gatekeeper:', err);
+      setIsAutomated(isAutomated);
     }
   };
 
@@ -189,13 +203,21 @@ const Dashboard = () => {
             {getGreeting()}, {user?.business_name || 'AFH'} 👋
           </h1>
           <p className="text-sm text-[#667085] mt-1">
-            {formatDate()} · Kasi is live and handling conversations
+            {formatDate()} · {isAutomated ? 'Kasi is live and handling conversations' : 'Kasi is paused'}
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-[#ECFDF3] text-[#027A48] border border-[#D1FAE5] px-4 py-2 rounded-full text-xs font-semibold self-start sm:self-center shadow-sm select-none">
-          <span className="w-2 h-2 rounded-full bg-[#12B76A] animate-pulse" />
-          Kasi is running
-        </div>
+        <button
+          onClick={handleToggleAutomated}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold self-start sm:self-center shadow-sm cursor-pointer border transition-all duration-300 ${
+            isAutomated 
+              ? 'bg-[#ECFDF3] text-[#027A48] border-[#D1FAE5] hover:bg-[#D1FAE5] active:scale-[0.97]' 
+              : 'bg-[#FEF3C7] text-[#B54708] border-[#FDE68A] hover:bg-[#FDE68A] active:scale-[0.97]'
+          }`}
+          title={isAutomated ? "Click to Pause Kasi AI Chatbot" : "Click to Resume Kasi AI Chatbot"}
+        >
+          <span className={`w-2 h-2 rounded-full ${isAutomated ? 'bg-[#12B76A] animate-pulse' : 'bg-[#F79009]'} transition-colors duration-300`} />
+          <span>{isAutomated ? 'Kasi is running' : 'Kasi is paused'}</span>
+        </button>
       </div>
 
       {isServiceBusiness ? (
