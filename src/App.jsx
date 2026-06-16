@@ -39,6 +39,7 @@ import AdminBroadcasts from './modules/Admin/pages/AdminBroadcasts';
 import AdminTransactions from './modules/Admin/pages/AdminTransactions';
 import AdminWaitlist from './modules/Admin/pages/AdminWaitlist';
 import AdminAuditLogs from './modules/Admin/pages/AdminAuditLogs';
+import AdminBlog from './modules/Admin/pages/AdminBlog';
 import BillingDashboard from './modules/Billing/pages/BillingDashboard';
 import PaymentCallback from './modules/Billing/pages/PaymentCallback';
 import PaymentSuccess from './modules/Payments/pages/PaymentSuccess';
@@ -226,6 +227,11 @@ function App() {
               <Route path="/kasisalienceadministration/broadcasts" element={
                 <ProtectedRoute allowedRoles={['Super Admin', 'Support Admin']}>
                   <AdminBroadcasts />
+                </ProtectedRoute>
+              } />
+              <Route path="/kasisalienceadministration/blog" element={
+                <ProtectedRoute allowedRoles={['Super Admin', 'Support Admin']}>
+                  <AdminBlog />
                 </ProtectedRoute>
               } />
               <Route path="/kasisalienceadministration/staff" element={
