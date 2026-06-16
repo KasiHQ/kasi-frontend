@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Plus, Edit, Trash2, Globe, Eye, Upload, X, Loader2, ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, User, Bold, Italic, Link2, List, Code, Quote, AlertCircle, Image } from 'lucide-react';
 import api from '../../../api/axios';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import LinkExtension from '@tiptap/extension-link';
+import ImageExtension from '@tiptap/extension-image';
 
 const CATEGORIES = [
   'Announcements',
@@ -135,28 +139,35 @@ const AdminBlog = () => {
   const [imageUploading, setImageUploading] = useState({ featured: false, author: false });
   const [submitLoading, setSubmitLoading] = useState(false);
   
-  const textareaRef = React.useRef(null);
   const [inlineUploading, setInlineUploading] = useState(false);
 
-  const insertAtCursor = (beforeText, afterText = '') => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      LinkExtension.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-emerald-600 dark:text-emerald-400 underline font-semibold',
+        },
+      }),
+      ImageExtension.configure({
+        HTMLAttributes: {
+          class: 'rounded-xl max-h-[400px] object-cover mx-auto my-6 shadow-md block max-w-full',
+        },
+      }),
+    ],
+    content: formData.content || '',
+    onUpdate: ({ editor }) => {
+      setFormData(prev => ({ ...prev, content: editor.getHTML() }));
+    },
+  });
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    
-    const selectedText = text.substring(start, end);
-    const replacement = beforeText + selectedText + afterText;
-    
-    const newContent = text.substring(0, start) + replacement + text.substring(end);
-    setFormData(prev => ({ ...prev, content: newContent }));
-    
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + beforeText.length, start + beforeText.length + selectedText.length);
-    }, 0);
-  };
+  // Sync content when loading different posts
+  useEffect(() => {
+    if (editor && formData.content !== editor.getHTML()) {
+      editor.commands.setContent(formData.content || '');
+    }
+  }, [formData.content, editor]);
 
   const handleInlineImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -171,22 +182,13 @@ const AdminBlog = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      insertAtCursor(`\n![${file.name.split('.')[0]}](${res.data.url})\n`);
+      if (editor) {
+        editor.chain().focus().setImage({ src: res.data.url, alt: file.name }).run();
+      }
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to upload image. Make sure image is under 5MB.');
     } finally {
       setInlineUploading(false);
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-      e.preventDefault();
-      insertAtCursor('**', '**');
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
-      e.preventDefault();
-      insertAtCursor('*', '*');
     }
   };
 
@@ -448,8 +450,96 @@ const AdminBlog = () => {
               </div>
             </div>
 
-            {/* Markdown Content Editor */}
+            {/* Rich Text Editor */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/50 overflow-hidden flex flex-col">
+              {/* Styling for ProseMirror */}
+              <style dangerouslySetInnerHTML={{ __html: `
+                .ProseMirror {
+                  outline: none;
+                  min-height: 400px;
+                  padding: 1.25rem;
+                  font-family: inherit;
+                }
+                .ProseMirror p {
+                  margin: 0.75rem 0;
+                  line-height: 1.625;
+                }
+                .ProseMirror h2 {
+                  font-size: 1.5rem;
+                  font-weight: 800;
+                  margin-top: 1.75rem;
+                  margin-bottom: 0.75rem;
+                  border-bottom: 1px solid #f3f4f6;
+                  padding-bottom: 0.25rem;
+                  color: #111827;
+                }
+                .dark .ProseMirror h2 {
+                  border-color: #374151;
+                  color: #f9fafb;
+                }
+                .ProseMirror h3 {
+                  font-size: 1.25rem;
+                  font-weight: 700;
+                  margin-top: 1.5rem;
+                  margin-bottom: 0.5rem;
+                  color: #1f2937;
+                }
+                .dark .ProseMirror h3 {
+                  color: #f3f4f6;
+                }
+                .ProseMirror ul {
+                  list-style-type: disc;
+                  padding-left: 1.5rem;
+                  margin: 0.75rem 0;
+                }
+                .ProseMirror ol {
+                  list-style-type: decimal;
+                  padding-left: 1.5rem;
+                  margin: 0.75rem 0;
+                }
+                .ProseMirror li {
+                  margin: 0.25rem 0;
+                }
+                .ProseMirror blockquote {
+                  border-left: 4px solid #059669;
+                  background-color: rgba(240, 253, 244, 0.4);
+                  padding: 0.75rem 1rem;
+                  margin: 1rem 0;
+                  border-radius: 0 0.5rem 0.5rem 0;
+                  font-style: italic;
+                }
+                .dark .ProseMirror blockquote {
+                  background-color: rgba(6, 78, 59, 0.1);
+                  border-color: #10b981;
+                }
+                .ProseMirror code {
+                  font-family: monospace;
+                  background-color: #f3f4f6;
+                  padding: 0.125rem 0.25rem;
+                  border-radius: 0.25rem;
+                  color: #059669;
+                }
+                .dark .ProseMirror code {
+                  background-color: #1f2937;
+                  color: #34d399;
+                }
+                .ProseMirror a {
+                  color: #059669;
+                  text-decoration: underline;
+                  font-weight: 600;
+                }
+                .dark .ProseMirror a {
+                  color: #34d399;
+                }
+                .ProseMirror img {
+                  border-radius: 0.75rem;
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                  margin: 1.5rem auto;
+                  max-width: 100%;
+                  display: block;
+                }
+              `}} />
+
               {/* Tab Header */}
               <div className="flex border-b border-gray-150 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4">
                 <button
@@ -461,7 +551,7 @@ const AdminBlog = () => {
                       : 'border-transparent text-gray-400 hover:text-gray-600'
                   }`}
                 >
-                  Write Markdown
+                  Write Content
                 </button>
                 <button
                   type="button"
@@ -480,134 +570,167 @@ const AdminBlog = () => {
               <div className="p-4 min-h-[400px]">
                 {activeTab === 'write' ? (
                   <div className="space-y-2">
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500 bg-gray-50 dark:bg-gray-900">
-                      {/* Editor Toolbar */}
-                      <div className="flex flex-wrap items-center gap-1 p-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('**', '**')}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Bold (Ctrl+B)"
-                        >
-                          <Bold size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('*', '*')}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Italic (Ctrl+I)"
-                        >
-                          <Italic size={16} />
-                        </button>
-                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('## ')}
-                          className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs font-bold text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Heading 2"
-                        >
-                          H2
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('### ')}
-                          className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs font-bold text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Heading 3"
-                        >
-                          H3
-                        </button>
-                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('- ')}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Bullet List"
-                        >
-                          <List size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('> ')}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Blockquote"
-                        >
-                          <Quote size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('`', '`')}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Inline Code"
-                        >
-                          <Code size={16} />
-                        </button>
-                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('[', '](https://)')}
-                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
-                          title="Insert Link"
-                        >
-                          <Link2 size={16} />
-                        </button>
-                        
-                        <button
-                          type="button"
-                          onClick={() => insertAtCursor('> [!NOTE]\n> ')}
-                          className="px-2 py-1 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded text-xs font-bold text-emerald-600 dark:text-emerald-400 transition-colors flex items-center gap-1"
-                          title="Insert Note Card"
-                        >
-                          <AlertCircle size={13} /> Alert
-                        </button>
+                    {editor ? (
+                      <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500 bg-gray-50 dark:bg-gray-900">
+                        {/* Editor Toolbar */}
+                        <div className="flex flex-wrap items-center gap-1 p-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                          <button
+                            type="button"
+                            onClick={() => editor.chain().focus().toggleBold().run()}
+                            className={`p-1.5 rounded transition-colors ${
+                              editor.isActive('bold')
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Bold (Ctrl+B)"
+                          >
+                            <Bold size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => editor.chain().focus().toggleItalic().run()}
+                            className={`p-1.5 rounded transition-colors ${
+                              editor.isActive('italic')
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Italic (Ctrl+I)"
+                          >
+                            <Italic size={16} />
+                          </button>
+                          <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                          <button
+                            type="button"
+                            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                            className={`px-2 py-1 rounded text-xs font-bold transition-colors ${
+                              editor.isActive('heading', { level: 2 })
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Heading 2"
+                          >
+                            H2
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                            className={`px-2 py-1 rounded text-xs font-bold transition-colors ${
+                              editor.isActive('heading', { level: 3 })
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Heading 3"
+                          >
+                            H3
+                          </button>
+                          <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                          <button
+                            type="button"
+                            onClick={() => editor.chain().focus().toggleBulletList().run()}
+                            className={`p-1.5 rounded transition-colors ${
+                              editor.isActive('bulletList')
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Bullet List"
+                          >
+                            <List size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                            className={`p-1.5 rounded transition-colors ${
+                              editor.isActive('blockquote')
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Blockquote"
+                          >
+                            <Quote size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => editor.chain().focus().toggleCode().run()}
+                            className={`p-1.5 rounded transition-colors ${
+                              editor.isActive('code')
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Code"
+                          >
+                            <Code size={16} />
+                          </button>
+                          <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const previousUrl = editor.getAttributes('link').href;
+                              const url = window.prompt('Enter Link URL:', previousUrl || 'https://');
+                              if (url === null) return;
+                              if (url === '') {
+                                editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                                return;
+                              }
+                              editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+                            }}
+                            className={`p-1.5 rounded transition-colors ${
+                              editor.isActive('link')
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            title="Insert Link"
+                          >
+                            <Link2 size={16} />
+                          </button>
 
-                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              editor.chain().focus().toggleBlockquote().run();
+                              editor.chain().focus().insertContent('💡 <strong>NOTE:</strong> ').run();
+                            }}
+                            className="px-2 py-1 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded text-xs font-bold text-emerald-600 dark:text-emerald-400 transition-colors flex items-center gap-1"
+                            title="Insert Note Card"
+                          >
+                            <AlertCircle size={13} /> Alert
+                          </button>
 
-                        {/* Inline Image Uploader */}
-                        <label className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold" title="Insert Image between articles">
-                          {inlineUploading ? (
-                            <Loader2 size={14} className="animate-spin text-emerald-500" />
-                          ) : (
-                            <Image size={14} className="text-emerald-500" />
-                          )}
-                          <span className="text-emerald-650 dark:text-emerald-400 font-bold">Insert Image</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleInlineImageUpload}
-                            className="hidden"
-                            disabled={inlineUploading}
-                          />
-                        </label>
+                          <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+                          {/* Inline Image Uploader */}
+                          <label className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold" title="Insert Image between articles">
+                            {inlineUploading ? (
+                              <Loader2 size={14} className="animate-spin text-emerald-500" />
+                            ) : (
+                              <Image size={14} className="text-emerald-500" />
+                            )}
+                            <span className="text-emerald-650 dark:text-emerald-400 font-bold">Insert Image</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleInlineImageUpload}
+                              className="hidden"
+                              disabled={inlineUploading}
+                            />
+                          </label>
+                        </div>
+
+                        <EditorContent editor={editor} className="bg-transparent" />
                       </div>
-
-                      <textarea
-                        ref={textareaRef}
-                        required
-                        value={formData.content}
-                        onChange={e => setFormData({ ...formData, content: e.target.value })}
-                        onKeyDown={handleKeyDown}
-                        className="w-full p-4 border-0 bg-transparent outline-none font-mono text-sm text-gray-950 dark:text-white min-h-[400px] block focus:ring-0"
-                        placeholder={`Write your article here...
-Use the toolbar above to format and upload images directly inside the content.
-
-Supported:
-## Subheading
-Write text here. Use **bold** or *italics*.
-You can embed inline \`code\` blocks.
-
-> [!NOTE]
-> This is a beautiful green alert card in Mintlify layout.
-You can also use [!TIP], [!WARNING], or [!IMPORTANT] inside blockquotes.`}
-                      />
-                    </div>
+                    ) : (
+                      <div className="flex items-center justify-center p-10 bg-gray-50 rounded-xl">
+                        <Loader2 className="w-6 h-6 animate-spin text-emerald-500 mr-2" />
+                        <span className="text-sm text-gray-500">Initializing editor...</span>
+                      </div>
+                    )}
                     <p className="text-[11px] text-gray-400">
                       Pro-tip: Use the <strong>Insert Image</strong> button in the toolbar to upload images directly between your paragraphs.
                     </p>
                   </div>
                 ) : (
                   <div 
-                    className="prose dark:prose-invert max-w-none p-4 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl min-h-[400px]"
-                    dangerouslySetInnerHTML={{ __html: parseMarkdown(formData.content) }}
+                    className="prose dark:prose-invert max-w-none p-4 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl min-h-[400px] select-text"
+                    dangerouslySetInnerHTML={{ __html: formData.content }}
                   />
                 )}
               </div>
@@ -616,7 +739,6 @@ You can also use [!TIP], [!WARNING], or [!IMPORTANT] inside blockquotes.`}
 
           {/* Settings / Uploads Side Panel (1 Column) */}
           <div className="space-y-6">
-            {/* Featured Cover Image */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700/50 space-y-4">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
                 Cover Photo
