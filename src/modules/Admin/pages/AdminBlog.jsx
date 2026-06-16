@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FileText, Plus, Edit, Trash2, Globe, Eye, Upload, X, Loader2, ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, User, Bold, Italic, Link2, List, Code, Quote, AlertCircle, Image } from 'lucide-react';
 import api from '../../../api/axios';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -112,6 +112,21 @@ const parseMarkdown = (markdown) => {
   return result.join('\n');
 };
 
+const TIPTAP_EXTENSIONS = [
+  StarterKit,
+  LinkExtension.configure({
+    openOnClick: false,
+    HTMLAttributes: {
+      class: 'text-emerald-600 dark:text-emerald-400 underline font-semibold',
+    },
+  }),
+  ImageExtension.configure({
+    HTMLAttributes: {
+      class: 'rounded-xl max-h-[400px] object-cover mx-auto my-6 shadow-md block max-w-full',
+    },
+  }),
+];
+
 const AdminBlog = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -141,21 +156,29 @@ const AdminBlog = () => {
   
   const [inlineUploading, setInlineUploading] = useState(false);
 
+  const uniqueAuthors = useMemo(() => {
+    const list = [
+      { name: 'Han Wang', role: 'Co-Founder', image: '' }
+    ];
+    const seen = new Set(['han wang']);
+    posts.forEach(post => {
+      if (post.author_name) {
+        const nameLower = post.author_name.trim().toLowerCase();
+        if (!seen.has(nameLower)) {
+          seen.add(nameLower);
+          list.push({
+            name: post.author_name,
+            role: post.author_role || '',
+            image: post.author_image || ''
+          });
+        }
+      }
+    });
+    return list;
+  }, [posts]);
+
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      LinkExtension.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-emerald-600 dark:text-emerald-400 underline font-semibold',
-        },
-      }),
-      ImageExtension.configure({
-        HTMLAttributes: {
-          class: 'rounded-xl max-h-[400px] object-cover mx-auto my-6 shadow-md block max-w-full',
-        },
-      }),
-    ],
+    extensions: TIPTAP_EXTENSIONS,
     content: formData.content || '',
     onUpdate: ({ editor }) => {
       setFormData(prev => ({ ...prev, content: editor.getHTML() }));
@@ -791,6 +814,46 @@ const AdminBlog = () => {
             {/* Author Settings */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700/50 space-y-4">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white">Author Profile</h3>
+              
+              <div>
+                <label className="block text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase mb-1">Choose Existing Author</label>
+                <select
+                  value={
+                    uniqueAuthors.findIndex(a => a.name.toLowerCase().trim() === formData.author_name.toLowerCase().trim()) !== -1
+                      ? uniqueAuthors.findIndex(a => a.name.toLowerCase().trim() === formData.author_name.toLowerCase().trim())
+                      : 'new'
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'new') {
+                      setFormData(prev => ({
+                        ...prev,
+                        author_name: '',
+                        author_role: '',
+                        author_image: ''
+                      }));
+                    } else {
+                      const selected = uniqueAuthors[parseInt(val)];
+                      if (selected) {
+                        setFormData(prev => ({
+                          ...prev,
+                          author_name: selected.name,
+                          author_role: selected.role,
+                          author_image: selected.image
+                        }));
+                      }
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
+                >
+                  {uniqueAuthors.map((author, index) => (
+                    <option key={index} value={index}>
+                      {author.name} {author.role ? `(${author.role})` : ''}
+                    </option>
+                  ))}
+                  <option value="new">+ Add New Author...</option>
+                </select>
+              </div>
               
               <div className="flex items-center gap-3">
                 {formData.author_image ? (
