@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Edit, Trash2, Globe, Eye, Upload, X, Loader2, ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, User } from 'lucide-react';
+import { FileText, Plus, Edit, Trash2, Globe, Eye, Upload, X, Loader2, ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, User, Bold, Italic, Link2, List, Code, Quote, AlertCircle, Image } from 'lucide-react';
 import api from '../../../api/axios';
 
 const CATEGORIES = [
@@ -134,6 +134,61 @@ const AdminBlog = () => {
   
   const [imageUploading, setImageUploading] = useState({ featured: false, author: false });
   const [submitLoading, setSubmitLoading] = useState(false);
+  
+  const textareaRef = React.useRef(null);
+  const [inlineUploading, setInlineUploading] = useState(false);
+
+  const insertAtCursor = (beforeText, afterText = '') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    const selectedText = text.substring(start, end);
+    const replacement = beforeText + selectedText + afterText;
+    
+    const newContent = text.substring(0, start) + replacement + text.substring(end);
+    setFormData(prev => ({ ...prev, content: newContent }));
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + beforeText.length, start + beforeText.length + selectedText.length);
+    }, 0);
+  };
+
+  const handleInlineImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+    
+    try {
+      setInlineUploading(true);
+      const res = await api.post('/api/blog/admin/upload-image', uploadData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      insertAtCursor(`\n![${file.name.split('.')[0]}](${res.data.url})\n`);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to upload image. Make sure image is under 5MB.');
+    } finally {
+      setInlineUploading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+      e.preventDefault();
+      insertAtCursor('**', '**');
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+      e.preventDefault();
+      insertAtCursor('*', '*');
+    }
+  };
 
   const fetchPosts = async () => {
     try {
@@ -425,27 +480,128 @@ const AdminBlog = () => {
               <div className="p-4 min-h-[400px]">
                 {activeTab === 'write' ? (
                   <div className="space-y-2">
-                    <textarea
-                      required
-                      value={formData.content}
-                      onChange={e => setFormData({ ...formData, content: e.target.value })}
-                      className="w-full p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-sm text-gray-950 dark:text-white min-h-[400px]"
-                      placeholder={`Use standard Markdown formatting:
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500 bg-gray-50 dark:bg-gray-900">
+                      {/* Editor Toolbar */}
+                      <div className="flex flex-wrap items-center gap-1 p-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('**', '**')}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Bold (Ctrl+B)"
+                        >
+                          <Bold size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('*', '*')}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Italic (Ctrl+I)"
+                        >
+                          <Italic size={16} />
+                        </button>
+                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('## ')}
+                          className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs font-bold text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Heading 2"
+                        >
+                          H2
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('### ')}
+                          className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs font-bold text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Heading 3"
+                        >
+                          H3
+                        </button>
+                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('- ')}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Bullet List"
+                        >
+                          <List size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('> ')}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Blockquote"
+                        >
+                          <Quote size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('`', '`')}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Inline Code"
+                        >
+                          <Code size={16} />
+                        </button>
+                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('[', '](https://)')}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors"
+                          title="Insert Link"
+                        >
+                          <Link2 size={16} />
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => insertAtCursor('> [!NOTE]\n> ')}
+                          className="px-2 py-1 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded text-xs font-bold text-emerald-600 dark:text-emerald-400 transition-colors flex items-center gap-1"
+                          title="Insert Note Card"
+                        >
+                          <AlertCircle size={13} /> Alert
+                        </button>
+
+                        <div className="w-[1px] h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+                        {/* Inline Image Uploader */}
+                        <label className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-700 dark:text-gray-300 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-bold" title="Insert Image between articles">
+                          {inlineUploading ? (
+                            <Loader2 size={14} className="animate-spin text-emerald-500" />
+                          ) : (
+                            <Image size={14} className="text-emerald-500" />
+                          )}
+                          <span className="text-emerald-650 dark:text-emerald-400 font-bold">Insert Image</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleInlineImageUpload}
+                            className="hidden"
+                            disabled={inlineUploading}
+                          />
+                        </label>
+                      </div>
+
+                      <textarea
+                        ref={textareaRef}
+                        required
+                        value={formData.content}
+                        onChange={e => setFormData({ ...formData, content: e.target.value })}
+                        onKeyDown={handleKeyDown}
+                        className="w-full p-4 border-0 bg-transparent outline-none font-mono text-sm text-gray-950 dark:text-white min-h-[400px] block focus:ring-0"
+                        placeholder={`Write your article here...
+Use the toolbar above to format and upload images directly inside the content.
+
+Supported:
 ## Subheading
 Write text here. Use **bold** or *italics*.
 You can embed inline \`code\` blocks.
 
 > [!NOTE]
 > This is a beautiful green alert card in Mintlify layout.
-You can also use [!TIP], [!WARNING], or [!IMPORTANT] inside blockquotes.
-
-- List item 1
-- List item 2
-
-![Image Alt Text](image_url)`}
-                    />
+You can also use [!TIP], [!WARNING], or [!IMPORTANT] inside blockquotes.`}
+                      />
+                    </div>
                     <p className="text-[11px] text-gray-400">
-                      Pro-tip: Upload images in the side panel to generate Cloudinary URLs, then copy and paste them as <code>![alt](url)</code>.
+                      Pro-tip: Use the <strong>Insert Image</strong> button in the toolbar to upload images directly between your paragraphs.
                     </p>
                   </div>
                 ) : (
