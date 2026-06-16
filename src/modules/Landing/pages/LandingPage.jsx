@@ -247,7 +247,7 @@ const LandingPage = () => {
                 to="/signup"
                 className="px-12 py-5 bg-white hover:bg-green-50 text-[#1A7A4A] font-black text-[18px] rounded-full shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2 group border-[1.5px] border-black"
               >
-                <span>Create Your Kasi Storefront</span>
+                <span>Get Started with Kasi</span>
                 <ArrowRight
                   size={20}
                   className="transition-transform group-hover:translate-x-1 stroke-[3]"
@@ -393,7 +393,7 @@ const LandingPage = () => {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a href="https://blog.usekasi.com" className="hover:text-white transition-colors">
                     Blog
                   </a>
                 </li>
