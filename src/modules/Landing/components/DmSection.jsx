@@ -36,12 +36,16 @@ export const DmSection = () => {
                 <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-3 bg-black rounded-full z-30" />
                 {/* Video */}
                 <video 
-                  src="/images/KASIVID.mp4" 
+                  src="/images/KASI_CAKEY_RESTAURANT.mp4" 
                   autoPlay 
                   loop 
                   muted 
                   playsInline 
-                  className="w-full h-full object-cover select-none pt-1" 
+                  controlsList="nodownload"
+                  disablePictureInPicture
+                  disableRemotePlayback
+                  onContextMenu={(e) => e.preventDefault()}
+                  className="w-full h-full object-cover select-none pointer-events-none" 
                 />
               </div>
 
