@@ -18,6 +18,10 @@ const Logistics = () => {
   const [copiedId, setCopiedId] = useState(null);
   const [currentPage, setCurrentPage] = useState({ 'Paid': 1, 'In Transit': 1, 'Delivered': 1 });
   const [spreadsheetPage, setSpreadsheetPage] = useState(1);
+  const [riderModalOpen, setRiderModalOpen] = useState(false);
+  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [riderName, setRiderName] = useState('');
+  const [riderPhone, setRiderPhone] = useState('');
 
   useEffect(() => {
     setCurrentPage({ 'Paid': 1, 'In Transit': 1, 'Delivered': 1 });
@@ -49,15 +53,33 @@ const Logistics = () => {
     }
   };
 
-  const handleStatusUpdate = async (conversationId, newStatus) => {
+  const handleStatusUpdate = async (conversationId, newStatus, riderInfo = null) => {
+    if (newStatus === 'In Transit' && !riderInfo) {
+      setRiderName('');
+      setRiderPhone(user?.logistics_phone || '');
+      setActiveConversationId(conversationId);
+      setRiderModalOpen(true);
+      return;
+    }
+
     // Optimistic UI Update: transition the order state locally immediately
     const originalConversations = [...conversations];
     setConversations(prev => 
-      prev.map(c => c.id === conversationId ? { ...c, status: newStatus } : c)
+      prev.map(c => c.id === conversationId ? { 
+        ...c, 
+        status: newStatus,
+        rider_name: riderInfo ? riderInfo.rider_name : c.rider_name,
+        rider_phone: riderInfo ? riderInfo.rider_phone : c.rider_phone
+      } : c)
     );
 
     try {
-      await conversationAPI.updateStatus(conversationId, { status: newStatus });
+      const payload = { status: newStatus };
+      if (riderInfo) {
+        payload.rider_name = riderInfo.rider_name;
+        payload.rider_phone = riderInfo.rider_phone;
+      }
+      await conversationAPI.updateStatus(conversationId, payload);
       addToast(`Status updated to ${newStatus}`, 'success');
       // Silently sync with backend in the background to ensure data consistency
       await fetchConversations(true);
@@ -319,6 +341,12 @@ const Logistics = () => {
                                 )}
                               </div>
                             </div>
+                            {item.rider_name && (
+                              <div className="flex items-center gap-1.5 text-[11px] bg-blue-50/50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 px-2 py-1 rounded-md mt-1.5 border border-blue-150/30 dark:border-blue-900/10 w-full">
+                                <Truck size={11} className="shrink-0 text-blue-500" />
+                                <span className="font-bold truncate">Rider: {item.rider_name} {item.rider_phone ? `(${item.rider_phone})` : ''}</span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Copy Dispatch Details Button */}
@@ -583,6 +611,73 @@ const Logistics = () => {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Rider Details Modal */}
+      {riderModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-3xl w-full max-w-md shadow-2xl p-6 relative overflow-hidden transition-all transform scale-100">
+            <h3 className="text-lg font-extrabold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <Truck size={20} className="text-primary dark:text-emerald-400" />
+              Add Rider Details
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-5">
+              Enter the rider's details. These details will be automatically included in the WhatsApp dispatch notification sent to the customer.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Rider's Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. John Doe"
+                  value={riderName}
+                  onChange={(e) => setRiderName(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary dark:text-white transition-all shadow-xs"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Rider's Phone Number</label>
+                <input
+                  type="text"
+                  placeholder="e.g. +234 812 345 6789"
+                  value={riderPhone}
+                  onChange={(e) => setRiderPhone(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary dark:text-white transition-all shadow-xs"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setRiderModalOpen(false);
+                  setActiveConversationId(null);
+                }}
+                className="px-4 py-2 bg-gray-150 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleStatusUpdate(activeConversationId, 'In Transit', {
+                    rider_name: riderName.trim(),
+                    rider_phone: riderPhone.trim()
+                  });
+                  setRiderModalOpen(false);
+                  setActiveConversationId(null);
+                }}
+                className="px-5 py-2 bg-primary hover:bg-green-750 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md shadow-green-200 dark:shadow-none"
+              >
+                Dispatch Order
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
