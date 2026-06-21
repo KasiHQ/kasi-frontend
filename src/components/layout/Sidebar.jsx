@@ -6,6 +6,7 @@ import { useLayout } from '../../context/LayoutContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import GlobalSearch from './GlobalSearch';
+import { conversationAPI } from '../../api/conversations';
 
 const SIDEBAR_KEY = 'bfm-sidebar-collapsed';
 
@@ -13,10 +14,36 @@ const Sidebar = ({ onWidthChange }) => {
   const { toggleLayout } = useLayout();
   const { isDark, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
+  const isAdmin = user?.is_admin;
+  const adminRole = user?.admin_role;
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem(SIDEBAR_KEY) === 'true'; } catch { return false; }
   });
+
+  const [badgeCounts, setBadgeCounts] = useState({ chats: 0, logistics: 0 });
+
+  useEffect(() => {
+    if (!user || isAdmin) return;
+
+    const fetchCounts = async () => {
+      try {
+        const res = await conversationAPI.getPipeline();
+        if (res && res.data) {
+          setBadgeCounts({
+            chats: res.data['Requires Attention'] || 0,
+            logistics: res.data['Paid'] || 0
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch sidebar badge counts:', err);
+      }
+    };
+
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 15000);
+    return () => clearInterval(interval);
+  }, [user, isAdmin]);
 
   const isService = user?.business_type === 'service';
 
@@ -60,9 +87,6 @@ const Sidebar = ({ onWidthChange }) => {
     onWidthChange?.(collapsed ? 72 : 220);
   }, []);
 
-  const isAdmin = user?.is_admin;
-  const adminRole = user?.admin_role;
-
   let navItems = [];
   if (isAdmin) {
     navItems.push({ icon: Home, label: 'Admin Dashboard', path: '/kasisalienceadministration' });
@@ -87,15 +111,15 @@ const Sidebar = ({ onWidthChange }) => {
     navItems = isService ? [
       { icon: Home, label: 'Home', path: '/dashboard' },
       { icon: Calendar, label: 'Schedule', path: '/bookings' },
-      { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
+      { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
       { icon: Users, label: 'Clients', path: '/customers' },
       { icon: Briefcase, label: 'Services', path: '/services' },
       { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
     ] : [
       { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-      { icon: MessageSquare, label: 'Chats', path: '/chats', badge: true },
+      { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
       { icon: Package, label: 'Store', path: '/products' },
-      { icon: Truck, label: 'Logistics', path: '/logistics', badge: true },
+      { icon: Truck, label: 'Logistics', path: '/logistics', badgeKey: 'logistics' },
       { icon: Users, label: 'Customers', path: '/customers' },
       { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
       { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
@@ -156,12 +180,12 @@ const Sidebar = ({ onWidthChange }) => {
             <item.icon size={19} className="transition-colors duration-200 shrink-0" />
             {!collapsed && <span>{item.label}</span>}
             {/* Badge */}
-            {item.badge && !collapsed && (
+            {item.badgeKey && badgeCounts[item.badgeKey] > 0 && !collapsed && (
               <span className="ml-auto w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                !
+                {badgeCounts[item.badgeKey]}
               </span>
             )}
-            {item.badge && collapsed && (
+            {item.badgeKey && badgeCounts[item.badgeKey] > 0 && collapsed && (
               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white" />
             )}
           </NavLink>

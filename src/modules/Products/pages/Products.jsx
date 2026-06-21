@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2, Grid, List, Search, Info, Coins, Truck } from 'lucide-react';
 import api from '../../../api/axios';
-import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import { ProductGridSkeleton } from '../../../components/ui/Skeleton';
 import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
@@ -13,7 +12,6 @@ const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
 const Products = () => {
-  const { token } = useAuth();
   const { addToast } = useToast();
   const isOnline = useNetwork();
   

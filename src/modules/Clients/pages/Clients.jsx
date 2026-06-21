@@ -114,7 +114,7 @@ const deriveTag = (customer, conversations) => {
 };
 
 const Clients = () => {
-  const { token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { addToast } = useToast();
   const isOnline = useNetwork();
   
@@ -140,8 +140,8 @@ const Clients = () => {
   const [broadcastSuccess, setBroadcastSuccess] = useState(false);
 
   useEffect(() => {
-    if (token) fetchAll();
-  }, [token]);
+    if (user) fetchAll();
+  }, [user]);
 
   const fetchAll = async () => {
     try {

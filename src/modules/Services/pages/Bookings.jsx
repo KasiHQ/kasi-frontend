@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../api/axios';
-import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import { Calendar as CalendarIcon, Clock, MapPin, User, CheckCircle, XCircle, ChevronRight, CreditCard, CalendarDays, ArrowLeft, MoreHorizontal, Pen, X } from 'lucide-react';
 import clsx from 'clsx';
@@ -8,7 +7,6 @@ import { formatCurrency } from '../../../utils/formatters';
 import useNetwork from '../../../hooks/useNetwork';
 
 const Schedule = () => {
-  const { token, user } = useAuth();
   const { addToast } = useToast();
   const isOnline = useNetwork();
   const [bookings, setBookings] = useState([]);
