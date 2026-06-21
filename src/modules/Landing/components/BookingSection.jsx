@@ -36,6 +36,18 @@ export const BookingSection = () => {
                 />
               </div>
 
+              {/* Mobile Phone Mockup Overlay */}
+              <div className="absolute -bottom-10 -left-6 w-[150px] h-[280px] bg-white rounded-[24px] border-[3px] border-black shadow-[4px_4px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[4deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
+                {/* Notch */}
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-10 h-2 bg-black rounded-full z-30" />
+                {/* Image */}
+                <img 
+                  src="/booking.jpeg" 
+                  alt="Kasi AI Booking Mobile View" 
+                  className="w-full h-full object-cover select-none pt-1" 
+                />
+              </div>
+
               {/* Floating Props */}
               {/* 1. Calendar Widget */}
               <div className="absolute -top-6 -left-6 bg-white border-[1.5px] border-black rounded-xl p-3 shadow-[4px_4px_0px_#0A0A0A] flex flex-col items-center z-20 transform -rotate-[4deg] w-24">
