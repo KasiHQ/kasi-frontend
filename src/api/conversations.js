@@ -66,5 +66,11 @@ export const conversationAPI = {
   toggleGlobalGatekeeper: async (isAutomated) => {
     const response = await api.post('/api/conversations/gatekeeper/toggle', { is_automated: isAutomated });
     return response.data;
+  },
+
+  // Delete conversation
+  deleteConversation: async (conversationId) => {
+    const response = await api.delete(`/api/conversations/${conversationId}`);
+    return response.data;
   }
 };

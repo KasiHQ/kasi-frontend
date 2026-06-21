@@ -135,6 +135,7 @@ const Chats = () => {
   const [instructions, setInstructions] = useState('');
   const [generatingSummary, setGeneratingSummary] = useState(false);
   const [savingInstructions, setSavingInstructions] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -155,7 +156,33 @@ const Chats = () => {
     }
   };
 
-  const filteredConversations = conversations.filter(c => {
+  const consolidatedList = React.useMemo(() => {
+    const groups = {};
+    conversations.forEach(c => {
+      const key = c.customer_phone || c.customer_name || `unknown-${c.id}`;
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(c);
+    });
+
+    return Object.values(groups).map(group => {
+      group.sort((a, b) => {
+        const timeA = new Date(a.last_message_at || a.created_at || 0).getTime();
+        const timeB = new Date(b.last_message_at || b.created_at || 0).getTime();
+        return timeB - timeA;
+      });
+      const latest = { ...group[0] };
+      latest.groupConversations = group;
+      return latest;
+    }).sort((a, b) => {
+      const timeA = new Date(a.last_message_at || a.created_at || 0).getTime();
+      const timeB = new Date(b.last_message_at || b.created_at || 0).getTime();
+      return timeB - timeA;
+    });
+  }, [conversations]);
+
+  const filteredConversations = consolidatedList.filter(c => {
     const matchesFilter = activeFilter === 'All' 
       ? c.status !== 'In Progress' 
       : c.status === activeFilter;
@@ -216,12 +243,12 @@ const Chats = () => {
 
   // Filters setup based on dynamic state
   const filters = [
-    { label: 'All', count: conversations.filter(c => c.status !== 'In Progress').length },
-    { label: 'In Progress', count: conversations.filter(c => c.status === 'In Progress').length },
-    { label: 'Requires Attention', short: 'Attention', count: conversations.filter(c => c.status === 'Requires Attention').length },
-    { label: 'Paid', count: conversations.filter(c => c.status === 'Paid').length },
-    { label: 'In Transit', count: conversations.filter(c => c.status === 'In Transit').length },
-    { label: 'Delivered', count: conversations.filter(c => c.status === 'Delivered').length },
+    { label: 'All', count: consolidatedList.filter(c => c.status !== 'In Progress').length },
+    { label: 'In Progress', count: consolidatedList.filter(c => c.status === 'In Progress').length },
+    { label: 'Requires Attention', short: 'Attention', count: consolidatedList.filter(c => c.status === 'Requires Attention').length },
+    { label: 'Paid', count: consolidatedList.filter(c => c.status === 'Paid').length },
+    { label: 'In Transit', count: consolidatedList.filter(c => c.status === 'In Transit').length },
+    { label: 'Delivered', count: consolidatedList.filter(c => c.status === 'Delivered').length },
   ];
 
   return (
@@ -377,6 +404,51 @@ const Chats = () => {
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Mute/Unmute Kasi Button */}
+                <button
+                  onClick={() => {
+                    const newStatus = selectedConversation.status === 'Muted' ? 'In Progress' : 'Muted';
+                    handleStatusUpdate(selectedConversation.id, newStatus);
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
+                    selectedConversation.status === 'Muted'
+                      ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30'
+                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-750'
+                  }`}
+                >
+                  {selectedConversation.status === 'Muted' ? '🔇 Unmute Kasi' : '🔇 Mute Kasi'}
+                </button>
+
+                {/* Delete Chat Button */}
+                <button
+                  onClick={async () => {
+                    if (window.confirm("Are you sure you want to delete this chat? This will remove the conversation log and messages permanently.")) {
+                      try {
+                        await conversationAPI.deleteConversation(selectedConversation.id);
+                        setSelectedConversation(null);
+                        fetchData();
+                      } catch (err) {
+                        console.error("Failed to delete chat:", err);
+                      }
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-750 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                >
+                  Delete Chat
+                </button>
+
+                {/* Order History Toggle */}
+                <button
+                  onClick={() => setHistoryOpen(!historyOpen)}
+                  className={`px-3 py-1.5 border rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    historyOpen
+                      ? 'bg-primary text-white border-primary hover:bg-green-700 dark:bg-emerald-600 dark:border-emerald-600 dark:hover:bg-emerald-700'
+                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-750'
+                  }`}
+                >
+                  Order History
+                </button>
+
                 <StatusBadge status={selectedConversation.status} />
                 {(() => {
                   const pb = getPlatformBadge(selectedConversation.platform);
@@ -507,6 +579,94 @@ const Chats = () => {
           </>
         )}
       </div>
+
+      {/* COLUMN 4 — ORDER HISTORY (320px) */}
+      {selectedConversation && historyOpen && (
+        <div className="w-80 shrink-0 border-l border-[#EAECF0] bg-white h-full flex flex-col overflow-hidden select-none">
+          {/* Header */}
+          <div className="h-16 border-b border-[#EAECF0] px-4 flex items-center justify-between shrink-0">
+            <h3 className="font-bold text-[#101828] text-sm uppercase tracking-wider">Order History</h3>
+            <button 
+              onClick={() => setHistoryOpen(false)} 
+              className="text-gray-450 hover:text-dark text-xs font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {(() => {
+              const matchedGroup = consolidatedList.find(c => 
+                (c.customer_phone && c.customer_phone === selectedConversation.customer_phone) || 
+                (c.customer_name && c.customer_name === selectedConversation.customer_name)
+              );
+              const historyItems = matchedGroup?.groupConversations || [selectedConversation];
+
+              return (
+                <>
+                  <div className="bg-gray-50 p-3 rounded-xl border border-gray-150">
+                    <p className="text-[10px] font-bold text-[#98A2B3] uppercase tracking-wider">Customer Profile</p>
+                    <p className="text-xs font-bold text-gray-850 mt-1">{selectedConversation.customer_name || 'Walk-in Customer'}</p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{selectedConversation.customer_phone || 'No Phone'}</p>
+                    <p className="text-[11px] text-gray-500 mt-1">Total Deals: {historyItems.length}</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-[#98A2B3] uppercase tracking-wider">Deals & Invoices</p>
+                    {historyItems.map((item, idx) => (
+                      <div key={idx} className="bg-white border border-[#EAECF0] rounded-xl p-3 shadow-xs hover:shadow-sm transition-shadow">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-mono font-bold text-gray-800">
+                            {item.invoice_reference ? `#${item.invoice_reference}` : `Deal #${item.id}`}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            item.status === 'Paid'
+                              ? 'bg-green-50 text-green-700'
+                              : item.status === 'In Transit'
+                              ? 'bg-blue-50 text-blue-700'
+                              : item.status === 'Delivered'
+                              ? 'bg-green-50 text-green-700'
+                              : 'bg-amber-50 text-amber-700'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </div>
+
+                        <div className="mt-2 text-[11px] text-gray-550">
+                          Issued: {new Date(item.created_at || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </div>
+
+                        {item.rider_name && (
+                          <div className="mt-1.5 text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100/60 truncate font-semibold">
+                            🚚 Rider: {item.rider_name} {item.rider_phone ? `(${item.rider_phone})` : ''}
+                          </div>
+                        )}
+
+                        {item.invoice_items && item.invoice_items.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">
+                            {item.invoice_items.map((it, i_idx) => (
+                              <div key={i_idx} className="flex justify-between items-center text-[10px] text-gray-600">
+                                <span className="truncate mr-2 font-medium">{it.description}</span>
+                                <span className="shrink-0 font-bold text-gray-400">x{it.quantity}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-gray-800">
+                          <span>Amount:</span>
+                          <span>₦{(item.agreed_price || 0).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
 
       {/* Summary Modal */}
       {summaryModalOpen && (
