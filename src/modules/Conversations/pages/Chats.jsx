@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft } from 'lucide-react';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
+import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
 
 // Dynamic Color Mapping for Avatars (B -> Green, T -> Pink, O -> Purple)
 const getAvatarTheme = (name) => {
@@ -138,6 +139,8 @@ const Chats = () => {
   const [generatingSummary, setGeneratingSummary] = useState(false);
   const [savingInstructions, setSavingInstructions] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingChat, setDeletingChat] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -205,6 +208,21 @@ const Chats = () => {
       }
     } catch (err) {
       console.error('Failed to update status:', err);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedConversation) return;
+    setDeletingChat(true);
+    try {
+      await conversationAPI.deleteConversation(selectedConversation.id);
+      setSelectedConversation(null);
+      fetchData();
+      setShowDeleteModal(false);
+    } catch (err) {
+      console.error("Failed to delete chat:", err);
+    } finally {
+      setDeletingChat(false);
     }
   };
 
@@ -425,17 +443,7 @@ const Chats = () => {
 
                 {/* Delete Chat Button */}
                 <button
-                  onClick={async () => {
-                    if (window.confirm("Are you sure you want to delete this chat? This will remove the conversation log and messages permanently.")) {
-                      try {
-                        await conversationAPI.deleteConversation(selectedConversation.id);
-                        setSelectedConversation(null);
-                        fetchData();
-                      } catch (err) {
-                        console.error("Failed to delete chat:", err);
-                      }
-                    }
-                  }}
+                  onClick={() => setShowDeleteModal(true)}
                   className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-750 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40 rounded-lg text-xs font-bold transition-all cursor-pointer"
                 >
                   Delete Chat
@@ -766,6 +774,15 @@ const Chats = () => {
           </div>
         </div>
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete this chat?"
+        message="Are you sure you want to delete this chat? This will remove the conversation log and messages permanently."
+        loading={deletingChat}
+      />
     </div>
   );
 };
