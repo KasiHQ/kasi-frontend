@@ -149,101 +149,103 @@ export const LandingNavbar = ({ activeSection, scrolled, onJoinWaitlistClick }) 
 
       {/* Mobile Drawer - Full Screen Overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-white z-[200] p-6 flex flex-col justify-between animate-in fade-in slide-in-from-top duration-200">
-          <div className="flex flex-col gap-6">
-            {/* Header inside the overlay */}
-            <div className="flex justify-between items-center h-12">
-              <a
-                href="#hero"
-                onClick={(e) => {
-                  handleLinkClick(e, "hero");
-                  setMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-2 group cursor-pointer"
-              >
-                <img
-                  src="/kasi.png"
-                  alt="Kasi AI Logo"
-                  className="w-8 h-8 object-contain shrink-0"
-                />
-                <span className="text-xl font-black text-black tracking-tight select-none">
-                  Kasi <span className="text-brand font-black">AI</span>
-                </span>
-              </a>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2 text-black hover:bg-bg-subtle rounded-lg transition-colors cursor-pointer"
-                aria-label="Close menu"
-              >
-                <X size={24} />
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-white z-[200] overflow-y-auto animate-in fade-in slide-in-from-top duration-200">
+          <div className="flex flex-col min-h-[100dvh] p-6 pb-12 justify-between">
+            <div className="flex flex-col gap-6">
+              {/* Header inside the overlay */}
+              <div className="flex justify-between items-center h-12">
+                <a
+                  href="#hero"
+                  onClick={(e) => {
+                    handleLinkClick(e, "hero");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 group cursor-pointer"
+                >
+                  <img
+                    src="/kasi.png"
+                    alt="Kasi AI Logo"
+                    className="w-8 h-8 object-contain shrink-0"
+                  />
+                  <span className="text-xl font-black text-black tracking-tight select-none">
+                    Kasi <span className="text-brand font-black">AI</span>
+                  </span>
+                </a>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 text-black hover:bg-bg-subtle rounded-lg transition-colors cursor-pointer"
+                  aria-label="Close menu"
+                >
+                  <X size={24} />
+                </button>
+              </div>
 
-            {/* Nav Link List - Stacked, Large Text */}
-            <div className="flex flex-col gap-4 mt-8">
-              {NAV_LINKS.map((link) => {
-                if (link.isExternal) {
+              {/* Nav Link List - Stacked, Large Text */}
+              <div className="flex flex-col gap-4 mt-8">
+                {NAV_LINKS.map((link) => {
+                  if (link.isExternal) {
+                    return (
+                      <a
+                        key={link.label}
+                        href={link.url}
+                        className="text-3xl font-black py-2.5 transition-all text-left block text-grey-700 hover:text-black"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {link.label}
+                      </a>
+                    );
+                  }
+                  const isActive = activeSection === link.id;
                   return (
                     <a
-                      key={link.label}
-                      href={link.url}
-                      className="text-3xl font-black py-2.5 transition-all text-left block text-grey-700 hover:text-black"
-                      onClick={() => setMobileMenuOpen(false)}
+                      key={link.id}
+                      href={`#${link.id}`}
+                      onClick={(e) => handleLinkClick(e, link.id)}
+                      className={clsx(
+                        "text-3xl font-black py-2.5 transition-all text-left block border-b border-transparent",
+                        isActive
+                          ? "text-black border-black inline-block"
+                          : "text-grey-700 hover:text-black",
+                      )}
                     >
                       {link.label}
                     </a>
                   );
-                }
-                const isActive = activeSection === link.id;
-                return (
-                  <a
-                    key={link.id}
-                    href={`#${link.id}`}
-                    onClick={(e) => handleLinkClick(e, link.id)}
-                    className={clsx(
-                      "text-3xl font-black py-2.5 transition-all text-left block border-b border-transparent",
-                      isActive
-                        ? "text-black border-black inline-block"
-                        : "text-grey-700 hover:text-black",
-                    )}
-                  >
-                    {link.label}
-                  </a>
-                );
-              })}
+                })}
+              </div>
             </div>
-          </div>
 
-          {/* Bottom Actions inside Full Screen menu */}
-          <div className="flex flex-col gap-3 mt-auto">
-            {PRELAUNCH_WAITLIST_MODE ? (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onJoinWaitlistClick();
-                }}
-                className="w-full text-center py-4 font-bold text-lg text-white bg-[#1A7A4A] hover:bg-[#15603A] rounded-full transition-all duration-150 border-[1.5px] border-black"
-              >
-                Join Waitlist
-              </button>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-4 font-bold text-lg text-black border-[1.5px] border-black rounded-full bg-white hover:bg-bg-subtle transition-all duration-150"
+            {/* Bottom Actions inside Full Screen menu */}
+            <div className="flex flex-col gap-3 mt-8">
+              {PRELAUNCH_WAITLIST_MODE ? (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onJoinWaitlistClick();
+                  }}
+                  className="w-full text-center py-4 font-bold text-lg text-white bg-[#1A7A4A] hover:bg-[#15603A] rounded-full transition-all duration-150 border-[1.5px] border-black"
                 >
-                  Sign in
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-4 font-bold text-lg text-white bg-black rounded-full hover:bg-neutral-800 transition-all duration-150"
-                >
-                  Get started
-                </Link>
-              </>
-            )}
+                  Join Waitlist
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-4 font-bold text-lg text-black border-[1.5px] border-black rounded-full bg-white hover:bg-bg-subtle transition-all duration-150"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-4 font-bold text-lg text-white bg-black rounded-full hover:bg-neutral-800 transition-all duration-150"
+                  >
+                    Get started
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

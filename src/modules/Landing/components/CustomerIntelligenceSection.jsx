@@ -108,28 +108,45 @@ export const CustomerIntelligenceSection = () => {
             </div>
           </div>
 
-          {/* Right Column — CRM Laptop / Desktop Mockup */}
-          <div className="lg:col-span-6 relative flex items-center justify-center">
-                   {/* Browser Mockup */}
-            <div className="w-full max-w-[540px] bg-white border-[2.5px] border-black rounded-2xl shadow-[6px_6px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[1.5deg] hover:rotate-0 transition-transform duration-500 z-10">
-              {/* Browser Header */}
-              <div className="bg-[#F5F5F0] border-b-[2px] border-black px-4 py-2.5 flex items-center justify-between shrink-0">
-                <div className="flex gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-black/35" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-black/35" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-black/35" />
+          {/* Right Column — CRM Laptop / Desktop Mockup with Mobile Overlay */}
+          <div className="lg:col-span-6 relative flex items-center justify-center select-none">
+            {/* Wrapper Container */}
+            <div className="relative w-full max-w-[540px] flex items-center justify-center overflow-visible">
+              
+              {/* Browser Mockup */}
+              <div className="relative w-full bg-white border-[2.5px] border-black rounded-2xl shadow-[6px_6px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[1.5deg] hover:rotate-0 transition-transform duration-500 z-10">
+                {/* Browser Header */}
+                <div className="bg-[#F5F5F0] border-b-[2px] border-black px-4 py-2.5 flex items-center justify-between shrink-0">
+                  <div className="flex gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-black/35" />
+                  </div>
+                  <div className="bg-white border border-black rounded-md px-4 py-0.5 text-[9px] font-bold text-grey-500 font-sans tracking-wide">
+                    usekasi.com/analytics
+                  </div>
+                  <div className="w-6 h-6" /> {/* Spacer */}
                 </div>
-                <div className="bg-white border border-black rounded-md px-4 py-0.5 text-[9px] font-bold text-grey-500 font-sans tracking-wide">
-                  usekasi.com/analytics
-                </div>
-                <div className="w-6 h-6" /> {/* Spacer */}
+                {/* Image */}
+                <img 
+                  src="/images/analytics-dashboard-desktop.png" 
+                  alt="Kasi AI Analytics Dashboard" 
+                  className="w-full h-auto object-cover select-none" 
+                />
               </div>
-              {/* Image */}
-              <img 
-                src="/images/analytics-dashboard-desktop.png" 
-                alt="Kasi AI Analytics Dashboard" 
-                className="w-full h-auto object-cover select-none" 
-              />
+
+              {/* Mobile Phone Mockup Overlay */}
+              <div className="absolute -bottom-10 -right-6 w-[150px] h-[280px] bg-white rounded-[24px] border-[3px] border-black shadow-[5px_5px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
+                {/* Notch */}
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-10 h-2 bg-black rounded-full z-30" />
+                {/* Image */}
+                <img 
+                  src="/analytics_mobile.png" 
+                  alt="Kasi AI Analytics Mobile View" 
+                  className="w-full h-full object-cover select-none pt-1" 
+                />
+              </div>
+
             </div>
           </div>
 

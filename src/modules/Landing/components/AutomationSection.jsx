@@ -76,39 +76,12 @@ export const AutomationSection = () => {
               </div>
 
               {/* Screen */}
-              <div className="w-full bg-[#ECE5DD] border-hard rounded-2xl p-3 flex flex-col h-[320px] justify-between relative overflow-hidden font-prompt">
-                
-                {/* Header */}
-                <div className="flex items-center gap-2 border-b border-black/10 pb-2 mb-2 bg-[#075E54] -mx-3 -mt-3 p-3 text-white">
-                  <div className="w-6 h-6 rounded-full bg-[#128C7E] flex items-center justify-center font-bold text-[10px]">
-                    W
-                  </div>
-                  <div className="text-left">
-                    <div className="text-[10px] font-black">WhatsApp Checkout</div>
-                    <div className="text-[7px] text-[#25D366] font-black">Kasi Checkout Agent</div>
-                  </div>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-hide text-left text-[10px] pt-1">
-                  <div className="self-start max-w-[85%] bg-white text-black p-2 rounded-lg rounded-tl-none shadow-xs font-semibold leading-relaxed">
-                    I want to pay for the 2 bottles of Zobo. Send the details.
-                  </div>
-                  
-                  <div className="self-end max-w-[85%] bg-[#DCF8C6] text-black p-2 rounded-lg rounded-tr-none shadow-xs font-semibold leading-relaxed">
-                    Great! I've prepared your secure Paystack link for ₦3,500. Click here to complete payment: <span className="text-blue-600 underline">paystack.com/k/zobo</span>
-                  </div>
-
-                  <div className="self-start max-w-[85%] bg-white text-black p-2 rounded-lg rounded-tl-none shadow-xs font-semibold leading-relaxed">
-                    Just paid! Check it.
-                  </div>
-
-                  <div className="self-end max-w-[85%] bg-[#DCF8C6] text-black p-2 rounded-lg rounded-tr-none shadow-xs font-bold leading-relaxed flex items-center gap-1.5 border border-[#1A7A4A]/20">
-                    <CheckCircle2 size={10} className="text-[#1A7A4A] shrink-0" />
-                    <span>Payment verified! Your order #INV-091 is confirmed. We will dispatch immediately. 🎉</span>
-                  </div>
-                </div>
-
+              <div className="w-full bg-[#ECE5DD] border-hard rounded-2xl h-[380px] relative overflow-hidden">
+                <img 
+                  src="/whatsapp.jpeg" 
+                  alt="WhatsApp Pay Autopilot" 
+                  className="w-full h-full object-cover object-top select-none pointer-events-none"
+                />
               </div>
             </div>
             <span className="mt-4 text-xs font-black text-white/50 uppercase tracking-widest">WhatsApp Pay autopilot</span>
@@ -124,41 +97,12 @@ export const AutomationSection = () => {
               </div>
 
               {/* Screen */}
-              <div className="w-full bg-[#FFFFFF] border-hard rounded-2xl p-3 flex flex-col h-[320px] justify-between relative overflow-hidden font-prompt">
-                
-                {/* Header */}
-                <div className="flex items-center gap-2 border-b border-black/10 pb-2 mb-2 -mx-3 -mt-3 p-3 bg-white text-black">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#FD1D1D] to-[#E1306C] p-0.5 flex items-center justify-center">
-                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-[9px] font-black">
-                      I
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-[10px] font-black">Instagram DM</div>
-                    <div className="text-[7px] text-[#E1306C] font-black">Auto-Negotiating</div>
-                  </div>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-hide text-left text-[10px] pt-1">
-                  <div className="self-end max-w-[85%] bg-black text-white p-2 rounded-2xl rounded-tr-none shadow-xs font-semibold leading-relaxed">
-                    Can you do ₦2,000? That's all I have.
-                  </div>
-
-                  <div className="self-start max-w-[85%] bg-[#E8F5EE] text-black p-2 rounded-2xl rounded-tl-none shadow-xs font-semibold leading-relaxed border border-[#1A7A4A]/20">
-                    Ah, we can't do ₦2,000, my friend. The best price I can give you today is ₦2,450. How does that sound?
-                  </div>
-
-                  <div className="self-end max-w-[85%] bg-black text-white p-2 rounded-2xl rounded-tr-none shadow-xs font-semibold leading-relaxed">
-                    Okay fine, let's do ₦2,450.
-                  </div>
-
-                  <div className="self-start max-w-[85%] bg-[#1A7A4A] text-white p-2 rounded-2xl rounded-tl-none shadow-xs font-black leading-relaxed flex items-center justify-between border border-black">
-                    <span>Deal Sealed! ₦2,450</span>
-                    <span className="text-[8px] bg-[#D4F263] text-black px-1.5 py-0.5 rounded-md">PROMPT MATCHED</span>
-                  </div>
-                </div>
-
+              <div className="w-full bg-[#FFFFFF] border-hard rounded-2xl h-[380px] relative overflow-hidden">
+                <img 
+                  src="/instagram.jpeg" 
+                  alt="Instagram Auto-Haggle" 
+                  className="w-full h-full object-cover object-top select-none pointer-events-none"
+                />
               </div>
             </div>
             <span className="mt-4 text-xs font-black text-white/50 uppercase tracking-widest">Instagram auto-haggle</span>
@@ -174,40 +118,12 @@ export const AutomationSection = () => {
               </div>
 
               {/* Screen */}
-              <div className="w-full bg-[#DEE8F1] border-hard rounded-2xl p-3 flex flex-col h-[320px] justify-between relative overflow-hidden font-prompt">
-                
-                {/* Header */}
-                <div className="flex items-center gap-2 border-b border-black/10 pb-2 mb-2 -mx-3 -mt-3 p-3 bg-[#5682a3] text-white">
-                  <div className="w-6 h-6 rounded-full bg-[#0088cc] flex items-center justify-center font-bold text-[10px]">
-                    T
-                  </div>
-                  <div className="text-left">
-                    <div className="text-[10px] font-black">Telegram Bot</div>
-                    <div className="text-[7px] text-white/80 font-black">Address & Dispatch</div>
-                  </div>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-hide text-left text-[10px] pt-1">
-                  <div className="self-start max-w-[85%] bg-white text-black p-2 rounded-lg rounded-tl-none shadow-xs font-semibold leading-relaxed">
-                    Here is my delivery address: 32 Alfred Rewane Road, Ikoyi, Lagos.
-                  </div>
-
-                  <div className="self-end max-w-[85%] bg-[#EFFDDE] text-black p-2 rounded-lg rounded-tr-none shadow-xs font-semibold leading-relaxed">
-                    Address matched! Let me compute logistics.
-                  </div>
-
-                  <div className="self-end max-w-[85%] bg-[#EFFDDE] text-black p-2 rounded-lg rounded-tr-none shadow-xs font-bold leading-relaxed border border-[#1A7A4A]/20">
-                    Delivery fee calculated: ₦1,500 🏍️ <br />
-                    Address matches rate sheet rules. <br />
-                    Order ready for packing!
-                  </div>
-
-                  <div className="self-start max-w-[85%] bg-white text-black p-2 rounded-lg rounded-tl-none shadow-xs font-bold leading-relaxed text-[#1A7A4A]">
-                    Wow, thanks for the fast booking!
-                  </div>
-                </div>
-
+              <div className="w-full bg-[#DEE8F1] border-hard rounded-2xl h-[380px] relative overflow-hidden">
+                <img 
+                  src="/telegram.jpeg" 
+                  alt="Telegram Delivery Dispatch" 
+                  className="w-full h-full object-cover object-top select-none pointer-events-none"
+                />
               </div>
             </div>
             <span className="mt-4 text-xs font-black text-white/50 uppercase tracking-widest">Telegram delivery dispatch</span>
