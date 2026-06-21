@@ -1,14 +1,20 @@
 import React from 'react';
 import { LogOut, Eye } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const ImpersonationBanner = () => {
-  const adminToken = localStorage.getItem('admin_token');
+  const { user } = useAuth();
 
-  if (!adminToken) return null;
+  // With cookie-based auth, impersonation is handled by the server setting
+  // the impersonated user's cookies. The admin can log out of the impersonated
+  // session to return to their own account by logging in again.
+  // This banner is no longer needed since we can't detect impersonation client-side
+  // without localStorage flags. It is kept as a placeholder in case a server-side
+  // impersonation flag is added to the user object in the future.
+  
+  if (!user?.is_impersonated) return null;
 
   const handleReturnToAdmin = () => {
-    localStorage.setItem('token', adminToken);
-    localStorage.removeItem('admin_token');
     window.location.href = '/kasisalienceadministration/users';
   };
 

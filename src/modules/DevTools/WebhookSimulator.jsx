@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import api from '../../api/axios';
-import { useAuth } from '../../context/AuthContext';
 import { Send, Bot, User, AlertCircle, CheckCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
 
 const WebhookSimulator = () => {
-    const { token } = useAuth();
     const [message, setMessage] = useState('');
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(false);

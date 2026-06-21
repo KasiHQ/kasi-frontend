@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft } from 'lucide-react';
 import { conversationAPI } from '../../../api/conversations';
+import api from '../../../api/axios';
 
 // Dynamic Color Mapping for Avatars (B -> Green, T -> Pink, O -> Purple)
 const getAvatarTheme = (name) => {
@@ -125,6 +126,7 @@ const getPlatformBadge = (platform) => {
 const Chats = () => {
   const [conversations, setConversations] = useState([]);
   const [pipeline, setPipeline] = useState({});
+  const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -143,12 +145,14 @@ const Chats = () => {
 
   const fetchData = async () => {
     try {
-      const [convRes, pipeRes] = await Promise.all([
+      const [convRes, pipeRes, invoicesRes] = await Promise.all([
         conversationAPI.getConversations(),
-        conversationAPI.getPipeline()
+        conversationAPI.getPipeline(),
+        api.get('/api/invoices/').catch(() => ({ data: [] }))
       ]);
       setConversations(convRes.data || []);
       setPipeline(pipeRes.data || {});
+      setInvoices(invoicesRes.data || []);
     } catch (err) {
       console.error('Failed to fetch conversations:', err);
     } finally {
@@ -184,7 +188,7 @@ const Chats = () => {
 
   const filteredConversations = consolidatedList.filter(c => {
     const matchesFilter = activeFilter === 'All' 
-      ? c.status !== 'In Progress' 
+      ? true 
       : c.status === activeFilter;
     const matchesSearch = !searchTerm ||
       (c.customer_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -243,7 +247,7 @@ const Chats = () => {
 
   // Filters setup based on dynamic state
   const filters = [
-    { label: 'All', count: consolidatedList.filter(c => c.status !== 'In Progress').length },
+    { label: 'All', count: consolidatedList.length },
     { label: 'In Progress', count: consolidatedList.filter(c => c.status === 'In Progress').length },
     { label: 'Requires Attention', short: 'Attention', count: consolidatedList.filter(c => c.status === 'Requires Attention').length },
     { label: 'Paid', count: consolidatedList.filter(c => c.status === 'Paid').length },
@@ -597,11 +601,23 @@ const Chats = () => {
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {(() => {
-              const matchedGroup = consolidatedList.find(c => 
-                (c.customer_phone && c.customer_phone === selectedConversation.customer_phone) || 
-                (c.customer_name && c.customer_name === selectedConversation.customer_name)
-              );
-              const historyItems = matchedGroup?.groupConversations || [selectedConversation];
+              const customerInvoices = invoices.filter(inv => {
+                const invPhone = inv.customer?.phone || '';
+                const invName = inv.customer?.name || '';
+                const convPhone = selectedConversation.customer_phone || '';
+                const convName = selectedConversation.customer_name || '';
+                
+                const normalize = (p) => p ? p.toString().replace(/\D/g, '') : '';
+                
+                const phoneMatch = convPhone && invPhone && (normalize(invPhone) === normalize(convPhone));
+                const nameMatch = convName && invName && (invName.toLowerCase().trim() === convName.toLowerCase().trim());
+                
+                return phoneMatch || nameMatch;
+              }).sort((a, b) => {
+                const dateA = new Date(a.date_issued || a.created_at || 0).getTime();
+                const dateB = new Date(b.date_issued || b.created_at || 0).getTime();
+                return dateB - dateA;
+              });
 
               return (
                 <>
@@ -609,16 +625,16 @@ const Chats = () => {
                     <p className="text-[10px] font-bold text-[#98A2B3] uppercase tracking-wider">Customer Profile</p>
                     <p className="text-xs font-bold text-gray-850 mt-1">{selectedConversation.customer_name || 'Walk-in Customer'}</p>
                     <p className="text-[11px] text-gray-500 mt-0.5">{selectedConversation.customer_phone || 'No Phone'}</p>
-                    <p className="text-[11px] text-gray-500 mt-1">Total Deals: {historyItems.length}</p>
+                    <p className="text-[11px] text-gray-500 mt-1">Total Invoices: {customerInvoices.length}</p>
                   </div>
 
                   <div className="space-y-3">
                     <p className="text-[10px] font-bold text-[#98A2B3] uppercase tracking-wider">Deals & Invoices</p>
-                    {historyItems.map((item, idx) => (
+                    {customerInvoices.map((item, idx) => (
                       <div key={idx} className="bg-white border border-[#EAECF0] rounded-xl p-3 shadow-xs hover:shadow-sm transition-shadow">
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-[11px] font-mono font-bold text-gray-800">
-                            {item.invoice_reference ? `#${item.invoice_reference}` : `Deal #${item.id}`}
+                            #{item.reference}
                           </span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                             item.status === 'Paid'
@@ -634,7 +650,7 @@ const Chats = () => {
                         </div>
 
                         <div className="mt-2 text-[11px] text-gray-550">
-                          Issued: {new Date(item.created_at || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                          Issued: {new Date(item.date_issued || item.created_at || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                         </div>
 
                         {item.rider_name && (
@@ -643,9 +659,9 @@ const Chats = () => {
                           </div>
                         )}
 
-                        {item.invoice_items && item.invoice_items.length > 0 && (
+                        {item.items && item.items.length > 0 && (
                           <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">
-                            {item.invoice_items.map((it, i_idx) => (
+                            {item.items.map((it, i_idx) => (
                               <div key={i_idx} className="flex justify-between items-center text-[10px] text-gray-600">
                                 <span className="truncate mr-2 font-medium">{it.description}</span>
                                 <span className="shrink-0 font-bold text-gray-400">x{it.quantity}</span>
@@ -656,7 +672,7 @@ const Chats = () => {
 
                         <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-gray-800">
                           <span>Amount:</span>
-                          <span>₦{(item.agreed_price || 0).toLocaleString()}</span>
+                          <span>₦{(item.total_amount || item.amount || 0).toLocaleString()}</span>
                         </div>
                       </div>
                     ))}

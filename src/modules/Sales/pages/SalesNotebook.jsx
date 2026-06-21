@@ -91,7 +91,7 @@ const SaleDetail = ({ sale }) => {
 
 /* ── Main Sales Notebook Page ─────────────────────── */
 const SalesNotebook = () => {
-    const { token } = useAuth();
+    const { user } = useAuth();
     const { addToast } = useToast();
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -108,8 +108,10 @@ const SalesNotebook = () => {
     });
 
     useEffect(() => {
-        fetchInvoices();
-    }, [token]);
+        if (user) {
+            fetchInvoices();
+        }
+    }, [user]);
 
     const fetchInvoices = async () => {
         try {

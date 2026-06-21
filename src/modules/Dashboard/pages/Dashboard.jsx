@@ -86,7 +86,7 @@ const CustomChartTooltip = ({ active, payload, label }) => {
 };
 
 const Dashboard = () => {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const isOnline = useNetwork();
@@ -108,8 +108,8 @@ const Dashboard = () => {
   }, [user, navigate]);
 
   useEffect(() => {
-    if (token) fetchAllData();
-  }, [token]);
+    if (user) fetchAllData();
+  }, [user]);
 
   const fetchAllData = async () => {
     try {

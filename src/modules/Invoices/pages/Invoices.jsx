@@ -347,7 +347,7 @@ const InvoiceActions = ({ invoice, onInvoiceUpdated, onInvoiceDeleted, onViewDet
 
 /* ── Main Invoices Page ───────────────────────────── */
 const Invoices = () => {
-    const { token, logout } = useAuth();
+    const { user, logout } = useAuth();
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -356,10 +356,10 @@ const Invoices = () => {
     const isOnline = useNetwork();
 
     useEffect(() => {
-        if (token) {
+        if (user) {
             fetchInvoices();
         }
-    }, [token]);
+    }, [user]);
 
     const fetchInvoices = async () => {
         try {

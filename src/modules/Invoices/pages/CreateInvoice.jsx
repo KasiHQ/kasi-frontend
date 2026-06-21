@@ -4,12 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import api from '../../../api/axios';
-import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 
 const CreateInvoice = () => {
     const navigate = useNavigate();
-    const { token } = useAuth();
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState([

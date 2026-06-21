@@ -159,7 +159,7 @@ const PaymentDetail = ({ invoice, user }) => {
 
 /* ── Main Finance & Audit Dashboard Page ───────────── */
 const Payments = () => {
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
   
@@ -188,10 +188,10 @@ const Payments = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    if (token) {
+    if (user) {
       fetchInvoices();
     }
-  }, [token]);
+  }, [user]);
 
   const fetchInvoices = async () => {
     try {

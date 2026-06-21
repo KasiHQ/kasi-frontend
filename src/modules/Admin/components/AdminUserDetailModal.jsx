@@ -82,12 +82,7 @@ const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {
       try {
           const res = await api.post(`/api/kasisalienceadministration/users/${userId}/impersonate`);
           if (res.data.status === 'success') {
-              // Save the current admin token securely before swapping
-              const currentToken = localStorage.getItem('token');
-              localStorage.setItem('admin_token', currentToken);
-              
-              // Inject the target user's token and hard-reload the app state
-              localStorage.setItem('token', res.data.access_token);
+              // Server has set the impersonated user's cookies — hard-reload to pick up new session
               window.location.href = '/'; 
           }
       } catch (err) {
