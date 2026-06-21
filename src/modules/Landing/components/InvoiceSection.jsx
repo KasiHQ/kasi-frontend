@@ -17,25 +17,13 @@ export const InvoiceSection = () => {
             <div className="relative w-full max-w-[420px] aspect-[4/5] bg-[#1A7A4A] rounded-2xl flex items-center justify-center p-8 border-[1.5px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-visible">
               <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none rounded-2xl" />
                            {/* Phone screen showing real invoice details */}
-              <div className="w-[175px] h-[320px] bg-white rounded-[24px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[3deg] hover:rotate-0 transition-transform duration-500 z-10 relative">
+              <div className="w-[220px] h-[380px] bg-white rounded-[28px] border-[3px] border-black shadow-[3px_3px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[3deg] hover:rotate-0 transition-transform duration-500 z-10 relative">
                 {/* Notch */}
-                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-10 h-2 bg-black rounded-full z-30" />
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-3 bg-black rounded-full z-30" />
                 {/* Image */}
                 <img 
                   src="/images/invoice-details-mobile.jpg" 
                   alt="Real customer paid invoice details" 
-                  className="w-full h-full object-cover select-none pt-1" 
-                />
-              </div>
-
-              {/* Mobile Phone Mockup Overlay - Receipt */}
-              <div className="absolute -bottom-8 -right-4 w-[160px] h-[290px] bg-[#0E3924] rounded-[24px] border-[3px] border-black shadow-[4px_4px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-6deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
-                {/* Notch */}
-                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-10 h-2 bg-black rounded-full z-30" />
-                {/* Image */}
-                <img 
-                  src="/receipt.png" 
-                  alt="Kasi AI Transaction Receipt" 
                   className="w-full h-full object-cover select-none pt-1" 
                 />
               </div>
@@ -54,15 +42,15 @@ export const InvoiceSection = () => {
                   <div className="text-xs font-black text-black mt-0.5 font-bricolage">₦2,100.00</div>
                 </div>
               </div>
-
-              {/* 2. Receipt paper, rotated slightly */}
-              <div className="absolute -top-10 -right-6 bg-white border-[1.5px] border-black p-2.5 w-24 rounded-lg shadow-[3px_3px_0px_#0A0A0A] z-20 transform rotate-[12deg] text-black text-[7.5px] font-mono leading-tight text-left">
-                <div className="text-center font-bold border-b border-dashed border-black pb-1 mb-1">RECEIPT</div>
-                <div className="flex justify-between"><span>Bitter Kola</span><span>x2</span></div>
-                <div className="flex justify-between mb-1"><span>Total</span><span>₦2,100</span></div>
-                <div className="text-center bg-[#E8F5EE] text-[#1A7A4A] border border-[#1A7A4A] py-0.5 rounded-[4px] font-bold text-[6.5px] uppercase">PAID</div>
+ 
+              {/* 2. Real Receipt Image overlay, rotated slightly */}
+              <div className="absolute -top-12 -right-10 w-[170px] border-[1.5px] border-black rounded-2xl overflow-hidden shadow-[4px_4px_0px_#0A0A0A] z-20 transform rotate-[10deg] hover:rotate-0 transition-transform duration-350 bg-[#0E3924]">
+                <img 
+                  src="/receipt.png" 
+                  alt="Kasi AI Transaction Receipt" 
+                  className="w-full h-auto object-cover select-none" 
+                />
               </div>
-
             </div>
           </div>
 
