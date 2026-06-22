@@ -9,6 +9,7 @@ import { PRELAUNCH_WAITLIST_MODE } from "../../../config";
 // Import Modular Components
 import { LandingNavbar } from "../components/LandingNavbar";
 import { HeroSection } from "../components/HeroSection";
+import { ExplainerVideoSection } from "../components/ExplainerVideoSection";
 import { DmSection } from "../components/DmSection";
 import { InvoiceSection } from "../components/InvoiceSection";
 import { NegotiationSection } from "../components/NegotiationSection";
@@ -164,6 +165,8 @@ const LandingPage = () => {
 
       {/* Main Core Sections */}
       <HeroSection onJoinWaitlistClick={openWaitlist} />
+
+      <ExplainerVideoSection />
 
       <DmSection />
 

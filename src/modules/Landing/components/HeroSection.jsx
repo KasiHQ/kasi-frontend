@@ -1,117 +1,20 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { Play, Pause, Volume2, VolumeX, Maximize, X } from "lucide-react";
+import { Play } from "lucide-react";
 import { CountdownTimer } from "./CountdownTimer";
 import { PRELAUNCH_WAITLIST_MODE } from "../../../config";
 
 export const HeroSection = ({ onJoinWaitlistClick }) => {
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [showControls, setShowControls] = useState(true);
-
-  const videoRef = useRef(null);
-  const controlsTimeoutRef = useRef(null);
-
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  const handleEnded = () => setIsPlaying(false);
-  
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+  const handleWatchDemoClick = () => {
+    const element = document.getElementById("explainer-video-section");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      // Dispatch custom event to trigger play & unmute on the inline player
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("play-explainer-video"));
+      }, 500);
     }
   };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e) => {
-    const time = parseFloat(e.target.value);
-    setCurrentTime(time);
-    if (videoRef.current) {
-      videoRef.current.currentTime = time;
-    }
-  };
-
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play().catch(err => console.log("Play failed: ", err));
-      }
-    }
-  };
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      const nextMute = !isMuted;
-      videoRef.current.muted = nextMute;
-      setIsMuted(nextMute);
-    }
-  };
-
-  const handleVolumeChange = (e) => {
-    const vol = parseFloat(e.target.value);
-    setVolume(vol);
-    if (videoRef.current) {
-      videoRef.current.volume = vol;
-      videoRef.current.muted = vol === 0;
-      setIsMuted(vol === 0);
-    }
-  };
-
-  const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (videoRef.current.requestFullscreen) {
-        videoRef.current.requestFullscreen();
-      } else if (videoRef.current.webkitRequestFullscreen) {
-        videoRef.current.webkitRequestFullscreen();
-      }
-    }
-  };
-
-  const formatTime = (secs) => {
-    if (isNaN(secs)) return "0:00";
-    const minutes = Math.floor(secs / 60);
-    const seconds = Math.floor(secs % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
-  const handleMouseMove = () => {
-    setShowControls(true);
-    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-    controlsTimeoutRef.current = setTimeout(() => {
-      if (isPlaying) {
-        setShowControls(false);
-      }
-    }, 2500);
-  };
-
-  const handleVideoOpen = () => {
-    setIsVideoOpen(true);
-    setShowControls(true);
-  };
-
-  const handleVideoClose = () => {
-    setIsVideoOpen(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-    };
-  }, [isPlaying]);
 
   return (
     <section
@@ -167,7 +70,7 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
                 </Link>
               )}
               <button
-                onClick={handleVideoOpen}
+                onClick={handleWatchDemoClick}
                 className="text-[15px] font-bold text-black border-[1.5px] border-black bg-white px-6 py-3.5 rounded-full hover:bg-bg-subtle active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <Play size={14} className="fill-current text-black" />
@@ -221,8 +124,6 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
             <div className="relative w-full max-w-[520px] h-[560px] bg-[#1A7A4A] rounded-[24px] p-8 flex items-center justify-center overflow-visible shadow-[8px_8px_0px_#0A0A0A] border-[1.5px] border-black">
               {/* White dot grid pattern overlay */}
               <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none rounded-[24px]" />
-
-
 
               {/* Browser Mockup */}
               <div className="relative w-full bg-white rounded-2xl border-[3px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[3deg] hover:rotate-0 transition-transform duration-500 z-10">
@@ -385,122 +286,6 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
           </div>
         </div>
       </div>
-
-      {/* Video Modal Popup */}
-      {isVideoOpen && (
-        <div
-          className="fixed inset-0 bg-black/85 z-[250] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200"
-          onClick={handleVideoClose}
-        >
-          <div
-            className="relative w-full max-w-[800px] bg-black rounded-2xl border-[3px] border-black shadow-[8px_8px_0px_#000] overflow-hidden aspect-video animate-in zoom-in-95 duration-200 group"
-            onClick={(e) => e.stopPropagation()}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => isPlaying && setShowControls(false)}
-          >
-            {/* Close Button */}
-            <button
-              onClick={handleVideoClose}
-              className="absolute top-3 right-3 text-white bg-black/70 hover:bg-black border border-white/25 hover:border-white/50 p-2 rounded-full transition-all duration-150 cursor-pointer z-50 hover:scale-105"
-              aria-label="Close video"
-            >
-              <X size={20} />
-            </button>
-            
-            {/* Video Player */}
-            <video
-              ref={videoRef}
-              src="/video/Kasi Explainer Video.mp4"
-              autoPlay
-              playsInline
-              onClick={togglePlay}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onTimeUpdate={handleTimeUpdate}
-              onLoadedMetadata={handleLoadedMetadata}
-              onEnded={handleEnded}
-              className="w-full h-full object-contain cursor-pointer"
-            />
-
-            {/* Custom Controls Bar */}
-            <div
-              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-4 flex flex-col gap-3 transition-opacity duration-300 ${
-                showControls ? "opacity-100" : "opacity-0 pointer-events-none"
-              }`}
-            >
-              {/* Progress Bar / Seek Slider */}
-              <div className="flex items-center w-full">
-                <input
-                  type="range"
-                  min="0"
-                  max={duration || 100}
-                  value={currentTime}
-                  onChange={handleSeek}
-                  className="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#1A7A4A] focus:outline-none"
-                  style={{
-                    background: `linear-gradient(to right, #1A7A4A 0%, #1A7A4A ${(currentTime / (duration || 1)) * 100}%, rgba(255, 255, 255, 0.2) ${(currentTime / (duration || 1)) * 100}%, rgba(255, 255, 255, 0.2) 100%)`
-                  }}
-                />
-              </div>
-
-              {/* Controls Buttons Row */}
-              <div className="flex items-center justify-between text-white select-none">
-                <div className="flex items-center gap-4">
-                  {/* Play/Pause Button */}
-                  <button
-                    onClick={togglePlay}
-                    className="hover:text-[#1A7A4A] transition-colors cursor-pointer p-1 rounded-md focus:outline-none"
-                    title={isPlaying ? "Pause" : "Play"}
-                  >
-                    {isPlaying ? (
-                      <Pause size={20} className="fill-current text-white hover:text-[#1A7A4A]" />
-                    ) : (
-                      <Play size={20} className="fill-current text-white hover:text-[#1A7A4A]" />
-                    )}
-                  </button>
-
-                  {/* Volume Controls */}
-                  <div className="flex items-center gap-2 group/volume">
-                    <button
-                      onClick={toggleMute}
-                      className="hover:text-[#1A7A4A] transition-colors cursor-pointer p-1 rounded-md focus:outline-none"
-                      title={isMuted ? "Unmute" : "Mute"}
-                    >
-                      {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                    </button>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={isMuted ? 0 : volume}
-                      onChange={handleVolumeChange}
-                      className="w-0 overflow-hidden group-hover/volume:w-16 transition-all duration-300 h-1 bg-white/25 rounded appearance-none cursor-pointer accent-[#1A7A4A]"
-                    />
-                  </div>
-
-                  {/* Time display */}
-                  <span className="text-xs font-mono font-medium tracking-tight">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
-                </div>
-
-                {/* Right controls */}
-                <div className="flex items-center gap-3">
-                  {/* Fullscreen Button */}
-                  <button
-                    onClick={toggleFullscreen}
-                    className="hover:text-[#1A7A4A] transition-colors cursor-pointer p-1 rounded-md focus:outline-none"
-                    title="Fullscreen"
-                  >
-                    <Maximize size={20} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 };
