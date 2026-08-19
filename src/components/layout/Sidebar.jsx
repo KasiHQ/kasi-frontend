@@ -226,7 +226,6 @@ const Sidebar = ({ onWidthChange }) => {
                 key={item.path}
                 to={item.path}
                 end={item.path === '/kasisalienceadministration' || item.path === '/dashboard'}
-                title={collapsed ? item.label : undefined}
                 className={({ isActive }) =>
                   clsx(
                     'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
@@ -248,6 +247,13 @@ const Sidebar = ({ onWidthChange }) => {
                 {item.badgeKey && badgeCounts[item.badgeKey] > 0 && collapsed && (
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-600 border-2 border-white dark:border-gray-900" />
                 )}
+                {/* Modern Sleek Tooltip when Collapsed */}
+                {collapsed && (
+                  <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
+                    {item.label}
+                    <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
+                  </div>
+                )}
               </NavLink>
             ))}
           </div>
@@ -260,10 +266,9 @@ const Sidebar = ({ onWidthChange }) => {
         {!isAdmin && (
           <NavLink
             to="/settings"
-            title={collapsed ? 'Settings' : undefined}
             className={({ isActive }) =>
               clsx(
-                'kasi-nav-item flex items-center rounded-xl transition-all duration-200 font-semibold text-sm',
+                'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
                 collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-4 py-2.5',
                 isActive
                   ? 'kasi-nav-active bg-primary text-white shadow-md'
@@ -273,6 +278,12 @@ const Sidebar = ({ onWidthChange }) => {
           >
             <Settings size={19} />
             {!collapsed && <span>Settings</span>}
+            {collapsed && (
+              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
+                Settings
+                <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
+              </div>
+            )}
           </NavLink>
         )}
 
@@ -281,10 +292,13 @@ const Sidebar = ({ onWidthChange }) => {
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}
-              title="Expand sidebar"
-              className="p-2 text-gray-400 hover:text-primary hover:bg-green-50 rounded-lg transition-all duration-200"
+              className="p-2 text-gray-400 hover:text-primary hover:bg-green-50 rounded-lg transition-all duration-200 group relative"
             >
               <ChevronsRight size={15} />
+              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
+                Expand Sidebar
+                <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
+              </div>
             </button>
           )}
         </div>
@@ -326,14 +340,19 @@ const Sidebar = ({ onWidthChange }) => {
         {/* Logout */}
         <button
           className={clsx(
-            'flex items-center w-full text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium text-sm mt-1',
+            'flex items-center w-full text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium text-sm mt-1 group relative',
             collapsed ? 'justify-center py-2.5' : 'gap-3 px-4 py-2.5'
           )}
           onClick={logout}
-          title={collapsed ? 'Logout' : undefined}
         >
           <LogOut size={18} />
           {!collapsed && <span>Logout</span>}
+          {collapsed && (
+            <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
+              Logout
+              <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
+            </div>
+          )}
         </button>
       </div>
     </div>
