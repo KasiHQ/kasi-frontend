@@ -42,7 +42,10 @@ const Logistics = () => {
       const res = await conversationAPI.getConversations();
       // Only retain orders that are Paid, In Transit, or Delivered
       const logisticsStatuses = ['Paid', 'In Transit', 'Delivered'];
-      const filtered = (res.data || []).filter(c => logisticsStatuses.includes(c.status));
+      const filtered = (res.data || []).filter(c => 
+        logisticsStatuses.includes(c.status) && 
+        (c.delivery_address || '').toUpperCase() !== 'PICKUP'
+      );
       setConversations(filtered);
     } catch (err) {
       console.error('Failed to fetch logistics data:', err);
@@ -104,7 +107,10 @@ const Logistics = () => {
     const phone = item.customer_phone || 'N/A';
     const address = item.delivery_address || 'Store Pickup';
     
-    const text = `Customer Name: ${name}\nPhone Number: ${phone}\nDelivery Address: ${address}`;
+    let text = `Customer Name: ${name}\nPhone Number: ${phone}\nDelivery Address: ${address}`;
+    if (item.customer_latitude && item.customer_longitude) {
+      text += `\nGoogle Maps: https://maps.google.com/?q=${item.customer_latitude},${item.customer_longitude}`;
+    }
     navigator.clipboard.writeText(text);
     
     setCopiedId(`all-${item.id}`);
@@ -327,9 +333,25 @@ const Logistics = () => {
                             <div className="flex items-start gap-1.5 text-[11px]">
                               <MapPin size={12} className="text-gray-400 shrink-0 mt-0.5" />
                               <div className="flex-1 min-w-0">
-                                <p className="line-clamp-2 leading-relaxed">
-                                  {item.delivery_address || <span className="italic text-gray-400">Store Pickup</span>}
-                                </p>
+                                <div className="leading-relaxed">
+                                  {item.customer_latitude && item.customer_longitude ? (
+                                    <a 
+                                      href={`https://maps.google.com/?q=${item.customer_latitude},${item.customer_longitude}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 dark:text-blue-400 hover:underline line-clamp-2"
+                                    >
+                                      {item.delivery_address || 'View on Map'} 🗺️
+                                    </a>
+                                  ) : (
+                                    <span className="line-clamp-2">{item.delivery_address || <span className="italic text-gray-400">Store Pickup</span>}</span>
+                                  )}
+                                  {item.delivery_distance_km && (
+                                    <span className="inline-block mt-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                                      📍 {item.delivery_distance_km.toFixed(1)}km
+                                    </span>
+                                  )}
+                                </div>
                                 {item.delivery_address && (
                                   <button
                                     onClick={() => handleCopyAddress(item.delivery_address, item.id)}
@@ -447,6 +469,7 @@ const Logistics = () => {
                   <th className="px-6 py-4">Customer</th>
                   <th className="px-6 py-4">Phone</th>
                   <th className="px-6 py-4">Delivery Address</th>
+                  <th className="px-6 py-4">Distance</th>
                   <th className="px-6 py-4">Ordered Items</th>
                   <th className="px-6 py-4 text-right">Amount Paid</th>
                   <th className="px-6 py-4 text-center">Logistics Stage</th>
@@ -516,6 +539,11 @@ const Logistics = () => {
                               Copy details
                             </button>
                           )}
+                        </td>
+                        
+                        {/* Distance */}
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
+                          {item.delivery_distance_km ? `${item.delivery_distance_km.toFixed(1)}km` : '—'}
                         </td>
                         
                         {/* Ordered Items */}

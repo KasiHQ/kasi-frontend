@@ -250,13 +250,28 @@ const Settings = () => {
     const [selectedPlatform, setSelectedPlatform] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Logistics Rate Sheet states
+    // Logistics & Distance-Based Delivery Pricing states
+    const [deliveryPricingEnabled, setDeliveryPricingEnabled] = useState(true);
+    const [deliveryBaseFee, setDeliveryBaseFee] = useState(800);
+    const [deliveryRatePerKm, setDeliveryRatePerKm] = useState(200);
+    const [deliveryBaseKm, setDeliveryBaseKm] = useState(2.0);
+    const [deliveryMaxRadiusKm, setDeliveryMaxRadiusKm] = useState(25.0);
+    const [storeLatitude, setStoreLatitude] = useState('');
+    const [storeLongitude, setStoreLongitude] = useState('');
+    const [detectingLocation, setDetectingLocation] = useState(false);
     const [deliveryCity, setDeliveryCity] = useState('');
     const [deliveryRates, setDeliveryRates] = useState({});
     const [customAreaName, setCustomAreaName] = useState('');
 
     useEffect(() => {
         if (user) {
+            setDeliveryPricingEnabled(user.delivery_pricing_enabled !== undefined ? Boolean(user.delivery_pricing_enabled) : true);
+            setDeliveryBaseFee(user.delivery_base_fee !== undefined ? user.delivery_base_fee : 800);
+            setDeliveryRatePerKm(user.delivery_rate_per_km !== undefined ? user.delivery_rate_per_km : 200);
+            setDeliveryBaseKm(user.delivery_base_km !== undefined ? user.delivery_base_km : 2.0);
+            setDeliveryMaxRadiusKm(user.delivery_max_radius_km !== undefined ? user.delivery_max_radius_km : 25.0);
+            setStoreLatitude(user.store_latitude !== null && user.store_latitude !== undefined ? user.store_latitude : '');
+            setStoreLongitude(user.store_longitude !== null && user.store_longitude !== undefined ? user.store_longitude : '');
             setDeliveryCity(user.delivery_city || '');
             let rates = {};
             if (user.delivery_rates) {
@@ -273,6 +288,44 @@ const Settings = () => {
             setDeliveryRates(rates);
         }
     }, [user]);
+
+    const handleDetectLocation = () => {
+        if (!navigator.geolocation) {
+            addToast('Geolocation is not supported by your browser', 'error');
+            return;
+        }
+        setDetectingLocation(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const lat = Number(position.coords.latitude.toFixed(6));
+                const lon = Number(position.coords.longitude.toFixed(6));
+                setStoreLatitude(lat);
+                setStoreLongitude(lon);
+                
+                // Auto-save immediately to database
+                try {
+                    await api.patch('/api/auth/profile', {
+                        store_latitude: lat,
+                        store_longitude: lon,
+                        store_google_maps_link: `https://maps.google.com/?q=${lat},${lon}`
+                    });
+                    if (fetchUser) await fetchUser();
+                    addToast('📍 Store GPS location detected & saved! Google Maps link generated for pickup orders.', 'success');
+                } catch (saveErr) {
+                    console.error('Auto-save error:', saveErr);
+                    addToast('GPS coordinates detected. Click "Save Logistics Settings" below to finalize.', 'info');
+                } finally {
+                    setDetectingLocation(false);
+                }
+            },
+            (error) => {
+                console.error(error);
+                setDetectingLocation(false);
+                addToast('Unable to detect location. Please allow browser location access.', 'error');
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    };
 
     const handleCityChange = (city) => {
         setDeliveryCity(city);
@@ -302,7 +355,7 @@ const Settings = () => {
     };
 
     const handleSaveLogistics = async (e) => {
-        e.preventDefault();
+        e?.preventDefault?.();
         setLoading(true);
         try {
             const cleanedRates = {};
@@ -313,11 +366,18 @@ const Settings = () => {
                 }
             });
             await api.patch('/api/auth/profile', {
+                delivery_pricing_enabled: deliveryPricingEnabled,
+                delivery_base_fee: Number(deliveryBaseFee) || 800.0,
+                delivery_rate_per_km: Number(deliveryRatePerKm) || 200.0,
+                delivery_base_km: Number(deliveryBaseKm) || 2.0,
+                delivery_max_radius_km: Number(deliveryMaxRadiusKm) || 25.0,
+                store_latitude: storeLatitude !== '' ? Number(storeLatitude) : null,
+                store_longitude: storeLongitude !== '' ? Number(storeLongitude) : null,
                 delivery_city: deliveryCity,
                 delivery_rates: cleanedRates
             });
             if (fetchUser) await fetchUser();
-            addToast('Logistics settings updated successfully', 'success');
+            addToast('Logistics & delivery pricing updated successfully', 'success');
         } catch (err) {
             console.error(err);
             addToast('Failed to save logistics settings', 'error');
@@ -1385,111 +1445,312 @@ const Settings = () => {
                 <ActivityLogsTable />
             )}
 
-            {/* ── LOGISTICS TAB ─────────────────────── */}
+            {/* ── LOGISTICS & DELIVERY PRICING TAB ─────────────────────── */}
             {activeTab === 'logistics' && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-6 animate-in fade-in duration-300">
-                    <h2 className="text-xl font-bold text-dark flex items-center gap-2">
-                        <Truck className="text-primary" size={24} />
-                        Delivery Rate Sheet
-                    </h2>
-                    <p className="text-sm text-gray-500 -mt-3">
-                        Set up delivery pricing rules for your city. Kasi AI will quote these fees to customers dynamically based on their delivery areas.
-                    </p>
+                <div className="space-y-6 animate-in fade-in duration-300">
+                    {/* Header Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-700">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                                    <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                                        <Truck size={22} />
+                                    </div>
+                                    Delivery & Logistics Pricing
+                                </h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Configure Chowdeck/Bolt-style distance pricing and fallback rates for WhatsApp sales.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600">
+                                <span className="text-xs font-bold text-gray-700 dark:text-gray-200">
+                                    Distance Pricing
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setDeliveryPricingEnabled(!deliveryPricingEnabled)}
+                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                        deliveryPricingEnabled ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
+                                    }`}
+                                >
+                                    <span
+                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                            deliveryPricingEnabled ? 'translate-x-5' : 'translate-x-0'
+                                        }`}
+                                    />
+                                </button>
+                            </div>
+                        </div>
 
-                    <div className="space-y-4">
+                        {/* Distance-Based Pricing Settings */}
+                        <div className="pt-6 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {/* Base Delivery Fee */}
+                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                                        Base Delivery Fee
+                                    </label>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Starting flat fee</p>
+                                    <div className="relative">
+                                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-bold">₦</span>
+                                        <input
+                                            type="number"
+                                            value={deliveryBaseFee}
+                                            onChange={(e) => setDeliveryBaseFee(e.target.value)}
+                                            placeholder="800"
+                                            className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Base Distance Included */}
+                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                                        Base Distance
+                                    </label>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Covered by base fee</p>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            step="0.5"
+                                            value={deliveryBaseKm}
+                                            onChange={(e) => setDeliveryBaseKm(e.target.value)}
+                                            placeholder="2.0"
+                                            className="w-full pl-3 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                            min="0"
+                                        />
+                                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-xs font-bold">km</span>
+                                    </div>
+                                </div>
+
+                                {/* Rate Per Km */}
+                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                                        Rate Per Extra Km
+                                    </label>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Charge per extra km</p>
+                                    <div className="relative">
+                                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-bold">₦</span>
+                                        <input
+                                            type="number"
+                                            value={deliveryRatePerKm}
+                                            onChange={(e) => setDeliveryRatePerKm(e.target.value)}
+                                            placeholder="200"
+                                            className="w-full pl-8 pr-12 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                            min="0"
+                                        />
+                                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-[10px] font-bold">/km</span>
+                                    </div>
+                                </div>
+
+                                {/* Max Delivery Radius */}
+                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                                        Max Radius
+                                    </label>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Max auto-accept zone</p>
+                                    <div className="relative">
+                                        <input
+                                            type="number"
+                                            value={deliveryMaxRadiusKm}
+                                            onChange={(e) => setDeliveryMaxRadiusKm(e.target.value)}
+                                            placeholder="25"
+                                            className="w-full pl-3 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                            min="1"
+                                        />
+                                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-xs font-bold">km</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Store Location GPS Section */}
+                            <div className="bg-gradient-to-r from-emerald-500/5 via-primary/5 to-transparent p-5 rounded-2xl border border-primary/20">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                            <MapPin size={16} className="text-primary" />
+                                            Store GPS Location (Dispatch Center)
+                                        </h3>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            Used as the starting point to calculate distance to your customer's WhatsApp location.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleDetectLocation}
+                                        disabled={detectingLocation}
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm transition-all shrink-0"
+                                    >
+                                        <MapPin size={14} className="text-primary" />
+                                        {detectingLocation ? 'Detecting GPS...' : '📍 Auto-Detect My Store GPS'}
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                            Store Latitude
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.000001"
+                                            value={storeLatitude}
+                                            onChange={(e) => setStoreLatitude(e.target.value)}
+                                            placeholder="e.g. 6.4281"
+                                            className="w-full px-3.5 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-mono font-semibold text-gray-900 dark:text-white outline-none focus:border-primary"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                            Store Longitude
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.000001"
+                                            value={storeLongitude}
+                                            onChange={(e) => setStoreLongitude(e.target.value)}
+                                            placeholder="e.g. 3.4219"
+                                            className="w-full px-3.5 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-mono font-semibold text-gray-900 dark:text-white outline-none focus:border-primary"
+                                        />
+                                    </div>
+                                </div>
+
+                                {storeLatitude && storeLongitude && (
+                                    <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1">
+                                        <div className="flex items-center gap-2 text-xs text-primary font-bold">
+                                            <CheckCircle size={15} />
+                                            <span>Store GPS Active & Saved</span>
+                                            <a
+                                                href={`https://maps.google.com/?q=${storeLatitude},${storeLongitude}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="ml-auto underline hover:text-emerald-700 inline-flex items-center gap-1 font-semibold"
+                                            >
+                                                Preview on Google Maps <ExternalLink size={12} />
+                                            </a>
+                                        </div>
+                                        <p className="text-[11px] text-emerald-800 dark:text-emerald-300">
+                                            📦 <strong>Automated Pickup Navigation:</strong> Whenever a customer or dispatch rider requests pickup, Kasi AI automatically sends them this exact Google Maps navigation pin along with your store address!
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Live Pricing Preview Demo */}
+                            <div className="bg-gray-50 dark:bg-gray-700/40 p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 space-y-1">
+                                <p className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                                    💡 How your customer will be charged:
+                                </p>
+                                <p className="text-gray-500 dark:text-gray-400">
+                                    • Up to <strong>{deliveryBaseKm} km</strong>: Flat <strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong>
+                                </p>
+                                <p className="text-gray-500 dark:text-gray-400">
+                                    • Beyond {deliveryBaseKm} km: <strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong> + <strong>₦{Number(deliveryRatePerKm).toLocaleString()}/km</strong> for each extra km.
+                                </p>
+                                <p className="text-emerald-600 dark:text-emerald-400 font-semibold pt-1">
+                                    Example: A customer 7.5 km away pays ₦{(Number(deliveryBaseFee) + (7.5 - Number(deliveryBaseKm)) * Number(deliveryRatePerKm)).toLocaleString()}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Fallback Rate Sheet Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
                         <div>
-                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Your Base City</label>
-                          <select
-                            value={deliveryCity}
-                            onChange={(e) => handleCityChange(e.target.value)}
-                            className="w-full h-11 px-3.5 border border-[#D0D5DD] bg-white rounded-xl text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all font-semibold"
-                          >
-                            <option value="">-- Select base city --</option>
-                            <option value="Lagos">Lagos</option>
-                            <option value="Abuja">Abuja</option>
-                            <option value="Port Harcourt">Port Harcourt</option>
-                            <option value="Ibadan">Ibadan</option>
-                          </select>
+                            <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                                Fallback Area Rate Sheet (Optional)
+                            </h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                Used as fallback when a customer sends a typed text area instead of a WhatsApp GPS pin.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Your Base City</label>
+                            <select
+                                value={deliveryCity}
+                                onChange={(e) => handleCityChange(e.target.value)}
+                                className="w-full h-11 px-3.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl text-sm text-gray-900 dark:text-white focus:border-primary outline-none transition-all font-semibold"
+                            >
+                                <option value="">-- Select base city --</option>
+                                <option value="Lagos">Lagos</option>
+                                <option value="Abuja">Abuja</option>
+                                <option value="Port Harcourt">Port Harcourt</option>
+                                <option value="Ibadan">Ibadan</option>
+                            </select>
                         </div>
 
                         {deliveryCity && (
-                          <div className="space-y-4 animate-fadeIn">
-                            <div className="border-t border-gray-100 pt-4">
-                              <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">
-                                Delivery Prices for {deliveryCity} Areas/LGAs
-                              </h3>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {Object.keys(deliveryRates).map(area => (
-                                  <div key={area} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200/60 gap-3">
-                                    <span className="text-xs font-semibold text-gray-700 truncate">{area}</span>
-                                    <div className="flex items-center gap-2 shrink-0">
-                                      <div className="relative rounded-lg shadow-sm w-32">
-                                        <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                                          <span className="text-gray-400 text-xs">₦</span>
+                            <div className="space-y-4 pt-2">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                                    {Object.keys(deliveryRates).map(area => (
+                                        <div key={area} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 gap-3">
+                                            <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">{area}</span>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <div className="relative rounded-lg w-28">
+                                                    <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-gray-400 text-xs">₦</span>
+                                                    <input
+                                                        type="number"
+                                                        value={deliveryRates[area]}
+                                                        onChange={(e) => {
+                                                            setDeliveryRates(prev => ({
+                                                                ...prev,
+                                                                [area]: e.target.value
+                                                            }));
+                                                        }}
+                                                        placeholder="Price"
+                                                        className="w-full pl-5 pr-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs outline-none focus:border-primary font-semibold"
+                                                        min="0"
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const updated = { ...deliveryRates };
+                                                        delete updated[area];
+                                                        setDeliveryRates(updated);
+                                                    }}
+                                                    className="text-gray-400 hover:text-red-500 font-bold text-xs p-1"
+                                                    title="Remove Area"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
                                         </div>
-                                        <input
-                                          type="number"
-                                          value={deliveryRates[area]}
-                                          onChange={(e) => {
-                                            setDeliveryRates(prev => ({
-                                              ...prev,
-                                              [area]: e.target.value
-                                            }));
-                                          }}
-                                          placeholder="Price"
-                                          className="w-full pl-6 pr-2 py-1.5 border border-gray-300 rounded-lg text-xs outline-none focus:border-primary transition-all font-semibold"
-                                          min="0"
-                                        />
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const updated = { ...deliveryRates };
-                                          delete updated[area];
-                                          setDeliveryRates(updated);
-                                        }}
-                                        className="text-gray-400 hover:text-red-500 font-bold text-xs p-1"
-                                        title="Remove Area"
-                                      >
-                                        ×
-                                      </button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
+                                    ))}
+                                </div>
 
-                            {/* Add Custom Area Input */}
-                            <form onSubmit={handleAddCustomArea} className="flex gap-2 items-center bg-gray-50 p-3 rounded-xl border border-gray-200/60 max-w-md">
-                              <input
-                                type="text"
-                                value={customAreaName}
-                                onChange={(e) => setCustomAreaName(e.target.value)}
-                                placeholder="Add custom area/LGA (e.g. Ikotun)"
-                                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs outline-none focus:border-primary font-semibold"
-                              />
-                              <button
-                                type="submit"
-                                disabled={!customAreaName.trim()}
-                                className="px-4 py-1.5 bg-primary hover:bg-[#125D37] text-white disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-xs font-bold rounded-lg transition-colors border border-black shadow-[2px_2px_0px_#0A0A0A] cursor-pointer"
-                              >
-                                Add Area
-                              </button>
-                            </form>
-
-                            {/* Save Button */}
-                            <div className="pt-2">
-                              <button
-                                onClick={handleSaveLogistics}
-                                disabled={loading}
-                                className="w-full bg-primary hover:bg-[#125D37] text-white py-3 rounded-xl shadow-lg shadow-green-200 font-bold border border-black shadow-[2px_2px_0px_#0A0A0A] cursor-pointer"
-                              >
-                                {loading ? 'Saving Settings...' : 'Save Rate Sheet'}
-                              </button>
+                                <form onSubmit={handleAddCustomArea} className="flex gap-2 items-center bg-gray-50 dark:bg-gray-700/50 p-2.5 rounded-xl border border-gray-200 dark:border-gray-600 max-w-md">
+                                    <input
+                                        type="text"
+                                        value={customAreaName}
+                                        onChange={(e) => setCustomAreaName(e.target.value)}
+                                        placeholder="Add custom area/LGA (e.g. Ikotun)"
+                                        className="flex-1 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs outline-none focus:border-primary font-semibold"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={!customAreaName.trim()}
+                                        className="px-4 py-1.5 bg-primary hover:bg-emerald-700 text-white disabled:opacity-50 text-xs font-bold rounded-lg transition-colors"
+                                    >
+                                        Add Area
+                                    </button>
+                                </form>
                             </div>
-                          </div>
                         )}
+                    </div>
+
+                    {/* Master Save Button */}
+                    <div className="flex justify-end">
+                        <button
+                            onClick={handleSaveLogistics}
+                            disabled={loading}
+                            className="px-8 py-3 bg-primary hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all inline-flex items-center gap-2 disabled:opacity-50"
+                        >
+                            <Save size={18} />
+                            {loading ? 'Saving Pricing...' : 'Save Logistics & Pricing Settings'}
+                        </button>
                     </div>
                 </div>
             )}

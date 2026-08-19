@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './modules/Dashboard/pages/Dashboard';
 import LandingPage from './modules/Landing/pages/LandingPage';
+import Marketplace from './modules/Marketplace/pages/Marketplace';
+import ProductDetail from './modules/Marketplace/pages/ProductDetail';
+import VendorProfile from './modules/Marketplace/pages/VendorProfile';
 import MainLayout from './components/layout/MainLayout';
 import NotFound from './components/layout/NotFound';
 
@@ -49,6 +52,7 @@ import Services from './modules/Services/pages/Services';
 import Bookings from './modules/Services/pages/Bookings';
 import Chats from './modules/Conversations/pages/Chats';
 import Logistics from './modules/Logistics/pages/Logistics';
+import Fulfilment from './modules/Fulfilment/pages/Fulfilment';
 import PrivacyPolicy from './modules/Legal/pages/PrivacyPolicy';
 import TermsOfService from './modules/Legal/pages/TermsOfService';
 import DataDeletion from './modules/Legal/pages/DataDeletion';
@@ -97,6 +101,9 @@ function App() {
           } />
           
           <Route path="/" element={<LandingPage />} />
+          <Route path="/market" element={<Marketplace />} />
+          <Route path="/market/product/:id" element={<ProductDetail />} />
+          <Route path="/market/vendor/:vendorId" element={<VendorProfile />} />
           
           <Route element={<MainLayout />}>
               <Route path="/dashboard" element={
@@ -114,6 +121,11 @@ function App() {
               <Route path="/logistics" element={
                 <SubscriptionProtected>
                   <Logistics />
+                </SubscriptionProtected>
+              } />
+              <Route path="/fulfilment" element={
+                <SubscriptionProtected>
+                  <Fulfilment />
                 </SubscriptionProtected>
               } />
               <Route path="/customers" element={

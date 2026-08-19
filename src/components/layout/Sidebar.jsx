@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { BarChart3, Settings, LogOut, MessageSquare, Package, Truck, Users, TrendingUp, ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, Briefcase, Calendar, Home, DollarSign, FileText } from 'lucide-react';
+import { BarChart3, Settings, LogOut, MessageSquare, Package, Truck, Users, TrendingUp, ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, Briefcase, Calendar, Home, DollarSign, FileText, Store } from 'lucide-react';
 import clsx from 'clsx';
 import { useLayout } from '../../context/LayoutContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -87,52 +87,103 @@ const Sidebar = ({ onWidthChange }) => {
     onWidthChange?.(collapsed ? 72 : 220);
   }, []);
 
-  let navItems = [];
+  let navGroups = [];
   if (isAdmin) {
-    navItems.push({ icon: Home, label: 'Admin Dashboard', path: '/kasisalienceadministration' });
-    
-    if (adminRole === 'Super Admin' || adminRole === 'Support Admin') {
-      navItems.push({ icon: Users, label: 'Vendors', path: '/kasisalienceadministration/users' });
-      navItems.push({ icon: FileText, label: 'Blog Posts', path: '/kasisalienceadministration/blog' });
-    }
-    if (adminRole === 'Super Admin' || adminRole === 'Finance Admin') {
-      navItems.push({ icon: BarChart3, label: 'Invoices', path: '/kasisalienceadministration/invoices' });
-      navItems.push({ icon: TrendingUp, label: 'Transactions', path: '/kasisalienceadministration/transactions' });
-    }
-    if (adminRole === 'Super Admin' || adminRole === 'Support Admin') {
-      navItems.push({ icon: MessageSquare, label: 'Broadcasts', path: '/kasisalienceadministration/broadcasts' });
-      navItems.push({ icon: PanelTop, label: 'Audit Logs', path: '/kasisalienceadministration/audit-logs' });
-    }
-    if (adminRole === 'Super Admin') {
-      navItems.push({ icon: Calendar, label: 'Waitlist', path: '/kasisalienceadministration/waitlist' });
-      navItems.push({ icon: Settings, label: 'Staff Panel', path: '/kasisalienceadministration/staff' });
-    }
+    navGroups = [
+      {
+        title: 'OVERVIEW',
+        items: [
+          { icon: Home, label: 'Admin Dashboard', path: '/kasisalienceadministration' },
+        ]
+      },
+      {
+        title: 'MANAGEMENT',
+        items: [
+          ...(adminRole === 'Super Admin' || adminRole === 'Support Admin' ? [
+            { icon: Users, label: 'Vendors', path: '/kasisalienceadministration/users' },
+            { icon: FileText, label: 'Blog Posts', path: '/kasisalienceadministration/blog' },
+          ] : []),
+          ...(adminRole === 'Super Admin' || adminRole === 'Finance Admin' ? [
+            { icon: BarChart3, label: 'Invoices', path: '/kasisalienceadministration/invoices' },
+            { icon: TrendingUp, label: 'Transactions', path: '/kasisalienceadministration/transactions' },
+          ] : []),
+        ]
+      },
+      {
+        title: 'SYSTEM',
+        items: [
+          ...(adminRole === 'Super Admin' || adminRole === 'Support Admin' ? [
+            { icon: MessageSquare, label: 'Broadcasts', path: '/kasisalienceadministration/broadcasts' },
+            { icon: PanelTop, label: 'Audit Logs', path: '/kasisalienceadministration/audit-logs' },
+          ] : []),
+          ...(adminRole === 'Super Admin' ? [
+            { icon: Calendar, label: 'Waitlist', path: '/kasisalienceadministration/waitlist' },
+            { icon: Settings, label: 'Staff Panel', path: '/kasisalienceadministration/staff' },
+          ] : []),
+        ]
+      }
+    ];
+  } else if (isService) {
+    navGroups = [
+      {
+        title: 'BUSINESS',
+        items: [
+          { icon: Home, label: 'Home', path: '/dashboard' },
+          { icon: Calendar, label: 'Schedule', path: '/bookings' },
+          { icon: Briefcase, label: 'Services', path: '/services' },
+        ]
+      },
+      {
+        title: 'INBOX & CRM',
+        items: [
+          { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
+          { icon: Users, label: 'Clients', path: '/customers' },
+        ]
+      },
+      {
+        title: 'OPERATIONS',
+        items: [
+          { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
+          { icon: Store, label: 'Marketplace', path: '/market' },
+        ]
+      }
+    ];
   } else {
-    navItems = isService ? [
-      { icon: Home, label: 'Home', path: '/dashboard' },
-      { icon: Calendar, label: 'Schedule', path: '/bookings' },
-      { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
-      { icon: Users, label: 'Clients', path: '/customers' },
-      { icon: Briefcase, label: 'Services', path: '/services' },
-      { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
-    ] : [
-      { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-      { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
-      { icon: Package, label: 'Store', path: '/products' },
-      { icon: Truck, label: 'Logistics', path: '/logistics', badgeKey: 'logistics' },
-      { icon: Users, label: 'Customers', path: '/customers' },
-      { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
-      { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
+    navGroups = [
+      {
+        title: 'SELLING',
+        items: [
+          { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
+          { icon: Package, label: 'Store', path: '/products' },
+          { icon: Truck, label: 'Logistics', path: '/logistics', badgeKey: 'logistics' },
+          { icon: Store, label: 'Fulfilment', path: '/fulfilment' },
+        ]
+      },
+      {
+        title: 'INBOX & CRM',
+        items: [
+          { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
+          { icon: Users, label: 'Customers', path: '/customers' },
+        ]
+      },
+      {
+        title: 'FINANCE & MARKET',
+        items: [
+          { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
+          { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
+          { icon: Store, label: 'Marketplace', path: '/market' },
+        ]
+      }
     ];
   }
 
   return (
     <div
-      className="kasi-sidebar h-screen hidden md:flex flex-col fixed left-0 top-0 z-50"
-      style={{ width: collapsed ? 72 : 220, transition: 'width 0.25s ease' }}
+      className="kasi-sidebar h-screen hidden md:flex flex-col fixed left-0 top-0 z-50 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+      style={{ width: collapsed ? 72 : 230, transition: 'width 0.25s ease' }}
     >
       {/* Brand Header */}
-      <div className={clsx('flex items-center py-5', collapsed ? 'px-3 justify-center' : 'px-5 justify-between')}>
+      <div className={clsx('flex items-center py-4', collapsed ? 'px-3 justify-center' : 'px-5 justify-between')}>
         {!collapsed ? (
           <div className="flex items-center gap-2">
             <img src="/kasi.png" alt="Kasi" className="w-7 h-7 rounded-lg" />
@@ -154,41 +205,52 @@ const Sidebar = ({ onWidthChange }) => {
 
       {/* Global Search (Hidden when collapsed or for admin) */}
       {!collapsed && !isAdmin && (
-        <div className="px-3 pb-3">
+        <div className="px-3.5 pb-2">
           <GlobalSearch />
         </div>
       )}
 
-      {/* Navigation */}
-      <nav className={clsx('flex-1 space-y-1', collapsed ? 'px-2' : 'px-3')}>
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            end={item.path === '/kasisalienceadministration' || item.path === '/dashboard'}
-            title={collapsed ? item.label : undefined}
-            className={({ isActive }) =>
-              clsx(
-                'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
-                collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-4 py-2.5',
-                isActive
-                  ? 'kasi-nav-active bg-primary text-white shadow-md'
-                  : 'text-gray-500 hover:text-dark hover:bg-gray-100/80'
-              )
-            }
-          >
-            <item.icon size={19} className="transition-colors duration-200 shrink-0" />
-            {!collapsed && <span>{item.label}</span>}
-            {/* Badge */}
-            {item.badgeKey && badgeCounts[item.badgeKey] > 0 && !collapsed && (
-              <span className="ml-auto w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                {badgeCounts[item.badgeKey]}
-              </span>
+      {/* Categorized Navigation */}
+      <nav className={clsx('flex-1 space-y-4 py-1', collapsed ? 'px-2' : 'px-3')}>
+        {navGroups.map((group, groupIdx) => (
+          <div key={groupIdx} className="space-y-1">
+            {!collapsed && group.title && (
+              <div className="px-3 pt-1 pb-1">
+                <span className="text-[10px] font-bold tracking-wider text-gray-400 dark:text-gray-500 uppercase">
+                  {group.title}
+                </span>
+              </div>
             )}
-            {item.badgeKey && badgeCounts[item.badgeKey] > 0 && collapsed && (
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white" />
-            )}
-          </NavLink>
+            {group.items.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.path === '/kasisalienceadministration' || item.path === '/dashboard'}
+                title={collapsed ? item.label : undefined}
+                className={({ isActive }) =>
+                  clsx(
+                    'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
+                    collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3.5 py-2.5',
+                    isActive
+                      ? 'kasi-nav-active bg-[#0D7043] dark:bg-[#0D7043] text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/70 dark:hover:bg-gray-800/60'
+                  )
+                }
+              >
+                <item.icon size={18} className="transition-colors duration-200 shrink-0" />
+                {!collapsed && <span className="truncate">{item.label}</span>}
+                {/* Badge */}
+                {item.badgeKey && badgeCounts[item.badgeKey] > 0 && !collapsed && (
+                  <span className="ml-auto px-1.5 py-0.5 min-w-[20px] h-5 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center">
+                    {badgeCounts[item.badgeKey]}
+                  </span>
+                )}
+                {item.badgeKey && badgeCounts[item.badgeKey] > 0 && collapsed && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-600 border-2 border-white dark:border-gray-900" />
+                )}
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
 
