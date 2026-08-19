@@ -340,20 +340,6 @@ const Sidebar = ({ onWidthChange }) => {
             </div>
           </div>
         )}
-
-        {/* Logout */}
-        <button
-          className={clsx(
-            'flex items-center w-full text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium text-sm mt-1 relative',
-            collapsed ? 'justify-center py-2.5' : 'gap-3 px-4 py-2.5'
-          )}
-          onClick={logout}
-          onMouseEnter={(e) => handleItemHover(e, 'Logout')}
-          onMouseLeave={handleItemLeave}
-        >
-          <LogOut size={18} />
-          {!collapsed && <span>Logout</span>}
-        </button>
       </div>
 
       {/* Sleek Fixed Floating Tooltip (Never clipped, zero horizontal scroll!) */}

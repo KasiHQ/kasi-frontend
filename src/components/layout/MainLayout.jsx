@@ -6,7 +6,7 @@ import ImpersonationBanner from './ImpersonationBanner';
 import BroadcastBanner from './BroadcastBanner';
 import { useLayout } from '../../context/LayoutContext';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Bell, X, DollarSign, Calendar, AlertTriangle, User, Truck, Settings, LogOut } from 'lucide-react';
+import { Search, Bell, X, DollarSign, Calendar, AlertTriangle, User, Truck, Settings, LogOut, Zap, Wallet } from 'lucide-react';
 import api from '../../api/axios';
 
 const MainLayout = () => {
@@ -318,7 +318,7 @@ const MainLayout = () => {
               <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="w-9 h-9 rounded-full bg-[#FFE5D3] text-[#D95B16] hover:ring-2 hover:ring-[#D95B16]/30 flex items-center justify-center font-bold text-xs shrink-0 select-none cursor-pointer transition-all shadow-xs"
+                  className="w-9 h-9 rounded-full bg-[#0D7043] text-white hover:ring-2 hover:ring-[#0D7043]/30 flex items-center justify-center font-bold text-xs shrink-0 select-none cursor-pointer transition-all shadow-xs"
                 >
                   {user?.business_name ? user.business_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U')}
                 </button>
@@ -327,7 +327,7 @@ const MainLayout = () => {
                   <div className="absolute right-0 mt-2.5 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 py-2.5 z-50 animate-in fade-in zoom-in-95 origin-top-right select-none">
                     {/* User Identity Header */}
                     <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80 mb-1.5">
-                      <div className="w-10 h-10 rounded-full bg-[#FFE5D3] text-[#D95B16] flex items-center justify-center font-bold text-sm shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-[#0D7043] text-white flex items-center justify-center font-bold text-sm shrink-0">
                         {user?.business_name ? user.business_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U')}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -345,12 +345,12 @@ const MainLayout = () => {
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);
-                          navigate('/settings?tab=profile');
+                          navigate('/settings?tab=integrations');
                         }}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
                       >
-                        <User size={16} className="text-gray-400 shrink-0" />
-                        <span>Edit account</span>
+                        <Zap size={16} className="text-gray-400 shrink-0" />
+                        <span>Integrations</span>
                       </button>
 
                       <button
@@ -367,19 +367,19 @@ const MainLayout = () => {
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);
-                          navigate('/settings');
+                          navigate('/settings?tab=payment');
                         }}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
                       >
-                        <Settings size={16} className="text-gray-400 shrink-0" />
-                        <span>Settings</span>
+                        <Wallet size={16} className="text-gray-400 shrink-0" />
+                        <span>Settlement & payouts</span>
                       </button>
                     </div>
 
                     {/* Divider */}
                     <div className="my-1.5 border-t border-gray-100 dark:border-gray-700/80" />
 
-                    {/* Sign out */}
+                    {/* Log out */}
                     <div className="px-2">
                       <button
                         onClick={() => {
@@ -389,7 +389,7 @@ const MainLayout = () => {
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer text-left"
                       >
                         <LogOut size={16} className="shrink-0 text-red-500" />
-                        <span>Sign out</span>
+                        <span>Log out</span>
                       </button>
                     </div>
                   </div>
