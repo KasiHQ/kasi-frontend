@@ -87,6 +87,21 @@ const Sidebar = ({ onWidthChange }) => {
     onWidthChange?.(collapsed ? 72 : 220);
   }, []);
 
+  const [hoveredTooltip, setHoveredTooltip] = useState(null);
+
+  const handleItemHover = (e, label) => {
+    if (!collapsed) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    setHoveredTooltip({
+      label,
+      top: rect.top + rect.height / 2
+    });
+  };
+
+  const handleItemLeave = () => {
+    setHoveredTooltip(null);
+  };
+
   let navGroups = [];
   if (isAdmin) {
     navGroups = [
@@ -179,7 +194,7 @@ const Sidebar = ({ onWidthChange }) => {
 
   return (
     <div
-      className="kasi-sidebar h-screen hidden md:flex flex-col fixed left-0 top-0 z-50 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+      className="kasi-sidebar h-screen hidden md:flex flex-col fixed left-0 top-0 z-50 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
       style={{ width: collapsed ? 72 : 230, transition: 'width 0.25s ease' }}
     >
       {/* Brand Header */}
@@ -226,6 +241,8 @@ const Sidebar = ({ onWidthChange }) => {
                 key={item.path}
                 to={item.path}
                 end={item.path === '/kasisalienceadministration' || item.path === '/dashboard'}
+                onMouseEnter={(e) => handleItemHover(e, item.label)}
+                onMouseLeave={handleItemLeave}
                 className={({ isActive }) =>
                   clsx(
                     'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
@@ -247,13 +264,6 @@ const Sidebar = ({ onWidthChange }) => {
                 {item.badgeKey && badgeCounts[item.badgeKey] > 0 && collapsed && (
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-600 border-2 border-white dark:border-gray-900" />
                 )}
-                {/* Modern Sleek Tooltip when Collapsed */}
-                {collapsed && (
-                  <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
-                    {item.label}
-                    <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
-                  </div>
-                )}
               </NavLink>
             ))}
           </div>
@@ -266,6 +276,8 @@ const Sidebar = ({ onWidthChange }) => {
         {!isAdmin && (
           <NavLink
             to="/settings"
+            onMouseEnter={(e) => handleItemHover(e, 'Settings')}
+            onMouseLeave={handleItemLeave}
             className={({ isActive }) =>
               clsx(
                 'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
@@ -278,12 +290,6 @@ const Sidebar = ({ onWidthChange }) => {
           >
             <Settings size={19} />
             {!collapsed && <span>Settings</span>}
-            {collapsed && (
-              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
-                Settings
-                <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
-              </div>
-            )}
           </NavLink>
         )}
 
@@ -292,13 +298,11 @@ const Sidebar = ({ onWidthChange }) => {
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}
-              className="p-2 text-gray-400 hover:text-primary hover:bg-green-50 rounded-lg transition-all duration-200 group relative"
+              onMouseEnter={(e) => handleItemHover(e, 'Expand Sidebar')}
+              onMouseLeave={handleItemLeave}
+              className="p-2 text-gray-400 hover:text-primary hover:bg-green-50 rounded-lg transition-all duration-200 relative"
             >
               <ChevronsRight size={15} />
-              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
-                Expand Sidebar
-                <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
-              </div>
             </button>
           )}
         </div>
@@ -340,21 +344,34 @@ const Sidebar = ({ onWidthChange }) => {
         {/* Logout */}
         <button
           className={clsx(
-            'flex items-center w-full text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium text-sm mt-1 group relative',
+            'flex items-center w-full text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium text-sm mt-1 relative',
             collapsed ? 'justify-center py-2.5' : 'gap-3 px-4 py-2.5'
           )}
           onClick={logout}
+          onMouseEnter={(e) => handleItemHover(e, 'Logout')}
+          onMouseLeave={handleItemLeave}
         >
           <LogOut size={18} />
           {!collapsed && <span>Logout</span>}
-          {collapsed && (
-            <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-gray-900 text-white text-xs font-semibold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap z-[100] translate-x-1 group-hover:translate-x-0 hidden md:flex items-center">
-              Logout
-              <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45" />
-            </div>
-          )}
         </button>
       </div>
+
+      {/* Sleek Fixed Floating Tooltip (Never clipped, zero horizontal scroll!) */}
+      {collapsed && hoveredTooltip && (
+        <div
+          className="fixed z-[99999] pointer-events-none transition-all duration-150 animate-in fade-in zoom-in-95"
+          style={{
+            left: 78,
+            top: hoveredTooltip.top,
+            transform: 'translateY(-50%)'
+          }}
+        >
+          <div className="bg-[#101828] text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-2xl flex items-center gap-1.5 whitespace-nowrap border border-gray-700/60">
+            {hoveredTooltip.label}
+            <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#101828] border-l border-b border-gray-700/60 rotate-45" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
