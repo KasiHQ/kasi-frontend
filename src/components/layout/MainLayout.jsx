@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
@@ -6,14 +6,28 @@ import ImpersonationBanner from './ImpersonationBanner';
 import BroadcastBanner from './BroadcastBanner';
 import { useLayout } from '../../context/LayoutContext';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Bell, X, DollarSign, Calendar, AlertTriangle } from 'lucide-react';
+import { Search, Bell, X, DollarSign, Calendar, AlertTriangle, User, Truck, Settings, LogOut, Zap, Wallet } from 'lucide-react';
 import api from '../../api/axios';
 
 const MainLayout = () => {
   const [sidebarWidth, setSidebarWidth] = useState(240);
-  const { user, fetchUser } = useAuth();
+  const { user, fetchUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Profile Menu Dropdown State
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Legacy Rider Migration States
   const [showRiderMigrator, setShowRiderMigrator] = useState(false);
@@ -291,20 +305,95 @@ const MainLayout = () => {
               <div className="relative">
                 <button 
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#667085] hover:bg-[#F2F4F7] hover:text-[#101828] transition-colors shrink-0 relative cursor-pointer"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-[#667085] hover:bg-[#F2F4F7] hover:text-[#101828] transition-colors shrink-0 relative cursor-pointer border border-[#EAECF0]"
                 >
                   <Bell size={18} />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#E53E3E] ring-2 ring-white animate-pulse" />
+                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#E53E3E] ring-2 ring-white animate-pulse" />
                   )}
                 </button>
-                
-                {/* Dropdown removed - now handled via Off-Canvas */}
               </div>
               
-              {/* Avatar (32px circle) */}
-              <div className="w-8 h-8 rounded-full bg-[#1A7A4A] text-white flex items-center justify-center font-bold text-xs shrink-0 select-none">
-                {user?.business_name ? user.business_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U')}
+              {/* User Profile Avatar & Buvvo-Style Dropdown Menu */}
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="w-9 h-9 rounded-full bg-[#0D7043] text-white hover:ring-2 hover:ring-[#0D7043]/30 flex items-center justify-center font-bold text-xs shrink-0 select-none cursor-pointer transition-all shadow-xs"
+                >
+                  {user?.business_name ? user.business_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U')}
+                </button>
+
+                {showProfileMenu && (
+                  <div className="absolute right-0 mt-2.5 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 py-2.5 z-50 animate-in fade-in zoom-in-95 origin-top-right select-none">
+                    {/* User Identity Header */}
+                    <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80 mb-1.5">
+                      <div className="w-10 h-10 rounded-full bg-[#0D7043] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                        {user?.business_name ? user.business_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U')}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                          {user?.business_name || 'My Business'}
+                        </p>
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 3 Major Settings Options */}
+                    <div className="px-2 space-y-0.5">
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          navigate('/settings?tab=integrations');
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
+                      >
+                        <Zap size={16} className="text-gray-400 shrink-0" />
+                        <span>Integrations</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          navigate('/settings?tab=logistics');
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
+                      >
+                        <Truck size={16} className="text-gray-400 shrink-0" />
+                        <span>Edit store & logistics</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          navigate('/settings?tab=payment');
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
+                      >
+                        <Wallet size={16} className="text-gray-400 shrink-0" />
+                        <span>Settlement & payouts</span>
+                      </button>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="my-1.5 border-t border-gray-100 dark:border-gray-700/80" />
+
+                    {/* Log out */}
+                    <div className="px-2">
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          logout();
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer text-left"
+                      >
+                        <LogOut size={16} className="shrink-0 text-red-500" />
+                        <span>Log out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </header>

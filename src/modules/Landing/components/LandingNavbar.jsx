@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { id: "testimonials", label: "Testimonials" },
   { id: "faq", label: "FAQ" },
   { url: "https://blog.usekasi.com", label: "Blog", isExternal: true },
+  { path: "/market", label: "Marketplace", isRoute: true },
 ];
 
 export const LandingNavbar = ({ activeSection, scrolled, onJoinWaitlistClick }) => {
@@ -77,6 +78,17 @@ export const LandingNavbar = ({ activeSection, scrolled, onJoinWaitlistClick }) 
         {/* Desktop Nav - Middle standard list */}
         <div className="hidden md:flex items-center justify-center gap-1.5 lg:gap-3">
           {NAV_LINKS.map((link) => {
+            if (link.isRoute) {
+              return (
+                <Link
+                  key={link.label}
+                  to={link.path}
+                  className="text-[15px] font-medium tracking-tight transition-all duration-150 select-none block font-sans text-grey-700 hover:text-black hover:underline"
+                >
+                  {link.label}
+                </Link>
+              );
+            }
             if (link.isExternal) {
               return (
                 <a
@@ -183,6 +195,18 @@ export const LandingNavbar = ({ activeSection, scrolled, onJoinWaitlistClick }) 
               {/* Nav Link List - Stacked, Large Text */}
               <div className="flex flex-col gap-4 mt-8">
                 {NAV_LINKS.map((link) => {
+                  if (link.isRoute) {
+                    return (
+                      <Link
+                        key={link.label}
+                        to={link.path}
+                        className="text-3xl font-black py-2.5 transition-all text-left block text-grey-700 hover:text-black"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  }
                   if (link.isExternal) {
                     return (
                       <a
