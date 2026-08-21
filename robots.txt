@@ -5,6 +5,7 @@
 # 1. Global Search Crawlers
 User-agent: *
 Allow: /
+Allow: /market
 Allow: /login
 Allow: /signup
 Allow: /forgot-password
