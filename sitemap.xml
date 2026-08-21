@@ -6,45 +6,52 @@
     <!-- Main Landing Page -->
     <url>
         <loc>https://www.usekasi.com/</loc>
-        <lastmod>2026-05-26</lastmod>
+        <lastmod>2026-08-21</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.00</priority>
+    </url>
+    <!-- Marketplace -->
+    <url>
+        <loc>https://www.usekasi.com/market</loc>
+        <lastmod>2026-08-21</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.90</priority>
     </url>
     <!-- Authentication Pages -->
     <url>
         <loc>https://www.usekasi.com/login</loc>
-        <lastmod>2026-05-26</lastmod>
+        <lastmod>2026-08-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.80</priority>
     </url>
     <url>
         <loc>https://www.usekasi.com/signup</loc>
-        <lastmod>2026-05-26</lastmod>
+        <lastmod>2026-08-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.80</priority>
     </url>
     <url>
         <loc>https://www.usekasi.com/forgot-password</loc>
-        <lastmod>2026-05-26</lastmod>
+        <lastmod>2026-08-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.50</priority>
     </url>
     <!-- Legal Pages -->
     <url>
         <loc>https://www.usekasi.com/privacy</loc>
-        <lastmod>2026-06-09</lastmod>
+        <lastmod>2026-08-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.60</priority>
     </url>
     <url>
         <loc>https://www.usekasi.com/terms</loc>
-        <lastmod>2026-06-09</lastmod>
+        <lastmod>2026-08-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.50</priority>
     </url>
     <url>
         <loc>https://www.usekasi.com/data-deletion</loc>
-        <lastmod>2026-06-09</lastmod>
+        <lastmod>2026-08-21</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.50</priority>
     </url>
