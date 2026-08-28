@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   MessageCircle, Send, Instagram, CheckCircle, XCircle,
-  ExternalLink, Copy, Loader2, Wifi, WifiOff, RefreshCw, LogOut, Zap, Facebook, Cpu
+  ExternalLink, Copy, Loader2, Wifi, WifiOff, RefreshCw, LogOut, Zap, Facebook, Cpu,
+  ShieldCheck, ChevronDown, ChevronUp, AlertTriangle, Sparkles
 } from 'lucide-react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
@@ -25,11 +26,13 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   const [waPhoneNumber, setWaPhoneNumber] = useState('');
   const [pairingCode, setPairingCode] = useState('');
   const [connectingWA, setConnectingWA] = useState(false);
+  const [connectingMetaWA, setConnectingMetaWA] = useState(false);
   const [disconnectingWA, setDisconnectingWA] = useState(false);
-  const [waStatus, setWaStatus] = useState({ connected: false, status: 'disconnected' });
+  const [waStatus, setWaStatus] = useState({ connected: false, status: 'disconnected', platform: null, instanceName: '' });
   const [loadingWA, setLoadingWA] = useState(true);
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [showLegacyWA, setShowLegacyWA] = useState(false);
 
   // Instagram state
   const [connectingIG, setConnectingIG] = useState(false);
@@ -67,9 +70,9 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    const state = urlParams.get('state'); // 'instagram' or 'facebook'
+    const state = urlParams.get('state'); // 'instagram', 'facebook', or 'whatsapp_meta'
 
-    if (code && (state === 'instagram' || state === 'facebook')) {
+    if (code && (state === 'instagram' || state === 'facebook' || state === 'whatsapp_meta')) {
       // Clear query params to prevent reload loop
       window.history.replaceState({}, document.title, window.location.pathname);
       completeOAuthConnection(code, state);
@@ -87,7 +90,16 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   const fetchWhatsAppStatus = async () => {
     try {
       const res = await api.get('/api/whatsapp/status');
-      setWaStatus(res.data);
+      const integrations = res.data.integrations || [];
+      const metaIntegration = integrations.find(int => int.platform === 'whatsapp_meta');
+      const evoIntegration = integrations.find(int => int.platform === 'whatsapp');
+
+      setWaStatus({
+        connected: res.data.connected,
+        status: res.data.status,
+        instanceName: res.data.instance_name,
+        platform: metaIntegration ? 'whatsapp_meta' : (evoIntegration ? 'whatsapp' : null)
+      });
       if (res.data.connected && pairingCodeRef.current) {
         setPairingCode('');
         addToast('WhatsApp connected successfully!', 'success');
@@ -245,26 +257,44 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
     } finally { setDisconnectingFB(false); }
   };
 
+  const connectMetaWhatsApp = () => {
+    const clientId = META_APP_ID;
+    const redirectUri = window.location.origin + '/settings';
+    const scope = 'whatsapp_business_management,whatsapp_business_messaging';
+    const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=code&state=whatsapp_meta`;
+    window.location.href = authUrl;
+  };
+
   const completeOAuthConnection = async (code, platform) => {
     if (platform === 'instagram') setConnectingIG(true);
-    else setConnectingFB(true);
+    else if (platform === 'facebook') setConnectingFB(true);
+    else if (platform === 'whatsapp_meta') setConnectingMetaWA(true);
 
     try {
       const redirectUri = window.location.origin + '/settings';
-      await api.post('/api/meta/oauth/callback', {
-        code,
-        platform,
-        redirect_uri: redirectUri
-      });
-      addToast(`${platform === 'instagram' ? 'Instagram' : 'Facebook Messenger'} connected successfully!`, 'success');
-      
-      if (platform === 'instagram') fetchInstagramStatus();
-      else fetchFacebookStatus();
+      if (platform === 'whatsapp_meta') {
+        await api.post('/api/meta/whatsapp/oauth/callback', {
+          code,
+          redirect_uri: redirectUri
+        });
+        addToast('WhatsApp connected successfully via Meta Cloud API!', 'success');
+        fetchWhatsAppStatus();
+      } else {
+        await api.post('/api/meta/oauth/callback', {
+          code,
+          platform,
+          redirect_uri: redirectUri
+        });
+        addToast(`${platform === 'instagram' ? 'Instagram' : 'Facebook Messenger'} connected successfully!`, 'success');
+        if (platform === 'instagram') fetchInstagramStatus();
+        else fetchFacebookStatus();
+      }
     } catch (err) {
       addToast(err.response?.data?.error || 'Failed to complete connection', 'error');
     } finally {
       setConnectingIG(false);
       setConnectingFB(false);
+      setConnectingMetaWA(false);
     }
   };
 
@@ -281,13 +311,20 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
       <div className="p-6">
         <div className="flex items-start gap-4">
           <div className="relative shrink-0">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${waStatus.connected ? 'bg-green-500' : 'bg-green-500/80'}`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${waStatus.connected ? 'bg-green-500' : 'bg-green-600'}`}>
               <MessageCircle size={24} className="text-white" />
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-dark dark:text-white">WhatsApp Business</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Link your WhatsApp account to auto-respond to customer messages.</p>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-bold text-dark dark:text-white">WhatsApp Business</h3>
+              <span className="px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300 rounded-md">
+                Official Meta Cloud
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Link your WhatsApp Business number for 24/7 AI sales, product recommendations, and instant invoices.
+            </p>
           </div>
         </div>
 
@@ -299,9 +336,22 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
           ) : waStatus.connected ? (
             <div className="space-y-4">
               <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 dark:bg-green-500/20 rounded-lg text-green-700 dark:text-green-400"><Wifi size={18} /></div>
-                  <p className="font-bold text-green-800 dark:text-green-300 text-sm">WhatsApp is live!</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 dark:bg-green-500/20 rounded-lg text-green-700 dark:text-green-400">
+                      <Wifi size={18} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-green-800 dark:text-green-300 text-sm">WhatsApp is live!</p>
+                      <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">
+                        {waStatus.platform === 'whatsapp_meta' ? 'Connected via Official Meta Cloud API' : 'Connected via Evolution Engine'}
+                        {waStatus.instanceName && ` • ID: ${waStatus.instanceName}`}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-200/60 dark:bg-green-500/30 px-2.5 py-1 rounded-full">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> Active
+                  </span>
                 </div>
               </div>
               <button onClick={() => setShowDisconnectConfirm(true)} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors">
@@ -309,34 +359,93 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
               </button>
               {showDisconnectConfirm && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3 mt-2">
-                  <p className="text-sm font-semibold text-red-800">Are you sure?</p>
+                  <p className="text-sm font-semibold text-red-800">Are you sure you want to disconnect WhatsApp?</p>
                   <div className="flex gap-2">
-                    <button onClick={disconnectWhatsApp} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">Yes, Disconnect</button>
-                    <button onClick={() => setShowDisconnectConfirm(false)} className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium">Cancel</button>
+                    <button onClick={disconnectWhatsApp} disabled={disconnectingWA} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50">
+                      {disconnectingWA ? 'Disconnecting...' : 'Yes, Disconnect'}
+                    </button>
+                    <button onClick={() => setShowDisconnectConfirm(false)} className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium">
+                      Cancel
+                    </button>
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="space-y-4">
-              {pairingCode ? (
-                <div className="text-center space-y-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Enter this code in WhatsApp Linked Devices:</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-3 text-2xl font-bold tracking-widest">{codeA}</div>
-                    <span className="text-gray-400">—</span>
-                    <div className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-3 text-2xl font-bold tracking-widest">{codeB}</div>
+            <div className="space-y-5">
+              {/* Primary: Meta Official Embedded Signup */}
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/10 border border-green-100 dark:border-green-900/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck size={16} className="text-green-600 dark:text-green-400" />
+                    <span className="text-xs font-bold text-green-800 dark:text-green-300">Recommended • Enterprise Grade</span>
                   </div>
-                  <button onClick={() => { setPairingCode(''); setWaPhoneNumber(''); }} className="text-xs text-gray-500 hover:underline">Start over</button>
                 </div>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input type="tel" value={waPhoneNumber} onChange={(e) => setWaPhoneNumber(e.target.value)} placeholder="Phone number (e.g. 2348031234567)" className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm outline-none focus:border-primary" />
-                  <button onClick={connectWhatsApp} disabled={connectingWA || !waPhoneNumber.trim()} className="px-6 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-green-700 disabled:opacity-50">
-                    {connectingWA ? 'Generating...' : 'Get Code'}
-                  </button>
-                </div>
-              )}
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Connect directly with your Meta Business account for 100% uptime, verified branding, and official Meta Cloud API infrastructure.
+                </p>
+                <button
+                  onClick={connectMetaWhatsApp}
+                  disabled={connectingMetaWA}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-green-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <MessageCircle size={16} />
+                  {connectingMetaWA ? 'Connecting with Meta...' : 'Connect WhatsApp with Meta'}
+                </button>
+              </div>
+
+              {/* Secondary Option Underneath: Legacy Pairing Code Test Mode */}
+              <div className="pt-2 border-t border-gray-100 dark:border-gray-700/60">
+                <button
+                  onClick={() => setShowLegacyWA(!showLegacyWA)}
+                  className="flex items-center justify-between w-full text-left py-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                >
+                  <span className="flex items-center gap-1.5 font-medium">
+                    <AlertTriangle size={13} className="text-amber-500" />
+                    Alternative: Quick Sandbox Test Mode (Pairing Code)
+                  </span>
+                  {showLegacyWA ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+
+                {showLegacyWA && (
+                  <div className="mt-3 p-4 bg-gray-50 dark:bg-gray-900/60 rounded-xl border border-gray-200 dark:border-gray-700/50 space-y-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Use this option only to quickly test Kasi on a spare phone number before completing Meta Business verification.
+                    </p>
+
+                    {pairingCode ? (
+                      <div className="text-center space-y-3 py-2">
+                        <p className="text-xs text-gray-600 dark:text-gray-400">Enter this pairing code in WhatsApp &gt; Linked Devices:</p>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-xl font-bold tracking-widest text-dark dark:text-white">{codeA}</div>
+                          <span className="text-gray-400 font-bold">—</span>
+                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-xl font-bold tracking-widest text-dark dark:text-white">{codeB}</div>
+                        </div>
+                        <button onClick={() => { setPairingCode(''); setWaPhoneNumber(''); }} className="text-xs text-primary hover:underline">
+                          Start over with different number
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="tel"
+                          value={waPhoneNumber}
+                          onChange={(e) => setWaPhoneNumber(e.target.value)}
+                          placeholder="Phone number (e.g. 2348031234567)"
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-lg text-xs outline-none focus:border-primary"
+                        />
+                        <button
+                          onClick={connectWhatsApp}
+                          disabled={connectingWA || !waPhoneNumber.trim()}
+                          className="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-xs font-semibold disabled:opacity-50 transition-colors"
+                        >
+                          {connectingWA ? 'Generating...' : 'Get Pairing Code'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
