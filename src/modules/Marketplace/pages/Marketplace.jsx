@@ -211,8 +211,8 @@ export default function Marketplace() {
     <div className="min-h-screen bg-[#faf6f1] text-[#0A0A0A] font-sans selection:bg-[#D4F263] selection:text-black flex flex-col justify-between">
       
       <div>
-        {/* ── Neubrutalist Header ── */}
-        <header className="sticky top-0 z-50 bg-white border-b-4 border-black py-4 px-6 shadow-[0_4px_0_#000]">
+        {/* ── Modern Header ── */}
+        <header className="sticky top-0 z-50 bg-white border-b border-[#E7E5E0] py-4 px-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)]">
           <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group hover:scale-[1.02] transition-transform">
@@ -224,8 +224,8 @@ export default function Marketplace() {
 
             {/* Search bar inside header with overlay suggestions */}
             <div ref={searchContainerRef} className="relative flex-1 max-w-md w-full">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-black">
-                <Search size={18} strokeWidth={2.5} />
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <Search size={18} strokeWidth={2} />
               </div>
               <input 
                 type="text"
@@ -236,7 +236,7 @@ export default function Marketplace() {
                   setShowSuggestions(true);
                 }}
                 placeholder="Search products, stores, categories..."
-                className="w-full pl-10 pr-4 py-2 border-3 border-black bg-white rounded-xl text-sm font-bold placeholder-gray-500 focus:outline-none focus:bg-[#faf6f1] focus:shadow-[2px_2px_0_#000] transition-all"
+                className="w-full pl-10 pr-4 py-2 border border-[#E7E5E0] bg-white rounded-xl text-sm font-medium placeholder-gray-400 focus:outline-none focus:bg-white focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all"
               />
               {searchQuery && (
                 <button 
@@ -244,24 +244,24 @@ export default function Marketplace() {
                     updateFilters('search', '');
                     setShowSuggestions(false);
                   }} 
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-black"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-black"
                 >
-                  <X size={16} strokeWidth={2.5} />
+                  <X size={16} strokeWidth={2} />
                 </button>
               )}
 
-              {/* Suggestions Overlay Dropdown (Image 1 style) */}
+              {/* Suggestions Overlay Dropdown */}
               {showSuggestions && searchQuery.trim().length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white border-3 border-black rounded-2xl shadow-[5px_5px_0_#000] overflow-hidden z-[110] text-left animate-in fade-in duration-100">
-                  <div className="grid grid-cols-1 md:grid-cols-12 divide-y-2 md:divide-y-0 md:divide-x-2 divide-black">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#E7E5E0] rounded-2xl shadow-[0_4px_8px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.10)] overflow-hidden z-[110] text-left animate-in fade-in duration-100">
+                  <div className="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-[#E7E5E0]">
                     
                     {/* Left Column: Terms & Stores (5 Cols) */}
                     <div className="md:col-span-5 p-4 space-y-4">
                       {/* Suggestions terms */}
                       <div className="space-y-2">
-                        <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Suggestions</h4>
+                        <h4 className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Suggestions</h4>
                         {suggestions.terms.length > 0 ? (
-                          <div className="flex flex-col gap-1.5 text-xs font-bold text-gray-800">
+                          <div className="flex flex-col gap-1.5 text-xs font-semibold text-gray-800">
                             {suggestions.terms.map((term, i) => (
                               <button 
                                 key={i} 
@@ -280,18 +280,18 @@ export default function Marketplace() {
 
                       {/* Stores suggestions */}
                       <div className="space-y-2 pt-2 border-t border-gray-100">
-                        <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Stores</h4>
+                        <h4 className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Stores</h4>
                         {suggestions.stores.length > 0 ? (
-                          <div className="flex flex-col gap-2 text-xs font-bold text-gray-800">
+                          <div className="flex flex-col gap-2 text-xs font-semibold text-gray-800">
                             {suggestions.stores.map((store) => (
                               <Link 
-                                key={store.id} 
-                                to={`/market/vendor/${store.id}`}
+                                key={store.id || store.public_id || store.business_name} 
+                                to={`/market/vendor/${store.id || store.public_id || store.user_id}`}
                                 onClick={() => setShowSuggestions(false)}
                                 className="w-full text-left py-1 hover:text-[#1A7A4A] flex items-center gap-1.5"
                               >
                                 {store.logo_url ? (
-                                  <img src={store.logo_url} alt="" className="w-4 h-4 rounded-full border border-black" />
+                                  <img src={store.logo_url} alt="" className="w-4 h-4 rounded-full border border-[#E7E5E0]" />
                                 ) : (
                                   <Store size={12} className="text-gray-400" />
                                 )}
@@ -307,7 +307,7 @@ export default function Marketplace() {
 
                     {/* Right Column: Products (7 Cols) */}
                     <div className="md:col-span-7 p-4 space-y-2">
-                      <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Products</h4>
+                      <h4 className="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Products</h4>
                       {suggestions.products.length > 0 ? (
                         <div className="flex flex-col gap-2">
                           {suggestions.products.map((p) => (
@@ -315,17 +315,17 @@ export default function Marketplace() {
                               key={p.id} 
                               to={`/market/product/${p.id}`}
                               onClick={() => setShowSuggestions(false)}
-                              className="flex items-center gap-3 p-1.5 hover:bg-gray-50 border-2 border-transparent hover:border-black rounded-xl transition-all"
+                              className="flex items-center gap-3 p-1.5 hover:bg-gray-50 border border-transparent hover:border-[#E7E5E0] rounded-xl transition-all"
                             >
                               <img 
                                 src={p.image_url || '/placeholder_product.png'} 
                                 alt="" 
-                                className="w-10 h-10 object-cover border border-black rounded-lg bg-gray-50 shrink-0" 
+                                className="w-10 h-10 object-cover border border-[#E7E5E0] rounded-lg bg-gray-50 shrink-0" 
                                 onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=100'; }}
                               />
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-black text-black truncate">{p.name}</p>
-                                <span className="text-[10px] font-black text-[#1A7A4A]">{formatCurrency(p.price)}</span>
+                                <p className="text-xs font-bold text-black truncate">{p.name}</p>
+                                <span className="text-[10px] font-bold text-[#1A7A4A]">{formatCurrency(p.price)}</span>
                               </div>
                             </Link>
                           ))}
@@ -337,10 +337,10 @@ export default function Marketplace() {
                   </div>
 
                   {/* View all results footer */}
-                  <div className="bg-[#faf6f1] border-t-2 border-black p-3 text-center">
+                  <div className="bg-[#faf6f1] border-t border-[#E7E5E0] p-3 text-center">
                     <button 
                       onClick={() => setShowSuggestions(false)}
-                      className="text-xs font-black text-black hover:text-[#1A7A4A] underline"
+                      className="text-xs font-bold text-black hover:text-[#1A7A4A] underline"
                     >
                       View all results
                     </button>
@@ -354,15 +354,15 @@ export default function Marketplace() {
               {user ? (
                 <Link 
                   to="/dashboard"
-                  className="px-5 py-2.5 bg-[#D4F263] text-black font-black text-sm rounded-xl border-3 border-black shadow-[3px_3px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0_#000] transition-all flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-[#D4F263] text-black font-bold text-sm rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] hover:translate-y-[-1px] hover:shadow-[0_4px_8px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.10)] transition-all flex items-center gap-1.5"
                 >
-                  <Building size={16} strokeWidth={2.5} />
+                  <Building size={16} strokeWidth={2} />
                   Dashboard
                 </Link>
               ) : (
                 <Link 
                   to="/signup"
-                  className="px-5 py-2.5 bg-black text-white font-black text-sm rounded-xl border-3 border-black shadow-[3px_3px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0_#000] transition-all flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-black text-white font-bold text-sm rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] hover:translate-y-[-1px] hover:shadow-[0_4px_8px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.10)] transition-all flex items-center gap-1.5"
                 >
                   <Sparkles size={16} className="text-[#D4F263]" />
                   Sell on Kasi
@@ -375,11 +375,11 @@ export default function Marketplace() {
         {/* ── Main Layout Wrapper ── */}
         <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-8 space-y-8">
           
-          {/* ── Neubrutalist Hero Banner ── */}
-          <section className="relative overflow-hidden bg-[#1A7A4A] text-white border-3 border-black rounded-3xl p-8 shadow-[6px_6px_0_#000] select-none text-left">
+          {/* ── Hero Banner ── */}
+          <section className="relative overflow-hidden bg-[#1A7A4A] text-white rounded-3xl p-8 shadow-[0_16px_48px_rgba(0,0,0,0.14)] select-none text-left">
             <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:20px_20px] pointer-events-none" />
             <div className="relative z-10 max-w-2xl space-y-4">
-              <span className="inline-flex items-center gap-1 bg-[#D4F263] text-black border-2 border-black rounded-full px-3.5 py-1 text-xs font-black uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 bg-[#D4F263] text-black rounded-full px-3.5 py-1 text-xs font-bold uppercase tracking-wider shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)]">
                 <MessageSquare size={12} fill="currentColor" /> Chat, Bargain & Buy
               </span>
               <h1 className="text-4xl md:text-5xl font-black font-bricolage tracking-tight leading-none">
@@ -390,11 +390,11 @@ export default function Marketplace() {
               </p>
             </div>
             <div className="absolute right-8 bottom-0 top-0 hidden lg:flex items-center justify-center opacity-90 pointer-events-none">
-              <div className="w-56 h-56 bg-[#D4F263] border-4 border-black shadow-[6px_6px_0_#000] rounded-3xl rotate-6 flex flex-col justify-between p-5 text-black">
-                <span className="text-[10px] font-black tracking-widest text-[#1A7A4A] uppercase">KASI VENDOR BILL</span>
+              <div className="w-56 h-56 bg-[#D4F263] shadow-[0_16px_48px_rgba(0,0,0,0.14)] rounded-3xl rotate-6 flex flex-col justify-between p-5 text-black">
+                <span className="text-[10px] font-bold tracking-widest text-[#1A7A4A] uppercase">KASI VENDOR BILL</span>
                 <div className="space-y-1">
-                  <div className="h-4 bg-black rounded-sm w-3/4" />
-                  <div className="h-4 bg-black rounded-sm w-1/2" />
+                  <div className="h-4 bg-black/80 rounded-sm w-3/4" />
+                  <div className="h-4 bg-black/80 rounded-sm w-1/2" />
                 </div>
                 <div className="flex justify-between items-end">
                   <div className="w-8 h-8 rounded-full bg-[#1A7A4A] flex items-center justify-center text-white font-bold">✓</div>
@@ -405,22 +405,22 @@ export default function Marketplace() {
           </section>
 
           {/* ── Filters Section ── */}
-          <section className="bg-white border-3 border-black rounded-2xl p-6 shadow-[4px_4px_0_#000] space-y-6 text-left">
+          <section className="bg-white rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] space-y-6 text-left">
             <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
               <div className="flex items-center gap-2">
-                <Filter className="text-[#1A7A4A]" size={20} strokeWidth={2.5} />
-                <h2 className="text-lg font-black font-bricolage">Filter Catalogs</h2>
+                <Filter className="text-[#1A7A4A]" size={20} strokeWidth={2} />
+                <h2 className="text-lg font-bold font-bricolage">Filter Catalogs</h2>
               </div>
               
               {/* Sorting & Vendor selectors */}
               <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto">
                 {/* Store selector */}
                 <div className="flex-1 lg:flex-none">
-                  <label className="block text-[10px] font-black uppercase text-gray-500 mb-1 tracking-wider">Select Vendor</label>
+                  <label className="block text-[10px] font-semibold uppercase text-gray-500 mb-1 tracking-wider">Select Vendor</label>
                   <select 
                     value={selectedVendor} 
                     onChange={(e) => updateFilters('vendor', e.target.value)}
-                    className="w-full lg:w-48 py-2 px-3 border-3 border-black rounded-xl text-xs font-black bg-white focus:outline-none focus:shadow-[2px_2px_0_#000] transition-all"
+                    className="w-full lg:w-48 py-2 px-3 border border-[#E7E5E0] rounded-xl text-xs font-semibold bg-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all"
                   >
                     <option value="All">All Stores / Vendors</option>
                     {vendors.map(v => (
@@ -431,11 +431,11 @@ export default function Marketplace() {
 
                 {/* Sorting selector */}
                 <div className="flex-1 lg:flex-none">
-                  <label className="block text-[10px] font-black uppercase text-gray-500 mb-1 tracking-wider">Sort Products</label>
+                  <label className="block text-[10px] font-semibold uppercase text-gray-500 mb-1 tracking-wider">Sort Products</label>
                   <select 
                     value={sortBy} 
                     onChange={(e) => updateFilters('sort', e.target.value)}
-                    className="w-full lg:w-48 py-2 px-3 border-3 border-black rounded-xl text-xs font-black bg-white focus:outline-none focus:shadow-[2px_2px_0_#000] transition-all"
+                    className="w-full lg:w-48 py-2 px-3 border border-[#E7E5E0] rounded-xl text-xs font-semibold bg-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all"
                   >
                     <option value="newest">Newest Additions</option>
                     <option value="price_asc">Price: Low to High</option>
@@ -447,7 +447,7 @@ export default function Marketplace() {
 
             {/* Category Chips Scrollbar */}
             <div className="space-y-1.5">
-              <label className="block text-[10px] font-black uppercase text-gray-500 tracking-wider">Browse Category</label>
+              <label className="block text-[10px] font-semibold uppercase text-gray-500 tracking-wider">Browse Category</label>
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide mask-linear-edges select-none">
                 {CATEGORIES.map((cat) => {
                   const isActive = selectedCategory === cat;
@@ -455,10 +455,10 @@ export default function Marketplace() {
                     <button
                       key={cat}
                       onClick={() => updateFilters('category', cat)}
-                      className={`shrink-0 px-4 py-2 text-xs font-black border-2 border-black rounded-xl shadow-[2px_2px_0_#000] active:scale-95 transition-all
+                      className={`shrink-0 px-4 py-2 text-xs rounded-xl active:scale-95 transition-all
                         ${isActive 
-                          ? 'bg-[#D4F263] text-black translate-x-[-1px] translate-y-[-1px] shadow-[3px_3px_0_#000]' 
-                          : 'bg-[#faf6f1] text-[#3D3D3D] hover:bg-white hover:text-black'
+                          ? 'bg-[#D4F263] text-black shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] font-bold' 
+                          : 'bg-[#faf6f1] text-[#3D3D3D] border border-[#E7E5E0] shadow-none hover:bg-white hover:text-black hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)]'
                         }`}
                     >
                       {cat}
@@ -472,7 +472,7 @@ export default function Marketplace() {
           {/* ── Products Display Grid ── */}
           <section className="space-y-4">
             <div className="flex justify-between items-center px-1">
-              <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                 Showing {filteredProducts.length} Product{filteredProducts.length !== 1 && 's'}
               </p>
               {(searchQuery || selectedCategory !== 'All' || selectedVendor !== 'All') && (
@@ -480,7 +480,7 @@ export default function Marketplace() {
                   onClick={() => {
                     setSearchParams(new URLSearchParams());
                   }}
-                  className="text-xs font-black text-red-600 hover:underline cursor-pointer"
+                  className="text-xs font-bold text-red-600 hover:underline cursor-pointer"
                 >
                   Clear all filters
                 </button>
@@ -488,11 +488,11 @@ export default function Marketplace() {
             </div>
 
             {loading ? (
-              /* Neubrutalist Skeleton Grid */
+              /* Skeleton Grid */
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                  <div key={i} className="bg-white border-3 border-black rounded-2xl p-4 shadow-[4px_4px_0_#000] space-y-4 animate-pulse">
-                    <div className="aspect-square bg-gray-200 border-2 border-black rounded-xl w-full" />
+                  <div key={i} className="bg-white rounded-2xl p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] space-y-4 animate-pulse">
+                    <div className="aspect-square bg-gray-200 border border-[#E7E5E0] rounded-xl w-full" />
                     <div className="h-4 bg-gray-200 rounded-sm w-3/4" />
                     <div className="h-6 bg-gray-200 rounded-sm w-1/3" />
                     <div className="h-10 bg-gray-200 rounded-xl w-full" />
@@ -500,17 +500,17 @@ export default function Marketplace() {
                 ))}
               </div>
             ) : error ? (
-              <div className="bg-white border-3 border-black rounded-2xl p-12 shadow-[4px_4px_0_#000] text-center max-w-md mx-auto space-y-4">
-                <HelpCircle size={48} className="mx-auto text-red-500" strokeWidth={2.5} />
-                <h3 className="text-lg font-black font-bricolage">Error Loading Catalog</h3>
-                <p className="text-sm text-gray-500 leading-relaxed font-semibold">{error}</p>
+              <div className="bg-white rounded-2xl p-12 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] text-center max-w-md mx-auto space-y-4">
+                <HelpCircle size={48} className="mx-auto text-red-500" strokeWidth={2} />
+                <h3 className="text-lg font-bold font-bricolage">Error Loading Catalog</h3>
+                <p className="text-sm text-gray-500 leading-relaxed font-medium">{error}</p>
                 <button onClick={fetchProducts} className="btn-primary py-2 px-5 text-sm">Retry Load</button>
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div className="bg-white border-3 border-black rounded-2xl p-12 shadow-[4px_4px_0_#000] text-center max-w-md mx-auto space-y-4">
-                <ShoppingBag size={48} className="mx-auto text-gray-400" strokeWidth={2.5} />
-                <h3 className="text-lg font-black font-bricolage">No items found</h3>
-                <p className="text-sm text-gray-500 leading-relaxed font-semibold">Try modifying your search or expanding the filter choices.</p>
+              <div className="bg-white rounded-2xl p-12 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] text-center max-w-md mx-auto space-y-4">
+                <ShoppingBag size={48} className="mx-auto text-gray-400" strokeWidth={2} />
+                <h3 className="text-lg font-bold font-bricolage">No items found</h3>
+                <p className="text-sm text-gray-500 leading-relaxed font-medium">Try modifying your search or expanding the filter choices.</p>
                 <button 
                   onClick={() => setSearchParams(new URLSearchParams())} 
                   className="btn-primary py-2 px-5 text-sm"
@@ -526,10 +526,10 @@ export default function Marketplace() {
                   return (
                     <article 
                       key={p.id}
-                      className="bg-white border-3 border-black rounded-2xl overflow-hidden shadow-[4px_4px_0_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[7px_7px_0_#000] transition-all flex flex-col justify-between"
+                      className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] hover:translate-y-[-2px] hover:shadow-[0_4px_8px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.10)] transition-all flex flex-col justify-between"
                     >
                       {/* Image Area */}
-                      <Link to={`/market/product/${p.id}`} className="relative aspect-square w-full bg-gray-50 border-b-3 border-black overflow-hidden group">
+                      <Link to={`/market/product/${p.id}`} className="relative aspect-square w-full bg-gray-50 border-b border-[#E7E5E0] overflow-hidden group">
                         <img 
                           src={p.image_url || '/placeholder_product.png'} 
                           alt={p.name} 
@@ -538,13 +538,13 @@ export default function Marketplace() {
                         />
                         
                         {/* Category Tag overlay */}
-                        <span className="absolute top-3 left-3 bg-white border-2 border-black rounded-lg px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-[1.5px_1.5px_0_#000]">
+                        <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] text-gray-800">
                           {p.category || 'General'}
                         </span>
 
                         {/* Delivery overlay badge */}
                         {p.delivery_available && (
-                          <span className="absolute top-3 right-3 bg-[#D4F263] border-2 border-black rounded-lg px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-[1.5px_1.5px_0_#000] flex items-center gap-1">
+                          <span className="absolute top-3 right-3 bg-[#D4F263]/90 backdrop-blur-sm rounded-lg px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] text-black flex items-center gap-1">
                             <Truck size={10} /> Delivery
                           </span>
                         )}
@@ -552,7 +552,7 @@ export default function Marketplace() {
                         {/* Out of Stock overlay */}
                         {isOutOfStock && (
                           <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center">
-                            <span className="bg-red-600 text-white border-3 border-black px-4 py-2 text-xs font-black uppercase tracking-widest shadow-[3px_3px_0_#000] rotate-[-5deg]">
+                            <span className="bg-red-600 text-white rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-widest shadow-[0_4px_8px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.10)] rotate-[-5deg]">
                               SOLD OUT
                             </span>
                           </div>
@@ -565,20 +565,20 @@ export default function Marketplace() {
                           {/* Store Info */}
                           {p.vendor && (
                             <Link 
-                              to={`/market/vendor/${p.vendor.id}`}
+                              to={`/market/vendor/${p.vendor.id || p.vendor.public_id || p.user_id}`}
                               className="flex items-center gap-1.5 group/shop hover:underline text-left"
                             >
                               {p.vendor.logo_url ? (
-                                <img src={p.vendor.logo_url} alt="" className="w-4 h-4 rounded-full border border-black shrink-0" />
+                                <img src={p.vendor.logo_url} alt="" className="w-4 h-4 rounded-full border border-[#E7E5E0] shrink-0" />
                               ) : (
                                 <Store size={12} className="text-[#1A7A4A]" />
                               )}
-                              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover/shop:text-black">
+                              <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest group-hover/shop:text-black">
                                 {p.vendor.business_name}
                               </span>
                             </Link>
                           )}
-                          <h3 className="font-black text-base line-clamp-1 leading-snug">
+                          <h3 className="font-bold text-base line-clamp-1 leading-snug">
                             <Link to={`/market/product/${p.id}`} className="hover:text-[#1A7A4A]">
                               {p.name}
                             </Link>
@@ -589,16 +589,16 @@ export default function Marketplace() {
                         </div>
 
                         <div className="space-y-3">
-                          <div className="flex items-baseline justify-between border-t-2 border-dashed border-gray-100 pt-2.5">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Price</span>
+                          <div className="flex items-baseline justify-between border-t border-dashed border-gray-200 pt-2.5">
+                            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Price</span>
                             <span className="font-black text-lg text-emerald-700">{formatCurrency(p.price)}</span>
                           </div>
 
-                          {/* Neubrutalist Buttons */}
+                          {/* Buttons */}
                           <div className="flex gap-2">
                             <Link 
                               to={`/market/product/${p.id}`}
-                              className="flex-1 py-2 px-3 border-2 border-black bg-[#faf6f1] hover:bg-white text-black font-black text-xs rounded-xl shadow-[2px_2px_0_#000] active:scale-95 transition-all text-center"
+                              className="flex-1 py-2 px-3 border border-[#E7E5E0] bg-transparent hover:bg-gray-50 text-black font-bold text-xs rounded-xl shadow-none active:scale-95 transition-all text-center"
                             >
                               Details
                             </Link>
@@ -607,7 +607,7 @@ export default function Marketplace() {
                               href={getWhatsAppLink(p.vendor, p)}
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className={`flex-2 py-2 px-3.5 border-2 border-black bg-[#1A7A4A] hover:bg-[#125D37] text-white font-black text-xs rounded-xl shadow-[2px_2px_0_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_#000] active:scale-95 transition-all flex items-center justify-center gap-1.5 text-center
+                              className={`flex-2 py-2 px-3.5 bg-[#1A7A4A] hover:bg-[#125D37] text-white font-bold text-xs rounded-xl shadow-none hover:shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] hover:translate-y-[-1px] active:scale-95 transition-all flex items-center justify-center gap-1.5 text-center
                                 ${isOutOfStock ? 'opacity-50 pointer-events-none' : ''}`}
                             >
                               <MessageSquare size={13} fill="currentColor" />
