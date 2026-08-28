@@ -33,6 +33,20 @@
   --spacing-space-lg: 48px;
   --spacing-space-xl: 80px;
   --spacing-space-2xl: 120px;
+
+  /* Modern elevation shadows */
+  --shadow-rest: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-hover: 0 4px 8px rgba(0,0,0,0.06), 0 12px 28px rgba(0,0,0,0.10);
+  --shadow-hero: 0 16px 48px rgba(0,0,0,0.14);
+
+  /* Consistent radius scale */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Motion */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Custom Utilities */
@@ -76,18 +90,18 @@
   -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent);
 }
 
-/* Neubrutalism Foundations */
+/* Foundations */
 .border-hard {
-  border: 1.5px solid #0A0A0A;
+  border: 1px solid #E7E5E0;
 }
 .border-subtle {
   border: 1.5px solid #E5E5E5;
 }
 .shadow-hard {
-  box-shadow: 4px 4px 0px #0A0A0A;
+  box-shadow: var(--shadow-rest);
 }
 
-/* Neubrutalist Typography Utilities */
+/* Modern Typography Utilities */
 .font-display {
   font-size: clamp(48px, 7vw, 88px);
   font-weight: 900;
@@ -98,7 +112,7 @@
 }
 .font-section-h2 {
   font-size: clamp(36px, 4.5vw, 56px);
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.02em;
   font-family: "Bricolage Grotesque", sans-serif;
@@ -125,16 +139,18 @@
 }
 .font-label-tag {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: #6B6B6B;
 }
 
 /* Badge Component */
 .badge-section {
   background: #E8F5EE;
   color: #1A7A4A;
-  border: 1.5px solid #1A7A4A;
+  border: none;
+  box-shadow: var(--shadow-rest);
   border-radius: 999px;
   padding: 6px 16px;
   font-size: 12px;
@@ -145,12 +161,12 @@
   margin-bottom: 24px;
 }
 
-/* Neubrutalist Buttons */
+/* Buttons */
 .btn-primary {
   background: #0A0A0A;
   color: #FFFFFF;
-  border: 1.5px solid #0A0A0A;
-  border-radius: 999px;
+  border: none;
+  border-radius: var(--radius-sm);
   padding: 16px 32px;
   font-size: 16px;
   font-weight: 700;
@@ -163,19 +179,19 @@
   text-decoration: none;
 }
 .btn-primary:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 4px 4px 0px #0A0A0A;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
 }
 .btn-primary:active {
-  transform: translate(0px, 0px);
-  box-shadow: 0px 0px 0px #0A0A0A;
+  transform: translateY(0px);
+  box-shadow: var(--shadow-rest);
 }
 
 .btn-secondary {
   background: transparent;
   color: #0A0A0A;
-  border: 1.5px solid #0A0A0A;
-  border-radius: 999px;
+  border: 1px solid #E7E5E0;
+  border-radius: var(--radius-sm);
   padding: 16px 32px;
   font-size: 16px;
   font-weight: 700;
@@ -188,24 +204,24 @@
   text-decoration: none;
 }
 .btn-secondary:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 4px 4px 0px #0A0A0A;
-  background-color: #F5F5F0;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+  background-color: #FAFAFA;
 }
 .btn-secondary:active {
-  transform: translate(0px, 0px);
-  box-shadow: 0px 0px 0px #0A0A0A;
+  transform: translateY(0px);
+  box-shadow: var(--shadow-rest);
 }
 
 .btn-green-cta {
   background: #1A7A4A;
   color: #FFFFFF;
-  border: 1.5px solid #0A0A0A;
-  border-radius: 999px;
+  border: none;
+  border-radius: var(--radius-sm);
   padding: 18px 40px;
   font-size: 18px;
   font-weight: 700;
-  box-shadow: 4px 4px 0px #0A0A0A;
+  box-shadow: var(--shadow-rest);
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   display: inline-flex;
@@ -215,12 +231,12 @@
   text-decoration: none;
 }
 .btn-green-cta:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 6px 6px 0px #0A0A0A;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
 }
 .btn-green-cta:active {
-  transform: translate(0px, 0px);
-  box-shadow: 0px 0px 0px #0A0A0A;
+  transform: translateY(0px);
+  box-shadow: none;
 }
 
 body {
