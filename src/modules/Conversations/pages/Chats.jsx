@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft, Send, User, Shield, Tag, History, CheckCircle2 } from 'lucide-react';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
 import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
@@ -125,6 +126,7 @@ const getPlatformBadge = (platform) => {
 };
 
 const Chats = () => {
+  const [searchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
   const [pipeline, setPipeline] = useState({});
   const [invoices, setInvoices] = useState([]);
@@ -141,6 +143,10 @@ const Chats = () => {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingChat, setDeletingChat] = useState(false);
+
+  // Direct chat messaging states
+  const [directMessageText, setDirectMessageText] = useState('');
+  const [sendingDirectMessage, setSendingDirectMessage] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -188,6 +194,42 @@ const Chats = () => {
       return timeB - timeA;
     });
   }, [conversations]);
+
+  // URL Query Param pre-selection (e.g., from Customer Database click)
+  useEffect(() => {
+    const targetCust = searchParams.get('customer') || searchParams.get('phone');
+    if (targetCust && consolidatedList.length > 0) {
+      const norm = (s) => (s || '').toString().toLowerCase().replace(/\D/g, '');
+      const match = consolidatedList.find(c => {
+        const phoneMatch = c.customer_phone && targetCust && norm(c.customer_phone) === norm(targetCust);
+        const nameMatch = c.customer_name && (c.customer_name.toLowerCase().includes(targetCust.toLowerCase()) || targetCust.toLowerCase().includes(c.customer_name.toLowerCase()));
+        return phoneMatch || nameMatch;
+      });
+      if (match) setSelectedConversation(match);
+    }
+  }, [searchParams, consolidatedList]);
+
+  const handleSendDirectMessage = async (e) => {
+    e?.preventDefault?.();
+    if (!directMessageText.trim() || !selectedConversation || sendingDirectMessage) return;
+    const textToSend = directMessageText.trim();
+    setDirectMessageText('');
+    setSendingDirectMessage(true);
+
+    try {
+      await conversationAPI.sendMessage(selectedConversation.id, textToSend);
+      setSelectedConversation(prev => {
+        if (!prev) return null;
+        const newSummary = prev.ai_summary ? `${prev.ai_summary}\n[Merchant]: ${textToSend}` : `[Merchant]: ${textToSend}`;
+        return { ...prev, ai_summary: newSummary, last_message_at: new Date().toISOString() };
+      });
+      fetchData();
+    } catch (err) {
+      console.error('Failed to send direct message:', err);
+    } finally {
+      setSendingDirectMessage(false);
+    }
+  };
 
   const filteredConversations = consolidatedList.filter(c => {
     const matchesFilter = activeFilter === 'All' 
@@ -263,14 +305,10 @@ const Chats = () => {
     }
   }, [selectedConversation]);
 
-  // Filters setup based on dynamic state
+  // Filters setup: Simplified to All and Attention Needed
   const filters = [
     { label: 'All', count: consolidatedList.length },
-    { label: 'In Progress', count: consolidatedList.filter(c => c.status === 'In Progress').length },
-    { label: 'Requires Attention', short: 'Attention', count: consolidatedList.filter(c => c.status === 'Requires Attention').length },
-    { label: 'Paid', count: consolidatedList.filter(c => c.status === 'Paid').length },
-    { label: 'In Transit', count: consolidatedList.filter(c => c.status === 'In Transit').length },
-    { label: 'Delivered', count: consolidatedList.filter(c => c.status === 'Delivered').length },
+    { label: 'Requires Attention', short: 'Attention Needed', count: consolidatedList.filter(c => c.status === 'Requires Attention').length },
   ];
 
   return (
@@ -554,39 +592,99 @@ const Chats = () => {
                 </div>
               )}
 
-              {/* Conversation Log */}
-              <div className="px-6">
-                <h4 className="text-[11px] font-semibold tracking-[0.08em] text-[#98A2B3] uppercase mb-3 select-none">KASI'S CONVERSATION LOG</h4>
-                <div className="bg-white border border-[#EAECF0] rounded-xl py-4 px-5">
-                  <p className="text-[14px] text-[#344054] leading-[1.6] whitespace-pre-wrap">
-                    {selectedConversation.ai_summary || 'No conversation log available yet.'}
-                  </p>
+              {/* Interactive Social Chat Stream */}
+              <div className="px-6 space-y-3">
+                <h4 className="text-[11px] font-semibold tracking-[0.08em] text-[#98A2B3] uppercase select-none">
+                  CHAT MESSAGES
+                </h4>
+                <div className="space-y-3">
+                  {(() => {
+                    const summaryText = selectedConversation.ai_summary || '';
+                    if (!summaryText.trim()) {
+                      return (
+                        <div className="bg-white border border-[#EAECF0] rounded-2xl p-8 text-center text-[#667085] text-xs">
+                          No messages in this chat thread yet. Send a message below to start chatting.
+                        </div>
+                      );
+                    }
+                    
+                    const lines = summaryText.split('\n').filter(l => l.trim().length > 0);
+                    return lines.map((line, idx) => {
+                      const isMerchant = line.startsWith('[Merchant]:') || line.startsWith('[Kasi]:') || line.startsWith('[Kasi AI]:');
+                      const cleanContent = line.replace(/^\[(Merchant|Customer|Kasi|Kasi AI|Agent)\]:\s*/, '');
+
+                      return (
+                        <div key={idx} className={`flex flex-col ${isMerchant ? 'items-end' : 'items-start'}`}>
+                          <div className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-xs text-xs md:text-sm leading-relaxed ${
+                            isMerchant 
+                              ? 'bg-[#1A7A4A] text-white rounded-br-none' 
+                              : 'bg-white border border-[#EAECF0] text-[#101828] rounded-bl-none'
+                          }`}>
+                            <div className="text-[10px] opacity-75 font-semibold mb-1">
+                              {isMerchant ? 'Merchant / Kasi AI' : (selectedConversation.customer_name || 'Customer')}
+                            </div>
+                            <p className="whitespace-pre-wrap">{cleanContent}</p>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </div>
 
-            {/* Bottom action bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-white border-t border-[#EAECF0] px-4 md:px-6 py-4 flex items-center gap-2 md:gap-3 shrink-0">
-               <button 
-                onClick={handleGenerateSummary}
-                className="flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 bg-[#1A7A4A] text-white rounded-lg text-xs md:text-sm font-semibold hover:bg-[#0F5533] transition-colors shadow-none cursor-pointer"
-              >
-                <span>✦</span>
-                <span>AI Summary</span>
-              </button>
-              <button
-                onClick={() => setInstructionModalOpen(true)}
-                className="flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 bg-white text-[#344054] border border-[#D0D5DD] rounded-lg text-xs md:text-sm font-semibold hover:bg-[#F9FAFB] transition-colors cursor-pointer"
-              >
-                <MessageSquare size={14} />
-                <span>Instruct Kasi</span>
-              </button>
-              <button
-                onClick={() => selectedConversation && handleStatusUpdate(selectedConversation.id, 'In Progress')}
-                className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 bg-[#FFFAEB] text-[#B54708] border border-[#FEC84B] rounded-lg text-xs md:text-sm font-semibold hover:bg-[#FEF3C7] transition-colors ml-auto cursor-pointer"
-              >
-                <span>Resolve</span>
-              </button>
+            {/* Bottom Direct Social Chat Input & Action Bar */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-[#EAECF0] p-3 md:p-4 flex flex-col gap-2 shrink-0 z-20">
+              <form onSubmit={handleSendDirectMessage} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder={`Type a message to ${selectedConversation.customer_name || 'customer'}...`}
+                  value={directMessageText}
+                  onChange={(e) => setDirectMessageText(e.target.value)}
+                  disabled={sendingDirectMessage}
+                  className="flex-1 px-4 py-2.5 bg-[#F2F4F7] border border-transparent rounded-xl text-xs md:text-sm outline-none text-[#101828] placeholder-[#98A2B3] focus:bg-white focus:border-[#1A7A4A] transition-all font-medium"
+                />
+                <button
+                  type="submit"
+                  disabled={!directMessageText.trim() || sendingDirectMessage}
+                  className="px-5 py-2.5 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-xl text-xs md:text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
+                >
+                  {sendingDirectMessage ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Send size={15} />
+                      Send
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={handleGenerateSummary}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E8F5EE] text-[#1A7A4A] rounded-lg text-xs font-semibold hover:bg-[#D1FAE5] transition-colors cursor-pointer"
+                  >
+                    <span>✦</span>
+                    <span>AI Summary</span>
+                  </button>
+                  <button
+                    onClick={() => setInstructionModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-[#344054] border border-[#D0D5DD] rounded-lg text-xs font-semibold hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <MessageSquare size={13} />
+                    <span>Instruct Kasi</span>
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => selectedConversation && handleStatusUpdate(selectedConversation.id, 'In Progress')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FFFAEB] text-[#B54708] border border-[#FEC84B] rounded-lg text-xs font-semibold hover:bg-[#FEF3C7] transition-colors cursor-pointer"
+                >
+                  <span>Resolve</span>
+                </button>
+              </div>
             </div>
           </>
         )}

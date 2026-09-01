@@ -21,13 +21,13 @@ const CITY_AREAS = {
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all md:w-full text-left whitespace-nowrap
+        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer shrink-0
             ${active
-                ? 'bg-primary text-white shadow-md shadow-green-200 dark:shadow-none'
+                ? 'bg-primary text-white shadow-sm shadow-green-200 dark:shadow-none'
                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
             }`}
     >
-        <Icon size={18} className="shrink-0" />
+        <Icon size={17} className="shrink-0" />
         <span>{label}</span>
     </button>
 );
@@ -701,22 +701,21 @@ const Settings = () => {
                 <p className="text-gray-500 text-sm">Manage integrations, AI persona, and account details.</p>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6 items-start">
-                {/* Secondary Sidebar (Left Navigation) */}
-                <aside className="w-full md:w-64 shrink-0 bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl p-2.5 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible scrollbar-hide select-none animate-in fade-in slide-in-from-left-4 duration-300">
-                    <TabButton active={activeTab === 'integrations'} icon={Zap} label="Integrations" onClick={() => setActiveTab('integrations')} />
-                    <TabButton active={activeTab === 'general'} icon={Building} label="General" onClick={() => setActiveTab('general')} />
-                    <TabButton active={activeTab === 'security'} icon={ShieldCheck} label="Security & 2FA" onClick={() => setActiveTab('security')} />
-                    <TabButton active={activeTab === 'payment'} icon={Wallet} label="Settlement & Payouts" onClick={() => setActiveTab('payment')} />
-                    <TabButton active={activeTab === 'billing'} icon={CreditCard} label="Billing & Subscriptions" onClick={() => setActiveTab('billing')} />
-                    <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
-                    <TabButton active={activeTab === 'logistics'} icon={Truck} label="Logistics Settings" onClick={() => setActiveTab('logistics')} />
-                    <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
-                    <TabButton active={activeTab === 'support'} icon={HelpCircle} label="Support & Help" onClick={() => setActiveTab('support')} />
-                </aside>
+            {/* Horizontal Top Navigation Bar */}
+            <div className="w-full bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl p-2 flex flex-row gap-1.5 overflow-x-auto scrollbar-hide select-none animate-in fade-in duration-300">
+                <TabButton active={activeTab === 'integrations'} icon={Zap} label="Integrations" onClick={() => setActiveTab('integrations')} />
+                <TabButton active={activeTab === 'general'} icon={Building} label="General" onClick={() => setActiveTab('general')} />
+                <TabButton active={activeTab === 'security'} icon={ShieldCheck} label="Security & 2FA" onClick={() => setActiveTab('security')} />
+                <TabButton active={activeTab === 'payment'} icon={Wallet} label="Settlement & Payouts" onClick={() => setActiveTab('payment')} />
+                <TabButton active={activeTab === 'billing'} icon={CreditCard} label="Billing & Subscriptions" onClick={() => setActiveTab('billing')} />
+                <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
+                <TabButton active={activeTab === 'logistics'} icon={Truck} label="Logistics Settings" onClick={() => setActiveTab('logistics')} />
+                <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
+                <TabButton active={activeTab === 'support'} icon={HelpCircle} label="Support & Help" onClick={() => setActiveTab('support')} />
+            </div>
 
-                {/* Main Settings Content Area (Right Column) */}
-                <div className="flex-1 min-w-0 w-full space-y-6">
+            {/* Main Settings Content Area */}
+            <div className="w-full space-y-6">
 
             {/* Platform Modal */}
             <PlatformModal
@@ -1988,7 +1987,6 @@ const Settings = () => {
                     <SupportTab />
                 </div>
             )}
-                </div>
             </div>
         </div>
     );
