@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
-import { TrendingUp, DollarSign, Target, Activity } from 'lucide-react';
+import { TrendingUp, DollarSign, Target, Activity, Crown, Award, MessageSquare, Users, ArrowUpRight } from 'lucide-react';
 import { getAnalyticsData } from '../../../api/analytics';
+import api from '../../../api/axios';
 import { AnalyticsSkeleton } from '../../../components/ui/Skeleton';
 import useNetwork from '../../../hooks/useNetwork';
 
@@ -13,7 +15,9 @@ const formatNaira = (amount) => {
 };
 
 const Analytics = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [bestCustomers, setBestCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const isOnline = useNetwork();
 
@@ -25,10 +29,19 @@ const Analytics = () => {
     try {
       setLoading(true);
       if (!isOnline) return;
-      const response = await getAnalyticsData();
-      if (response && response.status === 'success') {
-        setData(response.data);
+      const [analyticsRes, custRes] = await Promise.all([
+        getAnalyticsData(),
+        api.get('/api/invoices/customers').catch(() => ({ data: [] }))
+      ]);
+
+      if (analyticsRes && analyticsRes.status === 'success') {
+        setData(analyticsRes.data);
       }
+
+      const custData = custRes.data || [];
+      // Sort customers by total spend / revenue descending
+      const sorted = [...custData].sort((a, b) => (b.total_spent || 0) - (a.total_spent || 0)).slice(0, 5);
+      setBestCustomers(sorted);
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
     } finally {
@@ -151,6 +164,76 @@ const Analytics = () => {
               {productMargins.length === 0 && <p className="text-xs text-gray-400 text-center py-4">No product margins available</p>}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Best Customers (Top Spenders) Leaderboard */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-dark text-base flex items-center gap-2">
+              <Crown className="text-amber-500 fill-amber-400" size={18} />
+              Best Customers & Top Spenders
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">High value buyers ranked by lifetime purchase value</p>
+          </div>
+          <button 
+            onClick={() => navigate('/customers')}
+            className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            View Customer Database
+            <ArrowUpRight size={14} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+          {bestCustomers.length === 0 ? (
+            <div className="col-span-full py-8 text-center text-xs text-gray-400">
+              No customer revenue records found yet.
+            </div>
+          ) : (
+            bestCustomers.map((cust, idx) => {
+              const ranks = [
+                { bg: 'bg-amber-100 text-amber-800 border-amber-200', icon: '👑 #1 Top Buyer' },
+                { bg: 'bg-slate-100 text-slate-700 border-slate-200', icon: '🥈 #2 Top Buyer' },
+                { bg: 'bg-amber-50 text-amber-900 border-amber-100', icon: '🥉 #3 Top Buyer' },
+              ];
+              const rankInfo = ranks[idx] || { bg: 'bg-gray-100 text-gray-600 border-gray-200', icon: `#${idx + 1} Buyer` };
+
+              return (
+                <div key={cust.id || idx} className="bg-gray-50/70 border border-gray-100 rounded-2xl p-4 flex flex-col justify-between hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                        {(cust.name || '?').slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-dark text-sm leading-tight truncate">{cust.name}</h4>
+                        <p className="text-xs text-gray-400 mt-0.5 truncate">{cust.phone || cust.email || '—'}</p>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${rankInfo.bg}`}>
+                      {rankInfo.icon}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-gray-200/50 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lifetime Spend</p>
+                      <p className="text-base font-black text-primary">₦{(cust.total_spent || 0).toLocaleString()}</p>
+                    </div>
+                    <button
+                      onClick={() => navigate(`/chats?customer=${encodeURIComponent(cust.phone || cust.name)}`)}
+                      className="px-3 py-1.5 bg-white border border-gray-200 hover:bg-primary hover:text-white hover:border-primary text-gray-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-xs"
+                    >
+                      <MessageSquare size={12} />
+                      Chat
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>

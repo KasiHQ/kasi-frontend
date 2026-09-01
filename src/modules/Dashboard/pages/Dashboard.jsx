@@ -663,14 +663,14 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
         <h3 className="text-sm font-bold text-gray-700 mb-6">Quick actions</h3>
         <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
           {[
+            { label: 'Create Invoice', icon: Tag, path: '/invoices/create' },
+            { label: 'Fulfilment', icon: Truck, path: '/fulfilment' },
             { label: 'Train Kasi AI', icon: GraduationCap, path: '/settings?tab=ai_rules' },
             { label: 'Link WhatsApp', icon: MessageSquare, path: '/settings?tab=integrations' },
             { label: 'Setup Payouts', icon: NairaIcon, path: '/settings?tab=payment' },
             { label: 'Send Broadcast', icon: Megaphone, path: '/customers' },
             { label: 'Live Takeover', icon: UserCheck, path: '/chats' },
             { label: 'Manage Products', icon: Package, path: '/products' },
-            { label: 'Client Directory', icon: Users, path: '/customers' },
-            { label: 'Store Settings', icon: Settings, path: '/settings?tab=general' },
           ].map((act, idx) => (
             <div 
               key={idx} 

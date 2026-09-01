@@ -72,5 +72,11 @@ export const conversationAPI = {
   deleteConversation: async (conversationId) => {
     const response = await api.delete(`/api/conversations/${conversationId}`);
     return response.data;
+  },
+
+  // Send direct message
+  sendMessage: async (conversationId, message) => {
+    const response = await api.post(`/api/conversations/${conversationId}/send-message`, { message });
+    return response.data;
   }
 };
