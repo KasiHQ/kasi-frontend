@@ -150,22 +150,34 @@ const Chats = () => {
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(() => {
+      fetchData(false);
+    }, 3500);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
     try {
       const [convRes, pipeRes, invoicesRes] = await Promise.all([
         conversationAPI.getConversations(),
         conversationAPI.getPipeline(),
         api.get('/api/invoices/').catch(() => ({ data: [] }))
       ]);
-      setConversations(convRes.data || []);
+      const newConvs = convRes.data || [];
+      setConversations(newConvs);
       setPipeline(pipeRes.data || {});
       setInvoices(invoicesRes.data || []);
+
+      // Real-time synchronization: keep selected chat thread updated live
+      setSelectedConversation(prev => {
+        if (!prev) return null;
+        const updated = newConvs.find(c => c.id === prev.id);
+        return updated || prev;
+      });
     } catch (err) {
       console.error('Failed to fetch conversations:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
