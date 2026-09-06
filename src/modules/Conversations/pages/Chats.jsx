@@ -15,12 +15,50 @@ const getLastMessageInfo = (summary, phone) => {
   return { snippet: clean, isCustomer };
 };
 
+const isImageUrl = (url) => {
+  if (!url || typeof url !== 'string') return false;
+  const cleanUrl = url.toLowerCase().split('?')[0];
+  return (
+    cleanUrl.endsWith('.png') ||
+    cleanUrl.endsWith('.jpg') ||
+    cleanUrl.endsWith('.jpeg') ||
+    cleanUrl.endsWith('.webp') ||
+    cleanUrl.endsWith('.gif') ||
+    cleanUrl.includes('cloudinary.com') ||
+    cleanUrl.includes('kasi_receipts')
+  );
+};
+
 const formatMessageContent = (content, isMerchant) => {
   if (!content) return null;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   const parts = content.split(urlRegex);
   return parts.map((part, i) => {
     if (part.match(urlRegex)) {
+      if (isImageUrl(part)) {
+        return (
+          <div key={i} className="my-2">
+            <a
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="block group"
+            >
+              <img
+                src={part}
+                alt="Receipt Attachment"
+                className="rounded-xl max-h-72 max-w-full object-contain border border-black/10 dark:border-white/10 shadow-md group-hover:opacity-95 transition-opacity bg-white/5"
+                loading="lazy"
+              />
+              <span className="text-[11px] opacity-75 mt-1 inline-flex items-center gap-1 underline">
+                View receipt full size ↗
+              </span>
+            </a>
+          </div>
+        );
+      }
+
       return (
         <a
           key={i}

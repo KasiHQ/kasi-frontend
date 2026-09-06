@@ -112,13 +112,16 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
       const metaIntegration = integrations.find(int => int.platform === 'whatsapp_meta');
       const evoIntegration = integrations.find(int => int.platform === 'whatsapp');
 
+      const isMetaConnected = metaIntegration?.connection_status === 'connected' && !!metaIntegration?.instance_name;
+      const isConnected = res.data.connected || isMetaConnected;
+
       setWaStatus({
-        connected: res.data.connected,
-        status: res.data.status,
-        instanceName: res.data.instance_name,
-        platform: metaIntegration ? 'whatsapp_meta' : (evoIntegration ? 'whatsapp' : null)
+        connected: isConnected,
+        status: isConnected ? 'connected' : res.data.status,
+        instanceName: res.data.instance_name || metaIntegration?.instance_name,
+        platform: res.data.platform || (metaIntegration ? 'whatsapp_meta' : (evoIntegration ? 'whatsapp' : null))
       });
-      if (res.data.connected && pairingCodeRef.current) {
+      if (isConnected && pairingCodeRef.current) {
         setPairingCode('');
         addToast('WhatsApp connected successfully!', 'success');
       }
