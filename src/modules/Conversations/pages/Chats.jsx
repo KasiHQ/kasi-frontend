@@ -1,9 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft, Send, User, Shield, Tag, History, CheckCircle2 } from 'lucide-react';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
 import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
+
+const getLastMessageInfo = (summary, phone) => {
+  if (!summary) return { snippet: phone || 'No messages yet', isCustomer: false };
+  const lines = summary.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length === 0) return { snippet: phone || 'No messages yet', isCustomer: false };
+  const lastLine = lines[lines.length - 1];
+  const isCustomer = lastLine.startsWith('[Customer]:');
+  const clean = lastLine.replace(/^\[(Merchant|Customer|Kasi|Kasi AI|Agent)\]:\s*/, '');
+  return { snippet: clean, isCustomer };
+};
+
 
 // Dynamic Color Mapping for Avatars (B -> Green, T -> Pink, O -> Purple)
 const getAvatarTheme = (name) => {
@@ -180,6 +191,17 @@ const Chats = () => {
       if (showLoading) setLoading(false);
     }
   };
+
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedConversation?.ai_summary, selectedConversation?.id]);
+
 
   const consolidatedList = React.useMemo(() => {
     const groups = {};
@@ -381,6 +403,7 @@ const Chats = () => {
               const isSelected = selectedConversation?.id === conv.id;
               const avatarTheme = getAvatarTheme(conv.customer_name);
               const pb = getPlatformBadge(conv.platform);
+              const msgInfo = getLastMessageInfo(conv.ai_summary, conv.customer_phone);
 
               return (
                 <div
@@ -393,24 +416,35 @@ const Chats = () => {
                   }`}
                 >
                   {/* Avatar */}
-                  <div className={`w-10 h-10 rounded-full ${avatarTheme.bg} ${avatarTheme.text} flex items-center justify-center font-bold text-xs shrink-0`}>
+                  <div className={`w-10 h-10 rounded-full ${avatarTheme.bg} ${avatarTheme.text} flex items-center justify-center font-bold text-xs shrink-0 relative`}>
                     {getInitials(conv.customer_name)}
+                    {msgInfo.isCustomer && conv.status !== 'Delivered' && (
+                      <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#12B76A] border-2 border-white shadow-xs" />
+                    )}
                   </div>
 
                   {/* Content details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-[#101828] text-sm truncate">
-                        {conv.customer_name || conv.customer_phone || 'Unknown Customer'}
-                      </p>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <p className={`text-sm truncate ${msgInfo.isCustomer ? 'font-bold text-[#101828]' : 'font-semibold text-[#101828]'}`}>
+                          {conv.customer_name || conv.customer_phone || 'Unknown Customer'}
+                        </p>
+                        {msgInfo.isCustomer && conv.status !== 'Delivered' && (
+                          <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#12B76A] text-white shrink-0 shadow-xs">
+                            New
+                          </span>
+                        )}
+                      </div>
                       <span className="text-xs text-[#98A2B3] whitespace-nowrap shrink-0">
                         {timeAgo(conv.last_message_at)}
                       </span>
                     </div>
 
-                    <p className="text-[13px] text-[#667085] truncate mt-0.5">
-                      {conv.ai_summary || conv.customer_phone || 'No messages yet'}
+                    <p className={`text-[13px] truncate mt-0.5 ${msgInfo.isCustomer ? 'font-medium text-[#101828]' : 'text-[#667085]'}`}>
+                      {msgInfo.snippet}
                     </p>
+
 
                     {/* Status & Platform Tags */}
                     <div className="flex items-center gap-1.5 mt-2 flex-wrap">
@@ -524,7 +558,8 @@ const Chats = () => {
             </div>
 
             {/* Scrollable Content wrapper */}
-            <div className="flex-1 overflow-y-auto space-y-6 pb-24">
+            <div className="flex-1 overflow-y-auto space-y-6 pb-52 md:pb-48">
+
               
               {/* Price block */}
               <div className="grid grid-cols-2 gap-4 px-6 py-5 bg-white border-b border-[#EAECF0] select-none">
@@ -641,6 +676,7 @@ const Chats = () => {
                       );
                     });
                   })()}
+                  <div ref={messagesEndRef} className="h-6" />
                 </div>
               </div>
             </div>
