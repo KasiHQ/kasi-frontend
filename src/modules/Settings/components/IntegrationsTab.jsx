@@ -8,7 +8,7 @@ import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import useNetwork from '../../../hooks/useNetwork';
-import { META_APP_ID } from '../../../config';
+import { META_APP_ID, META_WHATSAPP_CONFIG_ID, META_HOSTED_ONBOARD_URL } from '../../../config';
 import { conversationAPI } from '../../../api/conversations';
 
 const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
@@ -51,6 +51,24 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
 
   const pairingCodeRef = useRef(pairingCode);
   pairingCodeRef.current = pairingCode;
+  const sessionDataRef = useRef({ phone_number_id: null, waba_id: null });
+
+  useEffect(() => {
+    const handleMetaMessage = (event) => {
+      if (typeof event.origin === 'string' && !event.origin.includes('facebook.com')) return;
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data && data.type === 'WA_EMBEDDED_SIGNUP') {
+          if (data.event === 'FINISH') {
+            const { phone_number_id, waba_id } = data.data || {};
+            sessionDataRef.current = { phone_number_id, waba_id };
+          }
+        }
+      } catch (e) {}
+    };
+    window.addEventListener('message', handleMetaMessage);
+    return () => window.removeEventListener('message', handleMetaMessage);
+  }, []);
 
   useEffect(() => {
     fetchTelegramStatus();
@@ -257,15 +275,62 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
     } finally { setDisconnectingFB(false); }
   };
 
-  const connectMetaWhatsApp = () => {
-    const clientId = META_APP_ID;
-    const redirectUri = window.location.origin + '/settings';
-    const scope = 'whatsapp_business_management,whatsapp_business_messaging';
-    const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=code&state=whatsapp_meta`;
-    window.location.href = authUrl;
+  const loadFacebookSDK = () => {
+    return new Promise((resolve) => {
+      if (window.FB) return resolve(window.FB);
+      window.fbAsyncInit = function () {
+        window.FB.init({
+          appId: META_APP_ID,
+          autoLogAppEvents: true,
+          xfbml: true,
+          version: 'v21.0'
+        });
+        resolve(window.FB);
+      };
+      if (!document.getElementById('facebook-jssdk')) {
+        const js = document.createElement('script');
+        js.id = 'facebook-jssdk';
+        js.src = 'https://connect.facebook.net/en_US/sdk.js';
+        js.async = true;
+        js.defer = true;
+        document.body.appendChild(js);
+      }
+    });
   };
 
-  const completeOAuthConnection = async (code, platform) => {
+  const connectMetaWhatsApp = async () => {
+    setConnectingMetaWA(true);
+    try {
+      const FB = await loadFacebookSDK();
+      FB.login(
+        (response) => {
+          if (response.authResponse && response.authResponse.code) {
+            const code = response.authResponse.code;
+            const { phone_number_id, waba_id } = sessionDataRef.current || {};
+            completeOAuthConnection(code, 'whatsapp_meta', { phone_number_id, waba_id });
+          } else {
+            setConnectingMetaWA(false);
+          }
+        },
+        {
+          config_id: META_WHATSAPP_CONFIG_ID,
+          response_type: 'code',
+          override_default_response_type: true,
+          extras: {
+            feature: 'whatsapp_embedded_signup',
+            version: 2,
+            sessionInfoVersion: 3
+          }
+        }
+      );
+    } catch (err) {
+      console.error('Failed to launch Meta Embedded Signup popup:', err);
+      setConnectingMetaWA(false);
+      window.open(META_HOSTED_ONBOARD_URL, '_blank');
+    }
+  };
+
+  const completeOAuthConnection = async (code, platform, extraData = {}) => {
     if (platform === 'instagram') setConnectingIG(true);
     else if (platform === 'facebook') setConnectingFB(true);
     else if (platform === 'whatsapp_meta') setConnectingMetaWA(true);
@@ -275,6 +340,8 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
       if (platform === 'whatsapp_meta') {
         await api.post('/api/meta/whatsapp/oauth/callback', {
           code,
+          phone_number_id: extraData?.phone_number_id,
+          waba_id: extraData?.waba_id,
           redirect_uri: redirectUri
         });
         addToast('WhatsApp connected successfully via Meta Cloud API!', 'success');
@@ -384,14 +451,25 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
                 <p className="text-xs text-gray-600 dark:text-gray-400">
                   Connect directly with your Meta Business account for 100% uptime, verified branding, and official Meta Cloud API infrastructure.
                 </p>
-                <button
-                  onClick={connectMetaWhatsApp}
-                  disabled={connectingMetaWA}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-green-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <MessageCircle size={16} />
-                  {connectingMetaWA ? 'Connecting with Meta...' : 'Connect WhatsApp with Meta'}
-                </button>
+                <div className="flex flex-col gap-2.5 items-start">
+                  <button
+                    onClick={connectMetaWhatsApp}
+                    disabled={connectingMetaWA}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-green-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <MessageCircle size={16} />
+                    {connectingMetaWA ? 'Connecting with Meta...' : 'Connect WhatsApp with Meta'}
+                  </button>
+                  <a
+                    href={META_HOSTED_ONBOARD_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-gray-500 hover:text-green-700 dark:text-gray-400 dark:hover:text-green-400 underline inline-flex items-center gap-1 transition-colors"
+                  >
+                    <span>Or onboard directly on Meta's website</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
               </div>
 
               {/* Secondary Option Underneath: Legacy Pairing Code Test Mode */}
