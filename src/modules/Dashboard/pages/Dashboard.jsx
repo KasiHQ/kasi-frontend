@@ -800,6 +800,8 @@ const ActionAlerts = ({ user }) => {
   const [dismissedStoreProfile, setDismissedStoreProfile] = useState(false);
   const [dismissedTrial, setDismissedTrial] = useState(false);
 
+  const [hasConnectedWA, setHasConnectedWA] = useState(false);
+
   useEffect(() => {
     fetchIntegrations();
   }, []);
@@ -807,7 +809,15 @@ const ActionAlerts = ({ user }) => {
   const fetchIntegrations = async () => {
     try {
       const response = await api.get('/api/whatsapp/status');
-      setIntegrations(response.data.integrations || []);
+      const list = response.data.integrations || [];
+      setIntegrations(list);
+      const isWAConnected = response.data.connected || list.some(i => 
+        (i.platform === 'whatsapp' || i.platform === 'whatsapp_meta') && 
+        (i.connection_status === 'connected' || !!i.instance_name)
+      );
+      if (isWAConnected) {
+        setHasConnectedWA(true);
+      }
     } catch (err) {
       console.error('Error fetching integrations:', err);
     } finally {
@@ -815,7 +825,10 @@ const ActionAlerts = ({ user }) => {
     }
   };
 
-  const hasWhatsApp = integrations.some(i => i.platform === 'whatsapp' && i.connection_status === 'connected');
+  const hasWhatsApp = hasConnectedWA || integrations.some(i => 
+    (i.platform === 'whatsapp' || i.platform === 'whatsapp_meta') && 
+    (i.connection_status === 'connected' || !!i.instance_name)
+  );
   const hasPaystack = !!user?.account_number;
   
   let hasRateSheet = false;
