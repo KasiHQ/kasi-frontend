@@ -15,6 +15,94 @@ const getLastMessageInfo = (summary, phone) => {
   return { snippet: clean, isCustomer };
 };
 
+const formatMessageContent = (content, isMerchant) => {
+  if (!content) return null;
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = content.split(urlRegex);
+  return parts.map((part, i) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`underline font-bold break-all transition-colors ${
+            isMerchant ? 'text-emerald-100 hover:text-white' : 'text-[#1A7A4A] hover:text-[#0F5533]'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    const boldParts = part.split(/(\*[^*]+\*)/g);
+    return boldParts.map((sub, j) => {
+      if (sub.startsWith('*') && sub.endsWith('*') && sub.length > 2) {
+        return <strong key={j} className="font-bold">{sub.slice(1, -1)}</strong>;
+      }
+      return sub;
+    });
+  });
+};
+
+const parseMessages = (summaryText, defaultCustomerName) => {
+  if (!summaryText || !summaryText.trim()) return [];
+  const regex = /\[(Merchant|Customer|Kasi|Kasi AI|Agent)\]:\s*([\s\S]*?)(?=(?:\[(?:Merchant|Customer|Kasi|Kasi AI|Agent)\]:|$))/gi;
+  const messages = [];
+  let match;
+
+  while ((match = regex.exec(summaryText)) !== null) {
+    const sender = match[1];
+    const content = match[2].trim();
+    if (!content) continue;
+
+    const isExplicitMerchant = /^(merchant|kasi|kasi ai|agent)$/i.test(sender);
+
+    // If an AI invoice, Paystack link, or confirmation was accidentally grouped under Customer
+    const invoiceSplitRegex = /(?=\n(?:🧾|\*Invoice Generated!|\*Order Confirmed!|💳 \*Pay Securely Online:\*))/i;
+    if (!isExplicitMerchant && invoiceSplitRegex.test(content)) {
+      const parts = content.split(invoiceSplitRegex);
+      const custPart = parts[0]?.trim();
+      const aiPart = parts.slice(1).join('\n').trim();
+
+      if (custPart) {
+        messages.push({
+          sender: defaultCustomerName || 'Customer',
+          content: custPart,
+          isMerchant: false
+        });
+      }
+      if (aiPart) {
+        messages.push({
+          sender: 'Merchant / Kasi AI',
+          content: aiPart,
+          isMerchant: true
+        });
+      }
+      continue;
+    }
+
+    messages.push({
+      sender: isExplicitMerchant ? 'Merchant / Kasi AI' : (defaultCustomerName || 'Customer'),
+      content,
+      isMerchant: isExplicitMerchant
+    });
+  }
+
+  if (messages.length === 0 && summaryText.trim()) {
+    const isInvoice = summaryText.includes('Invoice') || summaryText.includes('Pay Online') || summaryText.includes('paystack') || summaryText.includes('🧾');
+    messages.push({
+      sender: isInvoice ? 'Merchant / Kasi AI' : (defaultCustomerName || 'Customer'),
+      content: summaryText.trim(),
+      isMerchant: isInvoice
+    });
+  }
+
+  return messages;
+};
+
+
 
 // Dynamic Color Mapping for Avatars (B -> Green, T -> Pink, O -> Purple)
 const getAvatarTheme = (name) => {
@@ -647,7 +735,9 @@ const Chats = () => {
                 <div className="space-y-3">
                   {(() => {
                     const summaryText = selectedConversation.ai_summary || '';
-                    if (!summaryText.trim()) {
+                    const parsedMessages = parseMessages(summaryText, selectedConversation.customer_name);
+
+                    if (parsedMessages.length === 0) {
                       return (
                         <div className="bg-white border border-[#EAECF0] rounded-2xl p-8 text-center text-[#667085] text-xs">
                           No messages in this chat thread yet. Send a message below to start chatting.
@@ -655,26 +745,20 @@ const Chats = () => {
                       );
                     }
                     
-                    const lines = summaryText.split('\n').filter(l => l.trim().length > 0);
-                    return lines.map((line, idx) => {
-                      const isMerchant = line.startsWith('[Merchant]:') || line.startsWith('[Kasi]:') || line.startsWith('[Kasi AI]:');
-                      const cleanContent = line.replace(/^\[(Merchant|Customer|Kasi|Kasi AI|Agent)\]:\s*/, '');
-
-                      return (
-                        <div key={idx} className={`flex flex-col ${isMerchant ? 'items-end' : 'items-start'}`}>
-                          <div className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-xs text-xs md:text-sm leading-relaxed ${
-                            isMerchant 
-                              ? 'bg-[#1A7A4A] text-white rounded-br-none' 
-                              : 'bg-white border border-[#EAECF0] text-[#101828] rounded-bl-none'
-                          }`}>
-                            <div className="text-[10px] opacity-75 font-semibold mb-1">
-                              {isMerchant ? 'Merchant / Kasi AI' : (selectedConversation.customer_name || 'Customer')}
-                            </div>
-                            <p className="whitespace-pre-wrap">{cleanContent}</p>
+                    return parsedMessages.map((msg, idx) => (
+                      <div key={idx} className={`flex flex-col ${msg.isMerchant ? 'items-end' : 'items-start'}`}>
+                        <div className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-xs text-xs md:text-sm leading-relaxed ${
+                          msg.isMerchant 
+                            ? 'bg-[#1A7A4A] text-white rounded-br-none' 
+                            : 'bg-white border border-[#EAECF0] text-[#101828] rounded-bl-none'
+                        }`}>
+                          <div className="text-[10px] opacity-75 font-semibold mb-1">
+                            {msg.sender}
                           </div>
+                          <div className="whitespace-pre-wrap leading-relaxed">{formatMessageContent(msg.content, msg.isMerchant)}</div>
                         </div>
-                      );
-                    });
+                      </div>
+                    ));
                   })()}
                   <div ref={messagesEndRef} className="h-6" />
                 </div>
