@@ -113,13 +113,13 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
       const evoIntegration = integrations.find(int => int.platform === 'whatsapp');
 
       const isMetaConnected = metaIntegration?.connection_status === 'connected' && !!metaIntegration?.instance_name;
-      const isConnected = res.data.connected || isMetaConnected;
+      const isConnected = Boolean(res.data.connected || isMetaConnected);
 
       setWaStatus({
         connected: isConnected,
-        status: isConnected ? 'connected' : res.data.status,
-        instanceName: res.data.instance_name || metaIntegration?.instance_name,
-        platform: res.data.platform || (metaIntegration ? 'whatsapp_meta' : (evoIntegration ? 'whatsapp' : null))
+        status: isConnected ? 'connected' : (res.data.status || 'disconnected'),
+        instanceName: isConnected ? (res.data.instance_name || metaIntegration?.instance_name || '') : '',
+        platform: isConnected ? (res.data.platform || (metaIntegration ? 'whatsapp_meta' : (evoIntegration ? 'whatsapp' : null))) : null
       });
       if (isConnected && pairingCodeRef.current) {
         setPairingCode('');
@@ -224,11 +224,12 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
     setDisconnectingWA(true);
     setShowDisconnectConfirm(false);
     try {
-      await api.post('/api/whatsapp/disconnect');
-      setWaStatus({ connected: false, status: 'disconnected' });
+      await api.post('/api/whatsapp/disconnect', { platform: 'whatsapp' });
+      setWaStatus({ connected: false, status: 'disconnected', instanceName: '', platform: null });
       setPairingCode('');
       setWaPhoneNumber('');
       addToast('WhatsApp disconnected successfully.', 'success');
+      await fetchWhatsAppStatus();
     } catch (err) {
       addToast(err.response?.data?.error || 'Failed to disconnect', 'error');
     } finally { setDisconnectingWA(false); }
