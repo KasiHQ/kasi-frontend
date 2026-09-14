@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, LogOut } from 'lucide-react';
+import { Sun, Moon, PanelTop, LogOut } from 'lucide-react';
 import {
   PiHouse, PiShoppingBag, PiTruck, PiChatCircleDots, PiUsers,
   PiChartLineUp, PiCurrencyDollar, PiStorefront, PiGearSix,
-  PiCalendarCheck, PiBriefcase, PiFileText, PiChartBar
+  PiCalendarCheck, PiBriefcase, PiFileText, PiChartBar,
+  PiSidebarSimple
 } from 'react-icons/pi';
 import clsx from 'clsx';
 import { useLayout } from '../../context/LayoutContext';
@@ -16,15 +17,12 @@ import { conversationAPI } from '../../api/conversations';
 const SIDEBAR_KEY = 'bfm-sidebar-collapsed';
 
 const Sidebar = ({ onWidthChange }) => {
-  const { toggleLayout } = useLayout();
+  const { toggleLayout, sidebarCollapsed: collapsed, setSidebarCollapsed: setCollapsed } = useLayout();
   const { isDark, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const isAdmin = user?.is_admin;
   const adminRole = user?.admin_role;
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(() => {
-    try { return localStorage.getItem(SIDEBAR_KEY) === 'true'; } catch { return false; }
-  });
 
   const [badgeCounts, setBadgeCounts] = useState({ chats: 0, logistics: 0 });
 
@@ -203,23 +201,24 @@ const Sidebar = ({ onWidthChange }) => {
       style={{ width: collapsed ? 72 : 230, transition: 'width 0.25s ease' }}
     >
       {/* Brand Header */}
-      <div className={clsx('flex items-center py-4', collapsed ? 'px-3 justify-center' : 'px-5 justify-between')}>
+      <div className={clsx('flex items-center py-3.5', collapsed ? 'px-3 justify-center' : 'px-4 justify-between')}>
         {!collapsed ? (
-          <div className="flex items-center gap-2">
-            <img src="/kasi.png" alt="Kasi" className="w-7 h-7 rounded-lg" />
-            <span className="text-xl font-extrabold tracking-tight" style={{ background: 'linear-gradient(135deg, #0F8C55, #0BBF6A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Kasi</span>
+          <div className="flex items-center gap-2.5">
+            <img src="/kasi.png" alt="Kasi" className="w-6 h-6 rounded-md" />
+            <span className="text-lg font-bold tracking-tight text-[#101828] dark:text-white">Kasi</span>
           </div>
         ) : (
-          <img src="/kasi.png" alt="K" className="w-7 h-7 rounded-lg" />
+          <img src="/kasi.png" alt="K" className="w-6 h-6 rounded-md" />
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={clsx(
-            'p-1.5 rounded-lg transition-all duration-200 text-gray-400 hover:text-primary hover:bg-primary/10',
+            'p-1.5 rounded-lg text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer',
             collapsed && 'hidden'
           )}
+          title="Collapse sidebar"
         >
-          <ChevronsLeft size={16} />
+          <PiSidebarSimple size={18} />
         </button>
       </div>
 
@@ -303,11 +302,12 @@ const Sidebar = ({ onWidthChange }) => {
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}
-              onMouseEnter={(e) => handleItemHover(e, 'Expand Sidebar')}
+              onMouseEnter={(e) => handleItemHover(e, 'Expand sidebar')}
               onMouseLeave={handleItemLeave}
-              className="p-2 text-gray-400 hover:text-primary hover:bg-green-50 rounded-lg transition-all duration-200 relative"
+              className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+              title="Expand sidebar"
             >
-              <ChevronsRight size={15} />
+              <PiSidebarSimple size={18} />
             </button>
           )}
         </div>
@@ -347,19 +347,20 @@ const Sidebar = ({ onWidthChange }) => {
         )}
       </div>
 
-      {/* Sleek Fixed Floating Tooltip (Never clipped, zero horizontal scroll!) */}
+      {/* Modern ProofDeck-Style Tooltip */}
       {collapsed && hoveredTooltip && (
         <div
           className="fixed z-[99999] pointer-events-none transition-all duration-150 animate-in fade-in zoom-in-95"
           style={{
-            left: 78,
+            left: 74,
             top: hoveredTooltip.top,
             transform: 'translateY(-50%)'
           }}
         >
-          <div className="bg-[#101828] text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-2xl flex items-center gap-1.5 whitespace-nowrap border border-gray-700/60">
-            {hoveredTooltip.label}
-            <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-[#101828] border-l border-b border-gray-700/60 rotate-45" />
+          <div className="relative bg-[#0F172A] text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-xl flex items-center whitespace-nowrap border border-slate-700/50">
+            {/* Tooltip notch / pointer arrow on left */}
+            <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0F172A] border-l border-b border-slate-700/50 rotate-45" />
+            <span>{hoveredTooltip.label}</span>
           </div>
         </div>
       )}
