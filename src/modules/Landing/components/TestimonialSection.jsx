@@ -27,7 +27,7 @@ export const TestimonialSection = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-28 bg-bg-subtle border-b-1.5 border-black">
+    <section id="testimonials" className="py-28 bg-[#F8F9F7] border-b border-[#E5E5E5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -38,7 +38,7 @@ export const TestimonialSection = () => {
           <h2 className="font-section-h2">
             Loved by merchants in <span className="text-brand">Nigeria.</span>
           </h2>
-          <p className="font-body-large text-grey-700 max-w-xl">
+          <p className="font-body-large text-gray-600 max-w-xl font-sans">
             See how vendors across Lagos, Abuja, and Port Harcourt leverage Kasi's automated direct-selling agent to double conversions and free up precious hours.
           </p>
         </div>
@@ -48,34 +48,34 @@ export const TestimonialSection = () => {
           {TESTIMONIALS.map((t, idx) => (
             <div 
               key={idx} 
-              className="bg-white border-hard rounded-2xl p-8 hover:translate-y-[-4px] hover:shadow-[6px_6px_0px_#0A0A0A] transition-all duration-300 flex flex-col justify-between space-y-6 relative shadow-hard"
+              className="bg-white border border-gray-100 rounded-2xl p-8 shadow-xs hover:shadow-md hover:border-gray-200 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-6 relative"
             >
               {/* Quote icon ornament */}
-              <div className="absolute top-6 right-8 text-brand-light select-none pointer-events-none">
+              <div className="absolute top-6 right-8 text-brand-light/60 select-none pointer-events-none">
                 <Quote size={40} className="fill-current" />
               </div>
 
               {/* Star Rating */}
-              <div className="flex gap-1 text-yellow-550 z-10">
+              <div className="flex gap-1 text-amber-400 z-10">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} size={14} className="fill-current" />
                 ))}
               </div>
 
-              <blockquote className="text-xs text-grey-700 font-bold leading-relaxed relative z-10 text-left">
+              <blockquote className="text-sm text-gray-600 font-medium leading-relaxed relative z-10 text-left font-sans">
                 "{t.quote}"
               </blockquote>
 
-              <div className="border-t-1.5 border-black pt-4 flex justify-between items-end">
+              <div className="border-t border-gray-100 pt-4 flex justify-between items-end">
                 <div className="space-y-0.5 text-left">
-                  <cite className="text-xs font-black text-black not-italic block font-bricolage">{t.name}</cite>
-                  <span className="text-[9px] text-grey-500 font-black block font-prompt">{t.role}</span>
+                  <cite className="text-sm font-bold text-gray-900 not-italic block font-bricolage">{t.name}</cite>
+                  <span className="text-[11px] text-gray-400 font-medium block font-sans">{t.role}</span>
                 </div>
                 <div className="text-right space-y-0.5">
-                  <span className="inline-block px-2.5 py-0.5 bg-brand-light text-brand text-[8px] font-black tracking-wider uppercase border border-brand rounded-full font-prompt">
+                  <span className="inline-block px-2.5 py-0.5 bg-[#E8F5EE] text-[#1A7A4A] text-[9px] font-bold tracking-wider uppercase border border-[#1A7A4A]/20 rounded-full font-sans shadow-xs">
                     {t.platform}
                   </span>
-                  <span className="text-[8px] text-grey-500 font-black block font-prompt mt-0.5">{t.location}</span>
+                  <span className="text-[10px] text-gray-400 font-medium block font-sans mt-0.5">{t.location}</span>
                 </div>
               </div>
             </div>

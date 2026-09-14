@@ -27,7 +27,7 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
           <div className="lg:col-span-6 space-y-8 text-left">
             {PRELAUNCH_WAITLIST_MODE && (
               <div className="space-y-4 pb-2 animate-in fade-in slide-in-from-top duration-300">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4F263] border-[1.5px] border-black text-black text-[11px] font-black uppercase tracking-wider rounded-full shadow-[2px_2px_0px_#000]">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4F263] text-black text-[11px] font-black uppercase tracking-wider rounded-xl shadow-sm">
                   Launching June 12, 2026
                 </div>
                 <div>
@@ -36,20 +36,17 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               </div>
             )}
 
-            {/* H1 headline (3 lines) */}
-            <h1 className="text-4xl md:text-5.5xl lg:text-6xl font-black tracking-tight leading-[1.05] text-[#0A0A0A] font-bricolage select-none">
-              <span className="block text-[#0A0A0A]">AI-Powered</span>
-              <span className="block text-[#1A7A4A] mt-1">Direct Sales</span>
-              <span className="block text-[#0A0A0A] mt-1">
-                From DMs to Paid fast.
-              </span>
-            </h1>
+            {/* H1 headline */}
+            <div>
+              <h1 className="text-4xl md:text-5.5xl lg:text-[58px] font-black tracking-tight leading-[1.06] text-[#0A0A0A] font-bricolage select-none">
+                From First DM to Paid & Delivered.
+                <span className="block text-[#1A7A4A] mt-1">100% Autonomously.</span>
+              </h1>
+            </div>
 
             {/* Body text */}
-            <p className="text-base md:text-lg text-grey-700 max-w-[480px] leading-relaxed font-sans font-medium">
-              Simply connect your WhatsApp, Instagram, or Telegram. Kasi handles
-              every customer inquiry, negotiates pricing, collects payment, and
-              coordinates delivery — 24/7, automatically.
+            <p className="text-base md:text-[17px] text-gray-600 max-w-[500px] leading-relaxed font-sans font-medium">
+              Kasi is your AI sales and support employee on WhatsApp, Instagram, and TikTok. It handles the full customer journey — answers, negotiates, verifies payment, coordinates delivery — so you grow revenue without a support team.
             </p>
 
             {/* CTA Row */}
@@ -57,62 +54,62 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               {PRELAUNCH_WAITLIST_MODE ? (
                 <button
                   onClick={onJoinWaitlistClick}
-                  className="text-[15px] font-bold text-white bg-[#1A7A4A] hover:bg-[#15603A] px-6 py-3.5 rounded-full active:scale-95 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.15)] flex items-center gap-1 cursor-pointer border border-black"
+                  className="text-[15px] font-bold text-white bg-[#1A7A4A] hover:bg-[#15603A] px-6 py-3.5 rounded-xl active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
                 >
                   Join Beta Waitlist →
                 </button>
               ) : (
                 <Link
                   to="/signup"
-                  className="text-[15px] font-bold text-white bg-black px-6 py-3.5 rounded-full hover:bg-neutral-800 active:scale-95 transition-all shadow-[4px_4px_0px_rgba(0,0,0,0.15)] flex items-center gap-1 cursor-pointer"
+                  className="text-[15px] font-bold text-white bg-black px-6 py-3.5 rounded-xl hover:bg-neutral-800 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center gap-1.5 cursor-pointer"
                 >
-                  Get Kasi for Free →
+                  Get Started Free →
                 </Link>
               )}
               <button
                 onClick={handleWatchDemoClick}
-                className="text-[15px] font-bold text-black border-[1.5px] border-black bg-white px-6 py-3.5 rounded-full hover:bg-bg-subtle active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="text-[15px] font-bold text-gray-800 border border-gray-200 bg-white hover:bg-gray-50 px-6 py-3.5 rounded-xl active:scale-95 transition-all duration-200 shadow-xs hover:shadow-sm flex items-center gap-1.5 cursor-pointer"
               >
-                <Play size={14} className="fill-current text-black" />
-                Watch Demo Video
+                <Play size={14} className="fill-current text-[#1A7A4A]" />
+                Watch Demo
               </button>
             </div>
 
             {/* Trust Stats Row */}
-            <div className="flex items-center gap-8 pt-8 max-w-lg select-none border-t-[1.5px] border-[#E5E5E5]">
+            <div className="flex items-center gap-6 sm:gap-8 pt-6 max-w-lg select-none border-t border-gray-100">
               {/* Stat 1 */}
               <div className="space-y-1 text-left">
-                <div className="text-[32px] font-black text-[#0A0A0A] leading-none font-bricolage">
+                <div className="text-[28px] md:text-[32px] font-black text-[#0A0A0A] leading-none font-bricolage">
                   10×
                 </div>
-                <div className="text-[12px] font-bold tracking-wider text-grey-500 uppercase font-sans">
-                  Faster Replies
+                <div className="text-[11px] font-bold tracking-wider text-gray-500 uppercase font-sans">
+                  Faster DM Replies
                 </div>
               </div>
 
               {/* Divider */}
-              <div className="h-10 w-[1.5px] bg-[#E5E5E5]" />
+              <div className="h-9 w-px bg-gray-200" />
 
               {/* Stat 2 */}
               <div className="space-y-1 text-left">
-                <div className="text-[32px] font-black text-[#0A0A0A] leading-none font-bricolage">
-                  99%
+                <div className="text-[28px] md:text-[32px] font-black text-[#1A7A4A] leading-none font-bricolage">
+                  100%
                 </div>
-                <div className="text-[12px] font-bold tracking-wider text-grey-500 uppercase font-sans">
-                  Direct Paid
+                <div className="text-[11px] font-bold tracking-wider text-gray-500 uppercase font-sans">
+                  Margin Protection
                 </div>
               </div>
 
               {/* Divider */}
-              <div className="h-10 w-[1.5px] bg-[#E5E5E5]" />
+              <div className="h-9 w-px bg-gray-200" />
 
               {/* Stat 3 */}
               <div className="space-y-1 text-left">
-                <div className="text-[32px] font-black text-[#0A0A0A] leading-none font-bricolage">
+                <div className="text-[28px] md:text-[32px] font-black text-[#0A0A0A] leading-none font-bricolage">
                   24/7
                 </div>
-                <div className="text-[12px] font-bold tracking-wider text-grey-500 uppercase font-sans">
-                  Runs 24/7
+                <div className="text-[11px] font-bold tracking-wider text-gray-500 uppercase font-sans">
+                  Always-On Sales
                 </div>
               </div>
             </div>
@@ -121,20 +118,20 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
           {/* RIGHT COLUMN — 50% (lg:col-span-6) */}
           <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end mt-10 lg:mt-0 select-none">
             {/* Green Panel wrapper */}
-            <div className="relative w-full max-w-[520px] h-[560px] bg-[#1A7A4A] rounded-[24px] p-8 flex items-center justify-center overflow-visible shadow-[8px_8px_0px_#0A0A0A] border-[1.5px] border-black">
+            <div className="relative w-full max-w-[520px] h-[560px] bg-[#1A7A4A] rounded-3xl p-8 flex items-center justify-center overflow-visible shadow-[0_20px_50px_rgba(26,122,74,0.22)] border border-emerald-600/30">
               {/* White dot grid pattern overlay */}
-              <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none rounded-[24px]" />
+              <div className="absolute inset-0 opacity-[0.12] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none rounded-3xl" />
 
               {/* Browser Mockup */}
-              <div className="relative w-full bg-white rounded-2xl border-[3px] border-black shadow-[6px_6px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[3deg] hover:rotate-0 transition-transform duration-500 z-10">
+              <div className="relative w-full bg-white rounded-2xl border border-gray-100 shadow-[0_16px_40px_rgba(0,0,0,0.16)] overflow-hidden flex flex-col transform rotate-[2deg] hover:rotate-0 transition-transform duration-500 z-10">
                 {/* Browser Header */}
-                <div className="bg-[#F5F5F0] border-b-[2px] border-black px-4 py-2.5 flex items-center justify-between shrink-0">
+                <div className="bg-[#F8F9F7] border-b border-gray-200/80 px-4 py-2.5 flex items-center justify-between shrink-0">
                   <div className="flex gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-black/35" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-black/35" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
                   </div>
-                  <div className="bg-white border border-black rounded-md px-4 py-0.5 text-[9px] font-bold text-grey-500 font-sans tracking-wide">
+                  <div className="bg-white border border-gray-200 rounded-md px-4 py-0.5 text-[9px] font-bold text-gray-500 font-sans tracking-wide shadow-xs">
                     usekasi.com/dashboard
                   </div>
                   <div className="w-6 h-6" /> {/* Spacer */}
@@ -148,9 +145,9 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               </div>
 
               {/* Mobile Phone Mockup Overlay */}
-              <div className="absolute -bottom-10 -right-8 w-[160px] h-[300px] bg-white rounded-[28px] border-[3px] border-black shadow-[5px_5px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-6deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
+              <div className="absolute -bottom-10 -right-8 w-[160px] h-[300px] bg-white rounded-[28px] border border-gray-200/90 shadow-[0_20px_45px_rgba(0,0,0,0.22)] flex flex-col overflow-hidden transform rotate-[-4deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
                 {/* Notch */}
-                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-2.5 bg-black rounded-full z-30" />
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-2.5 bg-gray-900 rounded-full z-30" />
                 {/* Image */}
                 <img 
                   src="/images/hero-dashboard-mobile.jpg" 
@@ -172,6 +169,7 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
                   viewBox="0 0 60 60"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  className="drop-shadow-md"
                 >
                   <ellipse
                     cx="30"
@@ -179,8 +177,6 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
                     rx="24"
                     ry="19"
                     fill="#D97706"
-                    stroke="#0A0A0A"
-                    strokeWidth="1.5"
                   />
                   <ellipse
                     cx="30"
@@ -188,8 +184,6 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
                     rx="24"
                     ry="19"
                     fill="#FBBF24"
-                    stroke="#0A0A0A"
-                    strokeWidth="1.5"
                   />
                   <ellipse
                     cx="30"
@@ -216,10 +210,10 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               </div>
 
               {/* 2. Chat bubble with "SALE CONFIRMED ₦2,100" — bottom-left, below panel */}
-              <div className="absolute -bottom-6 -left-8 bg-white border-[1.5px] border-black rounded-[16px] p-3 shadow-[4px_4px_0px_#0A0A0A] flex items-center gap-3 z-20 transform -rotate-[3deg]">
-                <div className="w-8 h-8 rounded-lg bg-[#D4F263] border border-black flex items-center justify-center shrink-0">
+              <div className="absolute -bottom-6 -left-8 bg-white/95 backdrop-blur-sm border border-gray-100 rounded-2xl p-3 shadow-xl flex items-center gap-3 z-20 transform -rotate-[2deg]">
+                <div className="w-8 h-8 rounded-xl bg-[#D4F263]/30 border border-[#D4F263]/80 flex items-center justify-center shrink-0">
                   <svg
-                    className="w-4.5 h-4.5 text-black"
+                    className="w-4.5 h-4.5 text-[#1A7A4A]"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="3"
@@ -233,19 +227,19 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
                   </svg>
                 </div>
                 <div className="text-left">
-                  <div className="text-[8px] font-black text-grey-500 uppercase tracking-widest leading-none">
+                  <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">
                     Sale Confirmed
                   </div>
-                  <div className="text-xs font-black text-black leading-none mt-1 font-bricolage">
+                  <div className="text-xs font-black text-gray-900 leading-none mt-1 font-bricolage">
                     ₦2,100.00
                   </div>
                 </div>
               </div>
 
               {/* 3. Green checkmark badge — top-right of panel */}
-              <div className="absolute -top-4 -right-4 bg-[#D4F263] border-[1.5px] border-black rounded-full w-12 h-12 flex items-center justify-center shadow-[3px_3px_0px_#0A0A0A] z-20">
+              <div className="absolute -top-4 -right-4 bg-[#D4F263] border border-black/10 rounded-full w-12 h-12 flex items-center justify-center shadow-lg z-20">
                 <svg
-                  className="w-6 h-6 text-black"
+                  className="w-6 h-6 text-[#1A7A4A]"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="3.5"
@@ -260,26 +254,26 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               </div>
 
               {/* 4. Receipt paper — top-right corner, rotated 15deg */}
-              <div className="absolute -top-12 right-12 bg-white border-[1.5px] border-black p-2.5 w-24 rounded-lg shadow-[3px_3px_0px_#0A0A0A] z-10 transform rotate-[15deg] text-black text-[7.5px] font-mono leading-tight text-left">
-                <div className="text-center font-bold border-b border-dashed border-black pb-1 mb-1">
+              <div className="absolute -top-12 right-12 bg-white border border-gray-100 p-2.5 w-24 rounded-xl shadow-xl z-10 transform rotate-[15deg] text-black text-[7.5px] font-mono leading-tight text-left">
+                <div className="text-center font-bold border-b border-dashed border-gray-200 pb-1 mb-1 text-gray-600">
                   RECEIPT
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-gray-600">
                   <span>Fried Rice</span>
                   <span>Suya</span>
                   <span>x2</span>
                 </div>
-                <div className="flex justify-between mb-1">
+                <div className="flex justify-between mb-1 font-bold">
                   <span>Total</span>
                   <span>₦8,000</span>
                 </div>
-                <div className="text-center bg-[#E8F5EE] text-[#1A7A4A] border border-[#1A7A4A] py-0.5 rounded-[4px] font-bold text-[6.5px] uppercase">
+                <div className="text-center bg-[#E8F5EE] text-[#1A7A4A] py-0.5 rounded-[4px] font-bold text-[6.5px] uppercase">
                   PAID
                 </div>
               </div>
 
               {/* 5. "100% Autonomous" badge floating top-right of phone */}
-              <div className="absolute top-[80px] right-2 bg-[#0A0A0A] text-white border-[1.5px] border-black rounded-full px-3 py-1 shadow-[2px_2px_0px_#D4F263] z-20 text-[8.5px] font-black uppercase tracking-wider transform rotate-[6deg] hover:scale-105 transition-transform duration-200">
+              <div className="absolute top-[80px] right-2 bg-gray-950/90 backdrop-blur-sm text-[#D4F263] border border-white/15 rounded-full px-3 py-1 shadow-lg z-20 text-[8.5px] font-black uppercase tracking-wider transform rotate-[4deg] hover:scale-105 transition-transform duration-200">
                 100% Autonomous
               </div>
             </div>

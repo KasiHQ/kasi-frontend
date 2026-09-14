@@ -14,42 +14,42 @@ const STATUS_CONFIG = {
   attention: {
     label: 'Needs Attention',
     color: 'amber',
-    borderClass: 'border-l-amber-500',
-    bgClass: 'bg-amber-50/60 dark:bg-amber-950/20',
-    badgeBg: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
+    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60',
+    accentBorder: 'border-amber-400/80',
     dot: 'bg-amber-500',
-    stepperActive: 'bg-amber-500 text-white',
+    pill: 'bg-amber-500 text-white',
+    stepperActive: 'bg-amber-500 text-white ring-2 ring-amber-100 dark:ring-amber-900',
     stepperBar: 'bg-amber-500',
   },
   paid: {
     label: 'Ready to Dispatch',
     color: 'primary',
-    borderClass: 'border-l-primary',
-    bgClass: 'bg-primary/5 dark:bg-primary/10',
-    badgeBg: 'bg-primary/10 text-primary',
-    dot: 'bg-primary',
-    stepperActive: 'bg-primary text-white',
-    stepperBar: 'bg-primary',
+    badgeClass: 'bg-emerald-50 text-[#1A7A4A] border border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60',
+    accentBorder: 'border-[#1A7A4A]',
+    dot: 'bg-[#1A7A4A]',
+    pill: 'bg-[#1A7A4A] text-white',
+    stepperActive: 'bg-[#1A7A4A] text-white ring-2 ring-emerald-100 dark:ring-emerald-900',
+    stepperBar: 'bg-[#1A7A4A]',
   },
   transit: {
     label: 'Out for Delivery',
     color: 'blue',
-    borderClass: 'border-l-blue-500',
-    bgClass: 'bg-blue-50/60 dark:bg-blue-950/20',
-    badgeBg: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
-    dot: 'bg-blue-500',
-    stepperActive: 'bg-blue-500 text-white',
-    stepperBar: 'bg-blue-500',
+    badgeClass: 'bg-sky-50 text-sky-700 border border-sky-200/80 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/60',
+    accentBorder: 'border-sky-500',
+    dot: 'bg-sky-500',
+    pill: 'bg-sky-500 text-white',
+    stepperActive: 'bg-sky-500 text-white ring-2 ring-sky-100 dark:ring-sky-900',
+    stepperBar: 'bg-sky-500',
   },
   delivered: {
     label: 'Completed',
     color: 'gray',
-    borderClass: 'border-l-gray-300 dark:border-l-gray-600',
-    bgClass: 'bg-gray-50/50 dark:bg-gray-800/50',
-    badgeBg: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
+    badgeClass: 'bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+    accentBorder: 'border-gray-300 dark:border-gray-600',
     dot: 'bg-gray-400',
-    stepperActive: 'bg-gray-400 text-white',
-    stepperBar: 'bg-gray-300 dark:bg-gray-600',
+    pill: 'bg-gray-400 text-white',
+    stepperActive: 'bg-gray-500 text-white ring-2 ring-gray-100 dark:ring-gray-800',
+    stepperBar: 'bg-gray-300 dark:bg-gray-700',
   },
 };
 
@@ -91,185 +91,217 @@ function waitingLabel(dateStr) {
   if (!dateStr) return null;
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Waiting < 1m';
-  if (mins < 60) return `Waiting ${mins}m`;
+  if (mins < 1) return '< 1m';
+  if (mins < 60) return `${mins}m`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `Waiting ${hrs}h`;
+  if (hrs < 24) return `${hrs}h`;
   const days = Math.floor(hrs / 24);
-  return `Waiting ${days}d`;
+  return `${days}d`;
 }
 
-// ─── Summary Card ─────────────────────────────────────────────────────────────
-function SummaryCard({ label, count, variant, pulse }) {
+// ─── Summary Card (Clean, balanced, human-designed metrics) ─────────────────────
+function SummaryCard({ label, count, variant }) {
   const cfg = STATUS_CONFIG[variant] || STATUS_CONFIG.attention;
-  const isDominant = variant === 'attention';
-  return (
-    <div
-      className={`relative rounded-2xl p-5 border transition-all duration-300 overflow-hidden
-        ${isDominant
-          ? 'bg-amber-500 border-amber-400 text-white shadow-lg shadow-amber-200/40 dark:shadow-amber-900/30'
-          : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-xs'
-        }`}
-    >
-      {/* Subtle pulse ring for attention when count > 0 */}
-      {pulse && count > 0 && (
-        <span className="absolute top-4 right-4 flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-white/90" />
-        </span>
-      )}
+  const hasItems = count > 0;
 
-      <p className={`text-[10px] font-bold uppercase tracking-widest mb-2
-        ${isDominant ? 'text-amber-100' : 'text-gray-400 dark:text-gray-500'}`}>
-        {label}
-      </p>
-      <p className={`text-3xl font-black tracking-tight
-        ${isDominant
-          ? 'text-white'
-          : variant === 'paid' ? 'text-primary'
-          : variant === 'transit' ? 'text-blue-600 dark:text-blue-400'
-          : 'text-gray-400 dark:text-gray-500'
-        }`}>
-        {count}
-      </p>
+  return (
+    <div className="relative rounded-2xl p-5 bg-white dark:bg-gray-800/90 border border-gray-100 dark:border-gray-700/80 shadow-xs hover:shadow-sm transition-all duration-200 flex flex-col justify-between">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          {label}
+        </span>
+        <span className={`w-2 h-2 rounded-full ${cfg.dot} ${hasItems ? 'opacity-100' : 'opacity-30'}`} />
+      </div>
+
+      <div className="mt-4 flex items-baseline justify-between">
+        <p className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+          {count}
+        </p>
+        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${cfg.badgeClass}`}>
+          {variant === 'attention' && hasItems ? 'Action required' : variant === 'paid' && hasItems ? 'Ready' : variant === 'transit' ? 'In delivery' : 'Settled'}
+        </span>
+      </div>
     </div>
   );
 }
 
-// ─── Stepper ──────────────────────────────────────────────────────────────────
+// ─── Compact Stepper (Clean pill-stepper without giant empty lines) ─────────────
 function OrderStepper({ status, group }) {
-  const cfg = STATUS_CONFIG[group];
   const currentIdx = getPathwayIndex(status);
+
   return (
-    <div className="relative flex items-center justify-between py-1">
-      {/* track */}
-      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-gray-100 dark:bg-gray-700" />
-      {/* fill */}
-      <div
-        className={`absolute left-0 top-1/2 -translate-y-1/2 h-0.5 transition-all duration-700 ease-out ${cfg.stepperBar}`}
-        style={{ width: `${(currentIdx / 3) * 100}%` }}
-      />
+    <div className="flex items-center gap-1.5 p-2 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-700/60 text-xs">
       {pathwaySteps.map((step, idx) => {
         const done = idx <= currentIdx;
         const active = idx === currentIdx;
+
         return (
-          <div key={step.id} className="relative z-10 flex flex-col items-center">
+          <React.Fragment key={step.id}>
             <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black transition-all duration-300
-                ${done ? cfg.stepperActive : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}
-                ${active ? 'ring-2 ring-offset-1 ring-offset-white dark:ring-offset-gray-800 ' + (group === 'attention' ? 'ring-amber-400' : group === 'paid' ? 'ring-primary/50' : group === 'transit' ? 'ring-blue-400' : 'ring-gray-300') : ''}
-              `}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                active
+                  ? group === 'attention'
+                    ? 'bg-amber-100 text-amber-900 font-bold dark:bg-amber-950/60 dark:text-amber-300'
+                    : group === 'paid'
+                    ? 'bg-emerald-100 text-emerald-900 font-bold dark:bg-emerald-950/60 dark:text-emerald-300'
+                    : 'bg-sky-100 text-sky-900 font-bold dark:bg-sky-950/60 dark:text-sky-300'
+                  : done
+                  ? 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 shadow-2xs'
+                  : 'text-gray-400 dark:text-gray-500'
+              }`}
             >
-              {done ? <CheckCircle2 size={13} /> : idx + 1}
+              {done ? (
+                <CheckCircle2 size={13} className={active ? 'text-current' : 'text-[#1A7A4A]'} />
+              ) : (
+                <span className="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-700 text-[10px] flex items-center justify-center text-gray-500">
+                  {idx + 1}
+                </span>
+              )}
+              <span className="truncate">{step.label}</span>
             </div>
-            <span className={`text-[9px] font-bold mt-1 hidden sm:block whitespace-nowrap
-              ${done ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400'}`}>
-              {step.label}
-            </span>
-          </div>
+            {idx < pathwaySteps.length - 1 && (
+              <ChevronRight size={12} className="text-gray-300 dark:text-gray-600 shrink-0" />
+            )}
+          </React.Fragment>
         );
       })}
     </div>
   );
 }
 
-// ─── Full Order Card (Attention + Paid) ───────────────────────────────────────
+// ─── Full Order Card (High-end commerce layout) ────────────────────────────────
 function FullOrderCard({ order, group, onConfirmPayment, onAssignRider, onMarkDelivered, updating }) {
   const cfg = STATUS_CONFIG[group];
-  const waiting = group === 'attention' ? waitingLabel(order.updated_at || order.created_at) : null;
+  const waitTime = group === 'attention' ? waitingLabel(order.updated_at || order.created_at) : null;
+  const isPickup = (order.delivery_mode || '').toUpperCase() === 'PICKUP';
 
   return (
-    <div className={`rounded-2xl border border-l-4 ${cfg.borderClass} ${cfg.bgClass}
-      border-gray-100 dark:border-gray-700/60 overflow-hidden
-      shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5`}>
-      {/* Top bar */}
-      <div className="px-5 pt-5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100/80 dark:border-gray-700/60">
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shrink-0 text-white
-            ${group === 'attention' ? 'bg-amber-500' : group === 'paid' ? 'bg-primary' : group === 'transit' ? 'bg-blue-500' : 'bg-gray-400'}`}>
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden">
+      {/* Top Header Bar */}
+      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700/70">
+        <div className="flex items-start sm:items-center gap-3">
+          {/* Subtle initials indicator */}
+          <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-center font-bold text-sm shrink-0">
             {(order.customer_name || '?')[0].toUpperCase()}
           </div>
+
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-bold text-dark dark:text-white text-sm">{order.customer_name || 'Customer'}</h3>
-              <span className="font-mono text-[10px] font-bold text-gray-400">#{order.invoice_reference}</span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full
-                ${order.delivery_mode === 'PICKUP'
-                  ? 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800'
-                  : 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800'
-                }`}>
-                {order.delivery_mode === 'PICKUP' ? '📍 Pickup' : '🚚 Delivery'}
+              <h3 className="font-bold text-gray-900 dark:text-white text-sm">
+                {order.customer_name || 'Customer'}
+              </h3>
+              <span className="font-mono text-xs text-gray-400">
+                #{order.invoice_reference}
+              </span>
+              <span
+                className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                  isPickup
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300'
+                    : 'bg-emerald-50 text-[#1A7A4A] border border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300'
+                }`}
+              >
+                {isPickup ? '📍 Store Pickup' : '🚚 Home Delivery'}
               </span>
             </div>
-            <div className="flex items-center gap-3 mt-0.5">
-              <p className="text-xs text-gray-400">{order.customer_phone || 'No phone'}</p>
-              {waiting && (
-                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800 animate-pulse">
-                  ⏱ {waiting}
+
+            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <span className="flex items-center gap-1">
+                <Phone size={11} className="text-gray-400" />
+                {order.customer_phone || 'No phone'}
+              </span>
+              {waitTime && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200/70 font-medium">
+                  <Clock size={11} /> Waiting {waitTime}
                 </span>
               )}
             </div>
           </div>
         </div>
-        <div className="text-right shrink-0">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Order Value</p>
-          <p className="text-lg font-black text-dark dark:text-white">₦{(order.total_amount || 0).toLocaleString()}</p>
+
+        {/* Order Value & Action */}
+        <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100 dark:border-gray-700/60">
+          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+            Order Total
+          </span>
+          <span className="text-xl font-black text-gray-900 dark:text-white">
+            ₦{(order.total_amount || 0).toLocaleString()}
+          </span>
         </div>
       </div>
 
-      {/* Body */}
-      <div className="px-5 py-4 space-y-4">
-        {/* Stepper */}
+      {/* Body Content */}
+      <div className="p-5 space-y-4">
+        {/* Step Flow */}
         <OrderStepper status={order.status} group={group} />
 
-        {/* Items + logistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="bg-white/70 dark:bg-gray-900/30 rounded-xl p-3 border border-gray-100 dark:border-gray-800 text-xs space-y-1.5">
-            <p className="font-bold text-gray-400 uppercase tracking-wider text-[9px] mb-1">Purchased Items</p>
+        {/* Items & Fulfillment Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+          {/* Purchased Items List */}
+          <div className="md:col-span-7 bg-gray-50/70 dark:bg-gray-900/40 rounded-xl p-3.5 border border-gray-100/90 dark:border-gray-800 text-xs">
+            <p className="font-bold text-gray-400 uppercase tracking-wider text-[10px] mb-2">
+              Purchased Items
+            </p>
             {order.invoice_items && order.invoice_items.length > 0 ? (
-              order.invoice_items.map((it, idx) => (
-                <div key={idx} className="flex justify-between font-medium text-gray-700 dark:text-gray-300">
-                  <span>{it.quantity}× {it.description}</span>
-                  <span className="font-bold">₦{(it.total_price || (it.unit_price * it.quantity) || 0).toLocaleString()}</span>
-                </div>
-              ))
+              <div className="space-y-1.5 divide-y divide-gray-100 dark:divide-gray-800">
+                {order.invoice_items.map((it, idx) => (
+                  <div key={idx} className="flex justify-between items-center pt-1.5 first:pt-0">
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      {it.quantity}× {it.description}
+                    </span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      ₦{(it.total_price || (it.unit_price * it.quantity) || 0).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
             ) : (
-              <p className="text-gray-400">Sales agreement order</p>
+              <p className="text-gray-400 italic">Sales agreement order</p>
             )}
           </div>
 
-          <div className="bg-white/70 dark:bg-gray-900/30 rounded-xl p-3 border border-gray-100 dark:border-gray-800 text-xs flex flex-col justify-between">
+          {/* Logistics & Primary Call to Action */}
+          <div className="md:col-span-5 bg-gray-50/70 dark:bg-gray-900/40 rounded-xl p-3.5 border border-gray-100/90 dark:border-gray-800 text-xs flex flex-col justify-between">
             <div>
-              <p className="font-bold text-gray-400 uppercase tracking-wider text-[9px] mb-1">Logistics</p>
+              <p className="font-bold text-gray-400 uppercase tracking-wider text-[10px] mb-1.5">
+                Logistics & Rider
+              </p>
               {order.rider_name ? (
-                <p className="font-semibold text-dark dark:text-white">
-                  🚚 <strong className="text-primary">{order.rider_name}</strong>
-                  {order.rider_phone ? ` · ${order.rider_phone}` : ''}
-                </p>
+                <div className="space-y-0.5">
+                  <p className="font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                    <Bike size={13} className="text-[#1A7A4A]" />
+                    <span>{order.rider_name}</span>
+                  </p>
+                  {order.rider_phone && (
+                    <p className="text-gray-500 dark:text-gray-400 pl-4.5">
+                      {order.rider_phone}
+                    </p>
+                  )}
+                </div>
               ) : (
-                <p className="text-gray-400">No rider assigned</p>
+                <p className="text-gray-400">No rider assigned yet</p>
               )}
             </div>
 
-            {/* CTAs */}
-            <div className="mt-3 flex gap-2 justify-end">
+            {/* Contextual Action Button */}
+            <div className="mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-700/60 flex justify-end">
               {group === 'attention' && (
                 <button
                   onClick={() => onConfirmPayment(order.id)}
                   disabled={updating}
-                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs transition-all active:scale-95 shadow-sm shadow-amber-200 dark:shadow-amber-900/40 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 rounded-xl font-bold text-xs transition-all active:scale-95 shadow-xs cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  ✓ Confirm Payment
+                  <CheckCircle2 size={14} />
+                  Confirm Payment (₦{(order.total_amount || 0).toLocaleString()})
                 </button>
               )}
               {group === 'paid' && (
                 <button
                   onClick={() => onAssignRider(order)}
                   disabled={updating}
-                  className="px-4 py-2 bg-primary hover:bg-green-700 text-white rounded-xl font-bold text-xs transition-all active:scale-95 shadow-sm shadow-green-200 dark:shadow-green-900/40 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-[#1A7A4A] hover:bg-[#15603A] text-white rounded-xl font-bold text-xs transition-all active:scale-95 shadow-xs cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  🚀 Dispatch Rider
+                  <Truck size={14} />
+                  Assign Rider & Dispatch
                 </button>
               )}
             </div>
@@ -282,35 +314,40 @@ function FullOrderCard({ order, group, onConfirmPayment, onAssignRider, onMarkDe
 
 // ─── Slim Transit Card ─────────────────────────────────────────────────────────
 function SlimTransitCard({ order, onMarkDelivered, updating }) {
-  const cfg = STATUS_CONFIG.transit;
   return (
-    <div className={`rounded-xl border border-l-4 ${cfg.borderClass} ${cfg.bgClass}
-      border-gray-100 dark:border-gray-700/60
-      px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3
-      shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5`}>
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700/80 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:shadow-sm transition-all duration-200">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-black text-xs text-white shrink-0">
-          {(order.customer_name || '?')[0].toUpperCase()}
+        <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-300 flex items-center justify-center shrink-0">
+          <Truck size={16} />
         </div>
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-bold text-sm text-dark dark:text-white">{order.customer_name || 'Customer'}</p>
-            <span className="font-mono text-[10px] text-gray-400">#{order.invoice_reference}</span>
+            <p className="font-bold text-sm text-gray-900 dark:text-white">
+              {order.customer_name || 'Customer'}
+            </p>
+            <span className="font-mono text-[11px] text-gray-400">
+              #{order.invoice_reference}
+            </span>
           </div>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
             {order.rider_name && (
-              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">🚚 {order.rider_name}</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                Rider: {order.rider_name}
+              </span>
             )}
-            <span className="text-[10px] text-gray-400">{timeAgo(order.updated_at)}</span>
+            <span className="text-gray-400">· {timeAgo(order.updated_at)}</span>
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-3 shrink-0">
-        <p className="font-black text-sm text-dark dark:text-white">₦{(order.total_amount || 0).toLocaleString()}</p>
+
+      <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-100 dark:border-gray-700/60">
+        <p className="font-black text-sm text-gray-900 dark:text-white">
+          ₦{(order.total_amount || 0).toLocaleString()}
+        </p>
         <button
           onClick={() => onMarkDelivered(order.id)}
           disabled={updating}
-          className="px-3 py-1.5 bg-primary hover:bg-green-700 text-white rounded-lg font-bold text-xs transition-all active:scale-95 cursor-pointer whitespace-nowrap"
+          className="px-3 py-1.5 bg-[#1A7A4A] hover:bg-[#15603A] text-white rounded-lg font-bold text-xs transition-all active:scale-95 cursor-pointer disabled:opacity-50"
         >
           Mark Delivered
         </button>
@@ -344,8 +381,8 @@ function SectionHeader({ label, count, group }) {
   return (
     <div className="flex items-center gap-3 mb-3">
       <div className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-      <h2 className="text-xs font-black text-gray-700 dark:text-gray-200 uppercase tracking-widest">{label}</h2>
-      <span className={`ml-1 text-[10px] font-black px-2 py-0.5 rounded-full ${cfg.badgeBg}`}>{count}</span>
+      <h2 className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">{label}</h2>
+      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${cfg.badgeClass}`}>{count}</span>
       <div className="flex-1 h-px bg-gray-100 dark:bg-gray-700/80" />
     </div>
   );
@@ -354,16 +391,15 @@ function SectionHeader({ label, count, group }) {
 // ─── Assign Rider Modal ────────────────────────────────────────────────────────
 function AssignRiderModal({ order, riderName, setRiderName, riderPhone, setRiderPhone, onClose, onDispatch, updating }) {
   return (
-    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4
-        animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 border border-gray-100 dark:border-gray-700 animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-base font-bold text-dark dark:text-white">Assign Rider & Dispatch</h3>
+            <h3 className="text-base font-bold text-gray-950 dark:text-white">Assign Rider & Dispatch</h3>
             <p className="text-xs text-gray-500 mt-0.5">Order #{order.invoice_reference} · {order.customer_name}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer p-1">
             <X size={18} />
           </button>
         </div>
@@ -377,7 +413,7 @@ function AssignRiderModal({ order, riderName, setRiderName, riderPhone, setRider
               value={riderName}
               onChange={(e) => setRiderName(e.target.value)}
               autoFocus
-              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all"
             />
           </div>
           <div>
@@ -387,7 +423,7 @@ function AssignRiderModal({ order, riderName, setRiderName, riderPhone, setRider
               placeholder="e.g. 08012345678"
               value={riderPhone}
               onChange={(e) => setRiderPhone(e.target.value)}
-              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all"
             />
           </div>
         </div>
@@ -395,16 +431,17 @@ function AssignRiderModal({ order, riderName, setRiderName, riderPhone, setRider
         <div className="flex gap-2 pt-1">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer transition-colors"
+            className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onDispatch}
             disabled={updating}
-            className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-green-700 cursor-pointer transition-all active:scale-95 shadow-sm shadow-green-200 dark:shadow-green-900/30 disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 bg-[#1A7A4A] hover:bg-[#15603A] text-white rounded-xl text-sm font-bold cursor-pointer transition-all active:scale-95 shadow-xs disabled:opacity-50 flex items-center justify-center gap-1.5"
           >
-            {updating ? 'Dispatching…' : '🚀 Dispatch Order'}
+            <Truck size={15} />
+            {updating ? 'Dispatching…' : 'Dispatch Order'}
           </button>
         </div>
       </div>
