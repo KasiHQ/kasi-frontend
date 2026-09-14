@@ -324,32 +324,32 @@ const MainLayout = () => {
                 </button>
 
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2.5 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 py-2.5 z-50 animate-in fade-in zoom-in-95 origin-top-right select-none">
+                  <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200/80 dark:border-gray-700/80 py-1.5 z-50 animate-in fade-in zoom-in-95 origin-top-right select-none">
                     {/* User Identity Header */}
-                    <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700/80 mb-1.5">
-                      <div className="w-10 h-10 rounded-full bg-[#0D7043] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                    <div className="px-3.5 py-2.5 flex items-center gap-2.5 border-b border-gray-100 dark:border-gray-700/80 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-[#0D7043] text-white flex items-center justify-center font-bold text-xs shrink-0">
                         {user?.business_name ? user.business_name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U')}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
                           {user?.business_name || 'My Business'}
                         </p>
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
                           {user?.email}
                         </p>
                       </div>
                     </div>
 
                     {/* 3 Major Settings Options */}
-                    <div className="px-2 space-y-0.5">
+                    <div className="px-1.5 space-y-0.5">
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);
                           navigate('/settings?tab=integrations');
                         }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-700/60 rounded-lg transition-colors cursor-pointer text-left"
                       >
-                        <Zap size={16} className="text-gray-400 shrink-0" />
+                        <Zap size={15} className="text-gray-400 shrink-0" />
                         <span>Integrations</span>
                       </button>
 
@@ -358,10 +358,10 @@ const MainLayout = () => {
                           setShowProfileMenu(false);
                           navigate('/settings?tab=logistics');
                         }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-700/60 rounded-lg transition-colors cursor-pointer text-left"
                       >
-                        <Truck size={16} className="text-gray-400 shrink-0" />
-                        <span>Edit store & logistics</span>
+                        <Truck size={15} className="text-gray-400 shrink-0" />
+                        <span>Store & logistics</span>
                       </button>
 
                       <button
@@ -369,26 +369,26 @@ const MainLayout = () => {
                           setShowProfileMenu(false);
                           navigate('/settings?tab=payment');
                         }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 rounded-xl transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-700/60 rounded-lg transition-colors cursor-pointer text-left"
                       >
-                        <Wallet size={16} className="text-gray-400 shrink-0" />
+                        <Wallet size={15} className="text-gray-400 shrink-0" />
                         <span>Settlement & payouts</span>
                       </button>
                     </div>
 
                     {/* Divider */}
-                    <div className="my-1.5 border-t border-gray-100 dark:border-gray-700/80" />
+                    <div className="my-1 border-t border-gray-100 dark:border-gray-700/80" />
 
                     {/* Log out */}
-                    <div className="px-2">
+                    <div className="px-1.5">
                       <button
                         onClick={() => {
                           setShowProfileMenu(false);
                           logout();
                         }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer text-left"
                       >
-                        <LogOut size={16} className="shrink-0 text-red-500" />
+                        <LogOut size={15} className="shrink-0 text-red-500" />
                         <span>Log out</span>
                       </button>
                     </div>

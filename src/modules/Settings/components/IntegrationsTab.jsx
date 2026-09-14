@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  MessageCircle, Send, Instagram, CheckCircle, XCircle,
-  ExternalLink, Copy, Loader2, Wifi, WifiOff, RefreshCw, LogOut, Zap, Facebook, Cpu,
-  ShieldCheck, ChevronDown, ChevronUp, AlertTriangle, Sparkles
+  ExternalLink, Copy, Loader2, Wifi, WifiOff, RefreshCw, LogOut, Zap, Cpu,
+  ShieldCheck, ChevronDown, ChevronUp, AlertTriangle, Sparkles, Check, CheckCircle2
 } from 'lucide-react';
+import { SiWhatsapp, SiTelegram, SiInstagram, SiMessenger } from 'react-icons/si';
+import { PiCheckCircleFill, PiArrowSquareOut, PiCopy, PiShieldCheck, PiLightning } from 'react-icons/pi';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
@@ -378,64 +379,62 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   const [codeA, codeB] = formatCode(pairingCode);
 
   const renderWhatsApp = () => (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border overflow-hidden transition-all duration-300 ${waStatus.connected ? 'border-green-200' : 'border-gray-100'}`}>
-      <div className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="relative shrink-0">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${waStatus.connected ? 'bg-green-500' : 'bg-green-600'}`}>
-              <MessageCircle size={24} className="text-white" />
-            </div>
+    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-xs border overflow-hidden transition-all duration-200 ${waStatus.connected ? 'border-emerald-200 dark:border-emerald-900/40' : 'border-gray-200 dark:border-gray-700/60'}`}>
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center shrink-0 border border-[#25D366]/20">
+            <SiWhatsapp size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold text-dark dark:text-white">WhatsApp Business</h3>
-              <span className="px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300 rounded-md">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">WhatsApp Business</h3>
+              <span className="px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 rounded-md border border-emerald-200/60 dark:border-emerald-800/40">
                 Official Meta Cloud
               </span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Link your WhatsApp Business number for 24/7 AI sales, product recommendations, and instant invoices.
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+              Link your WhatsApp Business number for 24/7 AI sales, catalog discovery, payment verification, and instant invoices.
             </p>
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-5">
           {loadingWA ? (
-            <div className="flex items-center gap-2 text-gray-400 text-sm py-4 justify-center">
-              <Loader2 size={16} className="animate-spin" /> Checking connection...
+            <div className="flex items-center gap-2 text-gray-400 text-xs py-4 justify-center">
+              <Loader2 size={15} className="animate-spin text-emerald-600" /> Checking connection status...
             </div>
           ) : waStatus.connected ? (
             <div className="space-y-4">
-              <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-2xl p-4">
+              <div className="bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40 rounded-lg p-3.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 dark:bg-green-500/20 rounded-lg text-green-700 dark:text-green-400">
-                      <Wifi size={18} />
+                    <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/40 rounded-md text-emerald-700 dark:text-emerald-300">
+                      <Wifi size={16} />
                     </div>
                     <div>
-                      <p className="font-bold text-green-800 dark:text-green-300 text-sm">WhatsApp is live!</p>
-                      <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">
-                        {waStatus.platform === 'whatsapp_meta' ? 'Connected via Official Meta Cloud API' : 'Connected via Evolution Engine'}
+                      <p className="font-semibold text-emerald-900 dark:text-emerald-200 text-xs">WhatsApp is live!</p>
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+                        {waStatus.platform === 'whatsapp_meta' ? 'Official Meta Cloud API' : 'Evolution Engine'}
                         {waStatus.instanceName && ` • ID: ${waStatus.instanceName}`}
                       </p>
                     </div>
                   </div>
-                  <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-200/60 dark:bg-green-500/30 px-2.5 py-1 rounded-full">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> Active
+                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-900/40 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Connected
                   </span>
                 </div>
               </div>
-              <button onClick={() => setShowDisconnectConfirm(true)} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors">
+              <button onClick={() => setShowDisconnectConfirm(true)} className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium transition-colors border border-red-200/60">
                 Disconnect WhatsApp
               </button>
               {showDisconnectConfirm && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3 mt-2">
-                  <p className="text-sm font-semibold text-red-800">Are you sure you want to disconnect WhatsApp?</p>
+                <div className="bg-red-50/80 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-lg p-3.5 space-y-2.5 mt-2">
+                  <p className="text-xs font-medium text-red-800 dark:text-red-300">Are you sure you want to disconnect WhatsApp?</p>
                   <div className="flex gap-2">
-                    <button onClick={disconnectWhatsApp} disabled={disconnectingWA} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50">
+                    <button onClick={disconnectWhatsApp} disabled={disconnectingWA} className="px-3 py-1.5 bg-red-600 text-white rounded-md text-xs font-medium hover:bg-red-700 disabled:opacity-50">
                       {disconnectingWA ? 'Disconnecting...' : 'Yes, Disconnect'}
                     </button>
-                    <button onClick={() => setShowDisconnectConfirm(false)} className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium">
+                    <button onClick={() => setShowDisconnectConfirm(false)} className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-xs font-medium">
                       Cancel
                     </button>
                   </div>
@@ -443,35 +442,35 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
               )}
             </div>
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-4">
               {/* Primary: Meta Official Embedded Signup */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/10 border border-green-100 dark:border-green-900/30 space-y-3">
+              <div className="p-4 rounded-lg bg-gray-50/80 dark:bg-gray-900/40 border border-gray-200/80 dark:border-gray-700/60 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck size={16} className="text-green-600 dark:text-green-400" />
-                    <span className="text-xs font-bold text-green-800 dark:text-green-300">Recommended • Enterprise Grade</span>
+                  <div className="flex items-center gap-1.5">
+                    <PiShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-[11px] font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Recommended • Official Cloud API</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Connect directly with your Meta Business account for 100% uptime, verified branding, and official Meta Cloud API infrastructure.
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                  Direct connection with your Meta Business account for verified branding, highest message throughput, and guaranteed uptime.
                 </p>
-                <div className="flex flex-col gap-2.5 items-start">
+                <div className="flex flex-wrap items-center gap-3 pt-1">
                   <button
                     onClick={connectMetaWhatsApp}
                     disabled={connectingMetaWA}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-green-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="px-4 py-2 bg-[#0D7043] hover:bg-[#0A5A35] text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
                   >
-                    <MessageCircle size={16} />
+                    <SiWhatsapp size={14} />
                     {connectingMetaWA ? 'Connecting with Meta...' : 'Connect WhatsApp with Meta'}
                   </button>
                   <a
                     href={META_HOSTED_ONBOARD_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-gray-500 hover:text-green-700 dark:text-gray-400 dark:hover:text-green-400 underline inline-flex items-center gap-1 transition-colors"
+                    className="text-xs text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 inline-flex items-center gap-1 transition-colors"
                   >
-                    <span>Or onboard directly on Meta's website</span>
-                    <ExternalLink size={12} />
+                    <span>Onboard via Meta direct portal</span>
+                    <PiArrowSquareOut size={13} />
                   </a>
                 </div>
               </div>
@@ -536,39 +535,59 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   );
 
   const renderTelegram = () => (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border overflow-hidden transition-all duration-300 ${telegramStatus.connected ? 'border-blue-200' : 'border-gray-100'}`}>
-      <div className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center shrink-0">
-            <Send size={24} className="text-white" />
+    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-xs border overflow-hidden transition-all duration-200 ${telegramStatus.connected ? 'border-sky-200 dark:border-sky-900/40' : 'border-gray-200 dark:border-gray-700/60'}`}>
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#229ED9]/10 text-[#229ED9] flex items-center justify-center shrink-0 border border-[#229ED9]/20">
+            <SiTelegram size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-dark dark:text-white">Telegram</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Respond to customer messages via a Telegram bot.</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Telegram</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Respond to customer inquiries and orders automatically via your dedicated Telegram bot.</p>
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-5">
           {loadingStatus ? (
-            <div className="flex items-center gap-2 text-gray-400 text-sm py-4 justify-center">
-              <Loader2 size={16} className="animate-spin" /> Checking status...
+            <div className="flex items-center gap-2 text-gray-400 text-xs py-4 justify-center">
+              <Loader2 size={15} className="animate-spin text-[#229ED9]" /> Checking status...
             </div>
           ) : telegramStatus.connected ? (
             <div className="space-y-4">
-              <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-700 dark:text-blue-400"><CheckCircle size={18} /></div>
-                  <p className="font-bold text-blue-800 dark:text-blue-300 text-sm">@{telegramStatus.bot?.bot_username} is active!</p>
+              <div className="bg-sky-50/70 dark:bg-sky-950/20 border border-sky-200/80 dark:border-sky-800/40 rounded-lg p-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-sky-100 dark:bg-sky-900/40 rounded-md text-[#229ED9]">
+                      <Wifi size={16} />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sky-900 dark:text-sky-200 text-xs">@{telegramStatus.bot?.bot_username} is active</p>
+                      <p className="text-[11px] text-sky-700 dark:text-sky-400 mt-0.5">Telegram Bot API linked</p>
+                    </div>
+                  </div>
+                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-sky-700 dark:text-sky-300 bg-sky-100/70 dark:bg-sky-900/40 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" /> Active
+                  </span>
                 </div>
               </div>
-              <button onClick={disconnectTelegram} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors">
+              <button onClick={disconnectTelegram} className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium transition-colors border border-red-200/60">
                 Disconnect Bot
               </button>
             </div>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input type="text" value={botToken} onChange={(e) => setBotToken(e.target.value)} placeholder="Enter Bot Token from @BotFather" className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm outline-none focus:border-primary" />
-              <button onClick={connectTelegram} disabled={connecting || !botToken.trim()} className="px-6 py-2 bg-blue-500 text-white rounded-xl text-sm font-medium hover:bg-blue-600 disabled:opacity-50">
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <input 
+                type="text" 
+                value={botToken} 
+                onChange={(e) => setBotToken(e.target.value)} 
+                placeholder="Enter Bot Token from @BotFather" 
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-lg text-xs outline-none focus:border-[#0D7043] transition-colors" 
+              />
+              <button 
+                onClick={connectTelegram} 
+                disabled={connecting || !botToken.trim()} 
+                className="px-4 py-2 bg-[#229ED9] hover:bg-[#1b8ec5] text-white rounded-lg text-xs font-medium disabled:opacity-50 transition-colors shrink-0 shadow-xs"
+              >
                 {connecting ? 'Verifying...' : 'Connect'}
               </button>
             </div>
@@ -579,50 +598,58 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   );
 
   const renderInstagram = () => (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border overflow-hidden transition-all duration-300 ${igStatus.connected ? 'border-pink-200' : 'border-gray-100'}`}>
-      <div className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0">
-            <Instagram size={24} className="text-white" />
+    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-xs border overflow-hidden transition-all duration-200 ${igStatus.connected ? 'border-pink-200 dark:border-pink-900/40' : 'border-gray-200 dark:border-gray-700/60'}`}>
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#E1306C]/10 text-[#E1306C] flex items-center justify-center shrink-0 border border-[#E1306C]/20">
+            <SiInstagram size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-dark dark:text-white">Instagram</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Connect your Instagram Business account.</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Instagram</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Connect your Instagram Business account to automate DMs, product inquiries, and checkouts.</p>
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-5">
           {loadingIG ? (
-            <div className="flex items-center gap-2 text-gray-400 text-sm py-4 justify-center">
-              <Loader2 size={16} className="animate-spin" /> Checking status...
+            <div className="flex items-center gap-2 text-gray-400 text-xs py-4 justify-center">
+              <Loader2 size={15} className="animate-spin text-[#E1306C]" /> Checking status...
             </div>
           ) : igStatus.connected ? (
             <div className="space-y-4">
-              <div className="bg-pink-50 dark:bg-pink-500/10 border border-pink-200 dark:border-pink-500/20 rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-pink-100 dark:bg-pink-500/20 rounded-lg text-pink-700 dark:text-pink-400"><CheckCircle size={18} /></div>
-                  <div>
-                    <p className="font-bold text-pink-800 dark:text-pink-300 text-sm">Instagram is active!</p>
-                    {igStatus.pageId && <p className="text-xs text-pink-600 dark:text-pink-400 mt-0.5">Account ID: {igStatus.pageId}</p>}
+              <div className="bg-pink-50/70 dark:bg-pink-950/20 border border-pink-200/80 dark:border-pink-800/40 rounded-lg p-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-pink-100 dark:bg-pink-900/40 rounded-md text-[#E1306C]">
+                      <Wifi size={16} />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-pink-900 dark:text-pink-200 text-xs">Instagram is active</p>
+                      {igStatus.pageId && <p className="text-[11px] text-pink-700 dark:text-pink-400 mt-0.5">Account ID: {igStatus.pageId}</p>}
+                    </div>
                   </div>
+                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-pink-700 dark:text-pink-300 bg-pink-100/70 dark:bg-pink-900/40 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" /> Connected
+                  </span>
                 </div>
               </div>
-              <button onClick={disconnectInstagram} disabled={disconnectingIG} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
+              <button onClick={disconnectInstagram} disabled={disconnectingIG} className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium transition-colors border border-red-200/60 disabled:opacity-50">
                 {disconnectingIG ? 'Disconnecting...' : 'Disconnect Instagram'}
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div>
               {connectingIG ? (
-                <div className="flex items-center gap-2 text-pink-500 text-sm py-4 justify-center font-medium">
-                  <Loader2 size={18} className="animate-spin text-pink-500" /> Authenticating & linking Instagram...
+                <div className="flex items-center gap-2 text-[#E1306C] text-xs py-3 justify-center font-medium">
+                  <Loader2 size={15} className="animate-spin text-[#E1306C]" /> Authenticating with Facebook...
                 </div>
               ) : (
                 <button 
                   onClick={connectInstagram} 
-                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md shadow-pink-500/10 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2 shadow-xs"
                 >
-                  <Zap size={16} /> Connect with Facebook
+                  <SiInstagram size={14} />
+                  <span>Connect with Facebook</span>
                 </button>
               )}
             </div>
@@ -633,50 +660,58 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   );
 
   const renderFacebook = () => (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border overflow-hidden transition-all duration-300 ${fbStatus.connected ? 'border-blue-200' : 'border-gray-100'}`}>
-      <div className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-700 flex items-center justify-center shrink-0">
-            <Facebook size={24} className="text-white" />
+    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-xs border overflow-hidden transition-all duration-200 ${fbStatus.connected ? 'border-blue-200 dark:border-blue-900/40' : 'border-gray-200 dark:border-gray-700/60'}`}>
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#0084FF]/10 text-[#0084FF] flex items-center justify-center shrink-0 border border-[#0084FF]/20">
+            <SiMessenger size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-dark dark:text-white">Facebook Messenger</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Connect your Facebook Page.</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Facebook Messenger</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Connect your Facebook Business Page to handle customer messages directly from Messenger.</p>
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-5">
           {loadingFB ? (
-            <div className="flex items-center gap-2 text-gray-400 text-sm py-4 justify-center">
-              <Loader2 size={16} className="animate-spin" /> Checking status...
+            <div className="flex items-center gap-2 text-gray-400 text-xs py-4 justify-center">
+              <Loader2 size={15} className="animate-spin text-[#0084FF]" /> Checking status...
             </div>
           ) : fbStatus.connected ? (
             <div className="space-y-4">
-              <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-700 dark:text-blue-400"><CheckCircle size={18} /></div>
-                  <div>
-                    <p className="font-bold text-blue-800 dark:text-blue-300 text-sm">Facebook Messenger is active!</p>
-                    {fbStatus.pageId && <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">Page ID: {fbStatus.pageId}</p>}
+              <div className="bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/40 rounded-lg p-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-blue-100 dark:bg-blue-900/40 rounded-md text-[#0084FF]">
+                      <Wifi size={16} />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-blue-900 dark:text-blue-200 text-xs">Facebook Messenger is active</p>
+                      {fbStatus.pageId && <p className="text-[11px] text-blue-700 dark:text-blue-400 mt-0.5">Page ID: {fbStatus.pageId}</p>}
+                    </div>
                   </div>
+                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-blue-700 dark:text-blue-300 bg-blue-100/70 dark:bg-blue-900/40 px-2 py-0.5 rounded-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" /> Connected
+                  </span>
                 </div>
               </div>
-              <button onClick={disconnectFacebook} disabled={disconnectingFB} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors disabled:opacity-50">
+              <button onClick={disconnectFacebook} disabled={disconnectingFB} className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium transition-colors border border-red-200/60 disabled:opacity-50">
                 {disconnectingFB ? 'Disconnecting...' : 'Disconnect Facebook'}
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div>
               {connectingFB ? (
-                <div className="flex items-center gap-2 text-blue-600 text-sm py-4 justify-center font-medium">
-                  <Loader2 size={18} className="animate-spin text-blue-600" /> Authenticating & linking Page...
+                <div className="flex items-center gap-2 text-[#0084FF] text-xs py-3 justify-center font-medium">
+                  <Loader2 size={15} className="animate-spin text-[#0084FF]" /> Authenticating connection...
                 </div>
               ) : (
                 <button 
                   onClick={connectFacebook} 
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md shadow-blue-500/10 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2 bg-[#1877F2] hover:bg-[#166fe5] text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2 shadow-xs"
                 >
-                  <Zap size={16} /> Connect with Facebook
+                  <SiMessenger size={14} />
+                  <span>Connect with Facebook</span>
                 </button>
               )}
             </div>
@@ -694,36 +729,36 @@ const IntegrationsTab = ({ standalone = true, focusedPlatform = null }) => {
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-12">
       {/* Global Kasi AI status banner */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${isAutomated ? 'bg-[#ECFDF3]' : 'bg-[#FEF3C7]'}`}>
-            <Cpu size={20} className={isAutomated ? 'text-[#12B76A]' : 'text-[#F79009]'} />
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xs border border-gray-200 dark:border-gray-700/60 p-4 sm:p-5 flex items-center justify-between">
+        <div className="flex items-center gap-3.5">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${isAutomated ? 'bg-emerald-50 text-[#0D7043] border border-emerald-200/60' : 'bg-amber-50 text-amber-600 border border-amber-200/60'}`}>
+            <Cpu size={18} />
           </div>
           <div>
-            <h3 className="font-bold text-dark dark:text-white flex items-center gap-2">
-              Kasi AI Assistant 
-              <span className={`inline-flex items-center w-2 h-2 rounded-full ${isAutomated ? 'bg-[#12B76A] animate-pulse' : 'bg-[#F79009]'}`} />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              Kasi AI Automation
+              <span className={`inline-flex items-center w-2 h-2 rounded-full ${isAutomated ? 'bg-emerald-500' : 'bg-amber-500'}`} />
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {isAutomated 
-                ? "Kasi is actively responding to your customers on all connected platforms." 
-                : "Kasi is paused. Customers will not receive automated responses."}
+                ? "Kasi is actively handling customer conversations and orders across all channels." 
+                : "Kasi is currently paused. Customers will not receive automated responses."}
             </p>
           </div>
         </div>
         <button
           onClick={handleToggleAutomated}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAutomated ? 'bg-[#1A7A4A]' : 'bg-gray-200 dark:bg-gray-700'}`}
+          className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isAutomated ? 'bg-[#0D7043]' : 'bg-gray-200 dark:bg-gray-700'}`}
         >
           <span
-            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isAutomated ? 'translate-x-5' : 'translate-x-0'}`}
+            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs ring-0 transition duration-200 ease-in-out ${isAutomated ? 'translate-x-5' : 'translate-x-0'}`}
           />
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {renderWhatsApp()}
         {renderTelegram()}
         {renderInstagram()}

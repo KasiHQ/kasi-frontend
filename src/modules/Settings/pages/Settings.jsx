@@ -6,6 +6,7 @@ import { useTheme, THEMES } from '../../../context/ThemeContext';
 import Button from '../../../components/ui/Button';
 import api from '../../../api/axios';
 import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout, Wallet, ShieldCheck, Landmark, CheckCircle, AlertTriangle, Truck, Store } from 'lucide-react';
+import { SiWhatsapp, SiTelegram, SiInstagram, SiMessenger } from 'react-icons/si';
 import ActivityLogsTable from '../components/ActivityLogsTable';
 import IntegrationsTab from '../components/IntegrationsTab';
 import { X } from 'lucide-react';
@@ -21,13 +22,13 @@ const CITY_AREAS = {
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer shrink-0
+        className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer shrink-0
             ${active
-                ? 'bg-primary text-white shadow-sm shadow-green-200 dark:shadow-none'
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
+                ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-xs'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
             }`}
     >
-        <Icon size={17} className="shrink-0" />
+        <Icon size={15} className="shrink-0" />
         <span>{label}</span>
     </button>
 );
@@ -65,27 +66,27 @@ const ThemeCard = ({ theme, isSelected, onSelect }) => (
 );
 
 /* ── Integration Platform Card ──────────────────── */
-const PlatformCard = ({ icon: Icon, iconBg, name, description, connected, onConnect, onDisconnect, loading: cardLoading }) => (
-    <div className="flex items-center justify-between py-4 border-b border-gray-50 last:border-b-0">
+const PlatformCard = ({ icon: Icon, iconColor = "text-[#101828]", iconBg = "bg-gray-100", name, description, connected, onConnect, onDisconnect, loading: cardLoading }) => (
+    <div className="flex items-center justify-between py-3.5 border-b border-gray-100 dark:border-gray-800 last:border-b-0">
         <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
-                <Icon size={20} className="text-white" />
+            <div className={`w-9 h-9 rounded-lg ${iconBg} ${iconColor} flex items-center justify-center shrink-0 border border-black/5`}>
+                <Icon size={18} />
             </div>
             <div>
-                <p className="font-semibold text-dark text-sm">{name}</p>
-                <p className="text-xs text-gray-400">{description}</p>
+                <p className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">{name}</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">{description}</p>
             </div>
         </div>
         <div className="flex items-center gap-2">
             {connected ? (
                 <>
-                    <span className="flex items-center gap-1 text-xs font-semibold text-green-600">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Connected
+                    <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Connected
                     </span>
                     <button
                         onClick={onDisconnect}
                         disabled={cardLoading}
-                        className="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
+                        className="px-3 py-1 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors disabled:opacity-50 border border-red-200/60"
                     >
                         Disconnect
                     </button>
@@ -94,7 +95,7 @@ const PlatformCard = ({ icon: Icon, iconBg, name, description, connected, onConn
                 <button
                     onClick={onConnect}
                     disabled={cardLoading}
-                    className="px-4 py-1.5 text-xs font-semibold text-white bg-primary hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
+                    className="px-3.5 py-1.5 text-xs font-medium text-white bg-gray-900 hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50 shadow-xs"
                 >
                     Connect
                 </button>
@@ -107,15 +108,15 @@ const PlatformModal = ({ isOpen, onClose, platform }) => {
     if (!isOpen || !platform) return null;
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-            <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-                <div className="p-5 border-b dark:border-gray-700 flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-dark dark:text-white capitalize">{platform} Integration</h3>
-                    <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all">
-                        <X size={20} />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
+            <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+                <div className="p-4 border-b dark:border-gray-700 flex items-center justify-between">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white capitalize">{platform} Integration</h3>
+                    <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all">
+                        <X size={18} />
                     </button>
                 </div>
-                <div className="p-6">
+                <div className="p-5">
                     <IntegrationsTab standalone={false} focusedPlatform={platform} />
                 </div>
             </div>
@@ -704,7 +705,7 @@ const Settings = () => {
             </div>
 
             {/* Horizontal Top Navigation Bar */}
-            <div className="w-full bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl p-2 flex flex-row gap-1.5 overflow-x-auto scrollbar-hide select-none animate-in fade-in duration-300">
+            <div className="w-full bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/80 rounded-xl p-1.5 flex flex-row gap-1 overflow-x-auto scrollbar-hide select-none shadow-xs">
                 <TabButton active={activeTab === 'integrations'} icon={Zap} label="Integrations" onClick={() => setActiveTab('integrations')} />
                 <TabButton active={activeTab === 'general'} icon={Building} label="General" onClick={() => setActiveTab('general')} />
                 <TabButton active={activeTab === 'security'} icon={ShieldCheck} label="Security & 2FA" onClick={() => setActiveTab('security')} />
@@ -900,52 +901,57 @@ const Settings = () => {
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Connected Platforms */}
-                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                            <h2 className="text-lg font-bold text-dark mb-4">Connected platforms</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-xs border border-gray-200 dark:border-gray-700/80">
+                            <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Connected platforms</h2>
                             <div>
                                 <PlatformCard
-                                    icon={MessageCircle}
-                                    iconBg="bg-green-500"
+                                    icon={SiWhatsapp}
+                                    iconColor="text-[#25D366]"
+                                    iconBg="bg-[#25D366]/10"
                                     name="WhatsApp Business"
-                                    description="Handle customer DMs on WhatsApp"
+                                    description="Handle customer DMs and sales on WhatsApp"
                                     connected={waStatus.connected}
                                     onConnect={() => { setSelectedPlatform('whatsapp'); setIsModalOpen(true); }}
                                     onDisconnect={() => { setSelectedPlatform('whatsapp'); setIsModalOpen(true); }}
                                     loading={loadingIntegrations}
                                 />
                                 <PlatformCard
-                                    icon={Instagram}
-                                    iconBg="bg-gradient-to-br from-purple-500 to-pink-500"
+                                    icon={SiInstagram}
+                                    iconColor="text-[#E1306C]"
+                                    iconBg="bg-[#E1306C]/10"
                                     name="Instagram"
-                                    description="Respond to DMs from Instagram posts"
+                                    description="Respond to DMs and story mentions on Instagram"
                                     connected={igStatus.connected}
                                     onConnect={() => { setSelectedPlatform('instagram'); setIsModalOpen(true); }}
                                     onDisconnect={() => { setSelectedPlatform('instagram'); setIsModalOpen(true); }}
                                     loading={loadingIntegrations}
                                 />
                                 <PlatformCard
-                                    icon={Send}
-                                    iconBg="bg-blue-500"
+                                    icon={SiTelegram}
+                                    iconColor="text-[#229ED9]"
+                                    iconBg="bg-[#229ED9]/10"
                                     name="Telegram"
                                     description="Connect a Telegram bot for automated service"
-                                    connected={false} // Will update state logic later
+                                    connected={false}
                                     onConnect={() => { setSelectedPlatform('telegram'); setIsModalOpen(true); }}
                                     onDisconnect={() => { setSelectedPlatform('telegram'); setIsModalOpen(true); }}
                                     loading={false}
                                 />
                                 <PlatformCard
-                                    icon={Facebook}
-                                    iconBg="bg-blue-700"
+                                    icon={SiMessenger}
+                                    iconColor="text-[#0084FF]"
+                                    iconBg="bg-[#0084FF]/10"
                                     name="Facebook Messenger"
                                     description="Respond to Facebook Page messages"
-                                    connected={false} // Will update state logic later
+                                    connected={false}
                                     onConnect={() => { setSelectedPlatform('facebook'); setIsModalOpen(true); }}
                                     onDisconnect={() => { setSelectedPlatform('facebook'); setIsModalOpen(true); }}
                                     loading={false}
                                 />
                                 <PlatformCard
                                     icon={CreditCard}
-                                    iconBg="bg-blue-500"
+                                    iconColor="text-blue-600"
+                                    iconBg="bg-blue-50"
                                     name="Paystack"
                                     description="Payment links and webhook confirmation"
                                     connected={paystackStatus.connected}
