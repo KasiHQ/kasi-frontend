@@ -105,16 +105,16 @@ function SummaryCard({ label, count, variant }) {
   const hasItems = count > 0;
 
   return (
-    <div className="relative rounded-2xl p-5 bg-white dark:bg-gray-800/90 border border-gray-100 dark:border-gray-700/80 shadow-xs hover:shadow-sm transition-all duration-200 flex flex-col justify-between">
+    <div className="relative rounded-xl p-4 md:p-5 bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/60 shadow-xs hover:border-gray-300 dark:hover:border-gray-600 transition-colors flex flex-col justify-between">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           {label}
         </span>
         <span className={`w-2 h-2 rounded-full ${cfg.dot} ${hasItems ? 'opacity-100' : 'opacity-30'}`} />
       </div>
 
-      <div className="mt-4 flex items-baseline justify-between">
-        <p className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+      <div className="mt-3 flex items-baseline justify-between">
+        <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
           {count}
         </p>
         <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${cfg.badgeClass}`}>

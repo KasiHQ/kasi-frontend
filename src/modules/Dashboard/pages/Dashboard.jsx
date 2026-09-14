@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  TrendingUp, Users, CheckCircle, AlertTriangle, 
-  ArrowRight, MessageSquare, DollarSign, Cpu,
-  Package, ShoppingBag, Clock, UserPlus, Tag, Share2, BarChart3, Briefcase, Calendar,
-  Megaphone, Settings, GraduationCap, UserCheck, Truck, MapPin
-} from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip 
+} from 'recharts';
+import { 
+  PiTrendUp, 
+  PiUsers, 
+  PiCheckCircle, 
+  PiCpu, 
+  PiPackage, 
+  PiTruck, 
+  PiGraduationCap, 
+  PiChatCircleDots, 
+  PiMegaphone, 
+  PiUserSwitch, 
+  PiBriefcase, 
+  PiGearSix, 
+  PiTag, 
+  PiClock, 
+  PiCurrencyDollar, 
+  PiCalendarCheck, 
+  PiArrowRight
+} from 'react-icons/pi';
 import { DashboardSkeleton } from '../../../components/ui/Skeleton';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
@@ -15,7 +30,7 @@ import useNetwork from '../../../hooks/useNetwork';
 
 // Naira Icon for Settlement payouts
 const NairaIcon = ({ className }) => (
-  <span className={`font-extrabold flex items-center justify-center select-none ${className}`} style={{ fontStyle: 'normal', fontSize: '18px', fontWeight: '900', lineHeight: 1 }}>₦</span>
+  <span className={`font-bold flex items-center justify-center select-none ${className}`} style={{ fontStyle: 'normal', fontSize: '15px', fontWeight: '800', lineHeight: 1 }}>₦</span>
 );
 
 // Dynamic Color Mapping for Avatars (B -> Green, T -> Pink, O -> Purple)
@@ -173,10 +188,10 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="kasi-app space-y-8 min-h-screen bg-[#F7F8FA] p-6">
+      <div className="kasi-app space-y-6 min-h-screen bg-[#F7F8FA] p-6">
         <div>
-          <h1 className="text-[28px] font-bold text-[#101828] mb-1">{getGreeting()} 👋</h1>
-          <p className="text-[#667085] text-sm">Loading your dashboard...</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight leading-snug">{getGreeting()} 👋</h1>
+          <p className="text-xs text-gray-500 mt-1">Loading your dashboard...</p>
         </div>
         <DashboardSkeleton />
       </div>
@@ -197,25 +212,25 @@ const Dashboard = () => {
       <ActionAlerts user={user} />
 
       {/* Greeting Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-0.5">
         <div>
-          <h1 className="text-[28px] font-bold text-[#101828] tracking-tight leading-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight leading-snug">
             {getGreeting()}, {user?.business_name || 'AFH'} 👋
           </h1>
-          <p className="text-sm text-[#667085] mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             {formatDate()} · {isAutomated ? 'Kasi is live and handling conversations' : 'Kasi is paused'}
           </p>
         </div>
         <button
           onClick={handleToggleAutomated}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold self-start sm:self-center shadow-sm cursor-pointer border transition-all duration-300 ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium self-start sm:self-center cursor-pointer border transition-colors ${
             isAutomated 
-              ? 'bg-[#ECFDF3] text-[#027A48] border-[#D1FAE5] hover:bg-[#D1FAE5] active:scale-[0.97]' 
-              : 'bg-[#FEF3C7] text-[#B54708] border-[#FDE68A] hover:bg-[#FDE68A] active:scale-[0.97]'
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-900/40' 
+              : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/40'
           }`}
           title={isAutomated ? "Click to Pause Kasi AI Chatbot" : "Click to Resume Kasi AI Chatbot"}
         >
-          <span className={`w-2 h-2 rounded-full ${isAutomated ? 'bg-[#12B76A] animate-pulse' : 'bg-[#F79009]'} transition-colors duration-300`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${isAutomated ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
           <span>{isAutomated ? 'Kasi is running' : 'Kasi is paused'}</span>
         </button>
       </div>
@@ -314,33 +329,33 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
     { 
       label: 'REVENUE THIS WEEK', 
       value: formatNaira(thisWeekRevenue), 
-      icon: TrendingUp, 
-      color: 'text-[#F97316]', 
-      bg: 'bg-[#FFF4ED]',
+      icon: PiTrendUp, 
+      color: 'text-amber-600 dark:text-amber-400', 
+      bg: 'bg-amber-50 dark:bg-amber-950/40',
       trend: trendText
     },
     { 
       label: 'CONFIRMED SESSIONS', 
       value: confirmedSessions.length.toString(), 
-      icon: CheckCircle, 
-      color: 'text-[#12B76A]', 
-      bg: 'bg-[#ECFDF3]',
+      icon: PiCheckCircle, 
+      color: 'text-emerald-600 dark:text-emerald-400', 
+      bg: 'bg-emerald-50 dark:bg-emerald-950/40',
       sub: 'Total booked classes'
     },
     { 
       label: "TODAY'S APPOINTMENTS", 
       value: todaysBookings.length.toString(), 
-      icon: TrendingUp, 
-      color: 'text-[#7A5AF8]', 
-      bg: 'bg-[#F4F3FF]',
+      icon: PiCalendarCheck, 
+      color: 'text-purple-600 dark:text-purple-400', 
+      bg: 'bg-purple-50 dark:bg-purple-950/40',
       sub: `${todaysBookings.length} sessions active`
     },
     { 
       label: 'TOTAL CLIENTS', 
       value: uniqueCustomers.toString(), 
-      icon: Users, 
-      color: 'text-[#2E90FA]', 
-      bg: 'bg-[#EFF8FF]',
+      icon: PiUsers, 
+      color: 'text-blue-600 dark:text-blue-400', 
+      bg: 'bg-blue-50 dark:bg-blue-950/40',
       sub: 'WhatsApp + Instagram'
     },
   ];
@@ -359,23 +374,23 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
   }, [analytics]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Stat Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-2xl p-3 md:p-5 border border-[#EAECF0] flex flex-col justify-between h-[105px] md:h-[120px] shadow-none">
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-5 border border-gray-200/80 dark:border-gray-700/60 flex flex-col justify-between shadow-xs hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
             <div className="flex items-start justify-between">
-              <p className="text-[10px] md:text-[11px] font-bold text-[#667085] uppercase tracking-wider line-clamp-1 md:line-clamp-none">{stat.label}</p>
-              <div className={`w-7 h-7 md:w-9 md:h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-1 md:ml-3`}>
-                <stat.icon className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+              <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider line-clamp-1">{stat.label}</p>
+              <div className={`w-8 h-8 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-2`}>
+                <stat.icon className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-1 md:mt-2">
-              <p className="text-xl md:text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
+            <div className="mt-2.5">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">{stat.value}</p>
               {stat.trend ? (
-                <p className="text-[10px] md:text-xs text-[#12B76A] font-semibold mt-0.5 md:mt-1">{stat.trend}</p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">{stat.trend}</p>
               ) : (
-                <p className="text-[10px] md:text-xs text-[#667085] mt-0.5 md:mt-1">{stat.sub || ''}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stat.sub || ''}</p>
               )}
             </div>
           </div>
@@ -383,40 +398,43 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
       </div>
 
       {/* Quick Actions Grid */}
-      <div className="bg-white rounded-2xl p-5 md:p-6 border border-[#EAECF0] shadow-none">
-        <h3 className="text-sm font-bold text-gray-700 mb-6">Quick actions</h3>
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-xs">
+        <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3.5">Quick actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
           {[
-            { label: 'Train Kasi AI', icon: GraduationCap, path: '/settings?tab=ai_rules' },
-            { label: 'Link WhatsApp', icon: MessageSquare, path: '/settings?tab=integrations' },
+            { label: 'Train Kasi AI', icon: PiGraduationCap, path: '/settings?tab=ai_rules' },
+            { label: 'Link WhatsApp', icon: PiChatCircleDots, path: '/settings?tab=integrations' },
             { label: 'Setup Payouts', icon: NairaIcon, path: '/settings?tab=payment' },
-            { label: 'Send Broadcast', icon: Megaphone, path: '/customers' },
-            { label: 'Live Takeover', icon: UserCheck, path: '/chats' },
-            { label: 'Manage Services', icon: Briefcase, path: '/services' },
-            { label: 'Client Directory', icon: Users, path: '/customers' },
-            { label: 'Store Settings', icon: Settings, path: '/settings?tab=general' },
+            { label: 'Send Broadcast', icon: PiMegaphone, path: '/customers' },
+            { label: 'Live Takeover', icon: PiUserSwitch, path: '/chats' },
+            { label: 'Manage Services', icon: PiBriefcase, path: '/services' },
+            { label: 'Client Directory', icon: PiUsers, path: '/customers' },
+            { label: 'Store Settings', icon: PiGearSix, path: '/settings?tab=general' },
           ].map((act, idx) => (
-            <div 
+            <button 
               key={idx} 
               onClick={() => navigate(act.path)}
-              className="flex flex-col items-center group cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 rounded-lg border border-gray-100 dark:border-gray-700/50 bg-gray-50/60 dark:bg-gray-800/40 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/20 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-all duration-150 group cursor-pointer text-center"
             >
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-gray-100 bg-white shadow-xs flex items-center justify-center text-gray-600 group-hover:text-[#1A7A4A] group-hover:bg-[#E8F5EE] group-hover:border-[#B0D9C1] group-hover:scale-105 transition-all duration-200">
-                <act.icon className="w-5 h-5 md:w-6 md:h-6" />
+              <div className="w-8 h-8 rounded-md bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700 shadow-2xs flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 group-hover:border-emerald-300 transition-colors mb-1.5">
+                <act.icon className="w-4 h-4" />
               </div>
-              <span className="text-[10px] md:text-[11px] font-bold text-gray-500 group-hover:text-dark mt-2.5 text-center leading-normal">
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-emerald-800 dark:group-hover:text-emerald-300 line-clamp-1">
                 {act.label}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
+        <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200/80 dark:border-gray-700/60 h-[360px] flex flex-col justify-between shadow-xs">
            <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-[#101828]">Revenue this week</h3>
-              <select className="text-sm text-[#667085] border-0 bg-transparent py-1 pl-1 pr-6 font-medium outline-none cursor-pointer">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue this week</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Booking income by day</p>
+              </div>
+              <select className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 outline-none cursor-pointer hover:border-gray-300">
                 <option>Week</option>
                 <option>Month</option>
                 <option>All time</option>
@@ -441,63 +459,63 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
            </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200/80 dark:border-gray-700/60 h-[360px] flex flex-col justify-between shadow-xs">
            <div>
-              <h3 className="text-base font-semibold text-[#101828] mb-6">Platform Split</h3>
-              <div className="space-y-6">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-5">Platform Split</h3>
+              <div className="space-y-5">
                  {platformSplit.map((p) => (
-                   <div key={p.name} className="space-y-2">
-                      <div className="flex justify-between text-xs font-semibold">
-                         <span className="text-[#667085]">{p.name}</span>
-                         <span className="text-[#101828]">{p.value}%</span>
+                   <div key={p.name} className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-medium">
+                         <span className="text-gray-500 dark:text-gray-400">{p.name}</span>
+                         <span className="font-semibold text-gray-900 dark:text-white">{p.value}%</span>
                       </div>
-                      <div className="h-2 w-full bg-[#F2F4F7] rounded-full overflow-hidden">
+                      <div className="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                          <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${p.value}%`, backgroundColor: p.color }} />
                       </div>
                    </div>
                  ))}
               </div>
            </div>
-           <div className="pt-4 border-t border-[#EAECF0]">
-              <p className="text-xs text-[#667085] leading-relaxed">
+           <div className="pt-3 border-t border-gray-100 dark:border-gray-700/60">
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                  Most of your traffic is coming from WhatsApp. Try running Instagram ads to boost your reach there.
               </p>
            </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 border border-[#EAECF0] shadow-none">
-         <div className="flex items-center justify-between mb-6">
-            <h3 className="text-base font-semibold text-[#101828] flex items-center gap-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-xs">
+         <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                Today's Schedule
-               <span className="px-2.5 py-0.5 rounded-full bg-[#FFF3EA] text-[#F97316] text-[10px] font-bold tracking-wider uppercase">
+               <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 text-[10px] font-bold tracking-wider uppercase border border-orange-200/60">
                   {todaysBookings.length} APPOINTMENTS
                </span>
             </h3>
-            <Link to="/services/bookings" className="text-xs font-bold text-[#1A7A4A] hover:underline">View Full Schedule</Link>
+            <Link to="/services/bookings" className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline">View Full Schedule</Link>
          </div>
          
          {todaysBookings.length === 0 ? (
-           <div className="py-12 text-center">
-              <p className="text-sm text-[#667085] font-medium">No appointments scheduled for today yet.</p>
+           <div className="py-10 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400">No appointments scheduled for today yet.</p>
            </div>
          ) : (
-           <div className="space-y-3">
+           <div className="space-y-2">
               {todaysBookings.sort((a,b) => a.booking_time.localeCompare(b.booking_time)).map((booking) => (
-                <div key={booking.id} className="flex items-center gap-4 p-4 rounded-xl border border-[#EAECF0] hover:bg-[#F8F9FC] transition-colors group">
-                   <div className="w-16 text-center shrink-0">
-                      <p className="text-sm font-bold text-[#101828]">{booking.booking_time}</p>
-                      <p className="text-[10px] text-[#667085] font-semibold uppercase tracking-tight">{booking.duration} MIN</p>
+                <div key={booking.id} className="flex items-center gap-3.5 p-3 rounded-lg border border-gray-100 dark:border-gray-700/60 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors group">
+                   <div className="w-14 text-center shrink-0">
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">{booking.booking_time}</p>
+                      <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tight">{booking.duration} MIN</p>
                    </div>
-                   <div className="w-px h-8 bg-[#EAECF0] shrink-0" />
+                   <div className="w-px h-7 bg-gray-200 dark:bg-gray-700 shrink-0" />
                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-[#101828] text-sm truncate">{booking.service?.name || 'Service Session'}</h4>
-                      <p className="text-xs text-[#667085] truncate">{booking.customer?.name || 'Client'}</p>
+                      <h4 className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm truncate">{booking.service?.name || 'Service Session'}</h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{booking.customer?.name || 'Client'}</p>
                    </div>
-                   <div className="shrink-0 flex items-center gap-3">
+                   <div className="shrink-0 flex items-center gap-2">
                       <StatusBadge status={booking.status} />
-                      <button onClick={() => navigate('/services/bookings')} className="p-2 text-[#98A2B3] group-hover:text-[#1A7A4A] transition-colors">
-                         <ArrowRight size={16} />
+                      <button onClick={() => navigate('/services/bookings')} className="p-1.5 text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
+                         <PiArrowRight size={15} />
                       </button>
                    </div>
                 </div>
@@ -506,20 +524,20 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
          )}
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-none">
-        <h2 className="text-[15px] font-bold text-[#101828] mb-4">Top services by bookings</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200/80 dark:border-gray-700/60 p-5 shadow-xs">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3.5">Top services by bookings</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {topServices.map(ts => (
-            <div key={ts.id} className="bg-[#F8F9FC] rounded-xl border border-[#EAECF0] p-4 flex flex-col justify-between shadow-none">
-              <h3 className="text-xs font-semibold text-[#667085] uppercase tracking-wider truncate mb-3">{ts.name}</h3>
+            <div key={ts.id} className="bg-gray-50/70 dark:bg-gray-800/60 rounded-lg border border-gray-100 dark:border-gray-700/50 p-3.5 flex flex-col justify-between shadow-2xs">
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate mb-2">{ts.name}</h3>
               <div className="flex justify-between items-end">
                 <div>
-                  <div className="text-2xl font-bold text-[#1A7A4A] leading-none mb-1">{ts.unitsSold}</div>
-                  <div className="text-[10px] font-medium text-[#667085]">bookings</div>
+                  <div className="text-xl font-bold text-emerald-700 dark:text-emerald-400 leading-none mb-1">{ts.unitsSold}</div>
+                  <div className="text-[10px] font-medium text-gray-500 dark:text-gray-400">bookings</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-semibold text-[#175CD3] leading-none mb-1">{ts.margin}%</div>
-                  <div className="text-[10px] font-medium text-[#667085]">margin</div>
+                  <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 leading-none mb-1">{ts.margin}%</div>
+                  <div className="text-[10px] font-medium text-gray-500 dark:text-gray-400">margin</div>
                 </div>
               </div>
             </div>
@@ -575,33 +593,33 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
     { 
       label: 'REVENUE THIS WEEK', 
       value: formatNaira(thisWeekRevenue), 
-      icon: TrendingUp, 
-      bg: 'bg-[#FFF4ED]', 
-      color: 'text-[#F97316]',
+      icon: PiTrendUp, 
+      bg: 'bg-amber-50 dark:bg-amber-950/40', 
+      color: 'text-amber-600 dark:text-amber-400',
       trend: trendText
     },
     { 
       label: 'CUSTOMERS REACHED', 
       value: uniqueCustomers.toString(), 
-      icon: Users, 
-      bg: 'bg-[#EFF8FF]', 
-      color: 'text-[#2E90FA]',
+      icon: PiUsers, 
+      bg: 'bg-blue-50 dark:bg-blue-950/40', 
+      color: 'text-blue-600 dark:text-blue-400',
       sub: 'WhatsApp + Instagram'
     },
     { 
       label: 'TRANSACTIONS', 
       value: deliveredCount.toString(), 
-      icon: CheckCircle, 
-      bg: 'bg-[#ECFDF3]', 
-      color: 'text-[#12B76A]',
+      icon: PiCheckCircle, 
+      bg: 'bg-emerald-50 dark:bg-emerald-950/40', 
+      color: 'text-emerald-600 dark:text-emerald-400',
       sub: `${deliveredCount} delivered`
     },
     { 
       label: 'AI RESOLUTION', 
       value: `${analytics?.ai_resolution_rate || 91.8}%`, 
-      icon: Cpu, 
-      bg: 'bg-[#F4F3FF]', 
-      color: 'text-[#7A5AF8]',
+      icon: PiCpu, 
+      bg: 'bg-purple-50 dark:bg-purple-950/40', 
+      color: 'text-purple-600 dark:text-purple-400',
       attention: needsAttention > 0,
       sub: `${needsAttention} Attention needed`
     },
@@ -635,23 +653,23 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
   }, [products, paidInvoices]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Stat Cards Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-2xl p-3 md:p-5 border border-[#EAECF0] flex flex-col justify-between h-[105px] md:h-[120px] shadow-none">
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-5 border border-gray-200/80 dark:border-gray-700/60 flex flex-col justify-between shadow-xs hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
             <div className="flex items-start justify-between">
-              <p className="text-[10px] md:text-[11px] font-bold text-[#667085] uppercase tracking-wider line-clamp-1 md:line-clamp-none">{stat.label}</p>
-              <div className={`w-7 h-7 md:w-9 md:h-9 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-1 md:ml-3`}>
-                <stat.icon className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+              <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider line-clamp-1">{stat.label}</p>
+              <div className={`w-8 h-8 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 ml-2`}>
+                <stat.icon className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-1 md:mt-2">
-              <p className="text-xl md:text-2xl font-bold text-[#101828] leading-tight">{stat.value}</p>
+            <div className="mt-2.5">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">{stat.value}</p>
               {stat.trend ? (
-                <p className="text-[10px] md:text-xs text-[#12B76A] font-semibold mt-0.5 md:mt-1">{stat.trend}</p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">{stat.trend}</p>
               ) : (
-                <p className={`text-[10px] md:text-xs font-semibold mt-0.5 md:mt-1 ${stat.attention ? 'text-[#F79009]' : 'text-[#667085]'}`}>{stat.sub || ''}</p>
+                <p className={`text-xs font-medium mt-1 ${stat.attention ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'}`}>{stat.sub || ''}</p>
               )}
             </div>
           </div>
@@ -659,41 +677,44 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
       </div>
 
       {/* Quick Actions Grid */}
-      <div className="bg-white rounded-2xl p-5 md:p-6 border border-[#EAECF0] shadow-none">
-        <h3 className="text-sm font-bold text-gray-700 mb-6">Quick actions</h3>
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-xs">
+        <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3.5">Quick actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
           {[
-            { label: 'Create Invoice', icon: Tag, path: '/invoices/create' },
-            { label: 'Fulfilment', icon: Truck, path: '/fulfilment' },
-            { label: 'Train Kasi AI', icon: GraduationCap, path: '/settings?tab=ai_rules' },
-            { label: 'Link WhatsApp', icon: MessageSquare, path: '/settings?tab=integrations' },
+            { label: 'Create Invoice', icon: PiTag, path: '/invoices/create' },
+            { label: 'Fulfilment', icon: PiTruck, path: '/fulfilment' },
+            { label: 'Train Kasi AI', icon: PiGraduationCap, path: '/settings?tab=ai_rules' },
+            { label: 'Link WhatsApp', icon: PiChatCircleDots, path: '/settings?tab=integrations' },
             { label: 'Setup Payouts', icon: NairaIcon, path: '/settings?tab=payment' },
-            { label: 'Send Broadcast', icon: Megaphone, path: '/customers' },
-            { label: 'Live Takeover', icon: UserCheck, path: '/chats' },
-            { label: 'Manage Products', icon: Package, path: '/products' },
+            { label: 'Send Broadcast', icon: PiMegaphone, path: '/customers' },
+            { label: 'Live Takeover', icon: PiUserSwitch, path: '/chats' },
+            { label: 'Manage Products', icon: PiPackage, path: '/products' },
           ].map((act, idx) => (
-            <div 
+            <button 
               key={idx} 
               onClick={() => navigate(act.path)}
-              className="flex flex-col items-center group cursor-pointer"
+              className="flex flex-col items-center justify-center p-3 rounded-lg border border-gray-100 dark:border-gray-700/50 bg-gray-50/60 dark:bg-gray-800/40 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/20 hover:border-emerald-200 dark:hover:border-emerald-800/60 transition-all duration-150 group cursor-pointer text-center"
             >
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-gray-100 bg-white shadow-xs flex items-center justify-center text-gray-600 group-hover:text-[#1A7A4A] group-hover:bg-[#E8F5EE] group-hover:border-[#B0D9C1] group-hover:scale-105 transition-all duration-200">
-                <act.icon className="w-5 h-5 md:w-6 md:h-6" />
+              <div className="w-8 h-8 rounded-md bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700 shadow-2xs flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 group-hover:border-emerald-300 transition-colors mb-1.5">
+                <act.icon className="w-4 h-4" />
               </div>
-              <span className="text-[10px] md:text-[11px] font-bold text-gray-500 group-hover:text-dark mt-2.5 text-center leading-normal">
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300 group-hover:text-emerald-800 dark:group-hover:text-emerald-300 line-clamp-1">
                 {act.label}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* Revenue Chart Card (~65% width) */}
-        <div className="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
+        <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200/80 dark:border-gray-700/60 h-[360px] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-[#101828]">Revenue this week</h3>
-            <select className="text-sm text-[#667085] border-0 bg-transparent py-1 pl-1 pr-6 font-medium outline-none cursor-pointer">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue this week</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Paid invoice totals by day</p>
+            </div>
+            <select className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 outline-none cursor-pointer hover:border-gray-300">
               <option>Week</option>
               <option>Month</option>
               <option>All time</option>
@@ -719,31 +740,34 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
         </div>
 
         {/* Live Conversations Panel (~35% width) */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-[#EAECF0] h-[360px] flex flex-col justify-between shadow-none">
-          <div className="flex items-center justify-between mb-4 border-b border-[#F2F4F7] pb-3 shrink-0">
-            <h3 className="text-base font-semibold text-[#101828]">Live conversations</h3>
-            <span className="text-[11px] font-semibold text-[#12B76A]">● Live</span>
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200/80 dark:border-gray-700/60 h-[360px] flex flex-col justify-between shadow-xs">
+          <div className="flex items-center justify-between mb-3 border-b border-gray-100 dark:border-gray-700/60 pb-3 shrink-0">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Live conversations</h3>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300 border border-emerald-200/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live
+            </span>
           </div>
           
           <div className="flex-1 space-y-1 overflow-y-auto pr-1">
             {liveConversations.length === 0 ? (
-              <p className="text-sm text-[#667085] text-center py-12">No active conversations</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center py-12">No active conversations</p>
             ) : (
               liveConversations.map((conv) => {
                 const avatarTheme = getAvatarTheme(conv.customer_name);
                 return (
                   <div 
                     key={conv.id} 
-                    className="h-[68px] flex items-center justify-between py-3 border-b border-[#F2F4F7] last:border-0 cursor-pointer group hover:bg-[#F8F9FC] rounded-lg px-2 -mx-2 transition-colors" 
+                    className="h-[60px] flex items-center justify-between py-2 px-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/40 rounded-lg cursor-pointer group transition-colors border-b border-gray-100/70 dark:border-gray-800 last:border-0" 
                     onClick={() => navigate('/chats')}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-9 h-9 rounded-full ${avatarTheme.bg} ${avatarTheme.text} flex items-center justify-center font-bold text-[13px] shrink-0 select-none`}>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`w-8 h-8 rounded-full ${avatarTheme.bg} ${avatarTheme.text} flex items-center justify-center font-bold text-xs shrink-0 select-none`}>
                         {getInitials(conv.customer_name)}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-[#101828] text-sm truncate">{conv.customer_name || conv.customer_phone || 'Unknown'}</p>
-                        <p className="text-[13px] text-[#667085] truncate">{conv.ai_summary || conv.customer_phone || ''}</p>
+                        <p className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm truncate">{conv.customer_name || conv.customer_phone || 'Unknown'}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{conv.ai_summary || conv.customer_phone || ''}</p>
                       </div>
                     </div>
                     <div className="shrink-0 ml-2">
@@ -755,27 +779,27 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
             )}
           </div>
           
-          <Link to="/chats" className="text-sm font-semibold text-[#1A7A4A] hover:underline block text-center pt-4 border-t border-[#F2F4F7] mt-3 shrink-0 select-none">
-            View all chats →
+          <Link to="/chats" className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center justify-center gap-1 pt-3 border-t border-gray-100 dark:border-gray-700/60 mt-2 shrink-0 select-none transition-colors">
+            View all chats <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>
 
       {/* Bottom Row - Top Products */}
-      <div className="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-none">
-        <h2 className="text-[15px] font-bold text-[#101828] mb-4">Top products by units sold</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200/80 dark:border-gray-700/60 p-5 shadow-xs">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3.5">Top products by units sold</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {topProducts.map(tp => (
-            <div key={tp.id} className="bg-[#F8F9FC] rounded-xl border border-[#EAECF0] p-4 flex flex-col justify-between shadow-none">
-              <h3 className="text-xs font-semibold text-[#667085] uppercase tracking-wider truncate mb-3">{tp.name}</h3>
+            <div key={tp.id} className="bg-gray-50/70 dark:bg-gray-800/60 rounded-lg border border-gray-100 dark:border-gray-700/50 p-3.5 flex flex-col justify-between shadow-2xs">
+              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate mb-2">{tp.name}</h3>
               <div className="flex justify-between items-end">
                 <div>
-                  <div className="text-2xl font-bold text-[#F97316] leading-none mb-1">{tp.unitsSold}</div>
-                  <div className="text-[10px] font-medium text-[#667085]">units sold</div>
+                  <div className="text-xl font-bold text-gray-900 dark:text-white leading-none mb-1">{tp.unitsSold}</div>
+                  <div className="text-[10px] font-medium text-gray-500 dark:text-gray-400">units sold</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-semibold text-[#12B76A] leading-none mb-1">{tp.margin}%</div>
-                  <div className="text-[10px] font-medium text-[#667085]">margin</div>
+                  <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 leading-none mb-1">{tp.margin}%</div>
+                  <div className="text-[10px] font-medium text-gray-500 dark:text-gray-400">margin</div>
                 </div>
               </div>
             </div>
