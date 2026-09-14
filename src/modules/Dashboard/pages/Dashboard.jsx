@@ -20,7 +20,8 @@ import {
   PiClock, 
   PiCurrencyDollar, 
   PiCalendarCheck, 
-  PiArrowRight
+  PiArrowRight,
+  PiMapPin
 } from 'react-icons/pi';
 import { DashboardSkeleton } from '../../../components/ui/Skeleton';
 import api from '../../../api/axios';
@@ -886,7 +887,7 @@ const ActionAlerts = ({ user }) => {
         <div className="relative bg-[#FFFBEB] border border-[#FEF08A] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#FEF3C7] text-[#D97706] flex items-center justify-center shrink-0">
-              <Clock size={10} />
+              <PiClock size={12} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0 text-xs">
               <span className="font-bold text-[#D97706] tracking-wide shrink-0">
@@ -926,7 +927,7 @@ const ActionAlerts = ({ user }) => {
         <div className="relative bg-[#EFF8FF] border border-[#B2DDFF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#D1E9FF] text-[#175CD3] flex items-center justify-center shrink-0">
-              <DollarSign size={10} />
+              <PiCurrencyDollar size={12} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0 text-xs">
               <span className="font-bold text-[#175CD3] tracking-wide shrink-0">PAYMENTS NOT CONNECTED</span>
@@ -962,7 +963,7 @@ const ActionAlerts = ({ user }) => {
         <div className="relative bg-[#ECFDF3] border border-[#D1FADF] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#D1FADF] text-[#027A48] flex items-center justify-center shrink-0">
-              <MessageSquare size={10} />
+              <PiChatCircleDots size={12} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0 text-xs">
               <span className="font-bold text-[#027A48] tracking-wide shrink-0">WHATSAPP NOT CONNECTED</span>
@@ -998,7 +999,7 @@ const ActionAlerts = ({ user }) => {
         <div className="relative bg-[#FFF4ED] border border-[#FCD2C1] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#FFE4D6] text-[#F97316] flex items-center justify-center shrink-0">
-              <Truck size={10} />
+              <PiTruck size={12} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0 text-xs">
               <span className="font-bold text-[#D46B18] tracking-wide shrink-0">RATE SHEET NOT ADDED</span>
@@ -1034,7 +1035,7 @@ const ActionAlerts = ({ user }) => {
         <div className="relative bg-[#F4F3FF] border border-[#D9D6FE] rounded-xl p-2.5 px-3 flex items-center justify-between gap-3 shadow-none w-full h-full transition-all duration-300">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-[#EBE9FE] text-[#7A5AF8] flex items-center justify-center shrink-0">
-              <MapPin size={10} />
+              <PiMapPin size={12} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0 text-xs">
               <span className="font-bold text-[#6938EF] tracking-wide shrink-0">PICKUP PROFILE INCOMPLETE</span>
