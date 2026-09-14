@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft, Send, User, Shield, Tag, History, CheckCircle2 } from 'lucide-react';
+import { PiSpeakerSimpleSlash, PiSpeakerSimpleHigh, PiTrash, PiReceipt } from 'react-icons/pi';
+import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
 import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
@@ -214,51 +216,33 @@ const getPlatformBadge = (platform) => {
   const cleanPlatform = (platform || '').toLowerCase();
   if (cleanPlatform === 'whatsapp') {
     return {
-      bg: 'bg-emerald-50 border border-emerald-100',
-      color: 'text-emerald-700',
+      bg: 'bg-emerald-50 border border-emerald-200/60 dark:bg-emerald-950/30 dark:border-emerald-800/40',
+      color: 'text-emerald-700 dark:text-emerald-400',
       label: 'WhatsApp',
-      icon: (
-        <svg className="w-3 h-3 fill-emerald-600 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.517 2.266 2.27 3.507 5.289 3.507 8.494-.004 6.66-5.338 11.997-11.95 11.997-2.005-.001-3.973-.503-5.714-1.46L0 24zm6.59-20.347c-.186-.412-.384-.42-.562-.427-.146-.006-.314-.006-.482-.006-.168 0-.441.063-.672.314-.23.251-.879.859-.879 2.094 0 1.235.9 2.428 1.025 2.595.126.167 1.767 2.699 4.284 3.782.598.258 1.065.412 1.428.527.6.19 1.15.163 1.583.099.483-.072 1.482-.605 1.691-1.19.209-.584.209-1.086.146-1.19-.063-.105-.23-.167-.481-.293-.251-.126-1.482-.731-1.712-.815-.23-.084-.397-.126-.564.126-.167.251-.648.815-.794.982-.146.167-.293.188-.543.063-.25-.126-.98-.362-1.868-1.154-.69-.616-1.157-1.378-1.293-1.611-.136-.234-.015-.361.11-.486.112-.112.251-.293.376-.44.126-.146.167-.25.251-.418.084-.167.042-.314-.021-.44-.063-.125-.562-1.355-.77-1.854z"/>
-        </svg>
-      )
+      icon: <SiWhatsapp size={12} className="text-[#25D366] shrink-0" />
     };
   }
   if (cleanPlatform === 'telegram') {
     return {
-      bg: 'bg-sky-50 border border-sky-100',
-      color: 'text-sky-700',
+      bg: 'bg-sky-50 border border-sky-200/60 dark:bg-sky-950/30 dark:border-sky-800/40',
+      color: 'text-sky-700 dark:text-sky-400',
       label: 'Telegram',
-      icon: (
-        <svg className="w-3 h-3 fill-sky-600 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.18l-1.92 9.07c-.14.63-.52.79-1.05.49l-2.93-2.16-1.41 1.36c-.16.16-.29.29-.6.29l.21-2.98 5.43-4.91c.24-.21-.05-.33-.37-.12L8.2 13.98l-2.89-.9c-.63-.2-.64-.63.13-.93l11.27-4.34c.52-.19.98.12.85.37z"/>
-        </svg>
-      )
+      icon: <SiTelegram size={12} className="text-[#229ED9] shrink-0" />
     };
   }
   if (cleanPlatform === 'instagram') {
     return {
-      bg: 'bg-pink-50 border border-pink-100',
-      color: 'text-pink-700',
+      bg: 'bg-pink-50 border border-pink-200/60 dark:bg-pink-950/30 dark:border-pink-800/40',
+      color: 'text-pink-700 dark:text-pink-400',
       label: 'Instagram',
-      icon: (
-        <svg className="w-3 h-3 stroke-pink-600 fill-none shrink-0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-        </svg>
-      )
+      icon: <SiInstagram size={12} className="text-[#E1306C] shrink-0" />
     };
   }
   return {
-    bg: 'bg-gray-50 border border-gray-100',
-    color: 'text-gray-600',
-    label: platform || 'Unknown',
-    icon: (
-      <svg className="w-3 h-3 fill-gray-500 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
-      </svg>
-    )
+    bg: 'bg-gray-50 border border-gray-200/60 dark:bg-gray-800 dark:border-gray-700',
+    color: 'text-gray-700 dark:text-gray-300',
+    label: platform || 'Web',
+    icon: null
   };
 };
 
@@ -635,51 +619,68 @@ const Chats = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 {/* Mute/Unmute Kasi Button */}
                 <button
                   onClick={() => {
                     const newStatus = selectedConversation.status === 'Muted' ? 'In Progress' : 'Muted';
                     handleStatusUpdate(selectedConversation.id, newStatus);
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
                     selectedConversation.status === 'Muted'
-                      ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30'
-                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-750'
+                      ? 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/40'
+                      : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
                   }`}
+                  title={selectedConversation.status === 'Muted' ? 'Unmute Kasi AI' : 'Mute Kasi AI for this chat'}
                 >
-                  {selectedConversation.status === 'Muted' ? '🔇 Unmute Kasi' : '🔇 Mute Kasi'}
+                  {selectedConversation.status === 'Muted' ? (
+                    <>
+                      <PiSpeakerSimpleHigh size={15} className="text-amber-600 shrink-0" />
+                      <span className="hidden sm:inline">Unmute Kasi</span>
+                    </>
+                  ) : (
+                    <>
+                      <PiSpeakerSimpleSlash size={15} className="text-gray-500 shrink-0" />
+                      <span className="hidden sm:inline">Mute Kasi</span>
+                    </>
+                  )}
                 </button>
 
                 {/* Delete Chat Button */}
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-750 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-700 border border-gray-200 hover:border-red-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-red-950/30 dark:hover:text-red-400 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                  title="Delete chat conversation"
                 >
-                  Delete Chat
+                  <PiTrash size={15} className="text-gray-500 hover:text-red-600 shrink-0" />
+                  <span className="hidden sm:inline">Delete</span>
                 </button>
 
                 {/* Order History Toggle */}
                 <button
                   onClick={() => setHistoryOpen(!historyOpen)}
-                  className={`px-3 py-1.5 border rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 border rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     historyOpen
-                      ? 'bg-primary text-white border-primary hover:bg-green-700 dark:bg-emerald-600 dark:border-emerald-600 dark:hover:bg-emerald-700'
-                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-750'
+                      ? 'bg-[#0D7043] text-white border-[#0D7043] shadow-xs'
+                      : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
                   }`}
+                  title="Toggle order history"
                 >
-                  Order History
+                  <PiReceipt size={15} className="shrink-0" />
+                  <span className="hidden lg:inline">Order History</span>
                 </button>
 
-                <StatusBadge status={selectedConversation.status} />
-                {(() => {
-                  const pb = getPlatformBadge(selectedConversation.platform);
-                  return (
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${pb.bg} ${pb.color}`}>
-                      {pb.icon} {pb.label}
-                    </span>
-                  );
-                })()}
+                <div className="hidden sm:flex items-center gap-1.5">
+                  <StatusBadge status={selectedConversation.status} />
+                  {(() => {
+                    const pb = getPlatformBadge(selectedConversation.platform);
+                    return (
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${pb.bg} ${pb.color}`}>
+                        {pb.icon} {pb.label}
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
 

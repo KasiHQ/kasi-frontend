@@ -7,10 +7,12 @@ import BroadcastBanner from './BroadcastBanner';
 import { useLayout } from '../../context/LayoutContext';
 import { useAuth } from '../../context/AuthContext';
 import { Search, Bell, X, DollarSign, Calendar, AlertTriangle, User, Truck, Settings, LogOut, Zap, Wallet } from 'lucide-react';
+import { PiSidebarSimple } from 'react-icons/pi';
 import api from '../../api/axios';
 
 const MainLayout = () => {
   const [sidebarWidth, setSidebarWidth] = useState(240);
+  const { sidebarCollapsed, toggleSidebar } = useLayout();
   const { user, fetchUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -277,10 +279,21 @@ const MainLayout = () => {
           )}
           
           {/* Top Bar of Main Content */}
-          <header className="h-16 bg-white border-b border-[#EAECF0] px-4 md:px-10 flex items-center justify-between sticky top-0 z-40 shrink-0">
-            <div>
+          <header className="h-16 bg-white border-b border-[#EAECF0] px-4 md:px-8 flex items-center justify-between sticky top-0 z-40 shrink-0">
+            <div className="flex items-center gap-3">
+              {/* ProofDeck-style Sidebar Toggle Button (visible on desktop when sidebar is collapsed) */}
+              {sidebarCollapsed && (
+                <button
+                  onClick={toggleSidebar}
+                  className="hidden md:flex p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer border border-gray-200/80"
+                  title="Open sidebar"
+                >
+                  <PiSidebarSimple size={18} />
+                </button>
+              )}
+
               {isDashboard ? (
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                   <img src="/kasi.png" alt="Kasi" className="h-6 md:h-7 w-auto object-contain select-none" />
                 </div>
               ) : (

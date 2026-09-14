@@ -11,6 +11,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      workbox: {
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MiB to allow app bundle precaching
+      },
       manifest: {
         name: 'Kasi AI Sales Assistant',
         short_name: 'Kasi',
