@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { BarChart3, Settings, LogOut, MessageSquare, Package, Truck, Users, TrendingUp, ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, Briefcase, Calendar, Home, DollarSign, FileText, Store } from 'lucide-react';
+import { ChevronsLeft, ChevronsRight, Sun, Moon, PanelTop, LogOut } from 'lucide-react';
+import {
+  PiHouse, PiShoppingBag, PiTruck, PiChatCircleDots, PiUsers,
+  PiChartLineUp, PiCurrencyDollar, PiStorefront, PiGearSix,
+  PiCalendarCheck, PiBriefcase, PiFileText, PiChartBar
+} from 'react-icons/pi';
 import clsx from 'clsx';
 import { useLayout } from '../../context/LayoutContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -108,19 +113,19 @@ const Sidebar = ({ onWidthChange }) => {
       {
         title: 'OVERVIEW',
         items: [
-          { icon: Home, label: 'Admin Dashboard', path: '/kasisalienceadministration' },
+          { icon: PiHouse, label: 'Admin Dashboard', path: '/kasisalienceadministration' },
         ]
       },
       {
         title: 'MANAGEMENT',
         items: [
           ...(adminRole === 'Super Admin' || adminRole === 'Support Admin' ? [
-            { icon: Users, label: 'Vendors', path: '/kasisalienceadministration/users' },
-            { icon: FileText, label: 'Blog Posts', path: '/kasisalienceadministration/blog' },
+            { icon: PiUsers, label: 'Vendors', path: '/kasisalienceadministration/users' },
+            { icon: PiFileText, label: 'Blog Posts', path: '/kasisalienceadministration/blog' },
           ] : []),
           ...(adminRole === 'Super Admin' || adminRole === 'Finance Admin' ? [
-            { icon: BarChart3, label: 'Invoices', path: '/kasisalienceadministration/invoices' },
-            { icon: TrendingUp, label: 'Transactions', path: '/kasisalienceadministration/transactions' },
+            { icon: PiChartBar, label: 'Invoices', path: '/kasisalienceadministration/invoices' },
+            { icon: PiChartLineUp, label: 'Transactions', path: '/kasisalienceadministration/transactions' },
           ] : []),
         ]
       },
@@ -128,12 +133,12 @@ const Sidebar = ({ onWidthChange }) => {
         title: 'SYSTEM',
         items: [
           ...(adminRole === 'Super Admin' || adminRole === 'Support Admin' ? [
-            { icon: MessageSquare, label: 'Broadcasts', path: '/kasisalienceadministration/broadcasts' },
+            { icon: PiChatCircleDots, label: 'Broadcasts', path: '/kasisalienceadministration/broadcasts' },
             { icon: PanelTop, label: 'Audit Logs', path: '/kasisalienceadministration/audit-logs' },
           ] : []),
           ...(adminRole === 'Super Admin' ? [
-            { icon: Calendar, label: 'Waitlist', path: '/kasisalienceadministration/waitlist' },
-            { icon: Settings, label: 'Staff Panel', path: '/kasisalienceadministration/staff' },
+            { icon: PiCalendarCheck, label: 'Waitlist', path: '/kasisalienceadministration/waitlist' },
+            { icon: PiGearSix, label: 'Staff Panel', path: '/kasisalienceadministration/staff' },
           ] : []),
         ]
       }
@@ -143,23 +148,23 @@ const Sidebar = ({ onWidthChange }) => {
       {
         title: 'BUSINESS',
         items: [
-          { icon: Home, label: 'Home', path: '/dashboard' },
-          { icon: Calendar, label: 'Schedule', path: '/bookings' },
-          { icon: Briefcase, label: 'Services', path: '/services' },
+          { icon: PiHouse, label: 'Home', path: '/dashboard' },
+          { icon: PiCalendarCheck, label: 'Schedule', path: '/bookings' },
+          { icon: PiBriefcase, label: 'Services', path: '/services' },
         ]
       },
       {
         title: 'INBOX & CRM',
         items: [
-          { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
-          { icon: Users, label: 'Clients', path: '/customers' },
+          { icon: PiChatCircleDots, label: 'Chats', path: '/chats', badgeKey: 'chats' },
+          { icon: PiUsers, label: 'Clients', path: '/customers' },
         ]
       },
       {
         title: 'OPERATIONS',
         items: [
-          { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
-          { icon: Store, label: 'Marketplace', path: '/market' },
+          { icon: PiCurrencyDollar, label: 'Finance Audit', path: '/payments' },
+          { icon: PiStorefront, label: 'Marketplace', path: '/market' },
         ]
       }
     ];
@@ -168,25 +173,25 @@ const Sidebar = ({ onWidthChange }) => {
       {
         title: 'SELLING',
         items: [
-          { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
-          { icon: Package, label: 'Store', path: '/products' },
-          { icon: Truck, label: 'Logistics', path: '/logistics', badgeKey: 'logistics' },
-          { icon: Store, label: 'Fulfilment', path: '/fulfilment' },
+          { icon: PiChartBar, label: 'Dashboard', path: '/dashboard' },
+          { icon: PiShoppingBag, label: 'Store', path: '/products' },
+          { icon: PiTruck, label: 'Logistics', path: '/logistics', badgeKey: 'logistics' },
+          { icon: PiStorefront, label: 'Fulfilment', path: '/fulfilment' },
         ]
       },
       {
         title: 'INBOX & CRM',
         items: [
-          { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
-          { icon: Users, label: 'Customers', path: '/customers' },
+          { icon: PiChatCircleDots, label: 'Chats', path: '/chats', badgeKey: 'chats' },
+          { icon: PiUsers, label: 'Customers', path: '/customers' },
         ]
       },
       {
         title: 'FINANCE & MARKET',
         items: [
-          { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
-          { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
-          { icon: Store, label: 'Marketplace', path: '/market' },
+          { icon: PiChartLineUp, label: 'Analytics', path: '/analytics' },
+          { icon: PiCurrencyDollar, label: 'Finance Audit', path: '/payments' },
+          { icon: PiStorefront, label: 'Marketplace', path: '/market' },
         ]
       }
     ];
@@ -245,15 +250,15 @@ const Sidebar = ({ onWidthChange }) => {
                 onMouseLeave={handleItemLeave}
                 className={({ isActive }) =>
                   clsx(
-                    'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
-                    collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-3.5 py-2.5',
+                    'kasi-nav-item flex items-center rounded-lg transition-all duration-150 group font-medium text-xs relative',
+                    collapsed ? 'justify-center px-0 py-2' : 'gap-2.5 px-3 py-2',
                     isActive
-                      ? 'kasi-nav-active bg-[#0D7043] dark:bg-[#0D7043] text-white shadow-sm'
+                      ? 'kasi-nav-active bg-[#0D7043] dark:bg-[#0D7043] text-white shadow-xs'
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/70 dark:hover:bg-gray-800/60'
                   )
                 }
               >
-                <item.icon size={18} className="transition-colors duration-200 shrink-0" />
+                <item.icon size={17} className="transition-colors duration-150 shrink-0" />
                 {!collapsed && <span className="truncate">{item.label}</span>}
                 {/* Badge */}
                 {item.badgeKey && badgeCounts[item.badgeKey] > 0 && !collapsed && (
@@ -280,15 +285,15 @@ const Sidebar = ({ onWidthChange }) => {
             onMouseLeave={handleItemLeave}
             className={({ isActive }) =>
               clsx(
-                'kasi-nav-item flex items-center rounded-xl transition-all duration-200 group font-semibold text-sm relative',
-                collapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-4 py-2.5',
+                'kasi-nav-item flex items-center rounded-lg transition-all duration-200 group font-medium text-xs relative',
+                collapsed ? 'justify-center px-0 py-2' : 'gap-2.5 px-3 py-2',
                 isActive
-                  ? 'kasi-nav-active bg-primary text-white shadow-md'
-                  : 'text-gray-500 hover:text-dark hover:bg-gray-100/80'
+                  ? 'kasi-nav-active bg-[#0D7043] text-white shadow-xs'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/70 dark:hover:bg-gray-800/60'
               )
             }
           >
-            <Settings size={19} />
+            <PiGearSix size={18} className="shrink-0" />
             {!collapsed && <span>Settings</span>}
           </NavLink>
         )}
