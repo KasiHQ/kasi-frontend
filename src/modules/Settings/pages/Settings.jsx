@@ -1483,79 +1483,30 @@ const Settings = () => {
 
                         {/* Distance-Based Pricing Settings */}
                         <div className="pt-6 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {/* Base Delivery Fee */}
-                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
-                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
-                                        Base Delivery Fee
-                                    </label>
-                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Starting flat fee</p>
-                                    <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-bold">₦</span>
-                                        <input
-                                            type="number"
-                                            value={deliveryBaseFee}
-                                            onChange={(e) => setDeliveryBaseFee(e.target.value)}
-                                            placeholder="800"
-                                            className="w-full pl-8 pr-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                                            min="0"
-                                        />
-                                    </div>
-                                </div>
+                            {/* Kasi manages base fee / per-km / minimum internally; vendors only control max radius */}
+                            <div className="flex items-start gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4">
+                                <div className="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">i</div>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    Delivery fees are calculated automatically by Kasi using real bike-dispatch rates, calibrated to your city. You don't need to set pricing manually — just choose how far you're willing to deliver.
+                                </p>
+                            </div>
 
-                                {/* Base Distance Included */}
-                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
-                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
-                                        Base Distance
-                                    </label>
-                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Covered by base fee</p>
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            step="0.5"
-                                            value={deliveryBaseKm}
-                                            onChange={(e) => setDeliveryBaseKm(e.target.value)}
-                                            placeholder="2.0"
-                                            className="w-full pl-3 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                                            min="0"
-                                        />
-                                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-xs font-bold">km</span>
-                                    </div>
-                                </div>
-
-                                {/* Rate Per Km */}
-                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
-                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
-                                        Rate Per Extra Km
-                                    </label>
-                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Charge per extra km</p>
-                                    <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-bold">₦</span>
-                                        <input
-                                            type="number"
-                                            value={deliveryRatePerKm}
-                                            onChange={(e) => setDeliveryRatePerKm(e.target.value)}
-                                            placeholder="200"
-                                            className="w-full pl-8 pr-12 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                                            min="0"
-                                        />
-                                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-[10px] font-bold">/km</span>
-                                    </div>
-                                </div>
-
+                            <div className="max-w-xs">
                                 {/* Max Delivery Radius */}
                                 <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
                                     <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
-                                        Max Radius
+                                        Max Delivery Radius
                                     </label>
-                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Max auto-accept zone</p>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3">
+                                        Customers beyond this distance will be offered store pickup instead.
+                                    </p>
                                     <div className="relative">
                                         <input
                                             type="number"
                                             value={deliveryMaxRadiusKm}
                                             onChange={(e) => setDeliveryMaxRadiusKm(e.target.value)}
                                             placeholder="25"
-                                            className="w-full pl-3 pr-10 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                                            className="w-full pl-3 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                                             min="1"
                                         />
                                         <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-xs font-bold">km</span>
