@@ -113,27 +113,27 @@ export const ExplainerVideoSection = () => {
   return (
     <section
       id="explainer-video-section"
-      className="w-full py-20 bg-[#F5F5F0] border-b-[1.5px] border-black text-center relative select-none"
+      className="w-full py-20 bg-[#F8F9F7] border-b border-[#E5E5E5] text-center relative select-none"
     >
-      {/* Neo-brutalist white grid overlay */}
-      <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(#000_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none" />
+      {/* Subtle grid overlay */}
+      <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(#000_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none" />
 
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 relative z-10">
         {/* Section Header */}
         <div className="max-w-2xl mx-auto mb-12 text-center space-y-4 font-sans">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#D4F263] border-[1.5px] border-black text-black text-[11px] font-black uppercase tracking-wider rounded-full shadow-[2px_2px_0px_#000]">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#D4F263] border border-black/10 text-gray-950 text-[11px] font-bold uppercase tracking-wider rounded-full shadow-xs">
             Kasi in Action
           </div>
           <h2 className="text-3xl md:text-4.5xl font-black font-bricolage tracking-tight text-[#0A0A0A] leading-tight">
             See how Kasi automates your business
           </h2>
-          <p className="text-sm md:text-base text-grey-700 font-semibold leading-relaxed">
+          <p className="text-sm md:text-base text-gray-600 font-medium leading-relaxed">
             Watch the 1-minute walk-through to see how Kasi interacts with customers, handles orders, and reconciles payments on autopilot.
           </p>
         </div>
 
         {/* Video Player Box */}
-        <div className="max-w-[800px] mx-auto relative bg-black rounded-2xl border-[3px] border-black shadow-[8px_8px_0px_#0A0A0A] overflow-hidden aspect-video group"
+        <div className="max-w-[800px] mx-auto relative bg-white rounded-2xl border border-gray-200/80 shadow-[0_20px_50px_rgba(0,0,0,0.12)] overflow-hidden aspect-video group"
              onMouseMove={handleMouseMove}
              onMouseLeave={() => isPlaying && setShowControls(false)}>
           
@@ -151,14 +151,14 @@ export const ExplainerVideoSection = () => {
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={handleEnded}
-            className="w-full h-full object-contain cursor-pointer"
+            className="w-full h-full object-cover cursor-pointer"
           />
 
           {/* Prominent Floating "Click to Unmute" Overlay */}
           {isMuted && (
             <button
               onClick={toggleMute}
-              className="absolute inset-0 m-auto w-40 h-12 bg-[#1A7A4A] hover:bg-[#15603A] text-white font-bold rounded-full border-[1.5px] border-black shadow-[4px_4px_0px_#000] flex items-center justify-center gap-2 transition-all duration-150 scale-100 hover:scale-105 active:scale-95 cursor-pointer z-20 animate-pulse font-sans"
+              className="absolute inset-0 m-auto w-40 h-12 bg-[#1A7A4A] hover:bg-[#15603A] text-white font-bold rounded-xl border border-white/20 shadow-xl flex items-center justify-center gap-2 transition-all duration-150 scale-100 hover:scale-105 active:scale-95 cursor-pointer z-20 animate-pulse font-sans"
               style={{ animationDuration: "2s" }}
             >
               <VolumeX size={18} />

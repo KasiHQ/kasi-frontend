@@ -4,7 +4,9 @@ import {
   Search, 
   Store, 
   X, 
-  ArrowRight, 
+  ArrowRight,
+  ArrowLeft,
+  Globe,
   Phone, 
   MapPin, 
   Clock, 
@@ -350,21 +352,30 @@ export default function Marketplace() {
             </div>
 
             {/* User actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
+              <Link
+                to="/"
+                className="px-3.5 py-2 text-xs font-bold text-gray-600 hover:text-black border border-gray-200 hover:border-gray-300 rounded-xl bg-white hover:bg-gray-50 transition-all flex items-center gap-1.5 shadow-2xs"
+                title="Return to Kasi AI homepage"
+              >
+                <ArrowLeft size={14} className="text-gray-500" />
+                <span>Main Website</span>
+              </Link>
+
               {user ? (
                 <Link 
                   to="/dashboard"
-                  className="px-5 py-2.5 bg-[#D4F263] text-black font-bold text-sm rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] hover:translate-y-[-1px] hover:shadow-[0_4px_8px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.10)] transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 bg-[#D4F263] text-black font-bold text-xs md:text-sm rounded-xl shadow-xs hover:translate-y-[-1px] transition-all flex items-center gap-1.5"
                 >
-                  <Building size={16} strokeWidth={2} />
+                  <Building size={15} strokeWidth={2} />
                   Dashboard
                 </Link>
               ) : (
                 <Link 
                   to="/signup"
-                  className="px-5 py-2.5 bg-black text-white font-bold text-sm rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.05)] hover:translate-y-[-1px] hover:shadow-[0_4px_8px_rgba(0,0,0,0.06),0_12px_28px_rgba(0,0,0,0.10)] transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 bg-black text-white font-bold text-xs md:text-sm rounded-xl shadow-xs hover:translate-y-[-1px] transition-all flex items-center gap-1.5"
                 >
-                  <Sparkles size={16} className="text-[#D4F263]" />
+                  <Sparkles size={15} className="text-[#D4F263]" />
                   Sell on Kasi
                 </Link>
               )}

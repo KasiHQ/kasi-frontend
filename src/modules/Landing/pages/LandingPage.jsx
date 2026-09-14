@@ -193,39 +193,37 @@ const LandingPage = () => {
       <FAQSection />
 
       {/* PART 5 — High-Impact Bottom Call to Action Section (Pre-footer) */}
-      <section className="py-24 bg-[#1A7A4A] text-white relative overflow-hidden select-none border-b-[1.5px] border-black">
+      <section className="py-24 bg-[#1A7A4A] text-white relative overflow-hidden select-none">
         <div className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto px-4 relative z-10 text-center flex flex-col items-center space-y-8 font-sans">
           {/* White Pill Tag Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 border-[1.5px] border-white/30 text-white text-[12px] font-black uppercase tracking-wider rounded-full">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 border border-white/20 text-white text-[12px] font-bold uppercase tracking-wider rounded-full shadow-xs">
             <span>READY FOR AUTOPILOT?</span>
           </div>
 
           {/* Headline */}
           <h2 className="text-4xl md:text-5.5xl font-black font-bricolage tracking-tight max-w-3xl mx-auto leading-none text-white text-center">
-            Launch your autonomous
+            Turn social conversations
             <br />
-            commerce agent in minutes.
+            into predictable profit.
           </h2>
 
           {/* Body */}
-          <p className="text-base md:text-lg text-white/75 max-w-xl mx-auto leading-relaxed text-center font-medium">
-            Deploy your 24/7 AI employee today. Automatically handle inquiries,
-            negotiate deals with floor limits, and reconcile payments
-            seamlessly.
+          <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed text-center font-medium">
+            Deploy an AI employee that handles your customer conversation from first DM to final delivery. Scale sales, protect profit margins, build customer retention, and organize your business for credit and long-term growth.
           </p>
 
           {/* 3 Centered Feature Chips */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-4 pt-4 max-w-4xl w-full">
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-3 pt-4 max-w-4xl w-full">
             {[
-              "✓ 24/7 Social Automation — No more missed inquiries or cold leads in DMs.",
-              "✓ Floor-Limit Bargaining — AI negotiates prices inside your safe thresholds.",
-              "✓ Naira Instant Reconciles — Automatic callback verification directly on bank receipts.",
+              "✓ Omnichannel Autopilot — Zero missed leads on WhatsApp, Instagram & TikTok.",
+              "✓ Margin-Protected Bargaining — AI negotiates within your bottom floor thresholds.",
+              "✓ End-to-End Fulfilment — Instant bank transfer verification & automated delivery dispatch.",
             ].map((chip, idx) => (
               <div
                 key={idx}
-                className="bg-white/12 border-[1.5px] border-white/25 rounded-full px-6 py-3 text-white text-[15px] font-semibold text-center select-none"
+                className="bg-white/10 border border-white/15 rounded-xl px-5 py-2.5 text-white/95 text-[13.5px] font-medium text-center select-none backdrop-blur-xs"
               >
                 {chip}
               </div>
@@ -237,23 +235,23 @@ const LandingPage = () => {
             {PRELAUNCH_WAITLIST_MODE ? (
               <button
                 onClick={openWaitlist}
-                className="px-12 py-5 bg-white hover:bg-green-50 text-[#1A7A4A] font-black text-[18px] rounded-full shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2 group border-[1.5px] border-black cursor-pointer"
+                className="px-10 py-4 bg-white hover:bg-gray-50 text-[#1A7A4A] font-bold text-base rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
               >
                 <span>Join the Waitlist</span>
                 <ArrowRight
                   size={20}
-                  className="transition-transform group-hover:translate-x-1 stroke-[3]"
+                  className="transition-transform group-hover:translate-x-1 stroke-[2.5]"
                 />
               </button>
             ) : (
               <Link
                 to="/signup"
-                className="px-12 py-5 bg-white hover:bg-green-50 text-[#1A7A4A] font-black text-[18px] rounded-full shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:translate-y-[-2px] transition-all flex items-center justify-center gap-2 group border-[1.5px] border-black"
+                className="px-10 py-4 bg-white hover:bg-gray-50 text-[#1A7A4A] font-bold text-base rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group"
               >
                 <span>Get Started with Kasi</span>
                 <ArrowRight
                   size={20}
-                  className="transition-transform group-hover:translate-x-1 stroke-[3]"
+                  className="transition-transform group-hover:translate-x-1 stroke-[2.5]"
                 />
               </Link>
             )}

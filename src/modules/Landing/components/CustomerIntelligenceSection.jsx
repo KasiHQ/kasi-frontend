@@ -51,7 +51,7 @@ export const CustomerIntelligenceSection = () => {
   ];
 
   return (
-    <section id="customer-intelligence" className="w-full py-[100px] bg-white border-b-[1.5px] border-[#0A0A0A] relative select-none">
+    <section id="customer-intelligence" className="w-full py-[100px] bg-white border-b border-[#E5E5E5] relative select-none">
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6">
         
         {/* Main Grid Layout: Text & Cards Left | CRM Table Mockup Right */}
@@ -60,10 +60,10 @@ export const CustomerIntelligenceSection = () => {
           {/* Left Column — Text & Segment Cards */}
           <div className="lg:col-span-6 space-y-8 text-left">
             <div className="flex flex-col gap-1.5 items-start">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#E8F5EE] border-[1.5px] border-[#1A7A4A] text-[#1A7A4A] text-xs font-black uppercase tracking-wider rounded-full">
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-[#E8F5EE] border border-[#1A7A4A]/20 text-[#1A7A4A] text-xs font-bold uppercase tracking-wider rounded-full shadow-xs">
                 <span>08_CUSTOMER INTELLIGENCE</span>
               </div>
-              <span className="text-[10px] font-black text-grey-550 uppercase tracking-widest pl-2">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2">
                 GROWTH & PREMIUM PLANS
               </span>
             </div>
@@ -74,7 +74,7 @@ export const CustomerIntelligenceSection = () => {
                 Win them back.
               </h2>
               
-              <p className="text-base md:text-lg text-grey-700 max-w-xl leading-relaxed font-sans font-medium">
+              <p className="text-base md:text-lg text-gray-600 max-w-xl leading-relaxed font-sans font-medium">
                 Kasi builds a database of every person who has ever contacted your store — those who bought, those who nearly bought, and those who just said hi. Retarget them all. Send broadcast messages, offer discounts, and bring them back with a single tap.
               </p>
             </div>
@@ -84,14 +84,14 @@ export const CustomerIntelligenceSection = () => {
               {segments.map((seg, idx) => (
                 <div 
                   key={idx} 
-                  className="bg-white border-[1.5px] border-[#E5E5E5] rounded-xl p-5 text-left flex flex-col justify-between transition-all duration-300 hover:translate-y-[-2px] hover:border-black hover:shadow-[3px_3px_0px_#0A0A0A]"
+                  className="bg-white border border-gray-100 rounded-2xl p-5 text-left flex flex-col justify-between shadow-xs hover:shadow-md hover:-translate-y-1 hover:border-gray-200 transition-all duration-300"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <span 
-                      className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/20" 
+                      className="w-2.5 h-2.5 rounded-full shrink-0" 
                       style={{ backgroundColor: seg.dotColor }}
                     />
-                    <span className="text-[13px] font-black text-[#0A0A0A] uppercase tracking-wide">
+                    <span className="text-[13px] font-bold text-gray-900 uppercase tracking-wide">
                       {seg.label}
                     </span>
                   </div>
@@ -99,7 +99,7 @@ export const CustomerIntelligenceSection = () => {
                     <span className="text-2xl md:text-3.5xl font-black text-[#0A0A0A] block leading-none font-bricolage mb-1">
                       {seg.count}
                     </span>
-                    <span className="text-[11px] text-grey-550 font-bold leading-tight block">
+                    <span className="text-[11px] text-gray-500 font-medium leading-tight block">
                       {seg.sub}
                     </span>
                   </div>
@@ -114,15 +114,15 @@ export const CustomerIntelligenceSection = () => {
             <div className="relative w-full max-w-[540px] flex items-center justify-center overflow-visible">
               
               {/* Browser Mockup */}
-              <div className="relative w-full bg-white border-[2.5px] border-black rounded-2xl shadow-[6px_6px_0px_#0A0A0A] overflow-hidden flex flex-col transform rotate-[1.5deg] hover:rotate-0 transition-transform duration-500 z-10">
+              <div className="relative w-full bg-white border border-gray-200/80 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.14)] overflow-hidden flex flex-col transform rotate-[1.5deg] hover:rotate-0 transition-transform duration-500 z-10">
                 {/* Browser Header */}
-                <div className="bg-[#F5F5F0] border-b-[2px] border-black px-4 py-2.5 flex items-center justify-between shrink-0">
+                <div className="bg-[#F8F9F7] border-b border-gray-200 px-4 py-2.5 flex items-center justify-between shrink-0">
                   <div className="flex gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-black/35" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-black/35" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-black/35" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
                   </div>
-                  <div className="bg-white border border-black rounded-md px-4 py-0.5 text-[9px] font-bold text-grey-500 font-sans tracking-wide">
+                  <div className="bg-white border border-gray-200 rounded-md px-4 py-0.5 text-[9px] font-bold text-gray-500 font-sans tracking-wide shadow-xs">
                     usekasi.com/analytics
                   </div>
                   <div className="w-6 h-6" /> {/* Spacer */}
@@ -136,9 +136,9 @@ export const CustomerIntelligenceSection = () => {
               </div>
 
               {/* Mobile Phone Mockup Overlay */}
-              <div className="absolute -bottom-10 -right-6 w-[150px] h-[280px] bg-white rounded-[24px] border-[3px] border-black shadow-[5px_5px_0px_#0A0A0A] flex flex-col overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
+              <div className="absolute -bottom-10 -right-6 w-[150px] h-[280px] bg-white rounded-[24px] border border-gray-200/90 shadow-[0_20px_45px_rgba(0,0,0,0.22)] flex flex-col overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500 z-20 select-none">
                 {/* Notch */}
-                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-10 h-2 bg-black rounded-full z-30" />
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-10 h-2 bg-gray-900 rounded-full z-30" />
                 {/* Image */}
                 <img 
                   src="/analytics_mobile.png" 

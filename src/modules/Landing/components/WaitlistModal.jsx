@@ -96,17 +96,17 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Modal Card */}
-      <div className="relative w-full max-w-lg bg-[#ECFDF3] dark:bg-[#0B150E] border-[3px] border-black rounded-[24px] shadow-[8px_8px_0px_#000] z-10 overflow-hidden animate-in zoom-in-95 duration-200 text-left">
+      <div className="relative w-full max-w-lg bg-white dark:bg-[#121A15] border border-gray-200/80 dark:border-white/10 rounded-3xl shadow-2xl z-10 overflow-hidden animate-in zoom-in-95 duration-200 text-left">
         
         {/* Header decoration banner */}
-        <div className="bg-[#1A7A4A] h-3 border-b-[3px] border-black w-full" />
+        <div className="bg-[#1A7A4A] h-2 w-full" />
 
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 bg-white dark:bg-black hover:bg-neutral-100 border-[1.5px] border-black rounded-full transition-all shadow-[2px_2px_0px_#000] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_#000] active:translate-y-[0px] cursor-pointer text-black dark:text-white"
+          className="absolute top-5 right-5 p-2 bg-gray-50 dark:bg-black/40 hover:bg-gray-100 dark:hover:bg-black/60 border border-gray-200 dark:border-white/10 rounded-full transition-all shadow-xs hover:shadow-sm cursor-pointer text-gray-700 dark:text-gray-300"
         >
-          <X size={16} strokeWidth={3} />
+          <X size={16} strokeWidth={2.5} />
         </button>
 
         {/* Content */}
@@ -115,27 +115,27 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
             <>
               {/* Form Heading */}
               <div className="mb-6 space-y-1">
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#D4F263] border-[1.5px] border-black text-black text-[10px] font-black uppercase tracking-wider rounded-full shadow-[1.5px_1.5px_0px_#000]">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#D4F263] border border-black/10 text-gray-950 text-[10px] font-bold uppercase tracking-wider rounded-full shadow-xs">
                   Get Early Access
                 </span>
                 <h3 className="text-2xl md:text-3xl font-black text-black dark:text-white font-bricolage tracking-tight mt-1.5 leading-none">
                   Join Kasi Beta Waitlist.
                 </h3>
-                <p className="text-xs md:text-sm text-gray-700 dark:text-gray-300 leading-normal font-medium mt-1">
+                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-normal font-medium mt-1">
                   Be the first to automate your sales, negotiations, and payments. Tell us about yourself to customize your early access!
                 </p>
               </div>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-[1.5px] border-red-500 rounded-xl text-xs font-bold text-center">
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 rounded-xl text-xs font-bold text-center">
                   {error}
                 </div>
               )}
 
               {/* Progress Steps */}
               <div className="flex items-center gap-2 mb-6">
-                <div className={`h-2 flex-1 rounded-full border border-black transition-colors ${currentStep >= 1 ? "bg-[#1A7A4A]" : "bg-white"}`} />
-                <div className={`h-2 flex-1 rounded-full border border-black transition-colors ${currentStep >= 2 ? "bg-[#1A7A4A]" : "bg-white"}`} />
+                <div className={`h-1.5 flex-1 rounded-full transition-colors ${currentStep >= 1 ? "bg-[#1A7A4A]" : "bg-gray-100 dark:bg-gray-800"}`} />
+                <div className={`h-1.5 flex-1 rounded-full transition-colors ${currentStep >= 2 ? "bg-[#1A7A4A]" : "bg-gray-100 dark:bg-gray-800"}`} />
               </div>
 
               <form onSubmit={currentStep === 1 ? handleNext : handleSubmit} className="space-y-4">
@@ -145,7 +145,7 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                   <div className="space-y-3.5 animate-in fade-in duration-200">
                     {/* Full Name */}
                     <div className="space-y-1">
-                      <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">Full Name</label>
+                      <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">Full Name</label>
                       <input
                         type="text"
                         name="name"
@@ -153,14 +153,14 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="e.g. Bolaji Durojaiye"
-                        className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                        className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       {/* Email */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">Email Address</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">Email Address</label>
                         <input
                           type="email"
                           name="email"
@@ -168,13 +168,13 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="e.g. you@example.com"
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         />
                       </div>
 
                       {/* WhatsApp Phone Number */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">WhatsApp Phone Number</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">WhatsApp Phone Number</label>
                         <input
                           type="tel"
                           name="phone_number"
@@ -182,7 +182,7 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                           value={formData.phone_number}
                           onChange={handleChange}
                           placeholder="e.g. 08123456789"
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         />
                       </div>
                     </div>
@@ -190,13 +190,13 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       {/* Category */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">What describes you best?</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">What describes you best?</label>
                         <select
                           name="category"
                           required
                           value={formData.category}
                           onChange={handleChange}
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         >
                           <option value="">Select category...</option>
                           <option value="product_vendor">I sell physical products</option>
@@ -209,13 +209,13 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
 
                       {/* Heard About Kasi */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">How did you hear about Kasi?</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">How did you hear about Kasi?</label>
                         <select
                           name="heard_about"
                           required
                           value={formData.heard_about}
                           onChange={handleChange}
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         >
                           <option value="">Select option...</option>
                           <option value="Social Media">Social Media (Twitter, IG, TikTok)</option>
@@ -233,13 +233,13 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       {/* Runs Online Business */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">Do you run an online business?</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">Do you run an online business?</label>
                         <select
                           name="runs_online_biz"
                           required
                           value={formData.runs_online_biz}
                           onChange={handleChange}
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         >
                           <option value="">Select choice...</option>
                           <option value="Yes">Yes, I do</option>
@@ -249,13 +249,13 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
 
                       {/* Commerce Platform */}
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">Main platform for your transactions?</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">Main platform for your transactions?</label>
                         <select
                           name="commerce_platform"
                           required
                           value={formData.commerce_platform}
                           onChange={handleChange}
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         >
                           <option value="">Select platform...</option>
                           <option value="WhatsApp">WhatsApp</option>
@@ -272,13 +272,13 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                     {isBusinessUser ? (
                       /* Business Field: Orders */
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">Average orders or bookings received monthly?</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">Average orders or bookings received monthly?</label>
                         <select
                           name="business_orders"
                           required
                           value={formData.business_orders}
                           onChange={handleChange}
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         >
                           <option value="">Select orders range...</option>
                           <option value="Under 10">Under 10 orders / month</option>
@@ -290,13 +290,13 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                     ) : (
                       /* Customer Field: Budget */
                       <div className="space-y-1">
-                        <label className="text-[11px] font-black text-black dark:text-white tracking-wider uppercase">Average monthly budget on online shopping?</label>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 tracking-wider uppercase">Average monthly budget on online shopping?</label>
                         <select
                           name="customer_spend"
                           required
                           value={formData.customer_spend}
                           onChange={handleChange}
-                          className="w-full bg-white dark:bg-[#121A15] border-[2px] border-black px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1A7A4A]/25 transition-all shadow-[2px_2px_0px_#000]"
+                          className="w-full bg-white dark:bg-[#18221B] border border-gray-200 dark:border-gray-800 px-4 py-2.5 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all shadow-xs"
                         >
                           <option value="">Select spend range...</option>
                           <option value="Under ₦10k">Under ₦10,000 / month</option>
@@ -315,7 +315,7 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                     <button
                       type="button"
                       onClick={() => setCurrentStep(1)}
-                      className="px-6 py-3 border-[2px] border-black bg-white dark:bg-black text-black dark:text-white font-bold text-sm rounded-xl transition-all shadow-[2px_2px_0px_#000] hover:translate-y-[-1px] hover:shadow-[3px_3px_0px_#000] active:translate-y-[0px] cursor-pointer"
+                      className="px-6 py-3 border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#18221B] text-gray-800 dark:text-white font-bold text-sm rounded-xl transition-all shadow-xs hover:shadow-sm cursor-pointer"
                     >
                       Back
                     </button>
@@ -323,10 +323,10 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-3 bg-[#1A7A4A] hover:bg-[#15603A] text-white border-[2.5px] border-black font-black text-sm rounded-xl transition-all shadow-[3px_3px_0px_#000] hover:translate-y-[-1px] hover:shadow-[4.5px_4.5px_0px_#000] active:translate-y-[0px] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                    className="flex-1 py-3 bg-[#1A7A4A] hover:bg-[#15603A] text-white font-bold text-sm rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>{loading ? "Joining..." : currentStep === 1 ? "Next Step" : "Join Waitlist"}</span>
-                    <ArrowRight size={16} strokeWidth={3.5} />
+                    <ArrowRight size={16} strokeWidth={2.5} />
                   </button>
                 </div>
               </form>
@@ -334,7 +334,7 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
           ) : (
             /* Success State - Immediate WhatsApp Invite */
             <div className="py-6 text-center space-y-6 animate-in fade-in zoom-in-95 duration-300">
-              <div className="w-16 h-16 bg-[#1A7A4A]/10 border-[2px] border-[#1A7A4A] text-[#1A7A4A] rounded-full flex items-center justify-center mx-auto shadow-[3px_3px_0px_rgba(26,122,74,0.15)]">
+              <div className="w-16 h-16 bg-[#1A7A4A]/10 border border-[#1A7A4A]/20 text-[#1A7A4A] rounded-full flex items-center justify-center mx-auto shadow-xs">
                 <Check size={32} strokeWidth={3} />
               </div>
 
@@ -342,7 +342,7 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                 <h3 className="text-3xl font-black text-black dark:text-white font-bricolage tracking-tight leading-none">
                   Welcome to Kasi! 🎉
                 </h3>
-                <p className="text-sm text-gray-700 dark:text-gray-300 max-w-sm mx-auto leading-relaxed font-semibold">
+                <p className="text-sm text-gray-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed font-medium">
                   You are officially on the exclusive beta waitlist. Now, join our active WhatsApp group immediately to connect with the team and get priority access!
                 </p>
               </div>
@@ -352,7 +352,7 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
                   href="https://chat.whatsapp.com/H8Gays3ZzkUIZdex99WeKD"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex w-full py-4 bg-[#25D366] hover:bg-[#20ba59] text-white border-[2.5px] border-black font-black text-base rounded-xl transition-all shadow-[4px_4px_0px_#000] hover:translate-y-[-2px] hover:shadow-[5.5px_5.5px_0px_#000] active:translate-y-[0px] items-center justify-center gap-2.5 cursor-pointer text-center no-underline"
+                  className="inline-flex w-full py-3.5 bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-base rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 items-center justify-center gap-2.5 cursor-pointer text-center no-underline"
                 >
                   <Send size={18} className="fill-current" />
                   <span>Join WhatsApp Community</span>
@@ -361,7 +361,7 @@ export const WaitlistModal = ({ isOpen, onClose }) => {
 
               <button
                 onClick={onClose}
-                className="text-xs font-bold text-gray-500 hover:text-black dark:hover:text-white underline block mx-auto cursor-pointer bg-transparent border-0"
+                className="text-xs font-bold text-gray-400 hover:text-gray-700 dark:hover:text-white underline block mx-auto cursor-pointer bg-transparent border-0"
               >
                 Close Window
               </button>

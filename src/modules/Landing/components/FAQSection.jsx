@@ -25,7 +25,7 @@ export const FAQSection = () => {
   ];
 
   return (
-    <section id="faq" className="py-28 bg-white border-b-1.5 border-black">
+    <section id="faq" className="py-28 bg-white border-b border-[#E5E5E5]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 font-prompt">
         
         {/* Section Header */}
@@ -36,7 +36,7 @@ export const FAQSection = () => {
           <h2 className="font-section-h2">
             Frequently asked <span className="text-brand">questions.</span>
           </h2>
-          <p className="font-body-large text-grey-700 max-w-xl mx-auto mt-2">
+          <p className="font-body-large text-gray-600 max-w-xl mx-auto mt-2 font-sans">
             Everything you need to know about Kasi AI's subscription pricing, direct bank integrations, and social chat channel connections.
           </p>
         </div>
@@ -48,16 +48,16 @@ export const FAQSection = () => {
             return (
               <div 
                 key={idx}
-                className="bg-white border-hard rounded-2xl overflow-hidden transition-all duration-300 shadow-hard hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#0A0A0A]"
+                className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-xs hover:border-gray-200 hover:shadow-md transition-all duration-200"
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
                   className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none cursor-pointer"
                 >
-                  <span className="text-sm font-black text-black pl-1 flex items-center gap-2">
+                  <span className="text-sm font-bold text-gray-900 pl-1 flex items-center gap-2 font-sans">
                     <span>{faq.q}</span>
                   </span>
-                  <div className="p-1.5 rounded-lg bg-bg-subtle text-black border-hard transition-colors">
+                  <div className="p-1.5 rounded-lg bg-gray-50 text-gray-600 border border-gray-200 transition-colors">
                     {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </div>
                 </button>
@@ -66,10 +66,10 @@ export const FAQSection = () => {
                 <div 
                   className={clsx(
                     'transition-all duration-300 ease-in-out overflow-hidden pl-7 pr-12',
-                    isOpen ? 'max-h-48 border-t-1.5 border-black py-5 opacity-100' : 'max-h-0 py-0 opacity-0'
+                    isOpen ? 'max-h-48 border-t border-gray-100 py-5 opacity-100' : 'max-h-0 py-0 opacity-0'
                   )}
                 >
-                  <p className="text-xs text-grey-700 font-bold leading-relaxed">
+                  <p className="text-sm text-gray-500 font-medium leading-relaxed font-sans">
                     {faq.a}
                   </p>
                 </div>
@@ -79,19 +79,19 @@ export const FAQSection = () => {
         </div>
 
         {/* Help block below */}
-        <div className="bg-brand-light border-hard rounded-2xl p-6 md:p-8 mt-16 flex flex-col md:flex-row items-center justify-between gap-6 shadow-hard">
+        <div className="bg-[#E8F5EE]/60 border border-[#1A7A4A]/20 rounded-2xl p-6 md:p-8 mt-16 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
           <div className="flex gap-4 items-center">
-            <div className="w-10 h-10 rounded-xl bg-accent border-hard text-black flex items-center justify-center shrink-0 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-[#D4F263] text-gray-950 flex items-center justify-center shrink-0 shadow-xs">
               <MessageCircle size={18} />
             </div>
             <div className="space-y-0.5 text-left">
-              <h4 className="text-sm font-black text-black">Still have questions?</h4>
-              <p className="text-[10px] text-grey-700 font-bold leading-relaxed">We are here to help you get integrated and running smoothly.</p>
+              <h4 className="text-sm font-bold text-gray-900">Still have questions?</h4>
+              <p className="text-[11px] text-gray-500 font-medium leading-relaxed font-sans">We are here to help you get integrated and running smoothly.</p>
             </div>
           </div>
           <a
             href="mailto:support@usekasi.com"
-            className="px-5 py-2.5 btn-primary shrink-0 select-none"
+            className="px-5 py-2.5 btn-primary rounded-xl shrink-0 select-none shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
           >
             Contact Support
           </a>
