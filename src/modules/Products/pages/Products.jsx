@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2, Grid, List, Search, Info, Coins, Truck } from 'lucide-react';
+import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2, Grid, List, Search, Info, Coins, Truck, Store, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import api from '../../../api/axios';
 import { useToast } from '../../../context/ToastContext';
 import { ProductGridSkeleton } from '../../../components/ui/Skeleton';
@@ -33,6 +33,20 @@ const Products = () => {
   const [editing, setEditing] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   
+  // Marketplace bulk menu state
+  const [showBulkMenu, setShowBulkMenu] = useState(false);
+  const bulkMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (bulkMenuRef.current && !bulkMenuRef.current.contains(event.target)) {
+        setShowBulkMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
   // Delete state
   const [deletingId, setDeletingId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -53,6 +67,7 @@ const Products = () => {
     min_price: '',
     cost_price: '',
     in_stock: true,
+    is_marketplace_listed: true,
     stock_quantity: '',
     variants: '',
     weight: '',
@@ -91,9 +106,47 @@ const Products = () => {
     }
   };
 
+  const handleToggleMarketplace = async (product, e) => {
+    if (e) e.stopPropagation();
+    const currentVal = product.is_marketplace_listed !== undefined ? Boolean(product.is_marketplace_listed) : true;
+    const newStatus = !currentVal;
+    try {
+      await api.patch(`/api/products/${product.id}`, { is_marketplace_listed: newStatus });
+      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, is_marketplace_listed: newStatus } : p));
+      addToast(
+        newStatus ? `"${product.name}" is now listed on Kasi Marketplace` : `"${product.name}" unlisted from Kasi Marketplace`,
+        'success'
+      );
+    } catch (err) {
+      console.error('Toggle marketplace error:', err);
+      addToast('Failed to update marketplace status', 'error');
+    }
+  };
+
+  const handleBulkMarketplaceToggle = async (listed) => {
+    const actionLabel = listed ? 'list all products on' : 'unlist all products from';
+    if (!window.confirm(`Are you sure you want to ${actionLabel} the Kasi Marketplace?`)) {
+      return;
+    }
+    try {
+      setLoading(true);
+      await api.post('/api/products/bulk-marketplace-toggle', { is_marketplace_listed: listed });
+      addToast(
+        listed ? 'All products are now listed on Kasi Marketplace' : 'All products have been unlisted from Kasi Marketplace',
+        'success'
+      );
+      await fetchProducts();
+    } catch (err) {
+      console.error('Bulk marketplace toggle error:', err);
+      addToast('Failed to update marketplace visibility in bulk', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setForm({ 
-      name: '', brand: '', category: '', description: '', price: '', happy_price: '', min_price: '', cost_price: '', in_stock: true, stock_quantity: '',
+      name: '', brand: '', category: '', description: '', price: '', happy_price: '', min_price: '', cost_price: '', in_stock: true, is_marketplace_listed: true, stock_quantity: '',
       variants: '', weight: '', dimensions: '', expiry_date: '', voice_pitch: '', instagram_links: '', external_knowledge: '', bulk_discount_quantity: '', bulk_discount_percentage: '',
       specifications: [],
       delivery_available: true,
@@ -196,6 +249,7 @@ const Products = () => {
       delivery_cost_inside_city: product.delivery_cost_inside_city !== null && product.delivery_cost_inside_city !== undefined ? product.delivery_cost_inside_city : '',
       delivery_cost_outside_city: product.delivery_cost_outside_city !== null && product.delivery_cost_outside_city !== undefined ? product.delivery_cost_outside_city : '',
       is_fixed_price: (product.is_fixed_price !== null && product.is_fixed_price !== undefined) ? product.is_fixed_price : false,
+      is_marketplace_listed: product.is_marketplace_listed !== undefined ? Boolean(product.is_marketplace_listed) : true,
     });
     setEditing(product.id);
     setImages(product.images || []);
@@ -404,6 +458,10 @@ const Products = () => {
       matchesTab = !product.in_stock || (product.stock_quantity !== null && product.stock_quantity <= 0);
     } else if (filterTab === 'Hidden') {
       matchesTab = !product.in_stock;
+    } else if (filterTab === 'Market Listed') {
+      matchesTab = product.is_marketplace_listed !== false;
+    } else if (filterTab === 'Market Unlisted') {
+      matchesTab = product.is_marketplace_listed === false;
     }
     
     return matchesSearch && matchesTab;
@@ -434,13 +492,51 @@ const Products = () => {
             Manage your product catalog — the AI assistant uses this to answer customer queries
           </p>
         </div>
-        <button
-          onClick={() => { resetForm(); setShowModal(true); }}
-          className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl hover:bg-green-700 transition-colors text-sm font-medium shadow-sm"
-        >
-          <Plus size={18} />
-          Add Product
-        </button>
+        <div className="flex items-center gap-2.5">
+          {products.length > 0 && (
+            <div className="relative" ref={bulkMenuRef}>
+              <button
+                type="button"
+                onClick={() => setShowBulkMenu(!showBulkMenu)}
+                className="flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-3.5 py-2.5 rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+              >
+                <Store size={15} className="text-primary" />
+                <span>Marketplace Actions</span>
+                <ChevronDown size={14} className="text-gray-400" />
+              </button>
+              {showBulkMenu && (
+                <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-30 animate-in fade-in zoom-in-95">
+                  <div className="px-3 py-1.5 border-b border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    Bulk Marketplace Visibility
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setShowBulkMenu(false); handleBulkMarketplaceToggle(true); }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs font-medium text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <Eye size={14} className="text-emerald-600" />
+                    <span>List All Products on Market</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowBulkMenu(false); handleBulkMarketplaceToggle(false); }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs font-medium text-gray-700 hover:bg-amber-50 hover:text-amber-700 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <EyeOff size={14} className="text-amber-600" />
+                    <span>Unlist All from Market</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <button
+            onClick={() => { resetForm(); setShowModal(true); }}
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl hover:bg-green-700 transition-colors text-sm font-medium shadow-sm cursor-pointer"
+          >
+            <Plus size={18} />
+            Add Product
+          </button>
+        </div>
       </div>
       {/* Control Bar (Filters + Search) */}
       {products.length > 0 && (
@@ -450,7 +546,8 @@ const Products = () => {
               { label: 'All', count: products.length },
               { label: 'In Stock', count: products.filter(p => p.in_stock && (p.stock_quantity === null || p.stock_quantity > 0)).length },
               { label: 'Out of Stock', count: products.filter(p => !p.in_stock || (p.stock_quantity !== null && p.stock_quantity <= 0)).length },
-              { label: 'Hidden', count: products.filter(p => !p.in_stock).length },
+              { label: 'Market Listed', count: products.filter(p => p.is_marketplace_listed !== false).length },
+              { label: 'Market Unlisted', count: products.filter(p => p.is_marketplace_listed === false).length },
             ].map((f) => (
               <button
                 key={f.label}
@@ -595,7 +692,27 @@ const Products = () => {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 border-t border-gray-100 mt-4 pt-3">
+                  {/* Marketplace Visibility Toggle Pill */}
+                  <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => handleToggleMarketplace(product, e)}
+                      title={product.is_marketplace_listed !== false ? "Click to unlist this product from Kasi Marketplace" : "Click to list this product on Kasi Marketplace"}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                        product.is_marketplace_listed !== false
+                          ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/80'
+                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200'
+                      }`}
+                    >
+                      <Store size={12} className={product.is_marketplace_listed !== false ? 'text-emerald-600' : 'text-gray-400'} />
+                      <span>{product.is_marketplace_listed !== false ? 'Market: Listed' : 'Market: Unlisted'}</span>
+                    </button>
+                    <span className="text-[10px] text-gray-400 font-medium">
+                      {product.is_marketplace_listed !== false ? 'Public' : 'AI DMs only'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 border-t border-gray-100 mt-3 pt-3">
                     <button
                       onClick={() => handleEdit(product)}
                       className="flex-1 flex items-center justify-center gap-1.5 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 py-1.5 rounded-lg transition-colors"
@@ -920,6 +1037,28 @@ const Products = () => {
                             <div>
                               <span className="text-sm font-semibold text-gray-700 block">Enable Delivery for this Product</span>
                               <span className="text-xs text-gray-400">Allow Kasi to quote delivery for this item using your rate sheet</span>
+                            </div>
+                          </label>
+                        </div>
+
+                        {/* Marketplace Visibility Section */}
+                        <div className="border-t border-gray-100 pt-4 mt-2">
+                          <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                            <Store size={14} className="text-primary" /> Marketplace Visibility
+                          </h3>
+                          
+                          <label className="flex items-start gap-3 p-3.5 border border-gray-200 hover:border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all select-none">
+                            <input
+                              type="checkbox"
+                              checked={form.is_marketplace_listed}
+                              onChange={(e) => setForm({ ...form, is_marketplace_listed: e.target.checked })}
+                              className="w-4 h-4 mt-0.5 rounded text-primary focus:ring-primary border-gray-300 cursor-pointer"
+                            />
+                            <div>
+                              <span className="text-sm font-semibold text-gray-800 block">List on Kasi Marketplace</span>
+                              <span className="text-xs text-gray-500 block mt-0.5 leading-relaxed">
+                                When enabled, this product is displayed publicly on <strong className="text-gray-700">usekasi.com/market</strong>. When toggled off, it is unlisted from the marketplace, but your AI agent can still sell it privately to customers in WhatsApp & Instagram DMs.
+                              </span>
                             </div>
                           </label>
                         </div>
