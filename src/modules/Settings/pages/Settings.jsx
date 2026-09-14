@@ -5,7 +5,7 @@ import { useToast } from '../../../context/ToastContext';
 import { useTheme, THEMES } from '../../../context/ThemeContext';
 import Button from '../../../components/ui/Button';
 import api from '../../../api/axios';
-import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout, Wallet, ShieldCheck, Landmark, CheckCircle, AlertTriangle, Truck } from 'lucide-react';
+import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout, Wallet, ShieldCheck, Landmark, CheckCircle, AlertTriangle, Truck, Store } from 'lucide-react';
 import ActivityLogsTable from '../components/ActivityLogsTable';
 import IntegrationsTab from '../components/IntegrationsTab';
 import { X } from 'lucide-react';
@@ -421,7 +421,8 @@ const Settings = () => {
         agent_name: '',
         logistics_phone: '',
         store_google_maps_link: '',
-        general_enquiry_phone: ''
+        general_enquiry_phone: '',
+        marketplace_enabled: true
     });
 
     // Change Password states
@@ -574,7 +575,8 @@ const Settings = () => {
                 agent_name: user.agent_name || 'Kasi',
                 logistics_phone: user.logistics_phone || '',
                 store_google_maps_link: user.store_google_maps_link || '',
-                general_enquiry_phone: user.general_enquiry_phone || ''
+                general_enquiry_phone: user.general_enquiry_phone || '',
+                marketplace_enabled: user.marketplace_enabled !== undefined ? Boolean(user.marketplace_enabled) : true
             });
         }
     }, [user]);
@@ -975,6 +977,51 @@ const Settings = () => {
                                     <p className="font-bold text-sm text-dark">Service Provider</p>
                                     <p className="text-[10px] text-gray-500">I offer appointments</p>
                                 </button>
+                            </div>
+
+                            {/* Kasi Marketplace Visibility Card */}
+                            <div className="border border-gray-100 bg-gray-50/70 rounded-2xl p-5 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-xs">
+                                            <Store size={18} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-bold text-dark">Kasi Marketplace Visibility</h3>
+                                            <p className="text-[11px] text-gray-500">Display your store profile & products on usekasi.com/market</p>
+                                        </div>
+                                    </div>
+                                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                                        formData.marketplace_enabled
+                                            ? 'bg-emerald-100 text-emerald-800'
+                                            : 'bg-gray-200 text-gray-600'
+                                    }`}>
+                                        {formData.marketplace_enabled ? 'Store Listed' : 'Store Hidden'}
+                                    </span>
+                                </div>
+
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    Turn this off if you do not want your store or products shown on the public marketplace. Your AI sales agent will still actively sell your products in private WhatsApp, Instagram, or TikTok DM conversations.
+                                </p>
+
+                                <label className="flex items-center gap-3 p-3 bg-white border border-gray-200 hover:border-gray-300 rounded-xl cursor-pointer transition-all select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(formData.marketplace_enabled)}
+                                        onChange={(e) => setFormData({ ...formData, marketplace_enabled: e.target.checked })}
+                                        className="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300 cursor-pointer"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-xs font-semibold text-gray-800 block">
+                                            Enable public Kasi Marketplace listing
+                                        </span>
+                                        <span className="text-[11px] text-gray-400 block">
+                                            {formData.marketplace_enabled 
+                                                ? 'Your store and listed products are live and searchable by shoppers.'
+                                                : 'Your store is private. Products are hidden from the marketplace.'}
+                                        </span>
+                                    </div>
+                                </label>
                             </div>
 
                             <h2 className="text-lg font-bold text-dark pt-2">AI configuration</h2>
