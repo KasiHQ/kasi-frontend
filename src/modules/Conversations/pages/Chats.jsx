@@ -477,20 +477,20 @@ const Chats = () => {
         </div>
 
         {/* Filter Tabs (Horizontal Scroll) */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 pb-3 border-b border-[#EAECF0] shrink-0 select-none">
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide px-3 pb-2.5 border-b border-gray-200/80 dark:border-gray-700/60 shrink-0 select-none">
           {filters.map((f) => (
             <button
               key={f.label}
               onClick={() => setActiveFilter(f.label)}
-              className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all outline-none cursor-pointer ${
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all outline-none cursor-pointer ${
                 activeFilter === f.label
-                  ? 'bg-[#0A0A0A] text-white'
-                  : 'bg-transparent text-[#344054] hover:bg-[#F2F4F7]'
+                  ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-xs'
+                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
               <span>{f.short || f.label}</span>
               {f.count > 0 && (
-                <span className={`text-[11px] ml-0.5 px-1.5 py-0.2 rounded-full ${activeFilter === f.label ? 'bg-white/20 text-white' : 'bg-[#F2F4F7] text-[#667085]'}`}>
+                <span className={`text-[10px] font-semibold ml-0.5 px-1.5 py-0.2 rounded-md ${activeFilter === f.label ? 'bg-white/20 text-white dark:bg-gray-900/20 dark:text-gray-900' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}>
                   {f.count}
                 </span>
               )}
@@ -609,7 +609,7 @@ const Chats = () => {
                   {getInitials(selectedConversation.customer_name)}
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#101828] text-[18px] leading-tight">
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-tight truncate">
                     {selectedConversation.customer_name || 'Unknown Customer'}
                   </h3>
                   <p className="text-[13px] text-[#667085] flex items-center gap-1 mt-0.5">
@@ -689,19 +689,19 @@ const Chats = () => {
 
               
               {/* Price block */}
-              <div className="grid grid-cols-2 gap-4 px-6 py-5 bg-white border-b border-[#EAECF0] select-none">
+              <div className="grid grid-cols-2 gap-4 px-6 py-3.5 bg-white dark:bg-gray-800 border-b border-gray-200/80 dark:border-gray-700/60 select-none">
                 <div>
-                  <p className="text-[11px] font-semibold tracking-[0.08em] text-[#98A2B3] uppercase">LISTED PRICE</p>
-                  <p className="text-[24px] font-bold text-[#101828] mt-1">
+                  <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">LISTED PRICE</p>
+                  <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mt-0.5 tracking-tight">
                     {selectedConversation.listed_price > 0 ? `₦${selectedConversation.listed_price.toLocaleString()}` : '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold tracking-[0.08em] text-[#98A2B3] uppercase">AGREED PRICE</p>
-                  <p className={`text-[24px] font-bold mt-1 ${
+                  <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">AGREED PRICE</p>
+                  <p className={`text-lg sm:text-xl font-bold mt-0.5 tracking-tight ${
                     selectedConversation.agreed_price < selectedConversation.listed_price && selectedConversation.agreed_price > 0 
-                      ? 'text-[#F97316]' 
-                      : 'text-[#101828]'
+                      ? 'text-amber-600 dark:text-amber-400' 
+                      : 'text-gray-900 dark:text-white'
                   }`}>
                     {selectedConversation.agreed_price > 0 ? `₦${selectedConversation.agreed_price.toLocaleString()}` : 'Negotiating...'}
                   </p>
@@ -786,12 +786,12 @@ const Chats = () => {
                     
                     return parsedMessages.map((msg, idx) => (
                       <div key={idx} className={`flex flex-col ${msg.isMerchant ? 'items-end' : 'items-start'}`}>
-                        <div className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-xs text-xs md:text-sm leading-relaxed ${
+                        <div className={`max-w-[82%] rounded-xl px-3.5 py-2.5 shadow-2xs text-xs sm:text-sm leading-relaxed ${
                           msg.isMerchant 
                             ? 'bg-[#1A7A4A] text-white rounded-br-none' 
-                            : 'bg-white border border-[#EAECF0] text-[#101828] rounded-bl-none'
+                            : 'bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/60 text-gray-900 dark:text-white rounded-bl-none'
                         }`}>
-                          <div className="text-[10px] opacity-75 font-semibold mb-1">
+                          <div className="text-[10px] opacity-75 font-medium mb-1">
                             {msg.sender}
                           </div>
                           <div className="whitespace-pre-wrap leading-relaxed">{formatMessageContent(msg.content, msg.isMerchant)}</div>

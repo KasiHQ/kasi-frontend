@@ -557,22 +557,22 @@ const Clients = () => {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Total Contacts</p>
-          <p className="text-3xl font-black text-dark">{totalContacts}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
+          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Contacts</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{totalContacts}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Paying Buyers</p>
-          <p className="text-3xl font-black text-dark">{payingBuyers}</p>
+        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
+          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Paying Buyers</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{payingBuyers}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Total Revenue</p>
-          <p className="text-3xl font-black text-primary">{formatNaira(totalRevenue)}</p>
+        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
+          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Revenue</p>
+          <p className="text-xl sm:text-2xl font-bold text-[#1A7A4A] tracking-tight">{formatNaira(totalRevenue)}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Hot Leads</p>
-          <p className="text-3xl font-black text-dark">{hotLeadsCount}</p>
+        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
+          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Hot Leads</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{hotLeadsCount}</p>
         </div>
       </div>
 
