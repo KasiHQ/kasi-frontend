@@ -36,6 +36,8 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               </div>
             )}
 
+
+
             {/* H1 headline */}
             <div>
               <h1 className="text-4xl md:text-5.5xl lg:text-[58px] font-black tracking-tight leading-[1.06] text-[#0A0A0A] font-bricolage select-none">

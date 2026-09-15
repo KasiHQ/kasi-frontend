@@ -276,6 +276,17 @@ const LandingPage = () => {
               <p className="text-[15px] text-white/50 leading-relaxed font-medium max-w-xs mt-4">
                 Your AI sales agent that never sleeps.
               </p>
+
+              {/* Official Meta Tech Provider Card - Prominent & Tall */}
+              <div className="pt-4">
+                <div className="p-3.5 bg-white rounded-2xl border border-white/20 shadow-md inline-block max-w-[210px] select-none hover:shadow-lg transition-all">
+                  <img 
+                    src="/official-meta-tech-provider.jpg" 
+                    alt="Official Meta Tech Provider" 
+                    className="w-full h-auto object-contain rounded-lg"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Column 2 — PRODUCT */}
