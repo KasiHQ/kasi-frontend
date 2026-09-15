@@ -434,12 +434,6 @@ const Invoices = () => {
                         <Filter size={20} />
                         Filters
                     </Button>
-                    <Link to="/invoices/create" className="w-full sm:w-auto">
-                        <Button className="w-full flex justify-center items-center gap-2 bg-primary hover:bg-green-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-green-200 transition-all">
-                            <Plus size={20} />
-                            Create Invoice
-                        </Button>
-                    </Link>
                 </div>
             </div>
 

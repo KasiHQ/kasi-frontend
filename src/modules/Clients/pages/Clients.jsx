@@ -27,10 +27,10 @@ const getInitials = (name) => {
 };
 
 const tagConfig = {
-  'Buyers': { bg: 'bg-emerald-100', text: 'text-emerald-800' },
-  'Hot Lead': { bg: 'bg-rose-100', text: 'text-rose-800' },
-  'Negotiating': { bg: 'bg-amber-100', text: 'text-amber-800' },
-  'Cold Lead': { bg: 'bg-blue-100', text: 'text-blue-800' },
+  'Buyers': { bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-[#1C774E] dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/50' },
+  'Hot Lead': { bg: 'bg-rose-50 dark:bg-rose-950/40', text: 'text-rose-700 dark:text-rose-300 border border-rose-200/70 dark:border-rose-800/50' },
+  'Negotiating': { bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/50' },
+  'Cold Lead': { bg: 'bg-sky-50 dark:bg-sky-950/40', text: 'text-sky-700 dark:text-sky-300 border border-sky-200/70 dark:border-sky-800/50' },
 };
 
 const platformBadge = (platform) => {
@@ -38,9 +38,9 @@ const platformBadge = (platform) => {
   if (cleanPlatform === 'whatsapp') {
     return {
       label: 'WhatsApp',
-      color: 'text-emerald-700 bg-emerald-50 border border-emerald-100',
+      color: 'text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-800/50',
       icon: (
-        <svg className="w-3.5 h-3.5 fill-emerald-600 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-3.5 h-3.5 fill-[#25D366] shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.517 2.266 2.27 3.507 5.289 3.507 8.494-.004 6.66-5.338 11.997-11.95 11.997-2.005-.001-3.973-.503-5.714-1.46L0 24zm6.59-20.347c-.186-.412-.384-.42-.562-.427-.146-.006-.314-.006-.482-.006-.168 0-.441.063-.672.314-.23.251-.879.859-.879 2.094 0 1.235.9 2.428 1.025 2.595.126.167 1.767 2.699 4.284 3.782.598.258 1.065.412 1.428.527.6.19 1.15.163 1.583.099.483-.072 1.482-.605 1.691-1.19.209-.584.209-1.086.146-1.19-.063-.105-.23-.167-.481-.293-.251-.126-1.482-.731-1.712-.815-.23-.084-.397-.126-.564.126-.167.251-.648.815-.794.982-.146.167-.293.188-.543.063-.25-.126-.98-.362-1.868-1.154-.69-.616-1.157-1.378-1.293-1.611-.136-.234-.015-.361.11-.486.112-.112.251-.293.376-.44.126-.146.167-.25.251-.418.084-.167.042-.314-.021-.44-.063-.125-.562-1.355-.77-1.854z"/>
         </svg>
       )
@@ -49,12 +49,10 @@ const platformBadge = (platform) => {
   if (cleanPlatform === 'instagram') {
     return {
       label: 'Instagram',
-      color: 'text-pink-700 bg-pink-50 border border-pink-100',
+      color: 'text-pink-800 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/40 border border-pink-200/70 dark:border-pink-800/50',
       icon: (
-        <svg className="w-3.5 h-3.5 stroke-pink-600 fill-none shrink-0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+        <svg className="w-3.5 h-3.5 fill-[#E4405F] shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
         </svg>
       )
     };
@@ -62,17 +60,17 @@ const platformBadge = (platform) => {
   if (cleanPlatform === 'telegram') {
     return {
       label: 'Telegram',
-      color: 'text-sky-700 bg-sky-50 border border-sky-100',
+      color: 'text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/40 border border-sky-200/70 dark:border-sky-800/50',
       icon: (
-        <svg className="w-3.5 h-3.5 fill-sky-600 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.18l-1.92 9.07c-.14.63-.52.79-1.05.49l-2.93-2.16-1.41 1.36c-.16.16-.29.29-.6.29l.21-2.98 5.43-4.91c.24-.21-.05-.33-.37-.12L8.2 13.98l-2.89-.9c-.63-.2-.64-.63.13-.93l11.27-4.34c.52-.19.98.12.85.37z"/>
+        <svg className="w-3.5 h-3.5 fill-[#0088cc] shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
         </svg>
       )
     };
   }
   return {
-    label: platform || 'Unknown',
-    color: 'text-gray-600 bg-gray-50 border border-gray-100',
+    label: platform || 'Web',
+    color: 'text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200/70 dark:border-gray-700',
     icon: (
       <svg className="w-3.5 h-3.5 fill-gray-500 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
@@ -114,8 +112,8 @@ const deriveTag = (customer, conversations) => {
   return 'Cold Lead';
 };
 
-/* ── Customer History Popup Modal ───────────────── */
-const CustomerHistoryModal = ({ customer, invoices, onClose, onOpenChat }) => {
+/* ── Customer History Off-Canvas Slide-over Drawer ───────────────── */
+const CustomerHistoryDrawer = ({ customer, invoices, onClose, onOpenChat }) => {
   if (!customer) return null;
 
   const normalize = (p) => p ? p.toString().replace(/\D/g, '') : '';
@@ -139,127 +137,148 @@ const CustomerHistoryModal = ({ customer, invoices, onClose, onOpenChat }) => {
   const tc = tagConfig[tag] || tagConfig['Cold Lead'];
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-start justify-between bg-gray-50/50 dark:bg-gray-800/50">
-          <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-full ${getAvatarColor(customer.name)} text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0`}>
+    <div className="fixed inset-0 z-[100] flex justify-end">
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
+        onClick={onClose}
+      />
+
+      {/* Slide-over Drawer Container */}
+      <div 
+        className="relative z-10 w-full max-w-lg h-full bg-white dark:bg-gray-900 shadow-2xl flex flex-col border-l border-gray-200/80 dark:border-gray-800 animate-in slide-in-from-right duration-300"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Drawer Header */}
+        <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between bg-gray-50/70 dark:bg-gray-800/40">
+          <div className="flex items-center gap-3.5">
+            <div className={`w-12 h-12 rounded-2xl ${getAvatarColor(customer.name)} text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0`}>
               {getInitials(customer.name)}
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg font-bold text-dark dark:text-white">{customer.name}</h3>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${tc.bg} ${tc.text}`}>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">{customer.name}</h3>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${tc.bg} ${tc.text}`}>
                   {tag}
                 </span>
                 {customer.platform && (
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${pb.color}`}>
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${pb.color}`}>
                     {pb.icon} <span>{pb.label}</span>
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-4 mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {customer.phone && <span className="flex items-center gap-1"><Phone size={12} /> {customer.phone}</span>}
-                {customer.email && <span className="flex items-center gap-1"><Mail size={12} /> {customer.email}</span>}
+              <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {customer.phone && (
+                  <span className="flex items-center gap-1 font-mono">
+                    <Phone size={12} className="text-gray-400" /> {customer.phone}
+                  </span>
+                )}
+                {customer.email && (
+                  <span className="flex items-center gap-1">
+                    <Mail size={12} className="text-gray-400" /> {customer.email}
+                  </span>
+                )}
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all">
-            <X size={20} />
+          <button 
+            onClick={onClose} 
+            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all cursor-pointer"
+          >
+            <X size={18} />
           </button>
         </div>
 
         {/* Overview Stat Cards */}
-        <div className="grid grid-cols-3 gap-3 p-6 bg-slate-50/60 dark:bg-slate-900/30 border-b border-gray-100 dark:border-gray-700 shrink-0">
-          <div className="bg-white dark:bg-gray-800 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xs">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Spent</p>
-            <p className="text-xl font-black text-primary">₦{totalSpent.toLocaleString()}</p>
+        <div className="grid grid-cols-3 gap-2.5 p-4 bg-gray-50/50 dark:bg-gray-950/40 border-b border-gray-100 dark:border-gray-800 shrink-0">
+          <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200/80 dark:border-gray-700/70 shadow-2xs">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Total Spent</p>
+            <p className="text-base sm:text-lg font-black text-[#1C774E] dark:text-[#DBF361]">₦{totalSpent.toLocaleString()}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xs">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Orders</p>
-            <p className="text-xl font-black text-dark dark:text-white">{orderCount}</p>
+          <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200/80 dark:border-gray-700/70 shadow-2xs">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Orders</p>
+            <p className="text-base sm:text-lg font-black text-gray-900 dark:text-white">{orderCount}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xs">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Avg. Order Value</p>
-            <p className="text-xl font-black text-dark dark:text-white">₦{avgOrderValue.toLocaleString()}</p>
+          <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200/80 dark:border-gray-700/70 shadow-2xs">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Avg Order</p>
+            <p className="text-base sm:text-lg font-black text-gray-900 dark:text-white">₦{avgOrderValue.toLocaleString()}</p>
           </div>
         </div>
 
-        {/* Transactions / Orders List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
-          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Receipt size={14} className="text-primary" />
-            Order & Transaction History ({customerInvoices.length})
-          </h4>
+        {/* Scrollable Order History & Transactions */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-3.5">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Receipt size={14} className="text-[#1C774E]" />
+              Order & Transaction History ({customerInvoices.length})
+            </h4>
+          </div>
 
           {customerInvoices.length === 0 ? (
-            <div className="py-12 text-center border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-2xl">
-              <ShoppingBag size={36} className="mx-auto text-gray-300 mb-2" />
-              <p className="text-sm font-semibold text-dark dark:text-white">No invoices on record</p>
-              <p className="text-xs text-gray-400 mt-0.5">This customer hasn't completed any formal invoice orders yet.</p>
+            <div className="py-16 text-center border border-dashed border-gray-200 dark:border-gray-800 rounded-2xl bg-gray-50/40 dark:bg-gray-800/20">
+              <ShoppingBag size={32} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">No past orders</p>
+              <p className="text-[11px] text-gray-400 mt-0.5">This customer has not placed an order yet.</p>
             </div>
           ) : (
             customerInvoices.map((inv) => (
-              <div key={inv.id || inv.reference} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 space-y-3 hover:border-gray-200 transition-all shadow-xs">
+              <div key={inv.id || inv.reference} className="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/70 rounded-2xl p-3.5 space-y-2.5 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-sm text-dark dark:text-white">#{inv.reference}</span>
-                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                      inv.status === 'Paid' ? 'bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400' :
-                      inv.status === 'Delivered' ? 'bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400' :
-                      inv.status === 'In Transit' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400' :
-                      'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
+                    <span className="font-mono font-bold text-xs text-gray-900 dark:text-white">#{inv.reference}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      inv.status === 'Paid' ? 'bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60' :
+                      inv.status === 'Delivered' ? 'bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60' :
+                      inv.status === 'In Transit' ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border border-sky-200/60' :
+                      'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60'
                     }`}>
                       {inv.status}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-400 font-medium">
+                  <span className="text-[11px] text-gray-400 font-mono">
                     {new Date(inv.date_issued || inv.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
 
-                {/* Items */}
                 {inv.items && inv.items.length > 0 && (
-                  <div className="bg-gray-50 dark:bg-gray-900/40 rounded-xl p-3 space-y-1.5 border border-gray-100 dark:border-gray-800">
+                  <div className="bg-gray-50/80 dark:bg-gray-900/50 rounded-xl p-2.5 space-y-1 text-xs border border-gray-100 dark:border-gray-800">
                     {inv.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-xs text-gray-700 dark:text-gray-300">
-                        <span className="font-medium">{item.quantity}× {item.description}</span>
-                        <span className="font-semibold text-dark dark:text-white">₦{(item.total_price || (item.unit_price * item.quantity) || 0).toLocaleString()}</span>
+                      <div key={idx} className="flex justify-between items-center text-gray-600 dark:text-gray-300">
+                        <span className="font-medium truncate mr-2">{item.quantity}× {item.description}</span>
+                        <span className="font-semibold text-gray-900 dark:text-white shrink-0">₦{(item.total_price || (item.unit_price * item.quantity) || 0).toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Rider Info if present */}
                 {inv.rider_name && (
-                  <div className="text-xs bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 p-2 rounded-xl border border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
+                  <div className="text-[11px] bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 p-2 rounded-xl border border-sky-100 dark:border-sky-800 flex items-center justify-between">
                     <span>🚚 Rider: <strong>{inv.rider_name}</strong></span>
                     {inv.rider_phone && <span className="font-mono">{inv.rider_phone}</span>}
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-1 text-sm font-bold text-dark dark:text-white">
-                  <span className="text-xs text-gray-400 font-normal">Total Amount</span>
-                  <span className="text-primary">₦{(inv.total_amount || 0).toLocaleString()}</span>
+                <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800 text-xs">
+                  <span className="text-gray-400">Total</span>
+                  <span className="font-bold text-gray-900 dark:text-white">₦{(inv.total_amount || 0).toLocaleString()}</span>
                 </div>
               </div>
             ))
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 flex justify-between items-center shrink-0">
+        {/* Drawer Footer */}
+        <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900 flex items-center gap-2.5 shrink-0">
           <button
             onClick={() => onOpenChat(customer)}
-            className="px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-bold hover:bg-green-700 transition-all flex items-center gap-2 shadow-sm cursor-pointer"
+            className="flex-1 py-2.5 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-2xs cursor-pointer active:scale-95"
           >
-            <MessageSquare size={15} />
-            Chat with {customer.name.split(' ')[0]}
+            <MessageSquare size={14} />
+            Open Chat
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
           >
             Close
           </button>
@@ -606,29 +625,29 @@ const Clients = () => {
       </div>
 
       {/* Customer Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xs border border-gray-200/80 dark:border-gray-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-left border-b border-gray-100 bg-gray-50/50">
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider">Customer</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider">Contact</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider">Platform</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider">Tag</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider">Total Spend</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider text-center">Orders</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider">Last Active</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-400 text-[11px] uppercase tracking-wider"></th>
+              <tr className="text-left border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40">
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Customer</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Contact</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Platform</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Tag</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Total Spend</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider text-center">Orders</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider">Last Active</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-400 dark:text-gray-500 text-[11px] uppercase tracking-wider"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
               {loading ? (
                 <TableSkeleton rows={6} cols={8} />
               ) : filteredCustomers.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="text-center py-16">
-                    <Users size={36} className="mx-auto text-gray-300 mb-3" />
-                    <p className="text-sm font-semibold text-dark mb-1">No customers yet</p>
+                    <Users size={36} className="mx-auto text-gray-300 dark:text-gray-600 mb-3" />
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">No customers yet</p>
                     <p className="text-xs text-gray-400">Customers appear here when Kasi interacts with them.</p>
                   </td>
                 </tr>
@@ -639,33 +658,33 @@ const Clients = () => {
                   const tc = tagConfig[tag] || tagConfig['Cold Lead'];
 
                   return (
-                    <tr key={customer.id} className="group hover:bg-gray-50/80 transition-colors">
+                    <tr key={customer.id} className="group hover:bg-gray-50/70 dark:hover:bg-gray-800/50 transition-colors">
                       {/* Customer Name */}
                       <td className="px-5 py-4 cursor-pointer" onClick={() => setSelectedCustomerHistory(customer)}>
                         <div className="flex items-center gap-3">
-                          <div className={`w-9 h-9 rounded-full ${getAvatarColor(customer.name)} text-white flex items-center justify-center font-bold text-[11px] shrink-0`}>
+                          <div className={`w-9 h-9 rounded-2xl ${getAvatarColor(customer.name)} text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0`}>
                             {getInitials(customer.name)}
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-semibold text-dark text-sm group-hover:text-primary transition-colors">{customer.name}</span>
+                            <span className="font-bold text-gray-900 dark:text-white text-sm group-hover:text-[#1C774E] transition-colors">{customer.name}</span>
                             <span className="text-[10px] text-gray-400 font-medium">Click for history</span>
                           </div>
                         </div>
                       </td>
 
                       {/* Contact */}
-                      <td className="px-5 py-4 text-sm text-gray-600">
+                      <td className="px-5 py-4 text-xs font-mono text-gray-600 dark:text-gray-400">
                         {customer.phone || customer.email || '—'}
                       </td>
 
                       {/* Platform */}
                       <td className="px-5 py-4">
                         {customer.platform ? (
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${pb.color}`}>
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold ${pb.color}`}>
                             {pb.icon} <span>{pb.label}</span>
                           </span>
                         ) : (
-                          <span className="text-gray-400 text-sm">—</span>
+                          <span className="text-gray-400 text-xs font-mono">—</span>
                         )}
                       </td>
 
@@ -678,30 +697,30 @@ const Clients = () => {
 
                       {/* Total Spend */}
                       <td className="px-5 py-4">
-                        <span className={`font-bold text-sm ${customer.total_spent ? 'text-primary' : 'text-gray-400'}`}>
+                        <span className={`font-bold text-sm ${customer.total_spent ? 'text-[#1C774E] dark:text-[#DBF361]' : 'text-gray-400'}`}>
                           {formatNaira(customer.total_spent)}
                         </span>
                       </td>
 
                       {/* Orders */}
                       <td className="px-5 py-4 text-center cursor-pointer" onClick={() => setSelectedCustomerHistory(customer)}>
-                        <span className="inline-flex items-center gap-1 font-semibold text-dark text-sm hover:text-primary transition-colors">
-                          <History size={12} className="text-gray-400" />
+                        <span className="inline-flex items-center gap-1.5 font-bold text-gray-800 dark:text-gray-200 text-xs hover:text-[#1C774E] transition-colors">
+                          <History size={13} className="text-gray-400" />
                           {customer.order_count || 0}
                         </span>
                       </td>
 
                       {/* Last Active */}
-                      <td className="px-5 py-4 text-sm text-gray-500">
+                      <td className="px-5 py-4 text-xs text-gray-500 dark:text-gray-400 font-medium">
                         {timeAgo(customer.last_active || customer.last_purchase_date)}
                       </td>
 
                       {/* Actions */}
                       <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           <button 
                             onClick={() => setSelectedCustomerHistory(customer)}
-                            className="text-gray-600 font-semibold text-xs hover:text-dark transition-colors flex items-center gap-1 bg-gray-100 hover:bg-gray-200 px-2.5 py-1.5 rounded-lg cursor-pointer"
+                            className="text-gray-700 dark:text-gray-300 font-bold text-xs hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/80 border border-gray-200/80 dark:border-gray-700 px-3 py-1.5 rounded-xl cursor-pointer shadow-2xs"
                             title="View Full Order History"
                           >
                             <History size={13} />
@@ -709,7 +728,7 @@ const Clients = () => {
                           </button>
                           <button 
                             onClick={() => navigate(`/chats?customer=${encodeURIComponent(customer.phone || customer.name)}`)}
-                            className="text-primary font-semibold text-xs hover:text-green-700 transition-colors flex items-center gap-1 bg-green-50 hover:bg-green-100 px-2.5 py-1.5 rounded-lg cursor-pointer"
+                            className="text-[#1C774E] dark:text-[#DBF361] font-bold text-xs hover:bg-emerald-100/60 dark:hover:bg-emerald-950/60 transition-colors flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50 px-3 py-1.5 rounded-xl cursor-pointer shadow-2xs"
                           >
                             <MessageSquare size={13} />
                             Message
@@ -913,9 +932,9 @@ const Clients = () => {
         </div>
       )}
 
-      {/* Customer History Modal */}
+      {/* Customer History Off-Canvas Drawer */}
       {selectedCustomerHistory && (
-        <CustomerHistoryModal
+        <CustomerHistoryDrawer
           customer={selectedCustomerHistory}
           invoices={allInvoices}
           onClose={() => setSelectedCustomerHistory(null)}

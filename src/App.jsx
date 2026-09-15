@@ -16,7 +16,6 @@ import Signup from './modules/Auth/pages/Signup';
 import ForgotPassword from './modules/Auth/pages/ForgotPassword';
 import VerifyEmail from './modules/Auth/pages/VerifyEmail';
 
-import CreateInvoice from './modules/Invoices/pages/CreateInvoice';
 import Invoices from './modules/Invoices/pages/Invoices';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import SubscriptionGate from './components/layout/SubscriptionGate';
@@ -149,11 +148,6 @@ function App() {
               <Route path="/invoices" element={
                 <SubscriptionProtected>
                   <Invoices />
-                </SubscriptionProtected>
-              } />
-              <Route path="/invoices/create" element={
-                <SubscriptionProtected>
-                  <CreateInvoice />
                 </SubscriptionProtected>
               } />
               
