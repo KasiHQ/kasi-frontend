@@ -6,7 +6,8 @@ import api from '../../../api/axios';
 import {
   Package, Truck, CheckCircle2, Clock, MapPin, Phone, User,
   Search, AlertCircle, ShoppingBag, Send, Bike, ChevronRight,
-  ChevronLeft, RotateCcw, X, Check, Smartphone, Monitor
+  ChevronLeft, RotateCcw, X, Check, Smartphone, Monitor,
+  LayoutGrid, List, Store, Sparkles
 } from 'lucide-react';
 
 // ─── Pathway Steps Definition ──────────────────────────────────────────────────
@@ -24,6 +25,28 @@ const STEPS = {
     { key: 'collected', label: 'Picked up', sub: 'Order complete' }
   ]
 };
+
+// ─── Format 2-Sentence Context Helper ─────────────────────────────────────────
+function formatTwoSentenceSummary(rawText) {
+  if (!rawText || !rawText.trim()) return '';
+  // Strip raw transcripts and tags appended like [Customer]: ..., [Kasi AI]: ..., 🚨
+  let clean = rawText
+    .replace(/\[Customer\]:.*$/s, '')
+    .replace(/\[Kasi AI\]:.*$/s, '')
+    .replace(/\[Merchant\]:.*$/s, '')
+    .replace(/🚨/g, '')
+    .replace(/\[.*?\]/g, '')
+    .trim();
+
+  if (!clean) {
+    clean = rawText.replace(/\[(Customer|Kasi AI|Merchant|Agent)\]:\s*/gi, ' ').trim();
+  }
+
+  // Extract at most the first two clear sentences
+  const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
+  const twoSentences = sentences.slice(0, 2).map(s => s.trim()).join(' ');
+  return twoSentences || clean;
+}
 
 // Map backend conversation/invoice status to prototype state
 function mapToState(status, deliveryMode) {
@@ -45,7 +68,6 @@ function mapToState(status, deliveryMode) {
   if (s === 'paid') {
     return 'paid';
   }
-  // Attention or in progress (unconfirmed)
   return 'unconfirmed';
 }
 
@@ -137,7 +159,7 @@ export default function Fulfilment() {
   const [mobileViewMode, setMobileViewMode] = useState('cards'); // 'cards' | 'list'
   const [mobileFlowOpen, setMobileFlowOpen] = useState(false);
 
-  // Optional manual view override toggle (desktop vs mobile simulator)
+  // Optional manual view override toggle
   const [forcedView, setForcedView] = useState('responsive'); // 'responsive' | 'desk' | 'mob'
 
   // Rider modal
@@ -408,7 +430,7 @@ export default function Fulfilment() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#1C774E] text-[#DBF361] flex items-center justify-center font-bold shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-[#1C774E] text-[#DBF361] flex items-center justify-center font-bold shadow-xs">
               <Truck size={20} />
             </div>
             <div>
@@ -416,7 +438,7 @@ export default function Fulfilment() {
                 Orders & Fulfilment
               </h1>
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                {todoCount > 0 ? `${todoCount} order${todoCount > 1 ? 's' : ''} require action` : 'All caught up 🎉'}
+                {todoCount > 0 ? `${todoCount} order${todoCount > 1 ? 's' : ''} require action` : 'All caught up'}
               </p>
             </div>
           </div>
@@ -424,10 +446,10 @@ export default function Fulfilment() {
 
         <div className="flex items-center gap-2">
           {/* Responsive switch buttons */}
-          <div className="hidden lg:flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200/80 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300">
+          <div className="hidden lg:flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl border border-gray-200/80 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300">
             <button
               onClick={() => setForcedView('responsive')}
-              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                 forcedView === 'responsive' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
               }`}
             >
@@ -435,7 +457,7 @@ export default function Fulfilment() {
             </button>
             <button
               onClick={() => setForcedView('desk')}
-              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                 forcedView === 'desk' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
               }`}
             >
@@ -443,7 +465,7 @@ export default function Fulfilment() {
             </button>
             <button
               onClick={() => setForcedView('mob')}
-              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                 forcedView === 'mob' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
               }`}
             >
@@ -462,7 +484,7 @@ export default function Fulfilment() {
       </div>
 
       {/* ─── DESKTOP VIEW ───────────────────────────────────────────────────── */}
-      <div className={`relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-sm overflow-hidden ${
+      <div className={`relative bg-white dark:bg-gray-900 rounded-3xl border border-gray-200/90 dark:border-gray-800 shadow-sm overflow-hidden ${
         forcedView === 'mob' ? 'hidden' : forcedView === 'desk' ? 'block' : 'hidden md:block'
       }`}>
         
@@ -470,7 +492,7 @@ export default function Fulfilment() {
         <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-gray-900">
           <div className="flex items-center gap-2">
             <span className="text-base font-bold text-gray-900 dark:text-white">Active Pipeline</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#1C774E]/10 text-[#1C774E] dark:bg-[#1C774E]/20 dark:text-[#DBF361]">
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#1C774E]/10 text-[#1C774E] dark:bg-[#1C774E]/20 dark:text-[#DBF361]">
               {todoCount} to do
             </span>
           </div>
@@ -499,7 +521,7 @@ export default function Fulfilment() {
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                 filter === tab.key
                   ? 'bg-[#1C774E] text-white shadow-2xs font-bold'
                   : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200/80 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -532,14 +554,14 @@ export default function Fulfilment() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 text-[11px] uppercase tracking-wider font-semibold text-gray-400">
-                  <th className="py-3 px-4">Customer</th>
-                  <th className="py-3 px-3">Order ID</th>
-                  <th className="py-3 px-3">Type</th>
-                  <th className="py-3 px-3">Items</th>
-                  <th className="py-3 px-3">Total</th>
-                  <th className="py-3 px-3">Destination</th>
-                  <th className="py-3 px-3">Phase</th>
-                  <th className="py-3 px-4 text-right">Next action</th>
+                  <th className="py-3.5 px-4">Customer</th>
+                  <th className="py-3.5 px-3">Order ID</th>
+                  <th className="py-3.5 px-3">Type</th>
+                  <th className="py-3.5 px-3">Items</th>
+                  <th className="py-3.5 px-3">Total</th>
+                  <th className="py-3.5 px-3">Destination</th>
+                  <th className="py-3.5 px-3">Phase</th>
+                  <th className="py-3.5 px-4 text-right">Next action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -569,15 +591,17 @@ export default function Fulfilment() {
                         {order.displayId}
                       </td>
 
-                      {/* Type Badge */}
+                      {/* Type Badge - Clean Lucide SVG icons, NO emojis */}
                       <td className="py-3.5 px-3 whitespace-nowrap">
                         {order.delivery_type === 'delivery' ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
-                            🛵 Delivery
+                            <Truck size={12} className="shrink-0 text-[#1C774E]" />
+                            Delivery
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50">
-                            🏬 Pickup
+                            <ShoppingBag size={12} className="shrink-0 text-amber-600" />
+                            Pickup
                           </span>
                         )}
                       </td>
@@ -619,13 +643,13 @@ export default function Fulfilment() {
                           <button
                             onClick={nextAction.run}
                             disabled={updating}
-                            className="px-3 py-1.5 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-lg font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                            className="px-3.5 py-1.5 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-xl font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                           >
                             {nextAction.label}
                           </button>
                         ) : (
-                          <span className="inline-block px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-lg font-semibold text-xs border border-gray-200/70 dark:border-gray-700">
-                            Done ✓
+                          <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-500 rounded-xl font-semibold text-xs border border-gray-200/70 dark:border-gray-700">
+                            Completed <Check size={12} strokeWidth={3} className="text-[#1C774E]" />
                           </span>
                         )}
                       </td>
@@ -647,7 +671,7 @@ export default function Fulfilment() {
             />
 
             {/* Slide-out Drawer */}
-            <div className="fixed top-0 right-0 h-full w-[420px] max-w-[95vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl z-50 overflow-y-auto p-6 space-y-5 animate-in slide-in-from-right duration-200">
+            <div className="fixed top-0 right-0 h-full w-[430px] max-w-[95vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 rounded-l-3xl shadow-2xl z-50 overflow-y-auto p-6 sm:p-7 space-y-5 animate-in slide-in-from-right duration-200">
               {/* Top Drawer Header */}
               <div className="flex items-start justify-between">
                 <div>
@@ -660,17 +684,17 @@ export default function Fulfilment() {
                 </div>
                 <div className="flex items-center gap-2">
                   {selectedOrder.delivery_type === 'delivery' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300">
-                      🛵 Delivery
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60">
+                      <Truck size={12} /> Delivery
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
-                      🏬 Pickup
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60">
+                      <ShoppingBag size={12} /> Pickup
                     </span>
                   )}
                   <button
                     onClick={() => setSelectedId(null)}
-                    className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 flex items-center justify-center transition-colors cursor-pointer"
                   >
                     <X size={16} />
                   </button>
@@ -679,9 +703,12 @@ export default function Fulfilment() {
 
               {/* Now Banner */}
               {!isOrderDone(selectedOrder) && (
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl text-xs text-[#1C774E] dark:text-emerald-300 flex items-start gap-2">
-                  <span className="font-bold">👉 Now:</span>
-                  <span>{getNowText(selectedOrder)}</span>
+                <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl text-xs text-[#1C774E] dark:text-emerald-300 flex items-start gap-2.5 shadow-2xs">
+                  <Clock size={15} className="shrink-0 mt-0.5 text-[#1C774E]" />
+                  <div className="leading-relaxed">
+                    <span className="font-bold mr-1.5">Now:</span>
+                    <span>{getNowText(selectedOrder)}</span>
+                  </div>
                 </div>
               )}
 
@@ -708,7 +735,7 @@ export default function Fulfilment() {
                               : 'bg-gray-200 dark:bg-gray-700 text-gray-500 border border-gray-300 dark:border-gray-600'
                           }`}
                         >
-                          {isDone ? '✓' : isCurrent ? <span className="w-2 h-2 rounded-full bg-[#1C774E]" /> : idx + 1}
+                          {isDone ? <Check size={11} strokeWidth={3} /> : isCurrent ? <span className="w-2 h-2 rounded-full bg-[#1C774E]" /> : idx + 1}
                         </div>
                         <span
                           className={`text-[10px] mt-1.5 whitespace-nowrap ${
@@ -739,9 +766,9 @@ export default function Fulfilment() {
                     ) : (
                       <button
                         disabled
-                        className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-xl font-bold text-sm cursor-default"
+                        className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-xl font-bold text-sm cursor-default flex items-center justify-center gap-1.5"
                       >
-                        Order complete ✓
+                        Order complete <Check size={14} strokeWidth={3} />
                       </button>
                     )}
                     {action && (
@@ -788,7 +815,7 @@ export default function Fulfilment() {
                 <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                   {selectedOrder.delivery_type === 'delivery' ? 'Deliver to' : 'Pickup at'}
                 </h3>
-                <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/60 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800">
                   {getDestination(selectedOrder)}
                 </div>
 
@@ -798,7 +825,7 @@ export default function Fulfilment() {
                       Assigned Rider
                     </p>
                     {selectedOrder.rider ? (
-                      <div className="flex items-center justify-between text-xs bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center justify-between text-xs bg-gray-50 dark:bg-gray-800/60 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800">
                         <div className="flex items-center gap-2">
                           <Bike size={16} className="text-[#1C774E]" />
                           <div>
@@ -814,14 +841,14 @@ export default function Fulfilment() {
                 )}
               </div>
 
-              {/* Customer Note / AI Summary */}
+              {/* Customer Note / Context - Summarized in 2 Sentences */}
               {selectedOrder.note && (
                 <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
                   <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                     Customer Note / Context
                   </h3>
-                  <div className="p-3 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 rounded-xl text-xs text-amber-900 dark:text-amber-200 italic">
-                    “{selectedOrder.note}”
+                  <div className="p-3.5 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 rounded-2xl text-xs text-amber-950 dark:text-amber-200 leading-relaxed font-medium">
+                    “{formatTwoSentenceSummary(selectedOrder.note)}”
                   </div>
                 </div>
               )}
@@ -836,7 +863,7 @@ export default function Fulfilment() {
         {/* Main List Screen */}
         <div className={`space-y-3 ${mobileFlowOpen ? 'hidden' : 'block'}`}>
           {/* Mobile Tabs */}
-          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/90 p-1.5 rounded-xl border border-gray-200/70 dark:border-gray-700/60">
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/90 p-1.5 rounded-2xl border border-gray-200/70 dark:border-gray-700/60">
             {[
               { key: 'todo', label: 'To do', count: todoCount },
               { key: 'all', label: 'All', count: allCount },
@@ -845,7 +872,7 @@ export default function Fulfilment() {
               <button
                 key={tab.key}
                 onClick={() => setMobileFilter(tab.key)}
-                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all text-center cursor-pointer ${
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all text-center cursor-pointer ${
                   mobileFilter === tab.key
                     ? 'bg-[#1C774E] text-white shadow-2xs font-bold'
                     : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
@@ -856,27 +883,29 @@ export default function Fulfilment() {
             ))}
           </div>
 
-          {/* Cards vs List View Switch */}
+          {/* Cards vs List View Switch with Lucide Icons (NO EMOJIS) */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setMobileViewMode('cards')}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+              className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 mobileViewMode === 'cards'
                   ? 'bg-[#1C774E]/10 border-[#1C774E] text-[#1C774E] dark:text-[#DBF361] font-bold'
                   : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'
               }`}
             >
-              ▦ Cards
+              <LayoutGrid size={13} />
+              Cards
             </button>
             <button
               onClick={() => setMobileViewMode('list')}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+              className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 mobileViewMode === 'list'
                   ? 'bg-[#1C774E]/10 border-[#1C774E] text-[#1C774E] dark:text-[#DBF361] font-bold'
                   : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'
               }`}
             >
-              ☰ List
+              <List size={13} />
+              List
             </button>
           </div>
 
@@ -887,7 +916,7 @@ export default function Fulfilment() {
               <p className="text-xs">Loading orders…</p>
             </div>
           ) : filteredMobileOrders.length === 0 ? (
-            <div className="py-16 text-center bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-gray-400">
+            <div className="py-16 text-center bg-white dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-800 text-gray-400">
               <ShoppingBag size={34} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
               <p className="font-semibold text-xs text-gray-600 dark:text-gray-300">Nothing here right now</p>
             </div>
@@ -904,18 +933,20 @@ export default function Fulfilment() {
                       setSelectedId(order.id);
                       setMobileFlowOpen(true);
                     }}
-                    className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200/80 dark:border-gray-700 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:border-gray-300 active:bg-gray-50 dark:active:bg-gray-700 transition-all cursor-pointer"
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/80 dark:border-gray-700 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:border-gray-300 active:bg-gray-50 dark:active:bg-gray-700 transition-all cursor-pointer"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-sm text-gray-900 dark:text-white truncate">
                           {order.name}
                         </span>
-                        <span className="text-xs">
-                          {order.delivery_type === 'delivery' ? '🛵' : '🏬'}
-                        </span>
+                        {order.delivery_type === 'delivery' ? (
+                          <Truck size={12} className="text-gray-400 shrink-0" />
+                        ) : (
+                          <ShoppingBag size={12} className="text-gray-400 shrink-0" />
+                        )}
                       </div>
-                      <div className="text-[11px] text-gray-400 truncate mt-0.5">
+                      <div className="text-[11px] text-gray-400 truncate mt-0.5 font-mono">
                         {order.displayId} · {order.phone}
                       </div>
                       <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
@@ -953,7 +984,7 @@ export default function Fulfilment() {
                       setSelectedId(order.id);
                       setMobileFlowOpen(true);
                     }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/80 dark:border-gray-700 p-4 shadow-xs space-y-3 cursor-pointer"
+                    className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-200/80 dark:border-gray-700 p-4 shadow-xs space-y-3 cursor-pointer"
                   >
                     {/* Top row */}
                     <div className="flex items-start justify-between gap-2">
@@ -966,12 +997,12 @@ export default function Fulfilment() {
                         </p>
                       </div>
                       {order.delivery_type === 'delivery' ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300">
-                          🛵 Delivery
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60">
+                          <Truck size={12} /> Delivery
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
-                          🏬 Pickup
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60">
+                          <ShoppingBag size={12} /> Pickup
                         </span>
                       )}
                     </div>
@@ -1009,9 +1040,9 @@ export default function Fulfilment() {
                       ) : (
                         <button
                           disabled
-                          className="w-full py-2 bg-gray-100 dark:bg-gray-700 text-gray-400 rounded-xl font-semibold text-xs cursor-default"
+                          className="w-full py-2 bg-gray-100 dark:bg-gray-700 text-gray-400 rounded-xl font-semibold text-xs cursor-default flex items-center justify-center gap-1"
                         >
-                          Completed ✓
+                          Completed <Check size={12} strokeWidth={3} />
                         </button>
                       )}
                     </div>
@@ -1024,7 +1055,7 @@ export default function Fulfilment() {
 
         {/* Full Flow Sub-Screen (Mobile) */}
         {mobileFlowOpen && selectedOrder && (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden space-y-4 animate-in fade-in zoom-in-95 duration-150 shadow-sm">
             {/* Mobile Header with Back */}
             <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
               <button
@@ -1041,8 +1072,8 @@ export default function Fulfilment() {
                   {selectedOrder.displayId} · {selectedOrder.phone}
                 </p>
               </div>
-              <span className="shrink-0 text-xs">
-                {selectedOrder.delivery_type === 'delivery' ? '🛵 Delivery' : '🏬 Pickup'}
+              <span className="shrink-0 text-xs font-medium">
+                {selectedOrder.delivery_type === 'delivery' ? 'Delivery' : 'Pickup'}
               </span>
             </div>
 
@@ -1050,9 +1081,12 @@ export default function Fulfilment() {
             <div className="p-4 space-y-5">
               {/* Now Banner */}
               {!isOrderDone(selectedOrder) && (
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl text-xs text-[#1C774E] dark:text-emerald-300 flex items-start gap-2">
-                  <span className="font-bold">👉 Now:</span>
-                  <span>{getNowText(selectedOrder)}</span>
+                <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl text-xs text-[#1C774E] dark:text-emerald-300 flex items-start gap-2.5">
+                  <Clock size={15} className="shrink-0 mt-0.5 text-[#1C774E]" />
+                  <div className="leading-relaxed">
+                    <span className="font-bold mr-1.5">Now:</span>
+                    <span>{getNowText(selectedOrder)}</span>
+                  </div>
                 </div>
               )}
 
@@ -1086,7 +1120,7 @@ export default function Fulfilment() {
                               : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
                           }`}
                         >
-                          {isDone ? '✓' : isCurrent ? '•' : ''}
+                          {isDone ? <Check size={10} strokeWidth={3} /> : isCurrent ? '•' : ''}
                         </div>
                         <div>
                           <p className={`text-xs font-bold ${
@@ -1103,7 +1137,7 @@ export default function Fulfilment() {
               </div>
 
               {/* Items Card */}
-              <div className="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-800 space-y-2 text-xs">
+              <div className="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-800 space-y-2 text-xs">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                   Purchased Items
                 </p>
@@ -1126,7 +1160,7 @@ export default function Fulfilment() {
               </div>
 
               {/* Destination */}
-              <div className="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-800 space-y-1 text-xs">
+              <div className="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-800 space-y-1 text-xs">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                   {selectedOrder.delivery_type === 'delivery' ? 'Deliver to' : 'Pickup at'}
                 </p>
@@ -1134,6 +1168,18 @@ export default function Fulfilment() {
                   {getDestination(selectedOrder)}
                 </p>
               </div>
+
+              {/* Note / Context (2-sentence formatted) */}
+              {selectedOrder.note && (
+                <div className="p-3.5 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 rounded-2xl text-xs text-amber-950 dark:text-amber-200 space-y-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                    Customer Context
+                  </p>
+                  <p className="leading-relaxed font-medium">
+                    “{formatTwoSentenceSummary(selectedOrder.note)}”
+                  </p>
+                </div>
+              )}
 
               {/* Action Button at bottom */}
               {(() => {
@@ -1151,9 +1197,9 @@ export default function Fulfilment() {
                     ) : (
                       <button
                         disabled
-                        className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-xl font-bold text-sm cursor-default"
+                        className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-xl font-bold text-sm cursor-default flex items-center justify-center gap-1.5"
                       >
-                        Order complete ✓
+                        Order complete <Check size={14} strokeWidth={3} />
                       </button>
                     )}
                     {action && (
@@ -1169,20 +1215,28 @@ export default function Fulfilment() {
         )}
       </div>
 
-      {/* ─── BOOK A RIDER MODAL ─────────────────────────────────────────────── */}
+      {/* ─── BOOK A RIDER MODAL - Enhanced border radius & soft elevation ──── */}
       {riderModalOrder && (
         <div
           className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={(e) => e.target === e.currentTarget && setRiderModalOrder(null)}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4 border border-gray-100 dark:border-gray-700 animate-in zoom-in-95 duration-150">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Book a rider
-              </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Enter the rider's details. Kasi sends them to {riderModalOrder.name.split(' ')[0]} on WhatsApp.
-              </p>
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-sm p-6 sm:p-7 space-y-4 border border-gray-100 dark:border-gray-700/80 animate-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Book a rider
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Enter rider details. Kasi sends them to {riderModalOrder.name.split(' ')[0]} on WhatsApp.
+                </p>
+              </div>
+              <button
+                onClick={() => setRiderModalOrder(null)}
+                className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X size={16} />
+              </button>
             </div>
 
             <div className="space-y-3">
@@ -1196,7 +1250,7 @@ export default function Fulfilment() {
                   value={riderName}
                   onChange={(e) => setRiderName(e.target.value)}
                   autoFocus
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -1209,12 +1263,12 @@ export default function Fulfilment() {
                   placeholder="e.g. 0803 000 0000"
                   value={riderPhone}
                   onChange={(e) => setRiderPhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
                 />
               </div>
             </div>
 
-            <div className="flex gap-2 pt-1">
+            <div className="flex gap-2.5 pt-2">
               <button
                 onClick={() => setRiderModalOrder(null)}
                 className="flex-none px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-semibold hover:bg-gray-200 cursor-pointer transition-colors"
@@ -1241,7 +1295,7 @@ export default function Fulfilment() {
         }`}
       >
         <span className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center text-xs font-black shrink-0">
-          ✓
+          <Check size={12} strokeWidth={3} />
         </span>
         <div className="text-xs leading-relaxed">
           <span className="font-bold text-[#cdebd7]">WhatsApp sent to {waToast.name}: </span>

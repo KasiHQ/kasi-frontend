@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft, Send, User, Shield, Tag, History, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft, Send, User, Shield, Tag, History, CheckCircle2, X } from 'lucide-react';
 import { PiSpeakerSimpleSlash, PiSpeakerSimpleHigh, PiTrash, PiReceipt } from 'react-icons/pi';
 import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si';
 import { conversationAPI } from '../../../api/conversations';
@@ -15,6 +15,25 @@ const getLastMessageInfo = (summary, phone) => {
   const isCustomer = lastLine.startsWith('[Customer]:');
   const clean = lastLine.replace(/^\[(Merchant|Customer|Kasi|Kasi AI|Agent)\]:\s*/, '');
   return { snippet: clean, isCustomer };
+};
+
+export const formatTwoSentenceSummary = (rawText) => {
+  if (!rawText || !rawText.trim()) return '';
+  let clean = rawText
+    .replace(/\[Customer\]:.*$/s, '')
+    .replace(/\[Kasi AI\]:.*$/s, '')
+    .replace(/\[Merchant\]:.*$/s, '')
+    .replace(/🚨/g, '')
+    .replace(/\[.*?\]/g, '')
+    .trim();
+
+  if (!clean) {
+    clean = rawText.replace(/\[(Customer|Kasi AI|Merchant|Agent)\]:\s*/gi, ' ').trim();
+  }
+
+  const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
+  const twoSentences = sentences.slice(0, 2).map(s => s.trim()).join(' ');
+  return twoSentences || clean;
 };
 
 const isImageUrl = (url) => {
@@ -945,33 +964,41 @@ const Chats = () => {
 
       {/* Summary Modal */}
       {summaryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden border border-[#EAECF0]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden border border-[#EAECF0]">
             <div className="p-6 border-b border-[#EAECF0] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-[#1A7A4A] text-sm">✦</span>
-                <h3 className="text-lg font-bold text-[#101828]">Detailed AI Summary</h3>
+                <span className="w-8 h-8 rounded-xl bg-[#1A7A4A]/10 text-[#1A7A4A] flex items-center justify-center text-sm font-bold">
+                  ✦
+                </span>
+                <div>
+                  <h3 className="text-base font-bold text-[#101828]">AI Conversation Summary</h3>
+                  <p className="text-xs text-[#667085]">Key context distilled into two sentences</p>
+                </div>
               </div>
-              <button onClick={() => setSummaryModalOpen(false)} className="text-gray-400 hover:text-dark cursor-pointer text-sm font-bold">
-                ✕
+              <button
+                onClick={() => setSummaryModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-dark flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X size={16} />
               </button>
             </div>
             <div className="p-6 max-h-[60vh] overflow-y-auto">
               {generatingSummary ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="w-8 h-8 border-4 border-[#1A7A4A] border-t-transparent rounded-full animate-spin mb-4" />
-                  <p className="text-[#667085] text-sm font-medium">Analyzing conversation history...</p>
+                <div className="flex flex-col items-center justify-center py-10">
+                  <div className="w-8 h-8 border-3 border-[#1A7A4A] border-t-transparent rounded-full animate-spin mb-3" />
+                  <p className="text-[#667085] text-xs font-semibold">Analyzing conversation history...</p>
                 </div>
               ) : (
-                <div className="prose prose-sm max-w-none text-[#344054] leading-relaxed whitespace-pre-wrap text-sm font-medium">
-                  {detailedSummary || 'No detailed summary available.'}
+                <div className="p-4 bg-[#F8F9FC] border border-[#EAECF0] rounded-2xl text-[#101828] leading-relaxed text-sm font-medium">
+                  {formatTwoSentenceSummary(detailedSummary) || 'No detailed summary available.'}
                 </div>
               )}
             </div>
-            <div className="p-6 bg-[#F8F9FC] border-t border-[#EAECF0] flex justify-end">
+            <div className="p-5 bg-[#F8F9FC] border-t border-[#EAECF0] flex justify-end">
               <button
                 onClick={() => setSummaryModalOpen(false)}
-                className="px-5 py-2.5 bg-white border border-[#D0D5DD] rounded-lg text-xs font-bold text-[#344054] hover:bg-gray-50 transition-colors cursor-pointer"
+                className="px-5 py-2.5 bg-white border border-[#D0D5DD] rounded-xl text-xs font-bold text-[#344054] hover:bg-gray-50 transition-colors cursor-pointer shadow-2xs"
               >
                 Close
               </button>
@@ -982,44 +1009,52 @@ const Chats = () => {
 
       {/* Instruction Modal */}
       {instructionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-[#EAECF0]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-[#EAECF0]">
             <div className="p-6 border-b border-[#EAECF0] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <MessageSquare className="text-[#1A7A4A]" size={18} />
-                <h3 className="text-lg font-bold text-[#101828]">Instruct Kasi</h3>
+                <div className="w-8 h-8 rounded-xl bg-[#1A7A4A]/10 text-[#1A7A4A] flex items-center justify-center">
+                  <MessageSquare size={16} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#101828]">Instruct Kasi</h3>
+                  <p className="text-xs text-[#667085]">Override standard sales logic for this customer</p>
+                </div>
               </div>
-              <button onClick={() => setInstructionModalOpen(false)} className="text-gray-400 hover:text-dark cursor-pointer text-sm font-bold">
-                ✕
+              <button
+                onClick={() => setInstructionModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-dark flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X size={16} />
               </button>
             </div>
             <div className="p-6">
-              <p className="text-xs text-[#667085] mb-4 leading-relaxed font-semibold">
-                Tell Kasi exactly what to do next. These instructions will prioritize over its standard sales logic.
+              <p className="text-xs text-[#667085] mb-3 leading-relaxed font-semibold">
+                Tell Kasi exactly what to do next. These instructions take priority.
               </p>
               <textarea
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
-                placeholder="e.g., 'Tell the customer we can give them a 10% discount if they buy now' or 'Ask them for their preferred delivery time again.'"
-                className="w-full h-36 p-3 bg-[#F8F9FC] border border-[#D0D5DD] rounded-lg text-xs font-semibold focus:bg-white focus:border-[#1A7A4A] focus:ring-0 transition-all resize-none outline-none text-[#101828]"
+                placeholder="e.g., 'Offer a 10% discount if they complete payment today' or 'Remind them store pickup is available until 6pm.'"
+                className="w-full h-32 p-3 bg-[#F8F9FC] border border-[#D0D5DD] rounded-xl text-xs font-semibold focus:bg-white focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all resize-none outline-none text-[#101828]"
               />
             </div>
-            <div className="p-6 bg-[#F8F9FC] border-t border-[#EAECF0] flex gap-3 justify-end">
+            <div className="p-5 bg-[#F8F9FC] border-t border-[#EAECF0] flex gap-2.5 justify-end">
               <button
                 onClick={() => setInstructionModalOpen(false)}
-                className="px-5 py-2.5 bg-white border border-[#D0D5DD] rounded-lg text-xs font-bold text-[#344054] hover:bg-gray-50 transition-colors cursor-pointer"
+                className="px-5 py-2.5 bg-white border border-[#D0D5DD] rounded-xl text-xs font-bold text-[#344054] hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveInstructions}
                 disabled={savingInstructions || !instructions.trim()}
-                className="px-6 py-2.5 bg-[#1A7A4A] text-white rounded-lg text-xs font-bold hover:bg-[#0F5533] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
+                className="px-6 py-2.5 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-xl text-xs font-bold transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
               >
                 {savingInstructions && (
                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 )}
-                Give Instruction
+                Save Instructions
               </button>
             </div>
           </div>
