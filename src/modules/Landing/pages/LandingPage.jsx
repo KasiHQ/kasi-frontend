@@ -277,18 +277,14 @@ const LandingPage = () => {
                 Your AI sales agent that never sleeps.
               </p>
 
-              {/* Official Meta Tech Provider Card */}
-              <div className="pt-3">
-                <div className="inline-flex items-center gap-3 px-3.5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors select-none">
+              {/* Official Meta Tech Provider Card - Prominent & Tall */}
+              <div className="pt-4">
+                <div className="p-3.5 bg-white rounded-2xl border border-white/20 shadow-md inline-block max-w-[210px] select-none hover:shadow-lg transition-all">
                   <img 
                     src="/official-meta-tech-provider.jpg" 
                     alt="Official Meta Tech Provider" 
-                    className="h-6 w-auto object-contain rounded-md"
+                    className="w-full h-auto object-contain rounded-lg"
                   />
-                  <div className="text-left">
-                    <p className="text-[11px] font-bold text-white tracking-tight leading-tight">Official Meta Tech Provider</p>
-                    <p className="text-[10px] text-white/50 font-medium leading-tight">WhatsApp & Instagram Certified</p>
-                  </div>
                 </div>
               </div>
             </div>

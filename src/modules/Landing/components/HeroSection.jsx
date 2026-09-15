@@ -36,21 +36,7 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
               </div>
             )}
 
-            {/* Official Meta Tech Provider Badge */}
-            <div className="inline-flex items-center gap-3 px-3.5 py-1.5 bg-[#F8F9FA] hover:bg-white border border-gray-200/80 rounded-full shadow-xs transition-all duration-200 w-fit select-none group">
-              <div className="h-6 w-auto flex items-center justify-center">
-                <img 
-                  src="/official-meta-tech-provider.jpg" 
-                  alt="Official Meta Tech Provider" 
-                  className="h-5 w-auto object-contain rounded-[4px]"
-                />
-              </div>
-              <div className="h-3.5 w-px bg-gray-300" />
-              <span className="text-[12px] font-bold text-gray-700 font-sans tracking-tight">
-                Official Meta Tech Provider
-              </span>
-              <span className="inline-flex items-center justify-center w-1.5 h-1.5 rounded-full bg-[#0081FB]" />
-            </div>
+
 
             {/* H1 headline */}
             <div>
