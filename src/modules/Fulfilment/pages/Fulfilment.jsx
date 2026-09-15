@@ -159,9 +159,6 @@ export default function Fulfilment() {
   const [mobileViewMode, setMobileViewMode] = useState('cards'); // 'cards' | 'list'
   const [mobileFlowOpen, setMobileFlowOpen] = useState(false);
 
-  // Optional manual view override toggle
-  const [forcedView, setForcedView] = useState('responsive'); // 'responsive' | 'desk' | 'mob'
-
   // Rider modal
   const [riderModalOrder, setRiderModalOrder] = useState(null);
   const [riderName, setRiderName] = useState('');
@@ -445,34 +442,6 @@ export default function Fulfilment() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Responsive switch buttons */}
-          <div className="hidden lg:flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl border border-gray-200/80 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300">
-            <button
-              onClick={() => setForcedView('responsive')}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-                forcedView === 'responsive' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
-              }`}
-            >
-              Auto
-            </button>
-            <button
-              onClick={() => setForcedView('desk')}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-                forcedView === 'desk' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
-              }`}
-            >
-              <Monitor size={13} /> Desktop
-            </button>
-            <button
-              onClick={() => setForcedView('mob')}
-              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-                forcedView === 'mob' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
-              }`}
-            >
-              <Smartphone size={13} /> Mobile
-            </button>
-          </div>
-
           <button
             onClick={fetchOrders}
             className="inline-flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-2xs cursor-pointer"
@@ -484,9 +453,7 @@ export default function Fulfilment() {
       </div>
 
       {/* ─── DESKTOP VIEW ───────────────────────────────────────────────────── */}
-      <div className={`relative bg-white dark:bg-gray-900 rounded-3xl border border-gray-200/90 dark:border-gray-800 shadow-sm overflow-hidden ${
-        forcedView === 'mob' ? 'hidden' : forcedView === 'desk' ? 'block' : 'hidden md:block'
-      }`}>
+      <div className="hidden md:block relative bg-white dark:bg-gray-900 rounded-3xl border border-gray-200/90 dark:border-gray-800 shadow-sm overflow-hidden">
         
         {/* Desktop Header & Search */}
         <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-gray-900">
@@ -858,7 +825,7 @@ export default function Fulfilment() {
       </div>
 
       {/* ─── MOBILE VIEW ────────────────────────────────────────────────────── */}
-      <div className={`${forcedView === 'desk' ? 'hidden' : forcedView === 'mob' ? 'block' : 'block md:hidden'}`}>
+      <div className="block md:hidden">
         
         {/* Main List Screen */}
         <div className={`space-y-3 ${mobileFlowOpen ? 'hidden' : 'block'}`}>
