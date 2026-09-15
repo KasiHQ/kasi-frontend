@@ -690,9 +690,8 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
       {/* Quick Actions Grid */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-5 border border-gray-200/80 dark:border-gray-700/60 shadow-xs">
         <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3.5">Quick actions</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
           {[
-            { label: 'Create Invoice', icon: PiTag, path: '/invoices/create' },
             { label: 'Fulfilment', icon: PiTruck, path: '/fulfilment' },
             { label: 'Train Kasi AI', icon: PiGraduationCap, path: '/settings?tab=ai_rules' },
             { label: 'Link WhatsApp', icon: PiChatCircleDots, path: '/settings?tab=integrations' },

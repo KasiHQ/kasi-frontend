@@ -68,7 +68,7 @@ function mapToState(status, deliveryMode) {
   if (s === 'paid') {
     return 'paid';
   }
-  return 'unconfirmed';
+  return 'paid';
 }
 
 function getStepIndex(order) {
@@ -94,9 +94,6 @@ function getDestination(order) {
 }
 
 function getPhaseInfo(order) {
-  if (order.state === 'unconfirmed') {
-    return { cls: 'new', label: 'Needs confirmation', dotCls: 'bg-amber-500' };
-  }
   if (order.state === 'paid') {
     return { cls: 'new', label: 'Needs preparing', dotCls: 'bg-amber-500' };
   }
@@ -124,8 +121,6 @@ function getPhaseInfo(order) {
 
 function getNowText(order) {
   switch (order.state) {
-    case 'unconfirmed':
-      return 'Verify payment with the customer, then tap the button.';
     case 'paid':
       return 'Prepare this order, then tap the button.';
     case 'packed':
@@ -188,9 +183,9 @@ export default function Fulfilment() {
       const conversations = convRes.data || [];
       const invoices = invRes.data || [];
 
-      // Filter and harmonize orders
+      // Filter and harmonize orders - strictly paid / confirmed orders
       const normalizedOrders = conversations
-        .filter(c => ['Requires Attention', 'In Progress', 'Paid', 'Packed', 'Ready for Pickup', 'Ready', 'In Transit', 'Delivered', 'Collected'].includes(c.status))
+        .filter(c => ['Paid', 'Packed', 'Ready for Pickup', 'Ready', 'In Transit', 'Delivered', 'Collected'].includes(c.status))
         .map(c => {
           const normalizePhone = (p) => (p ? p.toString().replace(/\D/g, '') : '');
           const matchingInv = invoices.find(i =>
@@ -286,18 +281,6 @@ export default function Fulfilment() {
 
   // ─── Next Action Definition ─────────────────────────────────────────────────
   const getNextAction = (order) => {
-    if (order.state === 'unconfirmed') {
-      return {
-        label: 'Confirm payment',
-        run: () => advanceOrder(
-          order,
-          'paid',
-          'Paid',
-          'Payment confirmed! We are now processing your order.'
-        )
-      };
-    }
-
     if (order.delivery_type === 'delivery') {
       if (order.state === 'paid') {
         return {
@@ -479,7 +462,6 @@ export default function Fulfilment() {
         {/* Desktop Filter Chips */}
         <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 overflow-x-auto">
           {[
-            { key: 'all', label: 'All', count: allCount },
             { key: 'todo', label: 'To do', count: todoCount },
             { key: 'delivery', label: 'Delivery', count: deliveryCount },
             { key: 'pickup', label: 'Pickup', count: pickupCount },
@@ -830,10 +812,11 @@ export default function Fulfilment() {
         {/* Main List Screen */}
         <div className={`space-y-3 ${mobileFlowOpen ? 'hidden' : 'block'}`}>
           {/* Mobile Tabs */}
-          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/90 p-1.5 rounded-2xl border border-gray-200/70 dark:border-gray-700/60">
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/90 p-1.5 rounded-2xl border border-gray-200/70 dark:border-gray-700/60 overflow-x-auto">
             {[
               { key: 'todo', label: 'To do', count: todoCount },
-              { key: 'all', label: 'All', count: allCount },
+              { key: 'delivery', label: 'Delivery', count: deliveryCount },
+              { key: 'pickup', label: 'Pickup', count: pickupCount },
               { key: 'done', label: 'Done', count: doneCount }
             ].map(tab => (
               <button
