@@ -688,25 +688,7 @@ const Chats = () => {
             <div className="flex-1 overflow-y-auto space-y-6 pb-52 md:pb-48">
 
               
-              {/* Price block */}
-              <div className="grid grid-cols-2 gap-4 px-6 py-3.5 bg-white dark:bg-gray-800 border-b border-gray-200/80 dark:border-gray-700/60 select-none">
-                <div>
-                  <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">LISTED PRICE</p>
-                  <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mt-0.5 tracking-tight">
-                    {selectedConversation.listed_price > 0 ? `₦${selectedConversation.listed_price.toLocaleString()}` : '—'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold tracking-wider text-gray-400 uppercase">AGREED PRICE</p>
-                  <p className={`text-lg sm:text-xl font-bold mt-0.5 tracking-tight ${
-                    selectedConversation.agreed_price < selectedConversation.listed_price && selectedConversation.agreed_price > 0 
-                      ? 'text-amber-600 dark:text-amber-400' 
-                      : 'text-gray-900 dark:text-white'
-                  }`}>
-                    {selectedConversation.agreed_price > 0 ? `₦${selectedConversation.agreed_price.toLocaleString()}` : 'Negotiating...'}
-                  </p>
-                </div>
-              </div>
+              {/* Price block removed per CEO feedback */}
 
               {/* AI Instructions card */}
               {selectedConversation.vendor_instructions && (

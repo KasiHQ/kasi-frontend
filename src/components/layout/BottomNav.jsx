@@ -24,7 +24,7 @@ const BottomNav = () => {
     { icon: LayoutDashboard, label: 'Home', path: '/dashboard' },
     { icon: MessageSquare, label: 'Chats', path: '/chats' },
     { icon: Package, label: 'Store', path: '/products' },
-    { icon: Truck, label: 'Logistics', path: '/logistics' },
+    // { icon: Truck, label: 'Logistics', path: '/logistics' },
   ];
 
   const moreItems = [

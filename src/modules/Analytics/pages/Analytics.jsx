@@ -40,7 +40,7 @@ const Analytics = () => {
 
       const custData = custRes.data || [];
       // Sort customers by total spend / revenue descending
-      const sorted = [...custData].sort((a, b) => (b.total_spent || 0) - (a.total_spent || 0)).slice(0, 5);
+      const sorted = [...custData].sort((a, b) => (b.total_spent || 0) - (a.total_spent || 0)).slice(0, 3);
       setBestCustomers(sorted);
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
