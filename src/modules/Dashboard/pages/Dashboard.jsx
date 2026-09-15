@@ -263,6 +263,7 @@ const Dashboard = () => {
 
 const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNaira, invoices, services }) => {
   const navigate = useNavigate();
+  const [revenuePeriod, setRevenuePeriod] = useState('Week');
   const today = new Date().toISOString().split('T')[0];
   
   const confirmedSessions = bookings.filter(b => b.status === 'Confirmed');
@@ -430,20 +431,28 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200/80 dark:border-gray-700/60 h-[360px] flex flex-col justify-between shadow-xs">
-           <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue this week</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Booking income by day</p>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {revenuePeriod === 'Week' ? 'Revenue this week' : revenuePeriod === 'Month' ? 'Revenue this month' : 'All-time Revenue'}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {revenuePeriod === 'Week' ? 'Booking income by day' : revenuePeriod === 'Month' ? 'Booking income by week' : 'Monthly booking trend'}
+                </p>
               </div>
-              <select className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 outline-none cursor-pointer hover:border-gray-300">
-                <option>Week</option>
-                <option>Month</option>
-                <option>All time</option>
+              <select 
+                value={revenuePeriod}
+                onChange={(e) => setRevenuePeriod(e.target.value)}
+                className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 outline-none cursor-pointer hover:border-gray-300"
+              >
+                <option value="Week">Week</option>
+                <option value="Month">Month</option>
+                <option value="All time">All time</option>
               </select>
            </div>
            <div className="h-[240px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={getWeeklyRevenueData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={getRevenueChartData(paidInvoices, revenuePeriod)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="serviceRev" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="rgba(249, 115, 22, 0.12)" />
@@ -553,6 +562,7 @@ const ServiceDashboardContent = ({ bookings, analytics, conversations, formatNai
 
 const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline, products, formatNaira }) => {
   const navigate = useNavigate();
+  const [revenuePeriod, setRevenuePeriod] = useState('Week');
   const paidInvoices = invoices.filter(i => i.status === 'Paid');
   const totalRevenue = paidInvoices.reduce((s, i) => s + (i.total_amount || 0), 0);
   const uniqueCustomers = new Set(conversations.map(c => c.customer_phone || c.customer_name)).size;
@@ -712,18 +722,26 @@ const ProductDashboardContent = ({ invoices, analytics, conversations, pipeline,
         <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200/80 dark:border-gray-700/60 h-[360px] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Revenue this week</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Paid invoice totals by day</p>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {revenuePeriod === 'Week' ? 'Revenue this week' : revenuePeriod === 'Month' ? 'Revenue this month' : 'All-time Revenue'}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {revenuePeriod === 'Week' ? 'Paid invoice totals by day' : revenuePeriod === 'Month' ? 'Paid totals by week' : 'Monthly revenue trend'}
+              </p>
             </div>
-            <select className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 outline-none cursor-pointer hover:border-gray-300">
-              <option>Week</option>
-              <option>Month</option>
-              <option>All time</option>
+            <select 
+              value={revenuePeriod}
+              onChange={(e) => setRevenuePeriod(e.target.value)}
+              className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 outline-none cursor-pointer hover:border-gray-300"
+            >
+              <option value="Week">Week</option>
+              <option value="Month">Month</option>
+              <option value="All time">All time</option>
             </select>
           </div>
           <div className="h-[240px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={getWeeklyRevenueData(paidInvoices)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={getRevenueChartData(paidInvoices, revenuePeriod)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="rgba(249, 115, 22, 0.12)" />
@@ -1127,11 +1145,47 @@ const ActionAlerts = ({ user }) => {
 
 /* ── HELPERS ───────────────────────────────────────────────────────────── */
 
-const getWeeklyRevenueData = (paidInvoices) => {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const getRevenueChartData = (paidInvoices, period = 'Week') => {
   const now = new Date();
-  
-  // Calculate Monday of the current week
+
+  if (period === 'Month') {
+    // Group by 4 weeks of current month or last 30 days in 5-day intervals
+    const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    return weeks.map((w, idx) => {
+      const wStart = new Date(now.getFullYear(), now.getMonth(), 1 + idx * 7);
+      const wEnd = new Date(now.getFullYear(), now.getMonth(), 1 + (idx + 1) * 7);
+      const val = paidInvoices
+        .filter(inv => {
+          const d = new Date(inv.date_issued);
+          return d >= wStart && (idx === 3 ? d <= now : d < wEnd);
+        })
+        .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+      return { name: w, value: val };
+    });
+  }
+
+  if (period === 'All time') {
+    // Last 6 months
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const result = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mIdx = d.getMonth();
+      const mYear = d.getFullYear();
+      const val = paidInvoices
+        .filter(inv => {
+          const invDate = new Date(inv.date_issued);
+          return invDate.getMonth() === mIdx && invDate.getFullYear() === mYear;
+        })
+        .reduce((s, inv) => s + (inv.total_amount || 0), 0);
+      result.push({ name: `${months[mIdx]}`, value: val });
+    }
+    return result;
+  }
+
+  // Default: 'Week'
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const currentDay = now.getDay();
   const distance = currentDay === 0 ? -6 : 1 - currentDay;
   const startOfWeek = new Date(now);
@@ -1149,5 +1203,7 @@ const getWeeklyRevenueData = (paidInvoices) => {
     return { name: day, value: dayRevenue }; 
   });
 };
+
+const getWeeklyRevenueData = (paidInvoices) => getRevenueChartData(paidInvoices, 'Week');
 
 export default Dashboard;

@@ -711,7 +711,7 @@ const Settings = () => {
                 <TabButton active={activeTab === 'security'} icon={ShieldCheck} label="Security & 2FA" onClick={() => setActiveTab('security')} />
                 <TabButton active={activeTab === 'payment'} icon={Wallet} label="Settlement & Payouts" onClick={() => setActiveTab('payment')} />
                 <TabButton active={activeTab === 'billing'} icon={CreditCard} label="Billing & Subscriptions" onClick={() => setActiveTab('billing')} />
-                <TabButton active={activeTab === 'ai_rules'} icon={Brain} label="AI Rules" onClick={() => setActiveTab('ai_rules')} />
+                {/* AI Rules merged into General tab */}
                 <TabButton active={activeTab === 'logistics'} icon={Truck} label="Logistics Settings" onClick={() => setActiveTab('logistics')} />
                 <TabButton active={activeTab === 'activity'} icon={History} label="Activity" onClick={() => setActiveTab('activity')} />
                 <TabButton active={activeTab === 'support'} icon={HelpCircle} label="Support & Help" onClick={() => setActiveTab('support')} />
@@ -1056,6 +1056,19 @@ const Settings = () => {
                                     placeholder="We sell premium authentic electronics — phones, laptops, audio gear — all with warranty."
                                 />
                                 <p className="text-xs text-gray-400">Kasi reads this to understand your brand voice.</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Custom AI Instructions</label>
+                                <p className="text-xs text-gray-400 -mt-1">Teach Kasi how to talk to your customers. Add return policies, delivery times, or brand tone rules.</p>
+                                <textarea
+                                    name="ai_instructions"
+                                    value={formData.ai_instructions}
+                                    onChange={handleChange}
+                                    rows={6}
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
+                                    placeholder="E.g., 'We do not offer refunds, only exchanges. Standard delivery takes 3-5 days in Lagos for ₦3,000. Always end your messages with: Stay Beautiful!'"
+                                />
                             </div>
 
                              <div className="space-y-2">
@@ -1646,103 +1659,23 @@ const Settings = () => {
                                     💡 How your customer will be charged:
                                 </p>
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    • Up to <strong>{deliveryBaseKm} km</strong>: Flat <strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong>
+                                    • Up to <strong>{deliveryBaseKm} km</strong>: Flat <strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong> + <strong>15% safety margin</strong> (covers dispatch courier & traffic surge).
                                 </p>
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    • Beyond {deliveryBaseKm} km: <strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong> + <strong>₦{Number(deliveryRatePerKm).toLocaleString()}/km</strong> for each extra km.
+                                    • Beyond {deliveryBaseKm} km: [<strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong> + <strong>₦{Number(deliveryRatePerKm).toLocaleString()}/km</strong>] × <strong>1.15 (+15% margin)</strong>.
                                 </p>
                                 <p className="text-emerald-600 dark:text-emerald-400 font-semibold pt-1">
-                                    Example: A customer 7.5 km away pays ₦{(Number(deliveryBaseFee) + (7.5 - Number(deliveryBaseKm)) * Number(deliveryRatePerKm)).toLocaleString()}
+                                    Example: A customer 7.5 km away pays ₦{Math.ceil(((Number(deliveryBaseFee) + (7.5 - Number(deliveryBaseKm)) * Number(deliveryRatePerKm)) * 1.15) / 50) * 50} (incl. 15% buffer, rounded to nearest ₦50)
+                                </p>
+                                <p className="text-[11px] text-gray-400 dark:text-gray-500 italic pt-0.5">
+                                    * The 15% margin acts as a dynamic cushion so your business never bears unexpected courier surge or distance miscalculations.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Fallback Rate Sheet Card */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
-                        <div>
-                            <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                                Fallback Area Rate Sheet (Optional)
-                            </h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                Used as fallback when a customer sends a typed text area instead of a WhatsApp GPS pin.
-                            </p>
-                        </div>
+                    {/* Fallback Rate Sheet Card — Removed per CEO feedback */}
 
-                        <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Select Your Base City</label>
-                            <select
-                                value={deliveryCity}
-                                onChange={(e) => handleCityChange(e.target.value)}
-                                className="w-full h-11 px-3.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl text-sm text-gray-900 dark:text-white focus:border-primary outline-none transition-all font-semibold"
-                            >
-                                <option value="">-- Select base city --</option>
-                                <option value="Lagos">Lagos</option>
-                                <option value="Abuja">Abuja</option>
-                                <option value="Port Harcourt">Port Harcourt</option>
-                                <option value="Ibadan">Ibadan</option>
-                            </select>
-                        </div>
-
-                        {deliveryCity && (
-                            <div className="space-y-4 pt-2">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
-                                    {Object.keys(deliveryRates).map(area => (
-                                        <div key={area} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 gap-3">
-                                            <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">{area}</span>
-                                            <div className="flex items-center gap-2 shrink-0">
-                                                <div className="relative rounded-lg w-28">
-                                                    <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-gray-400 text-xs">₦</span>
-                                                    <input
-                                                        type="number"
-                                                        value={deliveryRates[area]}
-                                                        onChange={(e) => {
-                                                            setDeliveryRates(prev => ({
-                                                                ...prev,
-                                                                [area]: e.target.value
-                                                            }));
-                                                        }}
-                                                        placeholder="Price"
-                                                        className="w-full pl-5 pr-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs outline-none focus:border-primary font-semibold"
-                                                        min="0"
-                                                    />
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const updated = { ...deliveryRates };
-                                                        delete updated[area];
-                                                        setDeliveryRates(updated);
-                                                    }}
-                                                    className="text-gray-400 hover:text-red-500 font-bold text-xs p-1"
-                                                    title="Remove Area"
-                                                >
-                                                    ×
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <form onSubmit={handleAddCustomArea} className="flex gap-2 items-center bg-gray-50 dark:bg-gray-700/50 p-2.5 rounded-xl border border-gray-200 dark:border-gray-600 max-w-md">
-                                    <input
-                                        type="text"
-                                        value={customAreaName}
-                                        onChange={(e) => setCustomAreaName(e.target.value)}
-                                        placeholder="Add custom area/LGA (e.g. Ikotun)"
-                                        className="flex-1 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs outline-none focus:border-primary font-semibold"
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={!customAreaName.trim()}
-                                        className="px-4 py-1.5 bg-primary hover:bg-emerald-700 text-white disabled:opacity-50 text-xs font-bold rounded-lg transition-colors"
-                                    >
-                                        Add Area
-                                    </button>
-                                </form>
-                            </div>
-                        )}
-                    </div>
 
                     {/* Master Save Button */}
                     <div className="flex justify-end">
