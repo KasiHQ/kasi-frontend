@@ -1,11 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft, Send, User, Shield, Tag, History, CheckCircle2, X } from 'lucide-react';
-import { PiSpeakerSimpleSlash, PiSpeakerSimpleHigh, PiTrash, PiReceipt } from 'react-icons/pi';
+import { PiSpeakerSimpleSlash, PiSpeakerSimpleHigh, PiTrash, PiReceipt, PiImageSquare, PiSmiley } from 'react-icons/pi';
 import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
 import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
+
+const EMOJI_CATEGORIES = [
+  {
+    name: 'Frequent & Reactions',
+    emojis: ['👍', '❤️', '🙏', '🔥', '🙌', '🤝', '💯', '✨', '⭐', '🎉', '😊', '😍']
+  },
+  {
+    name: 'Smileys & Expressions',
+    emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥹', '☺️', '😊', '😇', '🙂', '😉', '😌', '😍', '🥰', '😘', '😋', '😛', '😜', '🤪', '🤩', '🥳', '😎', '🫡', '🤗', '🤝', '👍', '👌']
+  },
+  {
+    name: 'Commerce & Orders',
+    emojis: ['₦', '💰', '💳', '💵', '📦', '🛍️', '🛒', '🏷️', '🚚', '🛵', '📍', '🏢', '👗', '👟', '👠', '👜', '🕶️', '⌚', '📱', '💻']
+  },
+  {
+    name: 'Signs & Signals',
+    emojis: ['✅', '⚡', '⏳', '⏰', '🔔', '📢', '💬', '📞', '👋', '🚀', '🎯', '💡', '⚠️', '❗', '❓', '👑', '🔥', '💯', '🙏', '❤️']
+  }
+];
 
 const getLastMessageInfo = (summary, phone) => {
   if (!summary) return { snippet: phone || 'No messages yet', isCustomer: false };
@@ -287,6 +306,50 @@ const Chats = () => {
   // Direct chat messaging states
   const [directMessageText, setDirectMessageText] = useState('');
   const [sendingDirectMessage, setSendingDirectMessage] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [selectedImagePreview, setSelectedImagePreview] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const fileInputRef = useRef(null);
+  const emojiPickerRef = useRef(null);
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    if (showEmojiPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file (PNG, JPG, WebP, GIF).');
+        return;
+      }
+      setSelectedImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setSelectedImagePreview(previewUrl);
+    }
+  };
+
+  const handleClearImage = () => {
+    if (selectedImagePreview) {
+      URL.revokeObjectURL(selectedImagePreview);
+    }
+    setSelectedImageFile(null);
+    setSelectedImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -374,18 +437,39 @@ const Chats = () => {
 
   const handleSendDirectMessage = async (e) => {
     e?.preventDefault?.();
-    if (!directMessageText.trim() || !selectedConversation || sendingDirectMessage) return;
+    if ((!directMessageText.trim() && !selectedImageFile) || !selectedConversation || sendingDirectMessage) return;
+    
     const textToSend = directMessageText.trim();
+    const imageFileToSend = selectedImageFile;
+
     setDirectMessageText('');
+    handleClearImage();
+    setShowEmojiPicker(false);
     setSendingDirectMessage(true);
 
     try {
-      await conversationAPI.sendMessage(selectedConversation.id, textToSend);
-      setSelectedConversation(prev => {
-        if (!prev) return null;
-        const newSummary = prev.ai_summary ? `${prev.ai_summary}\n[Merchant]: ${textToSend}` : `[Merchant]: ${textToSend}`;
-        return { ...prev, ai_summary: newSummary, last_message_at: new Date().toISOString() };
-      });
+      if (imageFileToSend) {
+        const formData = new FormData();
+        formData.append('image', imageFileToSend);
+        if (textToSend) {
+          formData.append('message', textToSend);
+        }
+        const res = await conversationAPI.sendMessage(selectedConversation.id, formData);
+        const uploadedUrl = res.image_url;
+        setSelectedConversation(prev => {
+          if (!prev) return null;
+          const entryContent = uploadedUrl && textToSend ? `${uploadedUrl}\n${textToSend}` : (uploadedUrl || textToSend);
+          const newSummary = prev.ai_summary ? `${prev.ai_summary}\n[Merchant]: ${entryContent}` : `[Merchant]: ${entryContent}`;
+          return { ...prev, ai_summary: newSummary, last_message_at: new Date().toISOString() };
+        });
+      } else {
+        await conversationAPI.sendMessage(selectedConversation.id, textToSend);
+        setSelectedConversation(prev => {
+          if (!prev) return null;
+          const newSummary = prev.ai_summary ? `${prev.ai_summary}\n[Merchant]: ${textToSend}` : `[Merchant]: ${textToSend}`;
+          return { ...prev, ai_summary: newSummary, last_message_at: new Date().toISOString() };
+        });
+      }
       fetchData();
     } catch (err) {
       console.error('Failed to send direct message:', err);
@@ -806,19 +890,125 @@ const Chats = () => {
             </div>
 
             {/* Bottom Direct Social Chat Input & Action Bar */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-[#EAECF0] p-3 md:p-4 flex flex-col gap-2 shrink-0 z-20">
+            <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-[#EAECF0] dark:border-gray-700 p-3 md:p-4 flex flex-col gap-2 shrink-0 z-20">
+              
+              {/* Emoji Picker Popover */}
+              {showEmojiPicker && (
+                <div
+                  ref={emojiPickerRef}
+                  className="absolute bottom-full mb-2 left-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-3 w-80 max-w-[calc(100vw-32px)] z-30 animate-in fade-in slide-in-from-bottom-2 duration-150"
+                >
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700 mb-2">
+                    <span className="text-xs font-bold text-gray-800 dark:text-gray-100">Select Emoji</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowEmojiPicker(false)}
+                      className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-md cursor-pointer"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
+                    {EMOJI_CATEGORIES.map((cat, catIdx) => (
+                      <div key={catIdx}>
+                        <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">{cat.name}</p>
+                        <div className="grid grid-cols-6 gap-1">
+                          {cat.emojis.map((emoji, emojiIdx) => (
+                            <button
+                              key={emojiIdx}
+                              type="button"
+                              onClick={() => {
+                                setDirectMessageText(prev => prev + emoji);
+                              }}
+                              className="h-8 w-8 flex items-center justify-center text-lg hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-transform active:scale-90 cursor-pointer select-none"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Image Preview Attachment Badge */}
+              {selectedImagePreview && (
+                <div className="relative inline-flex items-center gap-3 p-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl mb-1 self-start">
+                  <img
+                    src={selectedImagePreview}
+                    alt="Preview"
+                    className="w-12 h-12 object-cover rounded-lg border border-emerald-300 dark:border-emerald-700"
+                  />
+                  <div className="text-xs text-emerald-900 dark:text-emerald-200 pr-5">
+                    <p className="font-semibold truncate max-w-[180px]">{selectedImageFile?.name || 'Image attached'}</p>
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400">Ready to send</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearImage}
+                    className="absolute -top-1.5 -right-1.5 p-1 bg-gray-800 hover:bg-black text-white rounded-full shadow cursor-pointer transition-colors"
+                    title="Remove attachment"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              )}
+
               <form onSubmit={handleSendDirectMessage} className="flex items-center gap-2">
+                {/* Hidden File Input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+
+                {/* Attach Image Button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Attach Image"
+                  disabled={sendingDirectMessage}
+                  className={`p-2.5 rounded-xl border transition-all cursor-pointer shrink-0 ${
+                    selectedImageFile 
+                      ? 'bg-emerald-100 dark:bg-emerald-950 border-emerald-300 text-emerald-700 dark:text-emerald-300' 
+                      : 'bg-[#F2F4F7] dark:bg-gray-800 border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <PiImageSquare size={18} />
+                </button>
+
+                {/* Emoji Picker Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowEmojiPicker(prev => !prev)}
+                  title="Insert Emoji"
+                  disabled={sendingDirectMessage}
+                  className={`p-2.5 rounded-xl border transition-all cursor-pointer shrink-0 ${
+                    showEmojiPicker 
+                      ? 'bg-emerald-100 dark:bg-emerald-950 border-emerald-300 text-emerald-700 dark:text-emerald-300' 
+                      : 'bg-[#F2F4F7] dark:bg-gray-800 border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'
+                  }`}
+                >
+                  <PiSmiley size={18} />
+                </button>
+
+                {/* Direct Message Input */}
                 <input
                   type="text"
-                  placeholder={`Type a message to ${selectedConversation.customer_name || 'customer'}...`}
+                  placeholder={selectedImageFile ? "Add an optional caption..." : `Type a message to ${selectedConversation.customer_name || 'customer'}...`}
                   value={directMessageText}
                   onChange={(e) => setDirectMessageText(e.target.value)}
                   disabled={sendingDirectMessage}
-                  className="flex-1 px-4 py-2.5 bg-[#F2F4F7] border border-transparent rounded-xl text-xs md:text-sm outline-none text-[#101828] placeholder-[#98A2B3] focus:bg-white focus:border-[#1A7A4A] transition-all font-medium"
+                  className="flex-1 px-4 py-2.5 bg-[#F2F4F7] dark:bg-gray-800 border border-transparent rounded-xl text-xs md:text-sm outline-none text-[#101828] dark:text-white placeholder-[#98A2B3] focus:bg-white dark:focus:bg-gray-700 focus:border-[#1A7A4A] transition-all font-medium"
                 />
+
+                {/* Send Button */}
                 <button
                   type="submit"
-                  disabled={!directMessageText.trim() || sendingDirectMessage}
+                  disabled={(!directMessageText.trim() && !selectedImageFile) || sendingDirectMessage}
                   className="px-5 py-2.5 bg-[#1A7A4A] hover:bg-[#0F5533] text-white rounded-xl text-xs md:text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer shadow-sm shrink-0"
                 >
                   {sendingDirectMessage ? (
