@@ -74,9 +74,26 @@ export const conversationAPI = {
     return response.data;
   },
 
-  // Send direct message
-  sendMessage: async (conversationId, message) => {
-    const response = await api.post(`/api/conversations/${conversationId}/send-message`, { message });
+  // Send direct message (supports text, object, or FormData)
+  sendMessage: async (conversationId, payload) => {
+    if (payload instanceof FormData) {
+      const response = await api.post(`/api/conversations/${conversationId}/send-message`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    }
+    const body = typeof payload === 'string' ? { message: payload } : payload;
+    const response = await api.post(`/api/conversations/${conversationId}/send-message`, body);
+    return response.data;
+  },
+
+  // Upload chat image
+  uploadImage: async (conversationId, file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await api.post(`/api/conversations/${conversationId}/upload-image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data;
   }
 };
