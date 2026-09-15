@@ -173,8 +173,7 @@ const Sidebar = ({ onWidthChange }) => {
         items: [
           { icon: PiChartBar, label: 'Dashboard', path: '/dashboard' },
           { icon: PiShoppingBag, label: 'Store', path: '/products' },
-          // { icon: PiTruck, label: 'Logistics', path: '/logistics', badgeKey: 'logistics' },
-          { icon: PiStorefront, label: 'Fulfilment', path: '/fulfilment' },
+          { icon: PiStorefront, label: 'Fulfilment', path: '/fulfilment', badgeKey: 'logistics' },
         ]
       },
       {

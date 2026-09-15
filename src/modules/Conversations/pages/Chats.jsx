@@ -6,6 +6,7 @@ import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
 import DeleteConfirmModal from '../../../components/ui/DeleteConfirmModal';
+import { useToast } from '../../../context/ToastContext';
 
 const EMOJI_CATEGORIES = [
   {
@@ -286,6 +287,7 @@ const getPlatformBadge = (platform) => {
 
 const Chats = () => {
   const [searchParams] = useSearchParams();
+  const { addToast } = useToast();
   const [conversations, setConversations] = useState([]);
   const [pipeline, setPipeline] = useState({});
   const [invoices, setInvoices] = useState([]);
@@ -473,6 +475,10 @@ const Chats = () => {
       fetchData();
     } catch (err) {
       console.error('Failed to send direct message:', err);
+      // Restore message input so user does not lose unsent content
+      setDirectMessageText(textToSend);
+      if (imageFileToSend) setSelectedImageFile(imageFileToSend);
+      addToast(err?.response?.data?.message || 'Failed to send direct message. Please try again.', 'error');
     } finally {
       setSendingDirectMessage(false);
     }

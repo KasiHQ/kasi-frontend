@@ -1,36 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Package, Truck, MoreHorizontal, Users, Settings, TrendingUp, LogOut, X, Sun, Moon, PanelLeft, PanelTop, Briefcase, Calendar, DollarSign } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Package, Truck, MoreHorizontal, Users, Settings, TrendingUp, LogOut, X, Sun, Moon, PanelLeft, PanelTop, Briefcase, Calendar, DollarSign, Store } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
 import { useLayout } from '../../context/LayoutContext';
 import { useAuth } from '../../context/AuthContext';
+import { conversationAPI } from '../../api/conversations';
 
 const BottomNav = () => {
   const [moreOpen, setMoreOpen] = useState(false);
+  const [badgeCounts, setBadgeCounts] = useState({ chats: 0, logistics: 0 });
   const { isDark, toggleTheme } = useTheme();
   const { layout, toggleLayout } = useLayout();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!user || user?.is_admin) return;
+
+    const fetchCounts = async () => {
+      try {
+        const res = await conversationAPI.getPipeline();
+        if (res && res.data) {
+          setBadgeCounts({
+            chats: res.data['Requires Attention'] || 0,
+            logistics: res.data['Paid'] || 0
+          });
+        }
+      } catch (err) {
+        // silent fail
+      }
+    };
+
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 15000);
+    return () => clearInterval(interval);
+  }, [user]);
+
   const isService = user?.business_type === 'service';
 
   const mainTabs = isService ? [
     { icon: LayoutDashboard, label: 'Home', path: '/dashboard' },
-    { icon: MessageSquare, label: 'Chats', path: '/chats' },
+    { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
     { icon: Briefcase, label: 'Services', path: '/services' },
     { icon: Calendar, label: 'Bookings', path: '/bookings' },
   ] : [
     { icon: LayoutDashboard, label: 'Home', path: '/dashboard' },
-    { icon: MessageSquare, label: 'Chats', path: '/chats' },
+    { icon: MessageSquare, label: 'Chats', path: '/chats', badgeKey: 'chats' },
     { icon: Package, label: 'Store', path: '/products' },
-    // { icon: Truck, label: 'Logistics', path: '/logistics' },
+    { icon: Truck, label: 'Fulfilment', path: '/fulfilment', badgeKey: 'logistics' },
   ];
 
   const moreItems = [
     { icon: Users, label: 'Customers', path: '/customers' },
     { icon: DollarSign, label: 'Finance Audit', path: '/payments' },
     { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
+    { icon: Store, label: 'Marketplace', path: '/market' },
+    ...(isService ? [{ icon: Truck, label: 'Fulfilment', path: '/fulfilment' }] : []),
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
@@ -114,11 +140,18 @@ const BottomNav = () => {
               className={({ isActive }) =>
                 clsx(
                   'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-200',
-                  isActive ? 'text-primary' : 'text-gray-400'
+                  isActive ? 'text-primary font-semibold' : 'text-gray-400'
                 )
               }
             >
-              <tab.icon size={22} strokeWidth={1.8} />
+              <div className="relative">
+                <tab.icon size={22} strokeWidth={1.8} />
+                {tab.badgeKey && badgeCounts[tab.badgeKey] > 0 && (
+                  <span className="absolute -top-1 -right-2 px-1 min-w-[15px] h-3.5 rounded-full bg-emerald-600 text-white text-[8px] font-bold flex items-center justify-center shadow-xs leading-none">
+                    {badgeCounts[tab.badgeKey] > 99 ? '99+' : badgeCounts[tab.badgeKey]}
+                  </span>
+                )}
+              </div>
               <span className="text-[10px] font-medium">{tab.label}</span>
             </NavLink>
           ))}
