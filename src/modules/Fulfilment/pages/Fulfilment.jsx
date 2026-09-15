@@ -6,464 +6,158 @@ import api from '../../../api/axios';
 import {
   Package, Truck, CheckCircle2, Clock, MapPin, Phone, User,
   Search, AlertCircle, ShoppingBag, Send, Bike, ChevronRight,
-  RotateCcw, X
+  ChevronLeft, RotateCcw, X, Check, Smartphone, Monitor
 } from 'lucide-react';
 
-// ─── Status config ────────────────────────────────────────────────────────────
-const STATUS_CONFIG = {
-  attention: {
-    label: 'Needs Attention',
-    color: 'amber',
-    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60',
-    accentBorder: 'border-amber-400/80',
-    dot: 'bg-amber-500',
-    pill: 'bg-amber-500 text-white',
-    stepperActive: 'bg-amber-500 text-white ring-2 ring-amber-100 dark:ring-amber-900',
-    stepperBar: 'bg-amber-500',
-  },
-  paid: {
-    label: 'Ready to Dispatch',
-    color: 'primary',
-    badgeClass: 'bg-emerald-50 text-[#1A7A4A] border border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60',
-    accentBorder: 'border-[#1A7A4A]',
-    dot: 'bg-[#1A7A4A]',
-    pill: 'bg-[#1A7A4A] text-white',
-    stepperActive: 'bg-[#1A7A4A] text-white ring-2 ring-emerald-100 dark:ring-emerald-900',
-    stepperBar: 'bg-[#1A7A4A]',
-  },
-  transit: {
-    label: 'Out for Delivery',
-    color: 'blue',
-    badgeClass: 'bg-sky-50 text-sky-700 border border-sky-200/80 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/60',
-    accentBorder: 'border-sky-500',
-    dot: 'bg-sky-500',
-    pill: 'bg-sky-500 text-white',
-    stepperActive: 'bg-sky-500 text-white ring-2 ring-sky-100 dark:ring-sky-900',
-    stepperBar: 'bg-sky-500',
-  },
-  delivered: {
-    label: 'Completed',
-    color: 'gray',
-    badgeClass: 'bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
-    accentBorder: 'border-gray-300 dark:border-gray-600',
-    dot: 'bg-gray-400',
-    pill: 'bg-gray-400 text-white',
-    stepperActive: 'bg-gray-500 text-white ring-2 ring-gray-100 dark:ring-gray-800',
-    stepperBar: 'bg-gray-300 dark:bg-gray-700',
-  },
+// ─── Pathway Steps Definition ──────────────────────────────────────────────────
+const STEPS = {
+  delivery: [
+    { key: 'paid', label: 'Paid', sub: 'Payment received' },
+    { key: 'packed', label: 'Prepared', sub: 'Packed and ready' },
+    { key: 'on_way', label: 'On the way', sub: 'Rider is delivering' },
+    { key: 'delivered', label: 'Delivered', sub: 'Order complete' }
+  ],
+  pickup: [
+    { key: 'paid', label: 'Paid', sub: 'Payment received' },
+    { key: 'packed', label: 'Prepared', sub: 'Packed and ready' },
+    { key: 'ready', label: 'Ready', sub: 'Customer can collect' },
+    { key: 'collected', label: 'Picked up', sub: 'Order complete' }
+  ]
 };
 
-const getStatusGroup = (status) => {
-  if (status === 'Delivered') return 'delivered';
-  if (status === 'In Transit') return 'transit';
-  if (status === 'Paid') return 'paid';
-  return 'attention'; // Requires Attention, In Progress, etc.
-};
+// Map backend conversation/invoice status to prototype state
+function mapToState(status, deliveryMode) {
+  const s = (status || '').toLowerCase().trim();
+  const isPickup = deliveryMode === 'PICKUP';
 
-const pathwaySteps = [
-  { id: 'placed', label: 'Placed' },
-  { id: 'paid', label: 'Payment' },
-  { id: 'transit', label: 'Dispatched' },
-  { id: 'delivered', label: 'Complete' },
-];
-
-const getPathwayIndex = (status) => {
-  if (status === 'Delivered') return 3;
-  if (status === 'In Transit') return 2;
-  if (status === 'Paid') return 1;
-  return 0;
-};
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function timeAgo(dateStr) {
-  if (!dateStr) return null;
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
+  if (s === 'delivered' || s === 'collected' || s === 'completed') {
+    return isPickup ? 'collected' : 'delivered';
+  }
+  if (s === 'in transit' || s === 'on_way' || s === 'dispatched') {
+    return 'on_way';
+  }
+  if (s === 'ready' || s === 'ready for pickup') {
+    return 'ready';
+  }
+  if (s === 'packed' || s === 'prepared') {
+    return 'packed';
+  }
+  if (s === 'paid') {
+    return 'paid';
+  }
+  // Attention or in progress (unconfirmed)
+  return 'unconfirmed';
 }
 
-function waitingLabel(dateStr) {
-  if (!dateStr) return null;
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return '< 1m';
-  if (mins < 60) return `${mins}m`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d`;
+function getStepIndex(order) {
+  const steps = STEPS[order.delivery_type] || STEPS.delivery;
+  const keys = steps.map(s => s.key);
+  const idx = keys.indexOf(order.state);
+  return idx >= 0 ? idx : 0;
 }
 
-// ─── Summary Card (Clean, balanced, human-designed metrics) ─────────────────────
-function SummaryCard({ label, count, variant }) {
-  const cfg = STATUS_CONFIG[variant] || STATUS_CONFIG.attention;
-  const hasItems = count > 0;
-
-  return (
-    <div className="relative rounded-xl p-4 md:p-5 bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/60 shadow-xs hover:border-gray-300 dark:hover:border-gray-600 transition-colors flex flex-col justify-between">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          {label}
-        </span>
-        <span className={`w-2 h-2 rounded-full ${cfg.dot} ${hasItems ? 'opacity-100' : 'opacity-30'}`} />
-      </div>
-
-      <div className="mt-3 flex items-baseline justify-between">
-        <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-          {count}
-        </p>
-        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${cfg.badgeClass}`}>
-          {variant === 'attention' && hasItems ? 'Action required' : variant === 'paid' && hasItems ? 'Ready' : variant === 'transit' ? 'In delivery' : 'Settled'}
-        </span>
-      </div>
-    </div>
-  );
+function isOrderDone(order) {
+  return order.state === 'delivered' || order.state === 'collected';
 }
 
-// ─── Compact Stepper (Clean pill-stepper without giant empty lines) ─────────────
-function OrderStepper({ status, group }) {
-  const currentIdx = getPathwayIndex(status);
-
-  return (
-    <div className="flex items-center gap-1.5 p-2 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-700/60 text-xs">
-      {pathwaySteps.map((step, idx) => {
-        const done = idx <= currentIdx;
-        const active = idx === currentIdx;
-
-        return (
-          <React.Fragment key={step.id}>
-            <div
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
-                active
-                  ? group === 'attention'
-                    ? 'bg-amber-100 text-amber-900 font-bold dark:bg-amber-950/60 dark:text-amber-300'
-                    : group === 'paid'
-                    ? 'bg-emerald-100 text-emerald-900 font-bold dark:bg-emerald-950/60 dark:text-emerald-300'
-                    : 'bg-sky-100 text-sky-900 font-bold dark:bg-sky-950/60 dark:text-sky-300'
-                  : done
-                  ? 'text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 shadow-2xs'
-                  : 'text-gray-400 dark:text-gray-500'
-              }`}
-            >
-              {done ? (
-                <CheckCircle2 size={13} className={active ? 'text-current' : 'text-[#1A7A4A]'} />
-              ) : (
-                <span className="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-700 text-[10px] flex items-center justify-center text-gray-500">
-                  {idx + 1}
-                </span>
-              )}
-              <span className="truncate">{step.label}</span>
-            </div>
-            {idx < pathwaySteps.length - 1 && (
-              <ChevronRight size={12} className="text-gray-300 dark:text-gray-600 shrink-0" />
-            )}
-          </React.Fragment>
-        );
-      })}
-    </div>
-  );
+function formatMoney(n) {
+  return '₦' + (n || 0).toLocaleString();
 }
 
-// ─── Full Order Card (High-end commerce layout) ────────────────────────────────
-function FullOrderCard({ order, group, onConfirmPayment, onAssignRider, onMarkDelivered, updating }) {
-  const cfg = STATUS_CONFIG[group];
-  const waitTime = group === 'attention' ? waitingLabel(order.updated_at || order.created_at) : null;
-  const isPickup = (order.delivery_mode || '').toUpperCase() === 'PICKUP';
-
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden">
-      {/* Top Header Bar */}
-      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-700/70">
-        <div className="flex items-start sm:items-center gap-3">
-          {/* Subtle initials indicator */}
-          <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-center font-bold text-sm shrink-0">
-            {(order.customer_name || '?')[0].toUpperCase()}
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-bold text-gray-900 dark:text-white text-sm">
-                {order.customer_name || 'Customer'}
-              </h3>
-              <span className="font-mono text-xs text-gray-400">
-                #{order.invoice_reference}
-              </span>
-              <span
-                className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
-                  isPickup
-                    ? 'bg-amber-50 text-amber-700 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300'
-                    : 'bg-emerald-50 text-[#1A7A4A] border border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300'
-                }`}
-              >
-                {isPickup ? '📍 Store Pickup' : '🚚 Home Delivery'}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
-              <span className="flex items-center gap-1">
-                <Phone size={11} className="text-gray-400" />
-                {order.customer_phone || 'No phone'}
-              </span>
-              {waitTime && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200/70 font-medium">
-                  <Clock size={11} /> Waiting {waitTime}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Order Value & Action */}
-        <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100 dark:border-gray-700/60">
-          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-            Order Total
-          </span>
-          <span className="text-xl font-black text-gray-900 dark:text-white">
-            ₦{(order.total_amount || 0).toLocaleString()}
-          </span>
-        </div>
-      </div>
-
-      {/* Body Content */}
-      <div className="p-5 space-y-4">
-        {/* Step Flow */}
-        <OrderStepper status={order.status} group={group} />
-
-        {/* Items & Fulfillment Breakdown */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
-          {/* Purchased Items List */}
-          <div className="md:col-span-7 bg-gray-50/70 dark:bg-gray-900/40 rounded-xl p-3.5 border border-gray-100/90 dark:border-gray-800 text-xs">
-            <p className="font-bold text-gray-400 uppercase tracking-wider text-[10px] mb-2">
-              Purchased Items
-            </p>
-            {order.invoice_items && order.invoice_items.length > 0 ? (
-              <div className="space-y-1.5 divide-y divide-gray-100 dark:divide-gray-800">
-                {order.invoice_items.map((it, idx) => (
-                  <div key={idx} className="flex justify-between items-center pt-1.5 first:pt-0">
-                    <span className="font-medium text-gray-800 dark:text-gray-200">
-                      {it.quantity}× {it.description}
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
-                      ₦{(it.total_price || (it.unit_price * it.quantity) || 0).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-400 italic">Sales agreement order</p>
-            )}
-          </div>
-
-          {/* Logistics & Primary Call to Action */}
-          <div className="md:col-span-5 bg-gray-50/70 dark:bg-gray-900/40 rounded-xl p-3.5 border border-gray-100/90 dark:border-gray-800 text-xs flex flex-col justify-between">
-            <div>
-              <p className="font-bold text-gray-400 uppercase tracking-wider text-[10px] mb-1.5">
-                Logistics & Rider
-              </p>
-              {order.rider_name ? (
-                <div className="space-y-0.5">
-                  <p className="font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
-                    <Bike size={13} className="text-[#1A7A4A]" />
-                    <span>{order.rider_name}</span>
-                  </p>
-                  {order.rider_phone && (
-                    <p className="text-gray-500 dark:text-gray-400 pl-4.5">
-                      {order.rider_phone}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-gray-400">No rider assigned yet</p>
-              )}
-            </div>
-
-            {/* Contextual Action Button */}
-            <div className="mt-4 pt-3 border-t border-gray-200/50 dark:border-gray-700/60 flex justify-end">
-              {group === 'attention' && (
-                <button
-                  onClick={() => onConfirmPayment(order.id)}
-                  disabled={updating}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 rounded-xl font-bold text-xs transition-all active:scale-95 shadow-xs cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
-                >
-                  <CheckCircle2 size={14} />
-                  Confirm Payment (₦{(order.total_amount || 0).toLocaleString()})
-                </button>
-              )}
-              {group === 'paid' && (
-                <button
-                  onClick={() => onAssignRider(order)}
-                  disabled={updating}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-[#1A7A4A] hover:bg-[#15603A] text-white rounded-xl font-bold text-xs transition-all active:scale-95 shadow-xs cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
-                >
-                  <Truck size={14} />
-                  Assign Rider & Dispatch
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+function getDestination(order) {
+  if (order.delivery_type === 'pickup') {
+    return 'Store pickup';
+  }
+  return order.delivery_address || 'Customer location';
 }
 
-// ─── Slim Transit Card ─────────────────────────────────────────────────────────
-function SlimTransitCard({ order, onMarkDelivered, updating }) {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700/80 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:shadow-sm transition-all duration-200">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-300 flex items-center justify-center shrink-0">
-          <Truck size={16} />
-        </div>
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-bold text-sm text-gray-900 dark:text-white">
-              {order.customer_name || 'Customer'}
-            </p>
-            <span className="font-mono text-[11px] text-gray-400">
-              #{order.invoice_reference}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
-            {order.rider_name && (
-              <span className="font-medium text-gray-700 dark:text-gray-300">
-                Rider: {order.rider_name}
-              </span>
-            )}
-            <span className="text-gray-400">· {timeAgo(order.updated_at)}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-100 dark:border-gray-700/60">
-        <p className="font-black text-sm text-gray-900 dark:text-white">
-          ₦{(order.total_amount || 0).toLocaleString()}
-        </p>
-        <button
-          onClick={() => onMarkDelivered(order.id)}
-          disabled={updating}
-          className="px-3 py-1.5 bg-[#1A7A4A] hover:bg-[#15603A] text-white rounded-lg font-bold text-xs transition-all active:scale-95 cursor-pointer disabled:opacity-50"
-        >
-          Mark Delivered
-        </button>
-      </div>
-    </div>
-  );
+function getPhaseInfo(order) {
+  if (order.state === 'unconfirmed') {
+    return { cls: 'new', label: 'Needs confirmation', dotCls: 'bg-amber-500' };
+  }
+  if (order.state === 'paid') {
+    return { cls: 'new', label: 'Needs preparing', dotCls: 'bg-amber-500' };
+  }
+  if (order.state === 'packed') {
+    return {
+      cls: 'mid',
+      label: order.delivery_type === 'delivery' ? 'Ready to dispatch' : 'Ready to set out',
+      dotCls: 'bg-sky-500'
+    };
+  }
+  if (order.state === 'on_way') {
+    return { cls: 'mid', label: 'Out for delivery', dotCls: 'bg-sky-500' };
+  }
+  if (order.state === 'ready') {
+    return { cls: 'mid', label: 'Waiting for pickup', dotCls: 'bg-sky-500' };
+  }
+  if (order.state === 'delivered') {
+    return { cls: 'done', label: 'Delivered', dotCls: 'bg-[#1C774E]' };
+  }
+  if (order.state === 'collected') {
+    return { cls: 'done', label: 'Picked up', dotCls: 'bg-[#1C774E]' };
+  }
+  return { cls: 'new', label: 'In Progress', dotCls: 'bg-gray-400' };
 }
 
-// ─── Collapsed Completed Row ───────────────────────────────────────────────────
-function CompletedRow({ order }) {
-  return (
-    <div className="flex items-center justify-between px-4 py-2.5 rounded-xl border border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/40 hover:bg-gray-100/60 dark:hover:bg-gray-800 transition-colors">
-      <div className="flex items-center gap-2.5">
-        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-[10px] font-black text-gray-500 dark:text-gray-300">
-          {(order.customer_name || '?')[0].toUpperCase()}
-        </div>
-        <p className="text-xs font-bold text-gray-600 dark:text-gray-300">{order.customer_name || 'Customer'}</p>
-        <span className="font-mono text-[10px] text-gray-400">#{order.invoice_reference}</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <p className="text-xs font-bold text-gray-500 dark:text-gray-400">₦{(order.total_amount || 0).toLocaleString()}</p>
-        <CheckCircle2 size={14} className="text-gray-300 dark:text-gray-600" />
-      </div>
-    </div>
-  );
+function getNowText(order) {
+  switch (order.state) {
+    case 'unconfirmed':
+      return 'Verify payment with the customer, then tap the button.';
+    case 'paid':
+      return 'Prepare this order, then tap the button.';
+    case 'packed':
+      return order.delivery_type === 'delivery'
+        ? 'Book a rider to send this order.'
+        : 'Set order aside, then mark it ready for pickup.';
+    case 'on_way':
+      return 'When the rider delivers, mark it delivered.';
+    case 'ready':
+      return 'When the customer collects, mark it picked up.';
+    case 'delivered':
+    case 'collected':
+      return 'This order is complete.';
+    default:
+      return 'Manage this order.';
+  }
 }
 
-// ─── Section Header ────────────────────────────────────────────────────────────
-function SectionHeader({ label, count, group }) {
-  const cfg = STATUS_CONFIG[group];
-  return (
-    <div className="flex items-center gap-3 mb-3">
-      <div className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-      <h2 className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">{label}</h2>
-      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${cfg.badgeClass}`}>{count}</span>
-      <div className="flex-1 h-px bg-gray-100 dark:bg-gray-700/80" />
-    </div>
-  );
-}
-
-// ─── Assign Rider Modal ────────────────────────────────────────────────────────
-function AssignRiderModal({ order, riderName, setRiderName, riderPhone, setRiderPhone, onClose, onDispatch, updating }) {
-  return (
-    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 border border-gray-100 dark:border-gray-700 animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-base font-bold text-gray-950 dark:text-white">Assign Rider & Dispatch</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Order #{order.invoice_reference} · {order.customer_name}</p>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer p-1">
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Rider Name</label>
-            <input
-              type="text"
-              placeholder="e.g. Samuel Okon"
-              value={riderName}
-              onChange={(e) => setRiderName(e.target.value)}
-              autoFocus
-              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">Rider Phone</label>
-            <input
-              type="text"
-              placeholder="e.g. 08012345678"
-              value={riderPhone}
-              onChange={(e) => setRiderPhone(e.target.value)}
-              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm outline-none focus:border-[#1A7A4A] focus:ring-2 focus:ring-[#1A7A4A]/20 transition-all"
-            />
-          </div>
-        </div>
-
-        <div className="flex gap-2 pt-1">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onDispatch}
-            disabled={updating}
-            className="flex-1 px-4 py-2.5 bg-[#1A7A4A] hover:bg-[#15603A] text-white rounded-xl text-sm font-bold cursor-pointer transition-all active:scale-95 shadow-xs disabled:opacity-50 flex items-center justify-center gap-1.5"
-          >
-            <Truck size={15} />
-            {updating ? 'Dispatching…' : 'Dispatch Order'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Component ────────────────────────────────────────────────────────────
-function Fulfilment() {
+export default function Fulfilment() {
   const { user } = useAuth();
   const { addToast } = useToast();
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [filter, setFilter] = useState('todo'); // 'all', 'todo', 'delivery', 'pickup', 'done'
+  const [selectedId, setSelectedId] = useState(null);
+
+  // Mobile specific view states
+  const [mobileFilter, setMobileFilter] = useState('todo');
+  const [mobileViewMode, setMobileViewMode] = useState('cards'); // 'cards' | 'list'
+  const [mobileFlowOpen, setMobileFlowOpen] = useState(false);
+
+  // Optional manual view override toggle (desktop vs mobile simulator)
+  const [forcedView, setForcedView] = useState('responsive'); // 'responsive' | 'desk' | 'mob'
 
   // Rider modal
-  const [assignRiderOrder, setAssignRiderOrder] = useState(null);
+  const [riderModalOrder, setRiderModalOrder] = useState(null);
   const [riderName, setRiderName] = useState('');
   const [riderPhone, setRiderPhone] = useState('');
   const [updating, setUpdating] = useState(false);
 
+  // In-app WhatsApp banner toast
+  const [waToast, setWaToast] = useState({ show: false, name: '', msg: '' });
+
+  const showWaToast = (name, msg) => {
+    const firstName = (name || 'Customer').split(' ')[0];
+    setWaToast({ show: true, name: firstName, msg });
+    setTimeout(() => {
+      setWaToast(prev => ({ ...prev, show: false }));
+    }, 4500);
+  };
+
+  // ─── Fetch Orders from Backend ──────────────────────────────────────────────
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
@@ -475,26 +169,54 @@ function Fulfilment() {
       const conversations = convRes.data || [];
       const invoices = invRes.data || [];
 
-      const activeOrders = conversations.filter(c =>
-        ['Requires Attention', 'In Progress', 'Paid', 'In Transit', 'Delivered'].includes(c.status)
-      ).map(c => {
-        const normalize = (p) => p ? p.toString().replace(/\D/g, '') : '';
-        const matchingInv = invoices.find(i =>
-          (c.customer_phone && i.customer?.phone && normalize(i.customer.phone) === normalize(c.customer_phone)) ||
-          (c.customer_name && i.customer?.name && i.customer.name.toLowerCase().trim() === c.customer_name.toLowerCase().trim())
-        );
-        return {
-          ...c,
-          invoice_reference: matchingInv?.reference || c.invoice_reference || `INV-${c.id}`,
-          invoice_items: matchingInv?.items || [],
-          total_amount: matchingInv?.total_amount || c.agreed_price || c.listed_price || 0,
-          rider_name: c.rider_name || matchingInv?.rider_name,
-          rider_phone: c.rider_phone || matchingInv?.rider_phone,
-          delivery_mode: (c.delivery_address || '').toUpperCase() === 'PICKUP' ? 'PICKUP' : 'DELIVERY',
-        };
-      });
+      // Filter and harmonize orders
+      const normalizedOrders = conversations
+        .filter(c => ['Requires Attention', 'In Progress', 'Paid', 'Packed', 'Ready for Pickup', 'Ready', 'In Transit', 'Delivered', 'Collected'].includes(c.status))
+        .map(c => {
+          const normalizePhone = (p) => (p ? p.toString().replace(/\D/g, '') : '');
+          const matchingInv = invoices.find(i =>
+            (c.customer_phone && i.customer?.phone && normalizePhone(i.customer.phone) === normalizePhone(c.customer_phone)) ||
+            (c.customer_name && i.customer?.name && i.customer.name.toLowerCase().trim() === c.customer_name.toLowerCase().trim())
+          );
 
-      setOrders(activeOrders);
+          const deliveryMode = (c.delivery_address || matchingInv?.delivery_address || '').toUpperCase() === 'PICKUP' ? 'PICKUP' : 'DELIVERY';
+          const deliveryType = deliveryMode === 'PICKUP' ? 'pickup' : 'delivery';
+          const state = mapToState(c.status, deliveryMode);
+
+          const rawItems = matchingInv?.items || c.invoice_items || [];
+          const items = rawItems.map(it => [
+            it.description || it.product_name || 'Item',
+            it.quantity || 1,
+            it.unit_price || it.price || (it.total_price ? it.total_price / (it.quantity || 1) : 0)
+          ]);
+
+          const total = matchingInv?.total_amount || c.agreed_price || c.listed_price || 0;
+          const itemsSubtotal = items.reduce((sum, item) => sum + item[1] * item[2], 0);
+          const fee = total > itemsSubtotal ? total - itemsSubtotal : 0;
+
+          return {
+            id: c.id,
+            displayId: matchingInv?.reference || c.invoice_reference || `KAS-${c.id}`,
+            name: c.customer_name || 'Customer',
+            phone: c.customer_phone || 'No phone',
+            delivery_type: deliveryType,
+            state: state,
+            backend_status: c.status,
+            delivery_address: c.delivery_address || matchingInv?.delivery_address || '',
+            items: items.length > 0 ? items : [['Order agreement', 1, total]],
+            fee: fee,
+            total_amount: total,
+            rider: (c.rider_name || matchingInv?.rider_name) ? {
+              n: c.rider_name || matchingInv?.rider_name,
+              p: c.rider_phone || matchingInv?.rider_phone || ''
+            } : null,
+            note: c.ai_summary || c.vendor_instructions || '',
+            created_at: c.created_at,
+            updated_at: c.updated_at
+          };
+        });
+
+      setOrders(normalizedOrders);
     } catch (err) {
       console.error('Failed to fetch fulfilment orders:', err);
       addToast('Failed to load orders', 'error');
@@ -503,222 +225,1030 @@ function Fulfilment() {
     }
   }, [addToast]);
 
-  useEffect(() => { fetchOrders(); }, [fetchOrders]);
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
-  const handleUpdateStatus = async (conversationId, newStatus, riderData = {}) => {
+  // ─── Status Advancement Handler ─────────────────────────────────────────────
+  const advanceOrder = async (order, nextState, backendStatus, message, riderData = null) => {
     setUpdating(true);
+    // Optimistically update order in state
+    setOrders(prev =>
+      prev.map(o => {
+        if (o.id === order.id) {
+          return {
+            ...o,
+            state: nextState,
+            backend_status: backendStatus,
+            rider: riderData ? { n: riderData.rider_name, p: riderData.rider_phone } : o.rider
+          };
+        }
+        return o;
+      })
+    );
+
+    showWaToast(order.name, message);
+
     try {
-      await conversationAPI.updateStatus(conversationId, { status: newStatus, ...riderData });
-      addToast(`Order updated to ${newStatus}`, 'success');
-      setAssignRiderOrder(null);
-      setRiderName('');
-      setRiderPhone('');
-      fetchOrders();
+      const payload = { status: backendStatus };
+      if (riderData) {
+        payload.rider_name = riderData.rider_name;
+        payload.rider_phone = riderData.rider_phone;
+      }
+      await conversationAPI.updateStatus(order.id, payload);
     } catch (err) {
-      console.error('Failed to update status:', err);
-      addToast('Failed to update status', 'error');
+      console.error('Failed to update status on server:', err);
+      addToast('Could not sync update with server. Please refresh.', 'error');
+      fetchOrders();
     } finally {
       setUpdating(false);
     }
   };
 
-  // ── Derived counts ─────────────────────────────────────────────────────────
-  const attentionOrders = orders.filter(o => getStatusGroup(o.status) === 'attention');
-  const paidOrders      = orders.filter(o => getStatusGroup(o.status) === 'paid');
-  const transitOrders   = orders.filter(o => getStatusGroup(o.status) === 'transit');
-  const deliveredOrders = orders.filter(o => getStatusGroup(o.status) === 'delivered');
+  // ─── Next Action Definition ─────────────────────────────────────────────────
+  const getNextAction = (order) => {
+    if (order.state === 'unconfirmed') {
+      return {
+        label: 'Confirm payment',
+        run: () => advanceOrder(
+          order,
+          'paid',
+          'Paid',
+          'Payment confirmed! We are now processing your order.'
+        )
+      };
+    }
 
-  // ── Filter + search ────────────────────────────────────────────────────────
+    if (order.delivery_type === 'delivery') {
+      if (order.state === 'paid') {
+        return {
+          label: 'Mark as packed',
+          run: () => advanceOrder(
+            order,
+            'packed',
+            'Packed',
+            'Your order is confirmed and being prepared for delivery.'
+          )
+        };
+      }
+      if (order.state === 'packed') {
+        return {
+          label: 'Book rider',
+          run: () => {
+            setRiderModalOrder(order);
+            setRiderName(order.rider?.n || '');
+            setRiderPhone(order.rider?.p || '');
+          }
+        };
+      }
+      if (order.state === 'on_way') {
+        return {
+          label: 'Mark as delivered',
+          run: () => advanceOrder(
+            order,
+            'delivered',
+            'Delivered',
+            'Your order has been delivered. Thank you!'
+          )
+        };
+      }
+    } else {
+      // Pickup
+      if (order.state === 'paid') {
+        return {
+          label: 'Mark as packed',
+          run: () => advanceOrder(
+            order,
+            'packed',
+            'Packed',
+            'Your order is packed and set aside.'
+          )
+        };
+      }
+      if (order.state === 'packed') {
+        return {
+          label: 'Mark as ready for pickup',
+          run: () => advanceOrder(
+            order,
+            'ready',
+            'Ready for Pickup',
+            `Your order is ready! Come collect at our store. Ref: ${order.displayId}`
+          )
+        };
+      }
+      if (order.state === 'ready') {
+        return {
+          label: 'Mark as picked up',
+          run: () => advanceOrder(
+            order,
+            'collected',
+            'Delivered',
+            'Thanks for picking up your order!'
+          )
+        };
+      }
+    }
+    return null;
+  };
+
+  // ─── Filter Logic ───────────────────────────────────────────────────────────
+  const matchFilter = (order, f) => {
+    if (f === 'all') return true;
+    if (f === 'todo') return !isOrderDone(order);
+    if (f === 'done') return isOrderDone(order);
+    if (f === 'delivery') return order.delivery_type === 'delivery';
+    if (f === 'pickup') return order.delivery_type === 'pickup';
+    return true;
+  };
+
   const applySearch = (list) => {
-    if (!searchQuery) return list;
-    const q = searchQuery.toLowerCase();
+    if (!searchQuery.trim()) return list;
+    const q = searchQuery.toLowerCase().trim();
     return list.filter(o =>
-      (o.customer_name || '').toLowerCase().includes(q) ||
-      (o.customer_phone || '').includes(q) ||
-      (o.invoice_reference || '').toLowerCase().includes(q)
+      o.name.toLowerCase().includes(q) ||
+      o.phone.includes(q) ||
+      o.displayId.toLowerCase().includes(q) ||
+      o.items.some(i => i[0].toLowerCase().includes(q))
     );
   };
 
-  const applyFilter = (list) => {
-    if (activeFilter === 'Pickup') return list.filter(o => o.delivery_mode === 'PICKUP');
-    if (activeFilter === 'Delivery') return list.filter(o => o.delivery_mode === 'DELIVERY');
-    return list;
+  const filteredDesktopOrders = applySearch(orders.filter(o => matchFilter(o, filter)));
+  const filteredMobileOrders = applySearch(orders.filter(o => matchFilter(o, mobileFilter)));
+
+  const todoCount = orders.filter(o => matchFilter(o, 'todo')).length;
+  const allCount = orders.length;
+  const deliveryCount = orders.filter(o => matchFilter(o, 'delivery')).length;
+  const pickupCount = orders.filter(o => matchFilter(o, 'pickup')).length;
+  const doneCount = orders.filter(o => matchFilter(o, 'done')).length;
+
+  const selectedOrder = orders.find(o => o.id === selectedId) || null;
+
+  // Handler for rider confirmation modal
+  const handleConfirmRider = () => {
+    if (!riderModalOrder) return;
+    const name = riderName.trim() || 'Rider';
+    const phone = riderPhone.trim() || '—';
+
+    advanceOrder(
+      riderModalOrder,
+      'on_way',
+      'In Transit',
+      `Your order is on the way! Rider: ${name} (${phone}).`,
+      { rider_name: name, rider_phone: phone }
+    );
+    setRiderModalOrder(null);
+    setRiderName('');
+    setRiderPhone('');
   };
 
-  const filter = (list) => applySearch(applyFilter(list));
-
-  const fAttention = filter(attentionOrders);
-  const fPaid      = filter(paidOrders);
-  const fTransit   = filter(transitOrders);
-  const fDelivered = filter(deliveredOrders);
-
-  const totalVisible = fAttention.length + fPaid.length + fTransit.length + fDelivered.length;
-
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans text-[#16211b] dark:text-gray-100">
+      
+      {/* ─── Top Bar with View Mode and Refresh ─────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-dark dark:text-white flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-primary/10 text-primary">
-              <Truck size={22} />
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#1C774E] text-[#DBF361] flex items-center justify-center font-bold shadow-xs">
+              <Truck size={20} />
             </div>
-            Fulfilment & Order Pathway
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Track orders from payment verification to final delivery
-          </p>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                Orders & Fulfilment
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                {todoCount > 0 ? `${todoCount} order${todoCount > 1 ? 's' : ''} require action` : 'All caught up 🎉'}
+              </p>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={fetchOrders}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-        >
-          <RotateCcw size={13} />
-          Refresh
-        </button>
-      </div>
 
-      {/* ── Summary Strip ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <SummaryCard label="Needs Attention" count={attentionOrders.length} variant="attention" pulse />
-        <SummaryCard label="Ready to Dispatch" count={paidOrders.length} variant="paid" />
-        <SummaryCard label="Out for Delivery" count={transitOrders.length} variant="transit" />
-        <SummaryCard label="Completed" count={deliveredOrders.length} variant="delivered" />
-      </div>
-
-      {/* ── Toolbar (filters + search) ─────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div className="flex gap-2 flex-wrap">
-          {['All', 'Delivery', 'Pickup'].map(f => (
+        <div className="flex items-center gap-2">
+          {/* Responsive switch buttons */}
+          <div className="hidden lg:flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200/80 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300">
             <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeFilter === f
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              onClick={() => setForcedView('responsive')}
+              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                forcedView === 'responsive' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
               }`}
             >
-              {f === 'All' ? 'All Orders' : `${f} Only`}
+              Auto
+            </button>
+            <button
+              onClick={() => setForcedView('desk')}
+              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                forcedView === 'desk' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
+              }`}
+            >
+              <Monitor size={13} /> Desktop
+            </button>
+            <button
+              onClick={() => setForcedView('mob')}
+              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                forcedView === 'mob' ? 'bg-white dark:bg-gray-700 text-[#1C774E] dark:text-[#DBF361] shadow-2xs font-bold' : 'hover:text-gray-900'
+              }`}
+            >
+              <Smartphone size={13} /> Mobile
+            </button>
+          </div>
+
+          <button
+            onClick={fetchOrders}
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-2xs cursor-pointer"
+          >
+            <RotateCcw size={13} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* ─── DESKTOP VIEW ───────────────────────────────────────────────────── */}
+      <div className={`relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200/90 dark:border-gray-800 shadow-sm overflow-hidden ${
+        forcedView === 'mob' ? 'hidden' : forcedView === 'desk' ? 'block' : 'hidden md:block'
+      }`}>
+        
+        {/* Desktop Header & Search */}
+        <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-gray-900">
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold text-gray-900 dark:text-white">Active Pipeline</span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#1C774E]/10 text-[#1C774E] dark:bg-[#1C774E]/20 dark:text-[#DBF361]">
+              {todoCount} to do
+            </span>
+          </div>
+
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+            <input
+              type="text"
+              placeholder="Search customer, order ID…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-[#1C774E]/20 focus:border-[#1C774E] outline-none transition-all dark:text-white placeholder-gray-400"
+            />
+          </div>
+        </div>
+
+        {/* Desktop Filter Chips */}
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 overflow-x-auto">
+          {[
+            { key: 'all', label: 'All', count: allCount },
+            { key: 'todo', label: 'To do', count: todoCount },
+            { key: 'delivery', label: 'Delivery', count: deliveryCount },
+            { key: 'pickup', label: 'Pickup', count: pickupCount },
+            { key: 'done', label: 'Done', count: doneCount }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                filter === tab.key
+                  ? 'bg-[#1C774E] text-white shadow-2xs font-bold'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200/80 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className={`text-[11px] ${filter === tab.key ? 'text-white/80' : 'text-gray-400'}`}>
+                ({tab.count})
+              </span>
             </button>
           ))}
         </div>
 
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-          <input
-            type="text"
-            placeholder="Search customer, invoice…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-          />
+        {/* Desktop Table View */}
+        <div className="overflow-x-auto min-h-[420px]">
+          {loading ? (
+            <div className="py-24 flex flex-col items-center justify-center gap-3 text-gray-400">
+              <div className="w-8 h-8 border-2 border-[#1C774E] border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs">Loading orders…</p>
+            </div>
+          ) : filteredDesktopOrders.length === 0 ? (
+            <div className="py-24 text-center text-gray-400">
+              <ShoppingBag size={38} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+              <p className="font-semibold text-sm text-gray-600 dark:text-gray-300">Nothing here right now</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {searchQuery ? 'Try adjusting your search query.' : 'Orders will appear here as customers buy.'}
+              </p>
+            </div>
+          ) : (
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 text-[11px] uppercase tracking-wider font-semibold text-gray-400">
+                  <th className="py-3 px-4">Customer</th>
+                  <th className="py-3 px-3">Order ID</th>
+                  <th className="py-3 px-3">Type</th>
+                  <th className="py-3 px-3">Items</th>
+                  <th className="py-3 px-3">Total</th>
+                  <th className="py-3 px-3">Destination</th>
+                  <th className="py-3 px-3">Phase</th>
+                  <th className="py-3 px-4 text-right">Next action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                {filteredDesktopOrders.map(order => {
+                  const phase = getPhaseInfo(order);
+                  const nextAction = getNextAction(order);
+                  const isSelected = selectedId === order.id;
+
+                  return (
+                    <tr
+                      key={order.id}
+                      onClick={() => setSelectedId(order.id)}
+                      className={`cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-[#1C774E]/5 dark:bg-[#1C774E]/10 border-l-4 border-l-[#1C774E]'
+                          : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/50'
+                      }`}
+                    >
+                      {/* Customer */}
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-gray-900 dark:text-white">{order.name}</div>
+                        <div className="text-[11px] text-gray-400 dark:text-gray-500 font-mono mt-0.5">{order.phone}</div>
+                      </td>
+
+                      {/* Order ID */}
+                      <td className="py-3.5 px-3 font-mono text-gray-500 dark:text-gray-400">
+                        {order.displayId}
+                      </td>
+
+                      {/* Type Badge */}
+                      <td className="py-3.5 px-3 whitespace-nowrap">
+                        {order.delivery_type === 'delivery' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
+                            🛵 Delivery
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50">
+                            🏬 Pickup
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Items */}
+                      <td className="py-3.5 px-3 max-w-[200px] truncate text-gray-700 dark:text-gray-300" title={order.items.map(i => `${i[0]} ×${i[1]}`).join(', ')}>
+                        {order.items.map(i => `${i[0]} ×${i[1]}`).join(', ')}
+                      </td>
+
+                      {/* Total */}
+                      <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                        {formatMoney(order.total_amount)}
+                      </td>
+
+                      {/* Destination */}
+                      <td className="py-3.5 px-3 max-w-[150px] truncate text-gray-500 dark:text-gray-400" title={getDestination(order)}>
+                        {getDestination(order)}
+                      </td>
+
+                      {/* Phase */}
+                      <td className="py-3.5 px-3 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+                            phase.cls === 'new'
+                              ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/50'
+                              : phase.cls === 'mid'
+                              ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50'
+                              : 'bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50'
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${phase.dotCls}`} />
+                          {phase.label}
+                        </span>
+                      </td>
+
+                      {/* Next Action Button */}
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        {nextAction ? (
+                          <button
+                            onClick={nextAction.run}
+                            disabled={updating}
+                            className="px-3 py-1.5 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-lg font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                          >
+                            {nextAction.label}
+                          </button>
+                        ) : (
+                          <span className="inline-block px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-lg font-semibold text-xs border border-gray-200/70 dark:border-gray-700">
+                            Done ✓
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Desktop Slide-Over Detail Panel */}
+        {selectedOrder && (
+          <>
+            {/* Scrim */}
+            <div
+              onClick={() => setSelectedId(null)}
+              className="fixed inset-0 bg-black/30 backdrop-blur-2xs z-40 transition-opacity"
+            />
+
+            {/* Slide-out Drawer */}
+            <div className="fixed top-0 right-0 h-full w-[420px] max-w-[95vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl z-50 overflow-y-auto p-6 space-y-5 animate-in slide-in-from-right duration-200">
+              {/* Top Drawer Header */}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {selectedOrder.name}
+                  </h2>
+                  <p className="text-xs font-mono text-gray-400 mt-0.5">
+                    {selectedOrder.displayId} · {selectedOrder.phone}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {selectedOrder.delivery_type === 'delivery' ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300">
+                      🛵 Delivery
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                      🏬 Pickup
+                    </span>
+                  )}
+                  <button
+                    onClick={() => setSelectedId(null)}
+                    className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 flex items-center justify-center transition-colors cursor-pointer"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Now Banner */}
+              {!isOrderDone(selectedOrder) && (
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl text-xs text-[#1C774E] dark:text-emerald-300 flex items-start gap-2">
+                  <span className="font-bold">👉 Now:</span>
+                  <span>{getNowText(selectedOrder)}</span>
+                </div>
+              )}
+
+              {/* Horizontal Stepper */}
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  Pathway Progress
+                </p>
+                <div className="relative flex justify-between items-center py-2">
+                  <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 h-0.5 bg-gray-200 dark:bg-gray-700 z-0" />
+                  {(STEPS[selectedOrder.delivery_type] || STEPS.delivery).map((step, idx) => {
+                    const currentIdx = getStepIndex(selectedOrder);
+                    const isDone = idx < currentIdx;
+                    const isCurrent = idx === currentIdx;
+
+                    return (
+                      <div key={step.key} className="relative z-10 flex flex-col items-center">
+                        <div
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+                            isDone
+                              ? 'bg-[#1C774E] text-white'
+                              : isCurrent
+                              ? 'bg-white dark:bg-gray-900 border-2 border-[#1C774E] text-[#1C774E] ring-4 ring-[#1C774E]/15'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-500 border border-gray-300 dark:border-gray-600'
+                          }`}
+                        >
+                          {isDone ? '✓' : isCurrent ? <span className="w-2 h-2 rounded-full bg-[#1C774E]" /> : idx + 1}
+                        </div>
+                        <span
+                          className={`text-[10px] mt-1.5 whitespace-nowrap ${
+                            isCurrent || isDone ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-400'
+                          }`}
+                        >
+                          {step.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Big CTA Button */}
+              {(() => {
+                const action = getNextAction(selectedOrder);
+                return (
+                  <div>
+                    {action ? (
+                      <button
+                        onClick={action.run}
+                        disabled={updating}
+                        className="w-full py-3 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-xl font-bold text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+                      >
+                        {action.label}
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-xl font-bold text-sm cursor-default"
+                      >
+                        Order complete ✓
+                      </button>
+                    )}
+                    {action && (
+                      <p className="text-center text-[11px] text-gray-400 mt-1.5">
+                        This sends a WhatsApp update to {selectedOrder.name.split(' ')[0]}.
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Order Items Breakdown */}
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                  Order Items
+                </h3>
+                <div className="space-y-1.5 divide-y divide-gray-100 dark:divide-gray-800 text-xs">
+                  {selectedOrder.items.map((item, i) => (
+                    <div key={i} className="pt-1.5 first:pt-0 flex items-center justify-between">
+                      <span className="font-medium text-gray-800 dark:text-gray-200">
+                        {item[0]} <span className="text-gray-400">×{item[1]}</span>
+                      </span>
+                      <span className="font-semibold text-gray-900 dark:text-white">
+                        {formatMoney(item[1] * item[2])}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1 text-xs">
+                  <div className="flex justify-between text-gray-500">
+                    <span>Delivery fee</span>
+                    <span>{selectedOrder.fee ? formatMoney(selectedOrder.fee) : '—'}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-sm text-gray-900 dark:text-white pt-1">
+                    <span>Total paid</span>
+                    <span>{formatMoney(selectedOrder.total_amount)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Destination & Logistics */}
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                  {selectedOrder.delivery_type === 'delivery' ? 'Deliver to' : 'Pickup at'}
+                </h3>
+                <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                  {getDestination(selectedOrder)}
+                </div>
+
+                {selectedOrder.delivery_type === 'delivery' && (
+                  <div className="pt-1">
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                      Assigned Rider
+                    </p>
+                    {selectedOrder.rider ? (
+                      <div className="flex items-center justify-between text-xs bg-gray-50 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center gap-2">
+                          <Bike size={16} className="text-[#1C774E]" />
+                          <div>
+                            <p className="font-bold text-gray-900 dark:text-white">{selectedOrder.rider.n}</p>
+                            <p className="text-gray-500">{selectedOrder.rider.p}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-400 italic">Not booked yet. Use “Book rider” button.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Customer Note / AI Summary */}
+              {selectedOrder.note && (
+                <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-1.5">
+                  <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    Customer Note / Context
+                  </h3>
+                  <div className="p-3 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 rounded-xl text-xs text-amber-900 dark:text-amber-200 italic">
+                    “{selectedOrder.note}”
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* ─── MOBILE VIEW ────────────────────────────────────────────────────── */}
+      <div className={`${forcedView === 'desk' ? 'hidden' : forcedView === 'mob' ? 'block' : 'block md:hidden'}`}>
+        
+        {/* Main List Screen */}
+        <div className={`space-y-3 ${mobileFlowOpen ? 'hidden' : 'block'}`}>
+          {/* Mobile Tabs */}
+          <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800/90 p-1.5 rounded-xl border border-gray-200/70 dark:border-gray-700/60">
+            {[
+              { key: 'todo', label: 'To do', count: todoCount },
+              { key: 'all', label: 'All', count: allCount },
+              { key: 'done', label: 'Done', count: doneCount }
+            ].map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setMobileFilter(tab.key)}
+                className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all text-center cursor-pointer ${
+                  mobileFilter === tab.key
+                    ? 'bg-[#1C774E] text-white shadow-2xs font-bold'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
+                }`}
+              >
+                {tab.label} <span className="text-[11px] opacity-80">({tab.count})</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Cards vs List View Switch */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setMobileViewMode('cards')}
+              className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                mobileViewMode === 'cards'
+                  ? 'bg-[#1C774E]/10 border-[#1C774E] text-[#1C774E] dark:text-[#DBF361] font-bold'
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'
+              }`}
+            >
+              ▦ Cards
+            </button>
+            <button
+              onClick={() => setMobileViewMode('list')}
+              className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                mobileViewMode === 'list'
+                  ? 'bg-[#1C774E]/10 border-[#1C774E] text-[#1C774E] dark:text-[#DBF361] font-bold'
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'
+              }`}
+            >
+              ☰ List
+            </button>
+          </div>
+
+          {/* Mobile Orders List */}
+          {loading ? (
+            <div className="py-20 flex flex-col items-center justify-center gap-2 text-gray-400">
+              <div className="w-7 h-7 border-2 border-[#1C774E] border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs">Loading orders…</p>
+            </div>
+          ) : filteredMobileOrders.length === 0 ? (
+            <div className="py-16 text-center bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 text-gray-400">
+              <ShoppingBag size={34} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+              <p className="font-semibold text-xs text-gray-600 dark:text-gray-300">Nothing here right now</p>
+            </div>
+          ) : mobileViewMode === 'list' ? (
+            /* Compact List View */
+            <div className="space-y-2">
+              {filteredMobileOrders.map(order => {
+                const phase = getPhaseInfo(order);
+
+                return (
+                  <div
+                    key={order.id}
+                    onClick={() => {
+                      setSelectedId(order.id);
+                      setMobileFlowOpen(true);
+                    }}
+                    className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200/80 dark:border-gray-700 p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:border-gray-300 active:bg-gray-50 dark:active:bg-gray-700 transition-all cursor-pointer"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-sm text-gray-900 dark:text-white truncate">
+                          {order.name}
+                        </span>
+                        <span className="text-xs">
+                          {order.delivery_type === 'delivery' ? '🛵' : '🏬'}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-gray-400 truncate mt-0.5">
+                        {order.displayId} · {order.phone}
+                      </div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                        {order.items.map(i => `${i[0]} ×${i[1]}`).join(', ')}
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <div className="font-bold text-sm text-gray-900 dark:text-white">
+                        {formatMoney(order.total_amount)}
+                      </div>
+                      <div className={`text-[10px] font-semibold mt-0.5 ${
+                        phase.cls === 'new' ? 'text-amber-600 dark:text-amber-400' : phase.cls === 'mid' ? 'text-sky-600 dark:text-sky-400' : 'text-[#1C774E] dark:text-[#DBF361]'
+                      }`}>
+                        {phase.label}
+                      </div>
+                    </div>
+
+                    <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 shrink-0" />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* Cards View */
+            <div className="space-y-3">
+              {filteredMobileOrders.map(order => {
+                const phase = getPhaseInfo(order);
+                const nextAction = getNextAction(order);
+
+                return (
+                  <div
+                    key={order.id}
+                    onClick={() => {
+                      setSelectedId(order.id);
+                      setMobileFlowOpen(true);
+                    }}
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/80 dark:border-gray-700 p-4 shadow-xs space-y-3 cursor-pointer"
+                  >
+                    {/* Top row */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="font-bold text-base text-gray-900 dark:text-white">
+                          {order.name}
+                        </h3>
+                        <p className="text-xs text-gray-400 font-mono mt-0.5">
+                          {order.displayId} · {order.phone}
+                        </p>
+                      </div>
+                      {order.delivery_type === 'delivery' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300">
+                          🛵 Delivery
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                          🏬 Pickup
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Status Pill */}
+                    <div className="flex items-center gap-2 text-xs font-semibold">
+                      <span className={`w-2 h-2 rounded-full ${phase.dotCls}`} />
+                      <span className={
+                        phase.cls === 'new' ? 'text-amber-700 dark:text-amber-400' : phase.cls === 'mid' ? 'text-sky-700 dark:text-sky-400' : 'text-[#1C774E] dark:text-[#DBF361]'
+                      }>
+                        {phase.label}
+                      </span>
+                    </div>
+
+                    {/* Items & Amount */}
+                    <div className="text-xs text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
+                      <span className="truncate max-w-[200px]">
+                        {order.items.map(i => `${i[0]} ×${i[1]}`).join(', ')}
+                      </span>
+                      <span className="font-bold text-sm text-gray-900 dark:text-white">
+                        {formatMoney(order.total_amount)}
+                      </span>
+                    </div>
+
+                    {/* Next Action Button */}
+                    <div onClick={(e) => e.stopPropagation()}>
+                      {nextAction ? (
+                        <button
+                          onClick={nextAction.run}
+                          disabled={updating}
+                          className="w-full py-2.5 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-xl font-bold text-xs shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                        >
+                          {nextAction.label}
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          className="w-full py-2 bg-gray-100 dark:bg-gray-700 text-gray-400 rounded-xl font-semibold text-xs cursor-default"
+                        >
+                          Completed ✓
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Full Flow Sub-Screen (Mobile) */}
+        {mobileFlowOpen && selectedOrder && (
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            {/* Mobile Header with Back */}
+            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+              <button
+                onClick={() => setMobileFlowOpen(false)}
+                className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 cursor-pointer"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-bold text-base text-gray-900 dark:text-white truncate">
+                  {selectedOrder.name}
+                </h2>
+                <p className="text-xs font-mono text-gray-400">
+                  {selectedOrder.displayId} · {selectedOrder.phone}
+                </p>
+              </div>
+              <span className="shrink-0 text-xs">
+                {selectedOrder.delivery_type === 'delivery' ? '🛵 Delivery' : '🏬 Pickup'}
+              </span>
+            </div>
+
+            {/* Content Body */}
+            <div className="p-4 space-y-5">
+              {/* Now Banner */}
+              {!isOrderDone(selectedOrder) && (
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl text-xs text-[#1C774E] dark:text-emerald-300 flex items-start gap-2">
+                  <span className="font-bold">👉 Now:</span>
+                  <span>{getNowText(selectedOrder)}</span>
+                </div>
+              )}
+
+              {/* Vertical Stepper */}
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Pathway Progress
+                </p>
+                <div className="relative pl-7 space-y-4">
+                  {/* Vertical connecting line */}
+                  <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-gray-200 dark:bg-gray-700" />
+                  
+                  {(STEPS[selectedOrder.delivery_type] || STEPS.delivery).map((step, idx) => {
+                    const currentIdx = getStepIndex(selectedOrder);
+                    const isDone = idx < currentIdx;
+                    const isCurrent = idx === currentIdx;
+
+                    let sub = step.sub;
+                    if (step.key === 'on_way' && selectedOrder.rider) {
+                      sub = `Rider: ${selectedOrder.rider.n} · ${selectedOrder.rider.p}`;
+                    }
+
+                    return (
+                      <div key={step.key} className="relative">
+                        <div
+                          className={`absolute -left-7 top-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                            isDone
+                              ? 'bg-[#1C774E] text-white'
+                              : isCurrent
+                              ? 'bg-white dark:bg-gray-900 border-2 border-[#1C774E] text-[#1C774E] ring-3 ring-[#1C774E]/20'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                          }`}
+                        >
+                          {isDone ? '✓' : isCurrent ? '•' : ''}
+                        </div>
+                        <div>
+                          <p className={`text-xs font-bold ${
+                            isCurrent || isDone ? 'text-gray-900 dark:text-white' : 'text-gray-400'
+                          }`}>
+                            {step.label}
+                          </p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">{sub}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Items Card */}
+              <div className="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-800 space-y-2 text-xs">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Purchased Items
+                </p>
+                <div className="space-y-1.5 divide-y divide-gray-100 dark:divide-gray-700/60">
+                  {selectedOrder.items.map((item, i) => (
+                    <div key={i} className="pt-1.5 first:pt-0 flex justify-between">
+                      <span className="font-medium text-gray-800 dark:text-gray-200">
+                        {item[0]} <span className="text-gray-400">×{item[1]}</span>
+                      </span>
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {formatMoney(item[1] * item[2])}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="pt-2 border-t border-gray-200/70 dark:border-gray-700 flex justify-between font-bold text-sm text-gray-900 dark:text-white">
+                  <span>Total</span>
+                  <span>{formatMoney(selectedOrder.total_amount)}</span>
+                </div>
+              </div>
+
+              {/* Destination */}
+              <div className="p-3.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-800 space-y-1 text-xs">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  {selectedOrder.delivery_type === 'delivery' ? 'Deliver to' : 'Pickup at'}
+                </p>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">
+                  {getDestination(selectedOrder)}
+                </p>
+              </div>
+
+              {/* Action Button at bottom */}
+              {(() => {
+                const action = getNextAction(selectedOrder);
+                return (
+                  <div className="pt-2">
+                    {action ? (
+                      <button
+                        onClick={action.run}
+                        disabled={updating}
+                        className="w-full py-3 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-xl font-bold text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+                      >
+                        {action.label}
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-xl font-bold text-sm cursor-default"
+                      >
+                        Order complete ✓
+                      </button>
+                    )}
+                    {action && (
+                      <p className="text-center text-[11px] text-gray-400 mt-1.5">
+                        This sends a WhatsApp update to {selectedOrder.name.split(' ')[0]}.
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ─── BOOK A RIDER MODAL ─────────────────────────────────────────────── */}
+      {riderModalOrder && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+          onClick={(e) => e.target === e.currentTarget && setRiderModalOrder(null)}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4 border border-gray-100 dark:border-gray-700 animate-in zoom-in-95 duration-150">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                Book a rider
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Enter the rider's details. Kasi sends them to {riderModalOrder.name.split(' ')[0]} on WhatsApp.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                  Rider's name
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Musa or Samuel"
+                  value={riderName}
+                  onChange={(e) => setRiderName(e.target.value)}
+                  autoFocus
+                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
+                  Rider's phone number
+                </label>
+                <input
+                  type="tel"
+                  placeholder="e.g. 0803 000 0000"
+                  value={riderPhone}
+                  onChange={(e) => setRiderPhone(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={() => setRiderModalOrder(null)}
+                className="flex-none px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-semibold hover:bg-gray-200 cursor-pointer transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmRider}
+                disabled={updating}
+                className="flex-1 px-4 py-2.5 bg-[#1C774E] hover:bg-[#15603A] text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                <Truck size={14} />
+                Send order with rider
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── FLOATING WHATSAPP UPDATE TOAST ─────────────────────────────────── */}
+      <div
+        className={`fixed left-1/2 -translate-x-1/2 bottom-6 z-50 bg-[#16211b] text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 max-w-md w-[92vw] sm:w-auto transition-all duration-300 pointer-events-none ${
+          waToast.show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        }`}
+      >
+        <span className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center text-xs font-black shrink-0">
+          ✓
+        </span>
+        <div className="text-xs leading-relaxed">
+          <span className="font-bold text-[#cdebd7]">WhatsApp sent to {waToast.name}: </span>
+          <span>{waToast.msg}</span>
         </div>
       </div>
 
-      {/* ── Orders ─────────────────────────────────────────────────────────── */}
-      {loading ? (
-        <div className="py-20 flex flex-col items-center gap-3 text-gray-400">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm">Loading fulfilment pipeline…</p>
-        </div>
-      ) : totalVisible === 0 ? (
-        <div className="py-16 text-center bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-          <ShoppingBag size={40} className="mx-auto text-gray-300 mb-3" />
-          <h3 className="text-base font-bold text-dark dark:text-white">No orders found</h3>
-          <p className="text-xs text-gray-400 mt-1">
-            {searchQuery ? 'Try a different search term.' : 'Orders appear here when Kasi processes sales & invoices.'}
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-
-          {/* — Needs Attention — */}
-          {fAttention.length > 0 && (
-            <section>
-              <SectionHeader label="Needs Attention" count={fAttention.length} group="attention" />
-              <div className="space-y-3">
-                {fAttention.map(order => (
-                  <FullOrderCard
-                    key={order.id}
-                    order={order}
-                    group="attention"
-                    onConfirmPayment={(id) => handleUpdateStatus(id, 'Paid')}
-                    onAssignRider={setAssignRiderOrder}
-                    onMarkDelivered={(id) => handleUpdateStatus(id, 'Delivered')}
-                    updating={updating}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* — Ready to Dispatch — */}
-          {fPaid.length > 0 && (
-            <section>
-              <SectionHeader label="Ready to Dispatch" count={fPaid.length} group="paid" />
-              <div className="space-y-3">
-                {fPaid.map(order => (
-                  <FullOrderCard
-                    key={order.id}
-                    order={order}
-                    group="paid"
-                    onConfirmPayment={(id) => handleUpdateStatus(id, 'Paid')}
-                    onAssignRider={setAssignRiderOrder}
-                    onMarkDelivered={(id) => handleUpdateStatus(id, 'Delivered')}
-                    updating={updating}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* — Out for Delivery — */}
-          {fTransit.length > 0 && (
-            <section>
-              <SectionHeader label="Out for Delivery" count={fTransit.length} group="transit" />
-              <div className="space-y-2">
-                {fTransit.map(order => (
-                  <SlimTransitCard
-                    key={order.id}
-                    order={order}
-                    onMarkDelivered={(id) => handleUpdateStatus(id, 'Delivered')}
-                    updating={updating}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* — Completed — */}
-          {fDelivered.length > 0 && (
-            <section>
-              <SectionHeader label="Completed" count={fDelivered.length} group="delivered" />
-              <div className="space-y-1.5">
-                {fDelivered.map(order => (
-                  <CompletedRow key={order.id} order={order} />
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
-      )}
-
-      {/* ── Assign Rider Modal ─────────────────────────────────────────────── */}
-      {assignRiderOrder && (
-        <AssignRiderModal
-          order={assignRiderOrder}
-          riderName={riderName}
-          setRiderName={setRiderName}
-          riderPhone={riderPhone}
-          setRiderPhone={setRiderPhone}
-          onClose={() => { setAssignRiderOrder(null); setRiderName(''); setRiderPhone(''); }}
-          onDispatch={() => handleUpdateStatus(assignRiderOrder.id, 'In Transit', { rider_name: riderName, rider_phone: riderPhone })}
-          updating={updating}
-        />
-      )}
     </div>
   );
 }
-
-export default Fulfilment;
