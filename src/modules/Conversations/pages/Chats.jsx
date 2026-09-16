@@ -56,6 +56,63 @@ export const formatTwoSentenceSummary = (rawText) => {
   return twoSentences || clean;
 };
 
+const compressImage = (file, maxWidth = 1280, maxHeight = 1280, quality = 0.8) => {
+  return new Promise((resolve) => {
+    if (!file || !file.type.startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob && blob.size < file.size) {
+              const cleanName = (file.name || 'image').replace(/\.[^/.]+$/, "") + ".jpg";
+              const compressedFile = new File([blob], cleanName, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            } else {
+              resolve(file);
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
+
 const isImageUrl = (url) => {
   if (!url || typeof url !== 'string') return false;
   const cleanUrl = url.toLowerCase().split('?')[0];
@@ -329,16 +386,23 @@ const Chats = () => {
     };
   }, [showEmojiPicker]);
 
-  const handleImageSelect = (e) => {
+  const handleImageSelect = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
         alert('Please select a valid image file (PNG, JPG, WebP, GIF).');
         return;
       }
-      setSelectedImageFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setSelectedImagePreview(previewUrl);
+      try {
+        const compressed = await compressImage(file);
+        setSelectedImageFile(compressed);
+        const previewUrl = URL.createObjectURL(compressed);
+        setSelectedImagePreview(previewUrl);
+      } catch {
+        setSelectedImageFile(file);
+        const previewUrl = URL.createObjectURL(file);
+        setSelectedImagePreview(previewUrl);
+      }
     }
   };
 
@@ -451,8 +515,9 @@ const Chats = () => {
 
     try {
       if (imageFileToSend) {
+        const compressed = await compressImage(imageFileToSend);
         const formData = new FormData();
-        formData.append('image', imageFileToSend);
+        formData.append('image', compressed);
         if (textToSend) {
           formData.append('message', textToSend);
         }
