@@ -160,15 +160,9 @@ export default function Fulfilment() {
   const [riderPhone, setRiderPhone] = useState('');
   const [updating, setUpdating] = useState(false);
 
-  // In-app WhatsApp banner toast
-  const [waToast, setWaToast] = useState({ show: false, name: '', msg: '' });
-
   const showWaToast = (name, msg) => {
     const firstName = (name || 'Customer').split(' ')[0];
-    setWaToast({ show: true, name: firstName, msg });
-    setTimeout(() => {
-      setWaToast(prev => ({ ...prev, show: false }));
-    }, 4500);
+    addToast(`WhatsApp sent to ${firstName}: ${msg}`, 'success');
   };
 
   // ─── Fetch Orders from Backend ──────────────────────────────────────────────
@@ -1237,21 +1231,6 @@ export default function Fulfilment() {
           </div>
         </div>
       )}
-
-      {/* ─── FLOATING WHATSAPP UPDATE TOAST ─────────────────────────────────── */}
-      <div
-        className={`fixed left-1/2 -translate-x-1/2 bottom-6 z-50 bg-[#16211b] text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 max-w-md w-[92vw] sm:w-auto transition-all duration-300 pointer-events-none ${
-          waToast.show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-        }`}
-      >
-        <span className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center text-xs font-black shrink-0">
-          <Check size={12} strokeWidth={3} />
-        </span>
-        <div className="text-xs leading-relaxed">
-          <span className="font-bold text-[#cdebd7]">WhatsApp sent to {waToast.name}: </span>
-          <span>{waToast.msg}</span>
-        </div>
-      </div>
 
     </div>
   );
