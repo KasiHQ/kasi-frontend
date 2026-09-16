@@ -68,7 +68,7 @@ export const ToastProvider = ({ children }) => {
             <div
               key={toast.id}
               className={clsx(
-                "pointer-events-auto text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 w-full sm:w-auto transition-all duration-300 transform animate-in fade-in slide-in-from-bottom-4",
+                "pointer-events-auto text-white px-4.5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 w-full sm:w-auto transition-all duration-350 ease-out transform animate-in fade-in slide-in-from-bottom-5 duration-350",
                 isSuccess && "bg-[#16211b] border border-[#25D366]/30 shadow-[#16211b]/50",
                 isError && "bg-[#241414] border border-red-500/30 shadow-[#241414]/50",
                 isWarning && "bg-[#241e14] border border-amber-500/30 shadow-[#241e14]/50",

@@ -5,6 +5,7 @@ import { conversationAPI } from '../../../api/conversations';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import { Search, Users, Download, Send, MessageSquare, X, History, ShoppingBag, Receipt, Calendar, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
+import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si';
 import { TableSkeleton } from '../../../components/ui/Skeleton';
 import useNetwork from '../../../hooks/useNetwork';
 import { getLocalCustomers, addCustomerToLocal } from '../../../db/db';
@@ -38,41 +39,29 @@ const platformBadge = (platform) => {
   if (cleanPlatform === 'whatsapp') {
     return {
       label: 'WhatsApp',
-      color: 'text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-800/50',
-      icon: (
-        <svg className="w-3.5 h-3.5 fill-[#25D366] shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.517 2.266 2.27 3.507 5.289 3.507 8.494-.004 6.66-5.338 11.997-11.95 11.997-2.005-.001-3.973-.503-5.714-1.46L0 24zm6.59-20.347c-.186-.412-.384-.42-.562-.427-.146-.006-.314-.006-.482-.006-.168 0-.441.063-.672.314-.23.251-.879.859-.879 2.094 0 1.235.9 2.428 1.025 2.595.126.167 1.767 2.699 4.284 3.782.598.258 1.065.412 1.428.527.6.19 1.15.163 1.583.099.483-.072 1.482-.605 1.691-1.19.209-.584.209-1.086.146-1.19-.063-.105-.23-.167-.481-.293-.251-.126-1.482-.731-1.712-.815-.23-.084-.397-.126-.564.126-.167.251-.648.815-.794.982-.146.167-.293.188-.543.063-.25-.126-.98-.362-1.868-1.154-.69-.616-1.157-1.378-1.293-1.611-.136-.234-.015-.361.11-.486.112-.112.251-.293.376-.44.126-.146.167-.25.251-.418.084-.167.042-.314-.021-.44-.063-.125-.562-1.355-.77-1.854z"/>
-        </svg>
-      )
+      color: 'bg-emerald-50 border border-emerald-200/60 dark:bg-emerald-950/30 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-400',
+      icon: <SiWhatsapp size={12} className="text-[#25D366] shrink-0" />
     };
   }
   if (cleanPlatform === 'instagram') {
     return {
       label: 'Instagram',
-      color: 'text-pink-800 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/40 border border-pink-200/70 dark:border-pink-800/50',
-      icon: (
-        <svg className="w-3.5 h-3.5 fill-[#E4405F] shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-        </svg>
-      )
+      color: 'bg-pink-50 border border-pink-200/60 dark:bg-pink-950/30 dark:border-pink-800/40 text-pink-700 dark:text-pink-400',
+      icon: <SiInstagram size={12} className="text-[#E1306C] shrink-0" />
     };
   }
   if (cleanPlatform === 'telegram') {
     return {
       label: 'Telegram',
-      color: 'text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/40 border border-sky-200/70 dark:border-sky-800/50',
-      icon: (
-        <svg className="w-3.5 h-3.5 fill-[#0088cc] shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-        </svg>
-      )
+      color: 'bg-sky-50 border border-sky-200/60 dark:bg-sky-950/30 dark:border-sky-800/40 text-sky-700 dark:text-sky-400',
+      icon: <SiTelegram size={12} className="text-[#229ED9] shrink-0" />
     };
   }
   return {
     label: platform || 'Web',
-    color: 'text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200/70 dark:border-gray-700',
+    color: 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200/70 dark:border-gray-700',
     icon: (
-      <svg className="w-3.5 h-3.5 fill-gray-500 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <svg className="w-3 h-3 fill-gray-400 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
       </svg>
     )
@@ -138,21 +127,21 @@ const CustomerHistoryDrawer = ({ customer, invoices, onClose, onOpenChat }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
-      {/* Backdrop */}
+      {/* Backdrop Scrim */}
       <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
+        className="fixed inset-0 bg-black/40 backdrop-blur-2xs z-40 transition-opacity duration-300 animate-in fade-in"
         onClick={onClose}
       />
 
       {/* Slide-over Drawer Container */}
       <div 
-        className="relative z-10 w-full max-w-lg h-full bg-white dark:bg-gray-900 shadow-2xl flex flex-col border-l border-gray-200/80 dark:border-gray-800 animate-in slide-in-from-right duration-300"
+        className="fixed top-0 right-0 h-full w-[430px] max-w-[95vw] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 rounded-l-3xl shadow-2xl z-50 flex flex-col overflow-hidden transition-transform duration-300 ease-out transform translate-x-0 animate-in slide-in-from-right duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Drawer Header */}
-        <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between bg-gray-50/70 dark:bg-gray-800/40">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex items-start justify-between bg-gray-50/70 dark:bg-gray-800/40 shrink-0">
           <div className="flex items-center gap-3.5">
-            <div className={`w-12 h-12 rounded-2xl ${getAvatarColor(customer.name)} text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0`}>
+            <div className={`w-11 h-11 rounded-2xl ${getAvatarColor(customer.name)} text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0`}>
               {getInitials(customer.name)}
             </div>
             <div>
@@ -162,7 +151,7 @@ const CustomerHistoryDrawer = ({ customer, invoices, onClose, onOpenChat }) => {
                   {tag}
                 </span>
                 {customer.platform && (
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${pb.color}`}>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${pb.color}`}>
                     {pb.icon} <span>{pb.label}</span>
                   </span>
                 )}
@@ -170,12 +159,12 @@ const CustomerHistoryDrawer = ({ customer, invoices, onClose, onOpenChat }) => {
               <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {customer.phone && (
                   <span className="flex items-center gap-1 font-mono">
-                    <Phone size={12} className="text-gray-400" /> {customer.phone}
+                    <Phone size={11} className="text-gray-400" /> {customer.phone}
                   </span>
                 )}
                 {customer.email && (
                   <span className="flex items-center gap-1">
-                    <Mail size={12} className="text-gray-400" /> {customer.email}
+                    <Mail size={11} className="text-gray-400" /> {customer.email}
                   </span>
                 )}
               </div>
@@ -183,9 +172,9 @@ const CustomerHistoryDrawer = ({ customer, invoices, onClose, onOpenChat }) => {
           </div>
           <button 
             onClick={onClose} 
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all cursor-pointer"
+            className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 flex items-center justify-center transition-colors cursor-pointer"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -577,21 +566,21 @@ const Clients = () => {
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Contacts</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{totalContacts}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-5 shadow-xs border border-gray-200/80 dark:border-gray-700/80">
+          <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Total Contacts</p>
+          <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">{totalContacts}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Paying Buyers</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{payingBuyers}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-5 shadow-xs border border-gray-200/80 dark:border-gray-700/80">
+          <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Paying Buyers</p>
+          <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">{payingBuyers}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Revenue</p>
-          <p className="text-xl sm:text-2xl font-bold text-[#1A7A4A] tracking-tight">{formatNaira(totalRevenue)}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-5 shadow-xs border border-gray-200/80 dark:border-gray-700/80">
+          <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Total Revenue</p>
+          <p className="text-xl sm:text-2xl font-black text-[#1C774E] dark:text-[#DBF361] tracking-tight">{formatNaira(totalRevenue)}</p>
         </div>
-        <div className="bg-white rounded-xl p-4 md:p-5 shadow-xs border border-gray-200/80">
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Hot Leads</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{hotLeadsCount}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-5 shadow-xs border border-gray-200/80 dark:border-gray-700/80">
+          <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Hot Leads</p>
+          <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">{hotLeadsCount}</p>
         </div>
       </div>
 
@@ -602,22 +591,22 @@ const Clients = () => {
             <button
               key={f.label}
               onClick={() => setActiveFilter(f.label)}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 activeFilter === f.label
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-xs'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
               }`}
             >
-              {f.label} {f.count > 0 && `(${f.count})`}
+              {f.label} {f.count > 0 && <span className="opacity-75 font-mono text-[11px]">({f.count})</span>}
             </button>
           ))}
         </div>
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
           <input
             type="text"
-            placeholder="Search..."
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            placeholder="Search customers..."
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#1C774E]/20 dark:text-white transition-all shadow-2xs"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -744,21 +733,21 @@ const Clients = () => {
         </div>
         {/* Pagination Controls */}
         {Math.ceil(filteredCustomers.length / 15) > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 bg-gray-50/50 border-t border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4 bg-gray-50/50 dark:bg-gray-800/40 border-t border-gray-100 dark:border-gray-800">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              className="px-3 py-1.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-2xs"
             >
               Previous
             </button>
-            <span className="text-xs text-gray-500 font-semibold font-mono">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-semibold font-mono">
               Page {currentPage} of {Math.ceil(filteredCustomers.length / 15)}
             </span>
             <button
               disabled={currentPage === Math.ceil(filteredCustomers.length / 15)}
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredCustomers.length / 15)))}
-              className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-xs"
+              className="px-3 py-1.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-2xs"
             >
               Next
             </button>
@@ -768,23 +757,23 @@ const Clients = () => {
 
       {/* Broadcast Modal */}
       {showBroadcast && (
-        <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-2xs flex items-center justify-center p-4 transition-opacity duration-300 animate-in fade-in">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden border border-gray-100 dark:border-gray-800 animate-in fade-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
               <div>
-                <h2 className="text-lg font-bold text-dark flex items-center gap-2">
-                  <Send size={18} className="text-primary animate-pulse" />
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Send size={18} className="text-[#1C774E]" />
                   Send Marketing Broadcast
                 </h2>
-                <p className="text-xs text-gray-500 mt-1">Send bulk WhatsApp messages to your segmented customer lists</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Send bulk WhatsApp messages to your segmented customer lists</p>
               </div>
               <button 
                 onClick={() => { if (!isBroadcasting) setShowBroadcast(false); }} 
-                className="text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-colors"
+                className="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 flex items-center justify-center transition-colors cursor-pointer"
                 disabled={isBroadcasting}
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 

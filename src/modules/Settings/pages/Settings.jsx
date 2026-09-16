@@ -401,6 +401,7 @@ const Settings = () => {
     const [verifyingBank, setVerifyingBank] = useState(false);
     const [isBankVerified, setIsBankVerified] = useState(false);
     const [connectingSubaccount, setConnectingSubaccount] = useState(false);
+    const [isEditingPayout, setIsEditingPayout] = useState(false);
 
     const [formData, setFormData] = useState({
         business_name: '',
@@ -1155,7 +1156,7 @@ const Settings = () => {
                             When customers buy from your WhatsApp catalog or AI agents, payments are split instantly. Your revenue lands directly in your bank account.
                         </p>
 
-                        {billingDetails?.account_number ? (
+                        {billingDetails?.account_number && !isEditingPayout ? (
                             <div className="space-y-6">
                                 <div className="bg-[#ECFDF3] border border-[#B0D9C1] rounded-2xl p-5 flex gap-4 text-sm text-[#027A48]">
                                     <ShieldCheck size={24} className="shrink-0 mt-0.5" />
@@ -1168,7 +1169,28 @@ const Settings = () => {
                                 </div>
 
                                 <div className="border border-gray-100 rounded-2xl p-5 space-y-4 bg-gray-50/50">
-                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Settlement Bank Details</h3>
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200/60 pb-3">
+                                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Settlement Bank Details</h3>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsEditingPayout(true);
+                                                setIsBankVerified(false);
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    bank_name: billingDetails?.bank_name || prev.bank_name,
+                                                    account_number: billingDetails?.account_number || prev.account_number,
+                                                    account_name: billingDetails?.account_name || prev.account_name
+                                                }));
+                                                const matchedBank = banksList.find(b => b.name?.toLowerCase() === billingDetails?.bank_name?.toLowerCase());
+                                                if (matchedBank) setBankCode(matchedBank.code);
+                                            }}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/70 dark:bg-emerald-950/40 text-[#1C774E] dark:text-[#DBF361] border border-emerald-200/60 dark:border-emerald-800/50 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs w-fit"
+                                        >
+                                            <Landmark size={13} />
+                                            Change Payout Destination
+                                        </button>
+                                    </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                                         <div className="space-y-1">
                                             <p className="text-gray-400 text-xs">Bank Name</p>
@@ -1187,18 +1209,32 @@ const Settings = () => {
                             </div>
                         ) : (
                             <div className="space-y-6">
-                                <div className="bg-[#FEF3F2] border border-[#FECDCA] rounded-2xl p-5 flex gap-4 text-sm text-[#B42318]">
-                                    <AlertTriangle size={24} className="shrink-0 mt-0.5" />
-                                    <div className="space-y-1">
-                                        <h4 className="font-bold text-base">No Settlement Bank Connected</h4>
-                                        <p className="text-xs text-[#B42318]/80 leading-relaxed">
-                                            You must set up a settlement account to start collecting payments. Kasi cannot initialize checkout links for your items without a payout destination.
-                                        </p>
+                                {billingDetails?.account_number && isEditingPayout ? (
+                                    <div className="bg-sky-50 border border-sky-200 rounded-2xl p-5 flex gap-4 text-sm text-sky-800">
+                                        <Landmark size={24} className="shrink-0 mt-0.5 text-sky-600" />
+                                        <div className="space-y-1">
+                                            <h4 className="font-bold text-base">Update Payout Destination</h4>
+                                            <p className="text-xs text-sky-700/80 leading-relaxed">
+                                                Select your new bank and enter the 10-digit account number. Once verified via NIBSS, click save to immediately update your Paystack subaccount.
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="bg-[#FEF3F2] border border-[#FECDCA] rounded-2xl p-5 flex gap-4 text-sm text-[#B42318]">
+                                        <AlertTriangle size={24} className="shrink-0 mt-0.5" />
+                                        <div className="space-y-1">
+                                            <h4 className="font-bold text-base">No Settlement Bank Connected</h4>
+                                            <p className="text-xs text-[#B42318]/80 leading-relaxed">
+                                                You must set up a settlement account to start collecting payments. Kasi cannot initialize checkout links for your items without a payout destination.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="space-y-4 border border-gray-100 rounded-2xl p-6 bg-white shadow-xs">
-                                    <h3 className="font-bold text-gray-800 text-sm">Connect settlement destination</h3>
+                                    <h3 className="font-bold text-gray-800 text-sm">
+                                        {isEditingPayout ? 'Enter New Bank Details' : 'Connect settlement destination'}
+                                    </h3>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div className="space-y-1.5">
@@ -1280,7 +1316,7 @@ const Settings = () => {
                                                 }
                                             }}
                                             disabled={verifyingBank || formData.account_number.length !== 10 || !bankCode}
-                                            className="w-full h-11 bg-white border border-[#D0D5DD] hover:bg-slate-50 text-[#344054] text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50"
+                                            className="w-full h-11 bg-white border border-[#D0D5DD] hover:bg-slate-50 text-[#344054] text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
                                         >
                                             {verifyingBank ? 'Resolving NIBSS Details...' : 'Verify Bank Details'}
                                         </button>
@@ -1296,6 +1332,7 @@ const Settings = () => {
                                                         bank_name: formData.bank_name
                                                     });
                                                     addToast('Settlement destination connected successfully!', 'success');
+                                                    setIsEditingPayout(false);
                                                     if (fetchUser) await fetchUser();
                                                     fetchBillingDetails();
                                                 } catch (err) {
@@ -1305,9 +1342,19 @@ const Settings = () => {
                                                 }
                                             }}
                                             disabled={connectingSubaccount}
-                                            className="w-full h-11 bg-primary text-white text-sm font-bold rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                                            className="w-full h-11 bg-[#1C774E] text-white text-sm font-bold rounded-xl hover:bg-[#15603A] transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
                                         >
-                                            {connectingSubaccount ? 'Connecting Payout Subaccount...' : 'Save & Enable Split Payouts'}
+                                            {connectingSubaccount ? 'Connecting Payout Subaccount...' : (isEditingPayout ? 'Save New Payout Destination' : 'Save & Enable Split Payouts')}
+                                        </button>
+                                    )}
+
+                                    {isEditingPayout && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsEditingPayout(false)}
+                                            className="w-full h-11 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                                        >
+                                            Cancel & Keep Current Destination
                                         </button>
                                     )}
                                 </div>
@@ -1695,26 +1742,35 @@ const Settings = () => {
             {activeTab === 'billing' && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                     {/* Active Plan Banner */}
-                    <div className="bg-[#0F1F0F] rounded-2xl p-6 text-white shadow-sm relative overflow-hidden select-none">
-                        <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+                    <div className="bg-gradient-to-br from-[#143D28] via-[#0E281A] to-[#0A1D13] rounded-3xl p-7 sm:p-8 text-white shadow-xl relative overflow-hidden border border-emerald-900/50 select-none">
+                        <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
                         
-                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div className="space-y-1.5">
-                                <span className="text-[10px] font-semibold tracking-wider text-[#D4F263] uppercase bg-[#D4F263]/10 border border-[#D4F263]/25 px-2.5 py-1 rounded-full">
-                                    CURRENT SUBSCRIPTION STATUS
-                                </span>
-                                <h2 className="text-2xl font-black tracking-tight leading-tight capitalize">
+                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <div className="space-y-2.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[10px] font-bold tracking-wider text-[#DBF361] uppercase bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full">
+                                        Current Subscription Status
+                                    </span>
+                                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
+                                        billingDetails?.subscription_status === 'active'
+                                            ? 'bg-emerald-400/20 text-emerald-300 border border-emerald-400/30'
+                                            : 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                    }`}>
+                                        {billingDetails?.subscription_status || 'trialing'}
+                                    </span>
+                                </div>
+                                <h2 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight capitalize text-white">
                                     {billingDetails?.subscription_tier === 'free_trial' ? '7-Day Free Trial' : `${billingDetails?.subscription_tier || 'starter'} Plan`}
                                 </h2>
-                                <p className="text-white/60 text-xs leading-relaxed">
+                                <p className="text-emerald-100/70 text-xs sm:text-sm max-w-xl leading-relaxed">
                                     {billingDetails?.subscription_status === 'trialing' ? (
-                                        <>Your free trial has <span className="text-white font-bold">{billingDetails?.days_remaining} days</span> remaining. Upgrade below to keep selling without interruption.</>
+                                        <>Your free trial has <strong className="text-white font-bold">{billingDetails?.days_remaining || 0} days</strong> remaining. Upgrade below to keep your automated sales engine running without interruption.</>
                                     ) : billingDetails?.subscription_status === 'active' ? (
-                                        <>Renews on <span className="text-white font-bold">{billingDetails?.subscription_expires_at ? new Date(billingDetails.subscription_expires_at).toLocaleDateString() : 'N/A'}</span>. Managed securely via Paystack.</>
+                                        <>Renews on <strong className="text-white font-bold">{billingDetails?.subscription_expires_at ? new Date(billingDetails.subscription_expires_at).toLocaleDateString() : 'N/A'}</strong>. Automatically managed and protected via Paystack.</>
                                     ) : billingDetails?.subscription_status === 'cancelled' ? (
-                                        <>Your plan is cancelled but remains active until <span className="text-white font-bold">{billingDetails?.subscription_expires_at ? new Date(billingDetails.subscription_expires_at).toLocaleDateString() : 'N/A'}</span>.</>
+                                        <>Your plan is cancelled but remains active until <strong className="text-white font-bold">{billingDetails?.subscription_expires_at ? new Date(billingDetails.subscription_expires_at).toLocaleDateString() : 'N/A'}</strong>.</>
                                     ) : (
-                                        <>No active subscription. Upgrade to a premium plan below.</>
+                                        <>No active subscription. Upgrade to a premium plan below to keep closing sales across channels.</>
                                     )}
                                 </p>
                             </div>
@@ -1723,7 +1779,7 @@ const Settings = () => {
                                 <button
                                     onClick={handleCancelSubscription}
                                     disabled={loading}
-                                    className="px-4 py-2 border border-white/20 hover:border-red-400 hover:text-red-400 rounded-xl text-xs font-bold transition-all text-white/80 shrink-0"
+                                    className="px-4 py-2.5 border border-white/20 hover:border-red-400/60 hover:bg-red-500/10 text-white/80 hover:text-red-300 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer shadow-sm"
                                 >
                                     Cancel Subscription
                                 </button>
@@ -1735,18 +1791,26 @@ const Settings = () => {
                     <div className="space-y-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
-                                <h3 className="text-base font-bold text-gray-800">Available Plans ({billingDetails?.subscription_type === 'service' ? 'Service Kasi' : 'Product Kasi'})</h3>
-                                <p className="text-xs text-gray-400">Upgrade to unlock advanced conversational AI capabilities</p>
+                                <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                                    Available Plans ({billingDetails?.subscription_type === 'service' ? 'Service Kasi' : 'Product Kasi'})
+                                </h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">Upgrade to unlock advanced conversational AI capabilities</p>
                             </div>
-                            <span className="text-xs text-gray-400 font-semibold shrink-0">Monthly auto-renew billing via Paystack</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 font-semibold shrink-0">Monthly auto-renew billing via Paystack</span>
                         </div>
 
                         {/* Automated Billing Disclaimer Banner */}
-                        <div className="bg-[#FFF9E6] border border-[#FFE199] rounded-xl p-4 flex gap-3 text-xs text-[#805B00] leading-relaxed font-sans shadow-2xs">
-                            <AlertTriangle size={18} className="text-[#B27F00] shrink-0 mt-0.5" />
+                        <div className="bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/50 rounded-2xl p-4.5 flex gap-3.5 text-xs text-amber-900 dark:text-amber-200 leading-relaxed shadow-2xs">
+                            <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <AlertTriangle size={16} />
+                            </div>
                             <div>
-                                <span className="font-bold uppercase tracking-wider text-[10px] block mb-0.5">⚠️ Recurring Auto-Debit Notice</span>
-                                Selecting a plan below will establish a secure **automated monthly subscription** via Paystack. Your card will be charged automatically every 30 days. You have full self-service control and can cancel this auto-renewal at any time instantly below.
+                                <span className="font-bold text-xs block mb-0.5 text-amber-950 dark:text-amber-100">
+                                    Recurring Auto-Debit Notice
+                                </span>
+                                <span>
+                                    Selecting a plan below activates a secure <strong>automated monthly subscription</strong> via Paystack. Your card will be charged automatically every 30 days. You have full self-service control and can cancel this auto-renewal at any time instantly.
+                                </span>
                             </div>
                         </div>
 
@@ -1774,7 +1838,7 @@ const Settings = () => {
                                     id: 'growth',
                                     name: 'Growth',
                                     price: billingDetails?.subscription_type === 'service' ? '₦24,000' : '₦29,000',
-                                    badge: 'MOST POPULAR',
+                                    badge: 'RECOMMENDED',
                                     isPopular: true,
                                     features: billingDetails?.subscription_type === 'service' ? [
                                         'Everything in Starter',
@@ -1813,54 +1877,53 @@ const Settings = () => {
                                 return (
                                     <div
                                         key={plan.id}
-                                        className={`rounded-2xl p-6 flex flex-col justify-between text-left transition-all duration-300 relative border ${
-                                            plan.isPopular
-                                                ? 'bg-green-50/40 border-primary shadow-md shadow-green-50'
-                                                : 'bg-white border-gray-100 hover:border-gray-200'
+                                        className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between text-left transition-all duration-300 relative border ${
+                                            isCurrent
+                                                ? 'bg-white dark:bg-gray-800 border-[#1C774E] ring-2 ring-[#1C774E]/30 shadow-md'
+                                                : plan.isPopular
+                                                    ? 'bg-emerald-50/20 dark:bg-emerald-950/20 border-[#1C774E] ring-1 ring-[#1C774E]/40 shadow-sm'
+                                                    : 'bg-white dark:bg-gray-800 border-gray-200/80 dark:border-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 shadow-xs'
                                         }`}
                                     >
                                         {plan.badge && (
-                                            <span className="absolute top-0 right-6 -translate-y-1/2 bg-[#D4F263] border border-black/15 text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                            <span className="absolute top-0 right-7 -translate-y-1/2 bg-[#1C774E] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
                                                 {plan.badge}
                                             </span>
                                         )}
 
                                         <div className="space-y-4">
                                             <div>
-                                                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest block">{plan.name}</span>
+                                                <span className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">{plan.name}</span>
                                                 <div className="flex items-baseline mt-1">
-                                                    <span className="text-3xl font-black text-gray-800 tracking-tight">{plan.price}</span>
-                                                    <span className="text-xs text-gray-400 ml-1 font-semibold">/month</span>
+                                                    <span className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{plan.price}</span>
+                                                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-1.5 font-semibold">/ month</span>
                                                 </div>
                                             </div>
 
                                             {isCurrent ? (
-                                                <button
-                                                    disabled
-                                                    className="w-full py-2.5 bg-gray-100 text-gray-400 font-bold text-xs rounded-xl border border-gray-200 select-none"
-                                                >
-                                                    Current Plan
-                                                </button>
+                                                <div className="w-full py-2.5 bg-emerald-50 dark:bg-emerald-950/40 text-[#1C774E] dark:text-[#DBF361] font-bold text-xs rounded-xl border border-emerald-200/60 dark:border-emerald-800/60 text-center select-none shadow-2xs">
+                                                    Current Active Plan
+                                                </div>
                                             ) : (
                                                 <button
                                                     onClick={() => handleInitializeSubscription(plan.id)}
                                                     disabled={loading}
-                                                    className={`w-full py-2.5 font-bold text-xs rounded-xl transition-all shadow-xs border ${
+                                                    className={`w-full py-2.5 font-bold text-xs rounded-xl transition-all shadow-xs cursor-pointer ${
                                                         plan.isPopular
-                                                            ? 'bg-primary hover:bg-green-700 text-white border-primary'
-                                                            : 'bg-white hover:bg-gray-50 text-gray-800 border-gray-200 hover:border-gray-300'
+                                                            ? 'bg-[#1C774E] hover:bg-[#15603A] text-white shadow-emerald-700/20'
+                                                            : 'bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100'
                                                     }`}
                                                 >
                                                     Upgrade to {plan.name}
                                                 </button>
                                             )}
 
-                                            <hr className="border-t border-gray-100" />
+                                            <hr className="border-t border-gray-100 dark:border-gray-700/60" />
 
                                             <ul className="space-y-2.5">
                                                 {plan.features.map((f, idx) => (
-                                                    <li key={idx} className="flex gap-2 items-start text-xs text-gray-600 leading-normal">
-                                                        <Check size={14} className="text-[#1A7A4A] shrink-0 mt-0.5" strokeWidth={2.5} />
+                                                    <li key={idx} className="flex gap-2 items-start text-xs text-gray-600 dark:text-gray-300 leading-normal">
+                                                        <Check size={14} className="text-[#1C774E] dark:text-[#DBF361] shrink-0 mt-0.5" strokeWidth={2.5} />
                                                         <span>{f}</span>
                                                     </li>
                                                 ))}
