@@ -217,7 +217,7 @@ const LandingPage = () => {
           {/* 3 Centered Feature Chips */}
           <div className="flex flex-col lg:flex-row items-center justify-center gap-3 pt-4 max-w-4xl w-full">
             {[
-              "✓ Omnichannel Autopilot — Zero missed leads on WhatsApp, Instagram & TikTok.",
+              "✓ Omnichannel Autopilot — Zero missed leads on WhatsApp, Instagram & Telegram.",
               "✓ Margin-Protected Bargaining — AI negotiates within your bottom floor thresholds.",
               "✓ End-to-End Fulfilment — Instant bank transfer verification & automated delivery dispatch.",
             ].map((chip, idx) => (
@@ -450,7 +450,7 @@ const LandingPage = () => {
             {/* Social icons */}
             <div className="flex items-center gap-3">
               {[
-                { icon: <Instagram size={16} />, url: "https://www.instagram.com/official_kasi247/" },
+                { icon: <Instagram size={16} />, url: "https://www.instagram.com/kasi.official_ai" },
                 { icon: <Twitter size={16} />, url: "https://x.com/hq_kasi" },
                 { icon: <Linkedin size={16} />, url: "https://www.linkedin.com/company/122863967/" },
               ].map((soc, idx) => (

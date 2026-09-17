@@ -72,7 +72,7 @@ export function MarketplaceFooter() {
             © 2026 Endogenous Technologies. All rights reserved.
           </span>
           <div className="flex items-center gap-3">
-            <a href="https://www.instagram.com/official_kasi247/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all"><Instagram size={16} /></a>
+            <a href="https://www.instagram.com/kasi.official_ai" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all"><Instagram size={16} /></a>
             <a href="https://x.com/hq_kasi" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all"><Twitter size={16} /></a>
             <a href="https://www.linkedin.com/company/122863967/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all"><Linkedin size={16} /></a>
           </div>
