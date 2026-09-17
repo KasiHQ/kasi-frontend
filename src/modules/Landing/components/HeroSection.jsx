@@ -48,7 +48,7 @@ export const HeroSection = ({ onJoinWaitlistClick }) => {
 
             {/* Body text */}
             <p className="text-base md:text-[17px] text-gray-600 max-w-[500px] leading-relaxed font-sans font-medium">
-              Kasi is your AI sales and support employee on WhatsApp, Instagram, and TikTok. It handles the full customer journey — answers, negotiates, verifies payment, coordinates delivery — so you grow revenue without a support team.
+              Kasi is your AI sales and support employee on WhatsApp, Instagram, and Telegram. It handles the full customer journey — answers, negotiates, verifies payment, coordinates delivery — so you grow revenue without a support team.
             </p>
 
             {/* CTA Row */}
