@@ -39,21 +39,26 @@ const getLastMessageInfo = (summary, phone) => {
 
 export const formatTwoSentenceSummary = (rawText) => {
   if (!rawText || !rawText.trim()) return '';
+  // 1. Strip everything from the first message tag ([Customer]:, [Kasi AI]:, [Merchant]:, etc.) to the end
   let clean = rawText
-    .replace(/\[Customer\]:.*$/s, '')
-    .replace(/\[Kasi AI\]:.*$/s, '')
-    .replace(/\[Merchant\]:.*$/s, '')
-    .replace(/🚨/g, '')
-    .replace(/\[.*?\]/g, '')
+    .replace(/(?:\[(?:Customer|Kasi|Kasi AI|Merchant|Agent)\]:[\s\S]*$)/i, '')
+    .replace(/[⚠️🚨]/g, '')
     .trim();
 
+  // 2. If the text was purely raw transcript without an explicit summary, strip prefixes
   if (!clean) {
-    clean = rawText.replace(/\[(Customer|Kasi AI|Merchant|Agent)\]:\s*/gi, ' ').trim();
+    clean = rawText
+      .replace(/\[(?:Customer|Kasi|Kasi AI|Merchant|Agent)\]:\s*/gi, ' ')
+      .replace(/[⚠️🚨]/g, '')
+      .trim();
   }
+
+  // 3. Remove inline media/event tags like [Voice Note], [Photo Sent] and collapse whitespace
+  clean = clean.replace(/\[.*?\]/g, '').replace(/\s+/g, ' ').trim();
 
   const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
   const twoSentences = sentences.slice(0, 2).map(s => s.trim()).join(' ');
-  return twoSentences || clean;
+  return (twoSentences || clean).trim();
 };
 
 const compressImage = (file, maxWidth = 1280, maxHeight = 1280, quality = 0.8) => {
@@ -673,7 +678,7 @@ const Chats = () => {
         </div>
 
         {/* Conversation List */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
           {loading ? (
             <div className="p-8 text-center text-[#667085] text-xs font-medium">Loading conversations...</div>
           ) : filteredConversations.length === 0 ? (
@@ -740,9 +745,9 @@ const Chats = () => {
 
                     {/* Attention alert panel inside list item */}
                     {conv.status === 'Requires Attention' && conv.ai_summary && (
-                      <div className="mt-2.5 py-2 px-3 bg-[#FFFDF5] border border-[#FEC84B] rounded-[6px]">
-                        <p className="text-xs text-[#92400E] leading-normal font-medium">
-                          ⚠️ {conv.ai_summary}
+                      <div className="mt-2.5 py-2 px-3 bg-[#FFFDF5] border border-[#FEC84B] rounded-[6px] overflow-hidden">
+                        <p className="text-xs text-[#92400E] leading-normal font-medium line-clamp-2 break-words">
+                          ⚠️ {formatTwoSentenceSummary(conv.ai_summary) || 'This conversation requires manual review.'}
                         </p>
                       </div>
                     )}
@@ -898,14 +903,14 @@ const Chats = () => {
 
               {/* Kasi Needs Help card (when status is Attention) */}
               {selectedConversation.status === 'Requires Attention' && (
-                <div className="bg-[#FFFAEB] border border-[#FEC84B] rounded-xl py-4 px-5 mx-6 mb-4">
+                <div className="bg-[#FFFAEB] border border-[#FEC84B] rounded-xl py-4 px-5 mx-6 mb-4 overflow-hidden">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-2.5">
-                      <span className="text-[#B54708] text-sm mt-0.5">⚠️</span>
-                      <div>
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      <span className="text-[#B54708] text-sm mt-0.5 shrink-0">⚠️</span>
+                      <div className="min-w-0">
                         <p className="text-sm font-semibold text-[#B54708]">Kasi needs your help</p>
-                        <p className="text-[13px] text-[#344054] mt-1.5 leading-relaxed">
-                          {selectedConversation.ai_summary || 'This conversation requires manual review.'}
+                        <p className="text-[13px] text-[#344054] mt-1.5 leading-relaxed break-words">
+                          {formatTwoSentenceSummary(selectedConversation.ai_summary) || 'This conversation requires manual review.'}
                         </p>
                       </div>
                     </div>
