@@ -178,8 +178,8 @@ export default function Fulfilment() {
       const invoices = invRes.data || [];
 
       // Filter and harmonize orders - strictly paid / confirmed orders
+      // Check invoice.status == 'Paid' (or cart.status == 'paid') directly - never rely on conversation.status alone
       const normalizedOrders = conversations
-        .filter(c => ['Paid', 'Packed', 'Ready for Pickup', 'Ready', 'In Transit', 'Delivered', 'Collected'].includes(c.status))
         .map(c => {
           const normalizePhone = (p) => (p ? p.toString().replace(/\D/g, '') : '');
           const matchingInv = invoices.find(i =>
@@ -187,9 +187,21 @@ export default function Fulfilment() {
             (c.customer_name && i.customer?.name && i.customer.name.toLowerCase().trim() === c.customer_name.toLowerCase().trim())
           );
 
+          // STRICT PAYMENT GUARD: Never show an order in the Fulfilment pipeline if its invoice is unpaid!
+          const invStatus = matchingInv?.status || c.invoice_status;
+          if (matchingInv && ['Pending', 'Sent', 'Failed'].includes(matchingInv.status)) {
+            return null;
+          }
+          const isGenuinelyPaid = invStatus
+            ? ['Paid', 'Packed', 'Ready for Pickup', 'Ready', 'In Transit', 'Delivered', 'Collected'].includes(invStatus)
+            : Boolean(c.is_paid);
+          if (!isGenuinelyPaid) {
+            return null;
+          }
+
           const deliveryMode = (c.delivery_address || matchingInv?.delivery_address || '').toUpperCase() === 'PICKUP' ? 'PICKUP' : 'DELIVERY';
           const deliveryType = deliveryMode === 'PICKUP' ? 'pickup' : 'delivery';
-          const state = mapToState(c.status, deliveryMode);
+          const state = mapToState(matchingInv?.status || c.status, deliveryMode);
 
           const rawItems = matchingInv?.items || c.invoice_items || [];
           const items = rawItems.map(it => [
@@ -209,7 +221,7 @@ export default function Fulfilment() {
             phone: c.customer_phone || 'No phone',
             delivery_type: deliveryType,
             state: state,
-            backend_status: c.status,
+            backend_status: matchingInv?.status || c.status,
             delivery_address: c.delivery_address || matchingInv?.delivery_address || '',
             items: items.length > 0 ? items : [['Order agreement', 1, total]],
             fee: fee,
@@ -222,7 +234,8 @@ export default function Fulfilment() {
             created_at: c.created_at,
             updated_at: c.updated_at
           };
-        });
+        })
+        .filter(Boolean);
 
       setOrders(normalizedOrders);
     } catch (err) {
