@@ -744,10 +744,10 @@ const Chats = () => {
                     </div>
 
                     {/* Attention alert panel inside list item */}
-                    {conv.status === 'Requires Attention' && conv.ai_summary && (
+                    {conv.status === 'Requires Attention' && (conv.attention_reason || conv.ai_summary) && (
                       <div className="mt-2.5 py-2 px-3 bg-[#FFFDF5] border border-[#FEC84B] rounded-[6px] overflow-hidden">
                         <p className="text-xs text-[#92400E] leading-normal font-medium line-clamp-2 break-words">
-                          ⚠️ {formatTwoSentenceSummary(conv.ai_summary) || 'This conversation requires manual review.'}
+                          ⚠️ {conv.attention_reason || formatTwoSentenceSummary(conv.ai_summary) || 'This conversation requires manual review.'}
                         </p>
                       </div>
                     )}
@@ -910,7 +910,7 @@ const Chats = () => {
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-[#B54708]">Kasi needs your help</p>
                         <p className="text-[13px] text-[#344054] mt-1.5 leading-relaxed break-words">
-                          {formatTwoSentenceSummary(selectedConversation.ai_summary) || 'This conversation requires manual review.'}
+                          {selectedConversation.attention_reason || formatTwoSentenceSummary(selectedConversation.ai_summary) || 'This conversation requires manual review.'}
                         </p>
                       </div>
                     </div>

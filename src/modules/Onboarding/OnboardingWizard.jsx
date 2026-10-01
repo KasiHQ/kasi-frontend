@@ -5,7 +5,7 @@ import {
   Briefcase, Phone, Instagram as InstagramIcon, 
   Building, MapPin, Loader2, Send, UploadCloud,
   MessageSquare, DollarSign, Wallet, ShieldCheck,
-  CheckCircle, Landmark, Copy, Truck
+  CheckCircle, Landmark, Copy
 } from 'lucide-react';
 import { onboardingAPI } from '../../api/onboarding';
 import { useAuth } from '../../context/AuthContext';
@@ -35,9 +35,6 @@ const OnboardingWizard = () => {
   const [storeLat, setStoreLat] = useState(user?.store_latitude || null);
   const [storeLng, setStoreLng] = useState(user?.store_longitude || null);
   const [locationLoading, setLocationLoading] = useState(false);
-
-  // Step 2 Base City for Delivery
-  const [deliveryCity, setDeliveryCity] = useState(user?.delivery_city || '');
 
 
   const getStoreLocation = () => {
@@ -123,9 +120,7 @@ const OnboardingWizard = () => {
       if (user.phone) {
         setWhatsappPhone(user.phone);
       }
-      if (user.delivery_city) {
-        setDeliveryCity(user.delivery_city);
-      }
+
       setInitialized(true);
     }
   }, [user, initialized]);
@@ -223,10 +218,6 @@ const OnboardingWizard = () => {
         setError('Store Name is required.');
         return;
       }
-      if (!deliveryCity) {
-        setError('Base City for delivery is required.');
-        return;
-      }
       setLoading(true);
       try {
         await onboardingAPI.updateProfile({
@@ -234,7 +225,6 @@ const OnboardingWizard = () => {
           business_bio: storeDesc,
           address: storeLocation,
           store_category: storeCategory,
-          delivery_city: deliveryCity,
         });
 
         // Save GPS pin if the vendor used location detection
@@ -731,27 +721,6 @@ const OnboardingWizard = () => {
                     />
                   </div>
 
-                  {/* Delivery City Selection */}
-                  <div className="space-y-1.5 pt-2 border-t border-gray-100">
-                    <label className="text-xs font-bold text-[#344054] flex items-center gap-1.5">
-                      <Truck size={14} className="text-[#1A7A4A]" />
-                      BASE CITY FOR DELIVERY *
-                    </label>
-                    <select
-                      value={deliveryCity}
-                      onChange={(e) => setDeliveryCity(e.target.value)}
-                      className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none bg-white transition-all font-semibold"
-                    >
-                      <option value="">Select your base city...</option>
-                      <option value="Lagos">Lagos</option>
-                      <option value="Abuja">Abuja</option>
-                      <option value="Port Harcourt">Port Harcourt</option>
-                      <option value="Ibadan">Ibadan</option>
-                    </select>
-                    <p className="text-[11px] text-[#667085]">
-                      Select the city where you dispatch your items from.
-                    </p>
-                  </div>
                 </div>
               </div>
             )}
