@@ -12,12 +12,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import api from '../../api/axios';
 
-const CITY_AREAS = {
-  'Lagos': ["Ikeja", "Lekki", "Victoria Island", "Surulere", "Yaba", "Ajah", "Gbagada", "Maryland", "Ikoyi", "Apapa", "Ogba", "Agege"],
-  'Abuja': ["Wuse", "Garki", "Maitama", "Asokoro", "Gwarinpa", "Kubwa", "Apo", "Lugbe"],
-  'Port Harcourt': ["GRA Phase 1-3", "Choba", "Diobu", "Trans Amadi", "Rumuokwuta", "Rumuola", "Rumuigbo", "Ada George"],
-  'Ibadan': ["Bodija", "Akobo", "Samonda", "Apata", "Challenge", "Ring Road", "Oluyole", "UI / Agbowo"]
-};
+
 
 const OnboardingWizard = () => {
   const navigate = useNavigate();
@@ -37,37 +32,47 @@ const OnboardingWizard = () => {
   const [storeCategory, setStoreCategory] = useState('');
   const [storeDesc, setStoreDesc] = useState(user?.business_bio || '');
   const [storeLocation, setStoreLocation] = useState(user?.address || '');
+  const [storeLat, setStoreLat] = useState(user?.store_latitude || null);
+  const [storeLng, setStoreLng] = useState(user?.store_longitude || null);
+  const [locationLoading, setLocationLoading] = useState(false);
 
-  // Step 2 Logistics / Delivery Rate Sheet Details
+  // Step 2 Base City for Delivery
   const [deliveryCity, setDeliveryCity] = useState(user?.delivery_city || '');
-  const [deliveryRates, setDeliveryRates] = useState({});
-  const [customAreaName, setCustomAreaName] = useState('');
 
-  const handleCityChange = (city) => {
-    setDeliveryCity(city);
-    const areas = CITY_AREAS[city] || [];
-    const newRates = { ...deliveryRates };
-    areas.forEach(area => {
-      if (newRates[area] === undefined) {
-        newRates[area] = '';
-      }
-    });
-    setDeliveryRates(newRates);
-  };
 
-  const handleAddCustomArea = (e) => {
-    e.preventDefault();
-    if (!customAreaName.trim()) return;
-    const name = customAreaName.trim();
-    if (deliveryRates[name] !== undefined) {
-      addToast('Area already exists', 'info');
+  const getStoreLocation = () => {
+    if (!navigator.geolocation) {
+      addToast('Geolocation is not supported by your browser.', 'error');
       return;
     }
-    setDeliveryRates(prev => ({
-      ...prev,
-      [name]: ''
-    }));
-    setCustomAreaName('');
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setStoreLat(latitude);
+        setStoreLng(longitude);
+        // Reverse geocode to a human-readable address using nominatim (free, no key needed)
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+          const geo = await res.json();
+          if (geo && geo.display_name) {
+            setStoreLocation(geo.display_name);
+          }
+        } catch {
+          setStoreLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+        }
+        setLocationLoading(false);
+        addToast('Location pinned successfully!', 'success');
+      },
+      (err) => {
+        setLocationLoading(false);
+        addToast('Could not get location. Please allow location access and try again.', 'error');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   // Step 3 First Item
@@ -113,24 +118,13 @@ const OnboardingWizard = () => {
       if (user.address) {
         setStoreLocation(user.address);
       }
+      if (user.store_latitude) setStoreLat(user.store_latitude);
+      if (user.store_longitude) setStoreLng(user.store_longitude);
       if (user.phone) {
         setWhatsappPhone(user.phone);
       }
       if (user.delivery_city) {
         setDeliveryCity(user.delivery_city);
-      }
-      if (user.delivery_rates) {
-        let rates = {};
-        if (typeof user.delivery_rates === 'object') {
-          rates = user.delivery_rates;
-        } else {
-          try {
-            rates = JSON.parse(user.delivery_rates);
-          } catch (e) {
-            console.error(e);
-          }
-        }
-        setDeliveryRates(rates);
       }
       setInitialized(true);
     }
@@ -235,22 +229,27 @@ const OnboardingWizard = () => {
       }
       setLoading(true);
       try {
-        const cleanedRates = {};
-        Object.keys(deliveryRates).forEach(area => {
-          const val = deliveryRates[area];
-          if (val !== '' && val !== null && val !== undefined) {
-            cleanedRates[area] = Number(val);
-          }
-        });
-
         await onboardingAPI.updateProfile({
           business_name: storeName,
           business_bio: storeDesc,
           address: storeLocation,
           store_category: storeCategory,
           delivery_city: deliveryCity,
-          delivery_rates: cleanedRates
         });
+
+        // Save GPS pin if the vendor used location detection
+        if (storeLat !== null && storeLng !== null) {
+          try {
+            await onboardingAPI.saveStoreAddress({
+              address: storeLocation || undefined,
+              latitude: storeLat,
+              longitude: storeLng,
+            });
+          } catch {
+            // Non-blocking — store address save is optional
+          }
+        }
+
         await fetchUser();
         setCurrentStep(3);
       } catch (err) {
@@ -258,6 +257,7 @@ const OnboardingWizard = () => {
       } finally {
         setLoading(false);
       }
+
     } else if (currentStep === 3) {
       if (!itemName.trim() || !startingPrice) {
         setError('Item details are required unless skipped.');
@@ -682,20 +682,53 @@ const OnboardingWizard = () => {
                   </div>
 
                   {/* Store Location */}
+                  {/* Store Location — GPS Pin */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-[#344054]">PHYSICAL LOCATION (OPTIONAL)</label>
-                    <div className="relative">
-                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#98A2B3]">
-                        <MapPin size={18} />
+                    <label className="text-xs font-medium text-[#344054]">STORE LOCATION PIN (OPTIONAL)</label>
+
+                    {/* Pin button */}
+                    <button
+                      type="button"
+                      onClick={getStoreLocation}
+                      disabled={locationLoading}
+                      className="w-full h-11 flex items-center gap-2.5 px-3.5 border border-[#D0D5DD] rounded-lg text-sm font-semibold text-[#344054] hover:border-[#1A7A4A] hover:bg-[#F6FEF9] transition-all disabled:opacity-60"
+                    >
+                      {locationLoading ? (
+                        <Loader2 size={16} className="animate-spin text-[#1A7A4A]" />
+                      ) : (
+                        <MapPin size={16} className={storeLat ? 'text-[#1A7A4A]' : 'text-[#98A2B3]'} />
+                      )}
+                      <span className={storeLat ? 'text-[#1A7A4A]' : ''}>
+                        {locationLoading ? 'Getting location...' : storeLat ? 'Location pinned — click to update' : 'Pin My Store Location'}
+                      </span>
+                    </button>
+
+                    {/* Show pinned address + map link */}
+                    {storeLat && storeLng && (
+                      <div className="flex items-start gap-2 p-2.5 bg-[#F0FFF4] border border-[#B0D9C1] rounded-lg">
+                        <MapPin size={14} className="text-[#1A7A4A] mt-0.5 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-semibold text-[#1A7A4A] truncate">{storeLocation || `${storeLat.toFixed(5)}, ${storeLng.toFixed(5)}`}</p>
+                          <a
+                            href={`https://maps.google.com/?q=${storeLat},${storeLng}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] text-[#1A7A4A] underline"
+                          >
+                            View on Google Maps ↗
+                          </a>
+                        </div>
                       </div>
-                      <input
-                        type="text"
-                        value={storeLocation}
-                        onChange={(e) => setStoreLocation(e.target.value)}
-                        placeholder="e.g. Computer Village, Ikeja, Lagos"
-                        className="w-full h-11 pl-[42px] pr-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all"
-                      />
-                    </div>
+                    )}
+
+                    {/* Manual fallback */}
+                    <input
+                      type="text"
+                      value={storeLocation}
+                      onChange={(e) => setStoreLocation(e.target.value)}
+                      placeholder="Or type your address manually (e.g. Computer Village, Ikeja, Lagos)"
+                      className="w-full h-10 px-3.5 border border-[#D0D5DD] rounded-lg text-xs text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all text-[#667085]"
+                    />
                   </div>
 
                   {/* Delivery City Selection */}
@@ -706,7 +739,7 @@ const OnboardingWizard = () => {
                     </label>
                     <select
                       value={deliveryCity}
-                      onChange={(e) => handleCityChange(e.target.value)}
+                      onChange={(e) => setDeliveryCity(e.target.value)}
                       className="w-full h-11 px-3.5 border border-[#D0D5DD] rounded-lg text-sm text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none bg-white transition-all font-semibold"
                     >
                       <option value="">Select your base city...</option>
@@ -719,77 +752,10 @@ const OnboardingWizard = () => {
                       Select the city where you dispatch your items from.
                     </p>
                   </div>
-
-                  {/* Delivery Rates Grid */}
-                  {deliveryCity && (
-                    <div className="space-y-4 pt-3 border-t border-gray-100 animate-in fade-in duration-200">
-                      <label className="block text-xs font-bold text-[#344054] uppercase tracking-wider">
-                        Delivery Rates for {deliveryCity} Areas/LGAs
-                      </label>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
-                        {Object.keys(deliveryRates).map(area => (
-                          <div key={area} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-200/60 gap-2">
-                            <span className="text-xs font-semibold text-gray-700 truncate">{area}</span>
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              <div className="relative rounded-lg shadow-xs w-24">
-                                <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                                  <span className="text-gray-400 text-[10px]">₦</span>
-                                </div>
-                                <input
-                                  type="number"
-                                  value={deliveryRates[area]}
-                                  onChange={(e) => {
-                                    setDeliveryRates(prev => ({
-                                      ...prev,
-                                      [area]: e.target.value
-                                    }));
-                                  }}
-                                  placeholder="Price"
-                                  className="w-full pl-5 pr-1.5 py-1 border border-gray-300 rounded-lg text-xs outline-none focus:border-[#1A7A4A] transition-all font-semibold"
-                                  min="0"
-                                />
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const updated = { ...deliveryRates };
-                                  delete updated[area];
-                                  setDeliveryRates(updated);
-                                }}
-                                className="text-gray-400 hover:text-red-500 font-bold text-xs p-1"
-                                title="Remove Area"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Add Custom Area Input */}
-                      <div className="flex gap-2 items-center bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
-                        <input
-                          type="text"
-                          value={customAreaName}
-                          onChange={(e) => setCustomAreaName(e.target.value)}
-                          placeholder="Add custom area (e.g. Ikotun)"
-                          className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg text-xs outline-none focus:border-[#1A7A4A] font-semibold bg-white"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddCustomArea}
-                          disabled={!customAreaName.trim()}
-                          className="px-3 py-1.5 bg-[#1A7A4A] hover:bg-[#0F5533] text-white disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-xs font-semibold rounded-lg transition-colors"
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
+
 
             {/* STEP 3: ADD FIRST PRODUCT / SERVICE */}
             {currentStep === 3 && (
