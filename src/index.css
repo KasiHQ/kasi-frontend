@@ -1089,3 +1089,72 @@ body {
   margin-right: 6px;
 }
 
+/* Kasi Brand System & Landing Page Styles */
+.bg-paper { background-color: #F6F8F3; }
+.text-ink { color: #141C17; }
+.bg-lime { background-color: #DBF361; }
+.bg-forest { background-color: #0D6E42; }
+
+.font-poppins { font-family: 'Poppins', sans-serif; }
+.font-mono-labels { font-family: 'JetBrains Mono', monospace; }
+
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(20, 28, 23, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+.mask-chat-top {
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 14%, black 28%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 14%, black 28%, black 100%);
+}
+
+@keyframes driftBlob1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(40px, -30px, 0) scale(1.08); }
+}
+@keyframes driftBlob2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-35px, 35px, 0) scale(0.95); }
+}
+@keyframes driftBlob3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(25px, 25px, 0) scale(1.05); }
+}
+@keyframes pulseRipple {
+  0% { transform: scale(0.85); opacity: 0.7; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+@keyframes orbitCW {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes orbitCCW {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+.animate-drift-1 { animation: driftBlob1 24s ease-in-out infinite; }
+.animate-drift-2 { animation: driftBlob2 28s ease-in-out infinite; }
+.animate-drift-3 { animation: driftBlob3 20s ease-in-out infinite; }
+.animate-ripple-1 { animation: pulseRipple 4s cubic-bezier(0, 0.2, 0.8, 1) infinite; }
+.animate-ripple-2 { animation: pulseRipple 4s cubic-bezier(0, 0.2, 0.8, 1) infinite 2s; }
+.animate-orbit-cw { animation: orbitCW 60s linear infinite; }
+.animate-orbit-ccw { animation: orbitCCW 90s linear infinite; }
+
+.is-paused *, .is-paused {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+
