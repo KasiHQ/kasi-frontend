@@ -156,6 +156,9 @@ const ALLOWLISTED_COPY = new Set([
   '/images/products & store.png',
   '/images/sales & finance.png',
   '/images/platforms.png',
+  '/images/One assistant. The whole shop/fashion vendor.jpeg',
+  '/images/One assistant. The whole shop/retail vendor handing off.jpeg',
+  '/images/One assistant. The whole shop/store owner analytics.jpeg',
   // Testimonial vendor attributes (from real Nigerian merchants per spec 2.7 directive)
   'Folake Adebayo',
   'Lush Looks',

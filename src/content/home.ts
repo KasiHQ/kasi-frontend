@@ -40,6 +40,7 @@ export const HOME_COPY = {
         cta: "Sales Engine",
         href: "/features/sales-engine",
         screenshot: "/images/chats.png",
+        photo: "/images/One assistant. The whole shop/fashion vendor.jpeg",
         placeholderCaption: "Nigerian female entrepreneur packing fashion orders",
       },
       {
@@ -48,6 +49,7 @@ export const HOME_COPY = {
         cta: "Fulfilment",
         href: "/features/fulfilment",
         screenshot: "/images/fulfilment & orders.png",
+        photo: "/images/One assistant. The whole shop/retail vendor handing off.jpeg",
         placeholderCaption: "Retail vendor handing off orders for rider dispatch",
       },
       {
@@ -56,6 +58,7 @@ export const HOME_COPY = {
         cta: "Customers & Analytics",
         href: "/features/customers",
         screenshot: "/images/analytics.png",
+        photo: "/images/One assistant. The whole shop/store owner analytics.jpeg",
         placeholderCaption: "Store owner reviewing analytics on phone",
       },
     ],

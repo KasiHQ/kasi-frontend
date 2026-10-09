@@ -12,10 +12,16 @@ export const PhoneChat = ({
   className = '',
 }) => {
   const script = JOURNEY_SCRIPT;
-  const messagesEndRef = useRef(null);
+  const chatScrollRef = useRef(null);
 
+  // Internal scroll only - NEVER call window scrollIntoView
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTo({
+        top: chatScrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
   }, [stageNumber]);
 
   return (
@@ -54,7 +60,10 @@ export const PhoneChat = ({
       </div>
 
       {/* Message Stream */}
-      <div className="flex-1 py-3 space-y-2.5 overflow-y-auto min-h-0 flex flex-col justify-start pr-0.5">
+      <div
+        ref={chatScrollRef}
+        className="flex-1 py-3 space-y-2.5 overflow-y-auto min-h-0 flex flex-col justify-start pr-0.5"
+      >
         {/* Customer initial inquiry */}
         <div className="self-end max-w-[85%] bg-white border border-[#141C17]/10 rounded-2xl rounded-tr-sm p-3 text-right shadow-xs">
           <p className="text-xs text-[#141C17] leading-relaxed font-normal">
@@ -79,6 +88,7 @@ export const PhoneChat = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
             className="self-start max-w-[88%] bg-[#EBF8EF] border border-[#0D6E42]/15 rounded-2xl rounded-tl-sm p-3 text-left shadow-xs"
           >
             <p className="text-xs text-[#141C17] leading-relaxed">
@@ -98,6 +108,7 @@ export const PhoneChat = ({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
               className="self-end max-w-[85%] bg-white border border-[#141C17]/10 rounded-2xl rounded-tr-sm p-3 text-right shadow-xs"
             >
               <p className="text-xs text-[#141C17] leading-relaxed font-normal">
@@ -111,6 +122,7 @@ export const PhoneChat = ({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
               className="self-start max-w-[88%] bg-[#EBF8EF] border border-[#0D6E42]/15 rounded-2xl rounded-tl-sm p-3 text-left shadow-xs space-y-2"
             >
               <p className="text-xs text-[#141C17] leading-relaxed">
@@ -129,6 +141,7 @@ export const PhoneChat = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
             className="space-y-2"
           >
             <LocationPin
@@ -155,6 +168,7 @@ export const PhoneChat = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
             className="self-start max-w-[88%] bg-[#EBF8EF] border border-[#0D6E42]/15 rounded-2xl rounded-tl-sm p-3 text-left shadow-xs"
           >
             <p className="text-xs text-[#141C17] leading-relaxed font-medium">
@@ -171,6 +185,7 @@ export const PhoneChat = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
             className="space-y-2"
           >
             <div className="self-start max-w-[88%] bg-[#EBF8EF] border border-[#0D6E42]/15 rounded-2xl rounded-tl-sm p-3 text-left shadow-xs">
@@ -197,6 +212,7 @@ export const PhoneChat = ({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
             className="self-start max-w-[88%] bg-[#EBF8EF] border border-[#0D6E42]/15 rounded-2xl rounded-tl-sm p-3 text-left shadow-xs"
           >
             <p className="text-xs text-[#0D6E42] font-semibold">
@@ -207,8 +223,6 @@ export const PhoneChat = ({
             </span>
           </motion.div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
     </div>
   );

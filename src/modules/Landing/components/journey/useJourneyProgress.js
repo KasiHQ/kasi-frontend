@@ -24,12 +24,12 @@ export function useJourneyProgress({ prefersReducedMotion = false } = {}) {
     }
   }, []);
 
-  // Smooth spring for high-power devices; direct linear MotionValue for low-power to reduce CPU cycles
+  // Velvety, smooth spring with controlled damping for an unhurried, luxurious scroll feel
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 180,
+    stiffness: 75,
     damping: 24,
-    mass: 0.2,
-    restDelta: 0.001,
+    mass: 0.5,
+    restDelta: 0.0005,
   });
 
   const activeProgress = isLowPower || prefersReducedMotion ? scrollYProgress : smoothProgress;

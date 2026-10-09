@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useId } from 'react';
-import { motion, useTransform, useMotionValueEvent } from 'framer-motion';
+import { motion, useTransform, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { useJourneyProgress } from './useJourneyProgress';
 import { LANDING_STAGES, FULL_STAGES } from './stages';
 import { PhoneChat } from './PhoneChat';
@@ -28,10 +28,10 @@ export const JourneyScene = ({ variant = 'landing' }) => {
     prefersReducedMotion,
   });
 
-  // Track active stage index (only re-renders React when stage boundary crosses)
+  // Track active stage index (driven by the smoothed spring progress for fluid harmony)
   const [activeStageIndex, setActiveStageIndex] = useState(0);
 
-  useMotionValueEvent(rawProgress, 'change', (latest) => {
+  useMotionValueEvent(progress, 'change', (latest) => {
     const stageIdx = stages.findIndex(
       (s) => latest >= s.range[0] && latest <= s.range[1]
     );
@@ -46,23 +46,23 @@ export const JourneyScene = ({ variant = 'landing' }) => {
   const phoneScale = useTransform(
     progress,
     [0, 0.45, 0.55, 0.8, 1],
-    [1, 1, 0.98, 0.94, 0.92]
+    [1, 1, 0.98, 0.95, 0.93]
   );
   const phoneDim = useTransform(
     progress,
     [0, 0.5, 0.75, 1],
-    [1, 1, 0.85, 0.75]
+    [1, 1, 0.88, 0.8]
   );
 
   const vendorScale = useTransform(
     progress,
     [0, 0.35, 0.65, 0.85, 1],
-    [0.94, 0.96, 1, 1.02, 1]
+    [0.95, 0.97, 1, 1.01, 1]
   );
   const vendorDim = useTransform(
     progress,
     [0, 0.3, 0.6, 1],
-    [0.65, 0.8, 1, 1]
+    [0.72, 0.85, 1, 1]
   );
 
   // Soft lime ambient tint blob that tracks active stage
@@ -84,7 +84,7 @@ export const JourneyScene = ({ variant = 'landing' }) => {
     <>
       <section
         ref={containerRef}
-        style={{ height: isFull ? '460vh' : '330vh' }}
+        style={{ height: isFull ? '780vh' : '540vh' }}
         className="relative w-full bg-[#F6F8F3] text-[#141C17]"
         aria-label={isFull ? 'Interactive Order Journey' : 'Kasi How It Works'}
       >
@@ -129,19 +129,29 @@ export const JourneyScene = ({ variant = 'landing' }) => {
           )}
 
           {/* Top Bar: Active Step Title with lime marker highlight + Spec Description */}
-          <header className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center sm:items-start pt-1 text-center sm:text-left">
-            <h3 className="font-display text-2xl md:text-3xl font-medium text-[#141C17] tracking-tight">
-              <span className="bg-[#D4FF5E] px-2 py-0.5 rounded-md inline-block mr-2">
-                {activeStage.title}
-              </span>
-            </h3>
-            <p className="text-[#141C17]/70 text-sm md:text-base font-normal mt-1 max-w-md">
-              {activeStage.desc}
-            </p>
+          <header className="relative z-20 max-w-5xl mx-auto w-full flex flex-col items-center sm:items-start pt-1 text-center sm:text-left shrink-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStage.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                <h3 className="font-display text-2xl md:text-3xl font-medium text-[#141C17] tracking-tight">
+                  <span className="bg-[#D4FF5E] px-2 py-0.5 rounded-md inline-block mr-2">
+                    {activeStage.title}
+                  </span>
+                </h3>
+                <p className="text-[#141C17]/70 text-sm md:text-base font-normal mt-1 max-w-md">
+                  {activeStage.desc}
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </header>
 
           {/* Center Stage: Split Screen (Customer Phone on Left, Vendor Dashboard on Right) */}
-          <main className="relative z-10 w-full max-w-6xl mx-auto flex-1 flex items-center justify-center my-auto min-h-0">
+          <main className="relative z-10 w-full max-w-6xl mx-auto flex-1 flex items-center justify-center my-auto min-h-0 overflow-visible py-2">
             {/* Desktop Dual-Surface Layout */}
             <div className="hidden lg:grid grid-cols-12 gap-8 items-center w-full px-2">
               {/* Left: Customer WhatsApp Phone */}
@@ -169,7 +179,7 @@ export const JourneyScene = ({ variant = 'landing' }) => {
               </motion.div>
             </div>
 
-            {/* Mobile Layout (One Surface at a time, perfectly centered at 390px) */}
+            {/* Mobile Layout (One Surface at a time, perfectly centered at 380px) */}
             <div className="lg:hidden w-full max-w-[380px] mx-auto flex justify-center">
               {activeStage.stepNumber <= (isFull ? 3 : 2) ? (
                 <PhoneChat
@@ -188,7 +198,7 @@ export const JourneyScene = ({ variant = 'landing' }) => {
           </main>
 
           {/* Bottom Rail: Slim progress rail with display font numbered nodes */}
-          <footer className="relative z-10 max-w-3xl mx-auto w-full flex flex-col items-center pb-2">
+          <footer className="relative z-20 max-w-3xl mx-auto w-full flex flex-col items-center pb-2 shrink-0">
             <StageRail
               stages={stages}
               activeStageIndex={activeStageIndex}

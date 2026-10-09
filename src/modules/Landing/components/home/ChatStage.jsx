@@ -66,18 +66,18 @@ export function ChatStage({ activeChannel, onChannelChange, isPausedExternal = f
 
     const stepSchedule = [
       { step: 0, delay: 0 },
-      { step: 1, delay: 500 },
-      { step: 2, delay: 1200 },
-      { step: 3, delay: 1800 },
-      { step: 4, delay: 2400 },
-      { step: 5, delay: 3200 },
-      { step: 6, delay: 3800 },
-      { step: 7, delay: 4500 },
-      { step: 8, delay: 5100 },
-      { step: 9, delay: 5800 },
+      { step: 1, delay: 600 },
+      { step: 2, delay: 1500 },
+      { step: 3, delay: 3400 },
+      { step: 4, delay: 4600 },
+      { step: 5, delay: 7000 },
+      { step: 6, delay: 8000 },
+      { step: 7, delay: 9400 },
+      { step: 8, delay: 10400 },
+      { step: 9, delay: 11000 },
     ];
 
-    const cycleDuration = 7600;
+    const cycleDuration = 13000;
     let elapsed = 0;
     const intervalMs = 50;
 

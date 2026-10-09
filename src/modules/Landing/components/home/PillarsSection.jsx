@@ -57,13 +57,29 @@ export function PillarsSection() {
               className="bg-white rounded-[22px] border border-[#141C17]/10 p-6 sm:p-7 shadow-xs flex flex-col justify-between overflow-hidden group hover:border-[#141C17]/20 transition-colors"
             >
               <div>
-                {/* Top: Designed Human/Vendor Placeholder */}
-                <div className="w-full h-44 rounded-xl overflow-hidden mb-6 border border-[#141C17]/8 shadow-inner">
-                  <DesignedPlaceholder
-                    aspect="16/9"
-                    caption={pillar.placeholderCaption}
-                    className="w-full h-full"
-                  />
+                {/* Top: Real Vendor Photo or Designed Placeholder */}
+                <div className="w-full h-44 rounded-xl overflow-hidden mb-6 border border-[#141C17]/8 shadow-inner bg-[#F6F8F3] relative">
+                  {pillar.photo ? (
+                    <img
+                      src={pillar.photo}
+                      alt={pillar.placeholderCaption || `${labelTitle} vendor in shop`}
+                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.nextElementSibling) {
+                          e.currentTarget.nextElementSibling.style.display = 'block';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div style={{ display: pillar.photo ? 'none' : 'block' }} className="w-full h-full">
+                    <DesignedPlaceholder
+                      aspect="16/9"
+                      caption={pillar.placeholderCaption}
+                      className="w-full h-full"
+                    />
+                  </div>
                 </div>
 
                 {/* Phosphor duotone icon bare over offset lime disc */}
