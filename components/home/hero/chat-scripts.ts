@@ -1,0 +1,158 @@
+import { ChannelId } from "./channel-themes";
+
+export interface ChatMessage {
+  id: string;
+  sender: "customer" | "kasi";
+  text: string;
+  label: string; // e.g. "AMAKA · 11:42 PM" or "KASI · WHATSAPP · REPLIED IN 3S"
+  replyTimeSec?: number; // for Kasi bubbles: reply time in seconds to count up
+}
+
+export interface OrderCardData {
+  title: string;
+  subtitle: string;
+  amount: string;
+  orderNumber: string;
+  stampText: string;
+  footerLabel: string; // e.g. "KASI · PAYMENT CONFIRMED · ORDER QUEUED"
+}
+
+export interface ChannelChatScript {
+  channelId: ChannelId;
+  contextPill: string;
+  customerInitial: string;
+  customerName: string;
+  messages: ChatMessage[];
+  orderCard: OrderCardData;
+}
+
+export const CHAT_SCRIPTS: Record<ChannelId, ChannelChatScript> = {
+  whatsapp: {
+    channelId: "whatsapp",
+    contextPill: "NEW WHATSAPP DM · FROM A STATUS",
+    customerInitial: "A",
+    customerName: "Amaka",
+    messages: [
+      {
+        id: "wa-1",
+        sender: "customer",
+        text: "Hi! Is the Ankara two-piece in size 14 still available?",
+        label: "AMAKA · 11:42 PM",
+      },
+      {
+        id: "wa-2",
+        sender: "kasi",
+        text: "Yes, size 14 is in stock. ₦18,500. Pickup or delivery?",
+        label: "KASI · WHATSAPP · REPLIED IN 3S",
+        replyTimeSec: 3,
+      },
+      {
+        id: "wa-3",
+        sender: "customer",
+        text: "Delivery to Lekki. Can you do ₦16,000?",
+        label: "AMAKA · 11:43 PM",
+      },
+      {
+        id: "wa-4",
+        sender: "kasi",
+        text: "I can do ₦17,000 for you today. Sending your Paystack link now.",
+        label: "KASI · WHATSAPP · REPLIED IN 2S",
+        replyTimeSec: 2,
+      },
+    ],
+    orderCard: {
+      title: "Ankara two-piece, size 14",
+      subtitle: "Delivery: Admiralty Way, Lekki Phase 1",
+      amount: "₦17,000",
+      orderNumber: "ORD-8291",
+      stampText: "PAID",
+      footerLabel: "KASI · PAYMENT CONFIRMED · ORDER QUEUED",
+    },
+  },
+
+  instagram: {
+    channelId: "instagram",
+    contextPill: "NEW INSTAGRAM DM · FROM A REEL",
+    customerInitial: "T",
+    customerName: "Tunde",
+    messages: [
+      {
+        id: "ig-1",
+        sender: "customer",
+        text: "Saw your reel. Do you ship the shea butter set to Abuja?",
+        label: "TUNDE · 2:14 AM",
+      },
+      {
+        id: "ig-2",
+        sender: "kasi",
+        text: "We do, 2-day delivery. ₦9,500 for the set. Want me to send your checkout?",
+        label: "KASI · INSTAGRAM · REPLIED IN 4S",
+        replyTimeSec: 4,
+      },
+      {
+        id: "ig-3",
+        sender: "customer",
+        text: "Yes please. 12 Aminu Kano Crescent, Wuse 2.",
+        label: "TUNDE · 2:15 AM",
+      },
+      {
+        id: "ig-4",
+        sender: "kasi",
+        text: "Delivery to Wuse 2 is ₦1,500. Total ₦11,000. Pay here to confirm.",
+        label: "KASI · INSTAGRAM · REPLIED IN 2S",
+        replyTimeSec: 2,
+      },
+    ],
+    orderCard: {
+      title: "Shea butter set",
+      subtitle: "Delivery: 12 Aminu Kano Cres, Wuse 2, Abuja",
+      amount: "₦11,000",
+      orderNumber: "ORD-8292",
+      stampText: "PAID",
+      footerLabel: "KASI · PAYMENT CONFIRMED · ORDER QUEUED",
+    },
+  },
+
+  telegram: {
+    channelId: "telegram",
+    contextPill: "NEW TELEGRAM MESSAGE · FROM A CHANNEL",
+    customerInitial: "C",
+    customerName: "Chidi",
+    messages: [
+      {
+        id: "tg-1",
+        sender: "customer",
+        text: "Is the 20,000mAh power bank still in stock?",
+        label: "CHIDI · 9:05 PM",
+      },
+      {
+        id: "tg-2",
+        sender: "kasi",
+        text: "Yes, 6 left at ₦22,000. Want one?",
+        label: "KASI · TELEGRAM · REPLIED IN 3S",
+        replyTimeSec: 3,
+      },
+      {
+        id: "tg-3",
+        sender: "customer",
+        text: "Send me two. I'll pick up at your shop.",
+        label: "CHIDI · 9:06 PM",
+      },
+      {
+        id: "tg-4",
+        sender: "kasi",
+        text: "Done. Two at ₦44,000. Here's your pickup address, hours and payment link.",
+        label: "KASI · TELEGRAM · REPLIED IN 2S",
+        replyTimeSec: 2,
+      },
+    ],
+    orderCard: {
+      title: "Power bank ×2",
+      subtitle: "In-store pickup: Ikeja Storefront",
+      amount: "₦44,000",
+      orderNumber: "ORD-8293",
+      stampText: "PAID",
+      footerLabel: "ORDER READY FOR PICKUP",
+    },
+  },
+};
