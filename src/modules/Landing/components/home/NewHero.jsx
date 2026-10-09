@@ -34,7 +34,7 @@ export function NewHero() {
 
   const isPaused = isTabHidden || isHeroOffscreen;
 
-  const waNumber = "2348000000000";
+  const waNumber = import.meta.env.VITE_DEMO_WHATSAPP || "2348000000000";
   const waDemoLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(
     "Hi Kasi, I'd like to try the live demo."
   )}`;
@@ -42,7 +42,7 @@ export function NewHero() {
   return (
     <section
       ref={heroRef}
-      className={`relative min-h-[88vh] flex flex-col justify-between pt-28 sm:pt-36 lg:pt-40 overflow-hidden bg-dot-grid ${
+      className={`relative min-h-[85vh] lg:min-h-[88vh] flex flex-col justify-between pt-24 sm:pt-28 lg:pt-32 pb-4 overflow-hidden bg-dot-grid ${
         isPaused ? "is-paused" : ""
       }`}
     >
@@ -79,23 +79,24 @@ export function NewHero() {
       </div>
 
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 my-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
           {/* Left Column: Copy ≈ 7 cols */}
           <div className="lg:col-span-7 flex flex-col justify-center">
-            <div className="min-h-[140px] sm:min-h-[180px] lg:min-h-[220px] flex items-center">
+            <div className="min-h-[110px] sm:min-h-[140px] lg:min-h-[175px] flex items-center">
               <RotatingChannelHeadline activeChannel={activeChannel} />
             </div>
 
-            <p className="mt-6 sm:mt-7 font-poppins font-light text-base sm:text-[19px] lg:text-[20px] leading-relaxed text-[#141C17]/75 max-w-[580px]">
+            {/* Spec sub: clamp(1rem, 0.9rem + 0.4vw, 1.25rem) */}
+            <p className="mt-4 sm:mt-5 font-poppins font-light text-[clamp(1rem,0.9rem+0.4vw,1.25rem)] leading-relaxed text-[#141C17]/80 max-w-[620px]">
               Kasi is the operating system for businesses that sell on WhatsApp and
               Instagram. It answers every customer, negotiates, takes payment, and
               pushes the order to delivery. You just prepare it.
             </p>
 
-            <div className="mt-8 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 max-w-[500px]">
+            <div className="mt-6 sm:mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 max-w-[500px]">
               <Link
                 to="/signup"
-                className="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-base shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all text-center"
+                className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-base shadow-sm hover:shadow-md hover:bg-[#d2eb57] hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all text-center"
               >
                 Start free
               </Link>
@@ -103,13 +104,13 @@ export function NewHero() {
                 href={waDemoLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#0D6E42]/30 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all text-center"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#0D6E42]/25 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all text-center"
               >
                 Chat the live demo
               </a>
             </div>
 
-            <div className="mt-6 sm:mt-7 flex items-center flex-wrap gap-x-2 gap-y-1 font-poppins text-xs sm:text-[13px] text-[#141C17]/65">
+            <div className="mt-5 sm:mt-6 flex items-center flex-wrap gap-x-2 gap-y-1 font-poppins text-xs sm:text-[13px] text-[#141C17]/70">
               <span>Works on WhatsApp, Instagram, Messenger & Telegram</span>
               <span className="text-[#141C17]/30">·</span>
               <span>Payments by Paystack</span>
@@ -119,7 +120,7 @@ export function NewHero() {
           </div>
 
           {/* Right Column: Chat Stage ≈ 5 cols */}
-          <div className="lg:col-span-5 flex justify-center items-center w-full mt-4 lg:mt-0">
+          <div className="lg:col-span-5 flex justify-center items-center w-full mt-2 lg:mt-0">
             <ChatStage
               activeChannel={activeChannel}
               onChannelChange={setActiveChannel}

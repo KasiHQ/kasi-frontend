@@ -20,7 +20,7 @@ export function RotatingChannelHeadline({ activeChannel }) {
     };
 
     updateWidth();
-    const timer = setTimeout(updateWidth, 50);
+    const timer = setTimeout(updateWidth, 40);
     window.addEventListener("resize", updateWidth);
     return () => {
       clearTimeout(timer);
@@ -30,7 +30,8 @@ export function RotatingChannelHeadline({ activeChannel }) {
 
   return (
     <div className="w-full">
-      <h1 className="font-poppins font-bold tracking-[-0.035em] leading-[0.98] text-[#141C17] text-[clamp(2.75rem,5.6vw,5.5rem)]">
+      {/* Spec Part A 1.1: H1 clamp(2rem, 1rem + 3.2vw, 4rem), line-height ~1.05, tracking -0.03em */}
+      <h1 className="font-poppins font-bold tracking-[-0.03em] leading-[1.05] text-[#141C17] text-[clamp(2.1rem,1rem+3vw,3.75rem)]">
         {/* Screen-reader static title */}
         <span className="sr-only">
           Automate your DMs. Answer every WhatsApp, Instagram and Telegram DM.
@@ -38,15 +39,16 @@ export function RotatingChannelHeadline({ activeChannel }) {
 
         {/* Visual presentation */}
         <span aria-hidden="true" className="block select-none">
-          <span className="block">Automate your DMs.</span>
-          <span className="block mt-2">Answer every</span>
+          {/* Hard requirement: from 768px up, line 1 never wraps */}
+          <span className="block md:whitespace-nowrap">Automate your DMs.</span>
+          <span className="block mt-1 sm:mt-1.5 md:whitespace-nowrap">Answer every</span>
 
-          <span className="flex items-baseline flex-nowrap mt-2">
+          <span className="flex items-baseline flex-nowrap mt-1 sm:mt-1.5">
             <span className="relative inline-grid grid-cols-1 grid-rows-1 align-baseline items-baseline">
-              {/* Highlight marker bar */}
+              {/* Highlight marker bar: lower 40% of x-height, overhang ~0.08em, clean baseline */}
               <motion.span
                 key={`highlight-${activeChannel}`}
-                className="absolute left-[-6px] bottom-1 h-[44%] rounded-[3px] -z-10 pointer-events-none origin-left"
+                className="absolute left-[-0.08em] bottom-[0.06em] h-[0.38em] rounded-[2px] -z-10 pointer-events-none origin-left"
                 initial={
                   shouldReduceMotion
                     ? false
@@ -58,11 +60,11 @@ export function RotatingChannelHeadline({ activeChannel }) {
                     : { clipPath: "inset(0 0% 0 0)", opacity: 1 }
                 }
                 transition={{
-                  duration: shouldReduceMotion ? 0 : 0.5,
+                  duration: shouldReduceMotion ? 0 : 0.45,
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 style={{
-                  width: `${wordWidth + 12}px`,
+                  width: `${wordWidth + 10}px`,
                   background: currentTheme.highlight,
                 }}
               />
@@ -88,7 +90,7 @@ export function RotatingChannelHeadline({ activeChannel }) {
                       : { y: "-0.35em", opacity: 0, filter: "blur(3px)" }
                   }
                   transition={{
-                    duration: shouldReduceMotion ? 0 : 0.45,
+                    duration: shouldReduceMotion ? 0 : 0.4,
                     ease: [0.22, 1, 0.36, 1],
                   }}
                   className="col-start-1 row-start-1 whitespace-nowrap text-[#141C17] z-10"
@@ -102,10 +104,10 @@ export function RotatingChannelHeadline({ activeChannel }) {
             <motion.span
               layout
               transition={{
-                duration: shouldReduceMotion ? 0 : 0.45,
+                duration: shouldReduceMotion ? 0 : 0.4,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="inline-block ml-3 sm:ml-4 text-[#141C17]"
+              className="inline-block ml-2.5 sm:ml-3.5 text-[#141C17] whitespace-nowrap"
             >
               DM.
             </motion.span>

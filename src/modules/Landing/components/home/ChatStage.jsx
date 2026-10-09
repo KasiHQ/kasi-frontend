@@ -158,19 +158,19 @@ export function ChatStage({ activeChannel, onChannelChange, isPausedExternal = f
             transition={{ duration: 0.4 }}
             className="flex flex-col gap-3 w-full"
           >
-            {/* Context Pill */}
+            {/* Context Pill - high contrast WCAG AA */}
             <motion.div
               initial={shouldReduceMotion ? false : { scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
               className="self-center mb-1"
             >
-              <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-black/10 shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-full border border-[#141C17]/15 shadow-xs">
                 <span
                   className="w-2 h-2 rounded-full animate-ping"
                   style={{ backgroundColor: theme.pillDot }}
                 />
-                <span className="font-mono-labels text-[11px] font-medium tracking-wider text-[#141C17]/80 uppercase">
+                <span className="font-mono-labels text-[11px] font-semibold tracking-wider text-[#141C17] uppercase">
                   {script.contextPill}
                 </span>
               </div>
@@ -193,7 +193,7 @@ export function ChatStage({ activeChannel, onChannelChange, isPausedExternal = f
                       {script.messages[0].text}
                     </div>
                   </div>
-                  <span className="font-mono-labels text-[10px] text-[#141C17]/50 mt-1 ml-8 uppercase tracking-wider">
+                  <span className="font-mono-labels text-[10px] text-[#141C17]/60 mt-1 ml-8 uppercase tracking-wider">
                     {script.messages[0].label}
                   </span>
                 </motion.div>
@@ -209,18 +209,11 @@ export function ChatStage({ activeChannel, onChannelChange, isPausedExternal = f
                   className="flex flex-col items-end self-end max-w-[85%]"
                 >
                   <div className="flex items-end gap-2 flex-row-reverse">
-                    <div className="w-6 h-6 rounded-full bg-[#141C17] flex items-center justify-center shrink-0 shadow-xs">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M4 11C6 16.5 10 18.5 12 18.5C14 18.5 18 16.5 20 11"
-                          stroke="#DBF361"
-                          strokeWidth="2.8"
-                          strokeLinecap="round"
-                        />
-                        <circle cx="7.5" cy="8.5" r="1.5" fill="#DBF361" />
-                        <circle cx="16.5" cy="8.5" r="1.5" fill="#DBF361" />
-                      </svg>
-                    </div>
+                    <img
+                      src="/kasi-icon.svg"
+                      alt="Kasi"
+                      className="w-6 h-6 rounded-md object-contain shrink-0 shadow-xs"
+                    />
                     <div
                       style={{ background: theme.kasiBubble }}
                       className="text-[#141C17] text-[13.5px] leading-relaxed px-4 py-2.5 rounded-[18px] rounded-br-sm shadow-sm border border-black/[0.04]"
@@ -274,18 +267,11 @@ export function ChatStage({ activeChannel, onChannelChange, isPausedExternal = f
                   className="flex flex-col items-end self-end max-w-[85%]"
                 >
                   <div className="flex items-end gap-2 flex-row-reverse">
-                    <div className="w-6 h-6 rounded-full bg-[#141C17] flex items-center justify-center shrink-0 shadow-xs">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M4 11C6 16.5 10 18.5 12 18.5C14 18.5 18 16.5 20 11"
-                          stroke="#DBF361"
-                          strokeWidth="2.8"
-                          strokeLinecap="round"
-                        />
-                        <circle cx="7.5" cy="8.5" r="1.5" fill="#DBF361" />
-                        <circle cx="16.5" cy="8.5" r="1.5" fill="#DBF361" />
-                      </svg>
-                    </div>
+                    <img
+                      src="/kasi-icon.svg"
+                      alt="Kasi"
+                      className="w-6 h-6 rounded-md object-contain shrink-0 shadow-xs"
+                    />
                     <div
                       style={{ background: theme.kasiBubble }}
                       className="text-[#141C17] text-[13.5px] leading-relaxed px-4 py-2.5 rounded-[18px] rounded-br-sm shadow-sm border border-black/[0.04]"

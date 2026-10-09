@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
+import KasiLogo from "../../../components/common/KasiLogo";
 
 const INNER_NODES = [
   {
@@ -363,18 +364,14 @@ export function ChannelOrbit() {
                 </div>
               )}
 
-              {/* Center Mark (~112px white circle) */}
+              {/* Center Mark (~112px white circle) with real Kasi Logo */}
               <div
-                className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white shadow-lg border border-black/8 p-4 flex items-center justify-center z-20 transition-transform duration-300 ${
+                className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white shadow-lg border border-[#141C17]/10 p-4 flex items-center justify-center z-20 transition-transform duration-300 ${
                   centerPulse ? "scale-105" : "scale-100"
                 }`}
               >
                 <div className="relative w-full h-full flex items-center justify-center">
-                  <img
-                    src="/brand/kasi-mark.svg"
-                    alt="Kasi official mark"
-                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain"
-                  />
+                  <KasiLogo variant="mark" size={56} />
                 </div>
               </div>
 

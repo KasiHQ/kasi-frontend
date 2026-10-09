@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import KasiLogo from "../../../components/common/KasiLogo";
 
 export function NewNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,13 +19,13 @@ export function NewNav() {
   }, []);
 
   const featureLinks = [
-    { title: "Sales Engine", desc: "Automate selling in every DM", href: "/features" },
-    { title: "Fulfilment Center", desc: "Paid orders straight to packing", href: "/features" },
-    { title: "Delivery & Pricing", desc: "Rules and automated fee calc", href: "/features" },
-    { title: "Payments & Checkout", desc: "Instant Paystack verification", href: "/features" },
-    { title: "Chats & Control", desc: "Take over whenever you want", href: "/features" },
-    { title: "Customers & CRM", desc: "Every contact automatically saved", href: "/features" },
-    { title: "Analytics & Bookings", desc: "Sales numbers that make sense", href: "/features" },
+    { title: "Sales Engine", desc: "Automate selling in every DM", href: "/features/sales-engine" },
+    { title: "Fulfilment Center", desc: "Paid orders straight to packing", href: "/features/fulfilment" },
+    { title: "Delivery & Pricing", desc: "Rules and automated fee calc", href: "/features/delivery" },
+    { title: "Payments & Checkout", desc: "Instant Paystack verification", href: "/features/payments" },
+    { title: "Chats & Control", desc: "Take over whenever you want", href: "/features/chats" },
+    { title: "Customers & CRM", desc: "Every contact automatically saved", href: "/features/customers" },
+    { title: "Analytics & Bookings", desc: "Sales numbers that make sense", href: "/features/analytics" },
     { title: "Platforms", desc: "WhatsApp, Instagram, Telegram", href: "/platforms" },
   ];
 
@@ -38,24 +39,15 @@ export function NewNav() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#F6F8F3]/90 backdrop-blur-md border-b border-[#141C17]/8 shadow-xs py-3"
-          : "bg-transparent py-5"
+          ? "bg-[#F6F8F3]/92 backdrop-blur-md border-b border-[#141C17]/8 shadow-xs py-3"
+          : "bg-transparent py-4 sm:py-5"
       }`}
     >
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-xs border border-[#141C17]/10 bg-white p-0.5 transition-transform group-hover:scale-105">
-              <img
-                src="/brand/kasi-mark.svg"
-                alt="Kasi logo mark"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <span className="font-poppins font-bold text-xl sm:text-2xl tracking-tight text-[#141C17]">
-              Kasi
-            </span>
+          {/* Logo with official KasiLogo */}
+          <Link to="/" className="flex items-center group">
+            <KasiLogo variant="full" size={32} />
           </Link>
 
           {/* Desktop Navigation */}
@@ -103,7 +95,7 @@ export function NewNav() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
                     transition={{ duration: 0.16 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[420px]"
+                    className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[430px]"
                   >
                     <div className="bg-white rounded-[18px] shadow-lg border border-[#141C17]/10 p-3 grid grid-cols-2 gap-1">
                       {featureLinks.map((item) => (
@@ -190,6 +182,8 @@ export function NewNav() {
                         <a
                           key={item.title}
                           href={item.href}
+                          target={item.href.startsWith("http") ? "_blank" : undefined}
+                          rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                           className="p-2.5 rounded-lg hover:bg-[#F6F8F3] transition-colors block group"
                         >
                           <div className="text-xs font-semibold text-[#141C17] group-hover:text-[#0D6E42] transition-colors">
