@@ -85,33 +85,53 @@ export function HowItWorksTeaser() {
                       </span>
                     </div>
 
-                    {/* Rich, Detailed Illustrated Vignette Container */}
+                    {/* Rich, Detailed Illustrated Vignette Container with continuous micro-animations */}
                     <div className="w-full h-32 rounded-2xl bg-[#F6F8F3] border border-[#141C17]/8 p-3 flex items-center justify-center relative overflow-hidden select-none">
                       {step.step === 1 && (
-                        // Vignette 1: Connect (WhatsApp & IG linked to Kasi mark with sync indicator)
+                        // Vignette 1: Connect (WhatsApp & IG linked with animated pulsing connection dots and floating icons)
                         <div className="flex flex-col items-center gap-2">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-white shadow-xs border border-[#141C17]/10 flex items-center justify-center p-1.5">
+                            <motion.div
+                              animate={shouldReduceMotion ? undefined : { y: [-2, 2, -2] }}
+                              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                              className="w-8 h-8 rounded-xl bg-white shadow-xs border border-[#141C17]/10 flex items-center justify-center p-1.5"
+                            >
                               <img
                                 src="/logos/whatsapp.svg"
                                 alt="WhatsApp"
                                 className="w-5 h-5 object-contain"
                               />
+                            </motion.div>
+                            <div className="flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#0D6E42] animate-ping" />
+                              <span className="w-1 h-1 rounded-full bg-[#0D6E42]/50" />
+                              <span className="w-1 h-1 rounded-full bg-[#0D6E42]/50" />
                             </div>
-                            <div className="w-5 border-t-2 border-dashed border-[#0D6E42]/40" />
-                            <div className="w-10 h-10 rounded-full bg-white shadow-md border-2 border-[#0D6E42]/20 flex items-center justify-center p-2 relative">
+                            <motion.div
+                              animate={shouldReduceMotion ? undefined : { scale: [1, 1.08, 1] }}
+                              transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                              className="w-10 h-10 rounded-full bg-white shadow-md border-2 border-[#0D6E42]/20 flex items-center justify-center p-2 relative"
+                            >
                               <KasiLogo variant="mark" size={24} />
+                            </motion.div>
+                            <div className="flex items-center gap-1">
+                              <span className="w-1 h-1 rounded-full bg-[#0D6E42]/50" />
+                              <span className="w-1 h-1 rounded-full bg-[#0D6E42]/50" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#0D6E42] animate-ping [animation-delay:0.5s]" />
                             </div>
-                            <div className="w-5 border-t-2 border-dashed border-[#0D6E42]/40" />
-                            <div className="w-8 h-8 rounded-xl bg-white shadow-xs border border-[#141C17]/10 flex items-center justify-center p-1.5">
+                            <motion.div
+                              animate={shouldReduceMotion ? undefined : { y: [2, -2, 2] }}
+                              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                              className="w-8 h-8 rounded-xl bg-white shadow-xs border border-[#141C17]/10 flex items-center justify-center p-1.5"
+                            >
                               <img
                                 src="/logos/instagram.svg"
                                 alt="Instagram"
                                 className="w-5 h-5 object-contain"
                               />
-                            </div>
+                            </motion.div>
                           </div>
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-[#0D6E42] bg-[#DBF361]/35 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-[#0D6E42] bg-[#DBF361]/35 px-2 py-0.5 rounded-full shadow-2xs">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
                             Sync active
                           </span>
@@ -119,35 +139,47 @@ export function HowItWorksTeaser() {
                       )}
 
                       {step.step === 2 && (
-                        // Vignette 2: Load shop (Rich miniature product cards with prices and stock tags)
+                        // Vignette 2: Load shop (Mini product cards with hovering badge effect)
                         <div className="flex gap-2.5 w-full justify-center">
-                          <div className="w-24 bg-white rounded-xl p-2 border border-[#141C17]/10 shadow-xs flex flex-col gap-1">
+                          <motion.div
+                            animate={shouldReduceMotion ? undefined : { y: [-2, 1, -2] }}
+                            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+                            className="w-24 bg-white rounded-xl p-2 border border-[#141C17]/10 shadow-xs flex flex-col gap-1"
+                          >
                             <div className="w-full h-8 rounded-lg bg-[#0D6E42]/10 flex items-center justify-center text-[9px] font-medium text-[#0D6E42]">
                               Ankara Set
                             </div>
                             <div className="flex items-center justify-between text-[9px]">
                               <span className="font-bold text-[#141C17]">₦18,500</span>
-                              <span className="text-[8px] text-[#0D6E42] font-semibold">Ready</span>
+                              <span className="text-[8px] text-[#0D6E42] font-semibold bg-[#0D6E42]/10 px-1 rounded">Ready</span>
                             </div>
-                          </div>
-                          <div className="w-24 bg-white rounded-xl p-2 border border-[#141C17]/10 shadow-xs flex flex-col gap-1">
+                          </motion.div>
+                          <motion.div
+                            animate={shouldReduceMotion ? undefined : { y: [1, -2, 1] }}
+                            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                            className="w-24 bg-white rounded-xl p-2 border border-[#141C17]/10 shadow-xs flex flex-col gap-1"
+                          >
                             <div className="w-full h-8 rounded-lg bg-[#DBF361]/25 flex items-center justify-center text-[9px] font-medium text-[#141C17]">
                               Silk Boubou
                             </div>
                             <div className="flex items-center justify-between text-[9px]">
                               <span className="font-bold text-[#141C17]">₦24,000</span>
-                              <span className="text-[8px] text-[#0D6E42] font-semibold">2 left</span>
+                              <span className="text-[8px] text-[#0D6E42] font-semibold bg-[#DBF361]/40 px-1 rounded">2 left</span>
                             </div>
-                          </div>
+                          </motion.div>
                         </div>
                       )}
 
                       {step.step === 3 && (
-                        // Vignette 3: Kasi sells (Realistic WhatsApp chat thread with typing indicators)
+                        // Vignette 3: Kasi sells (Realistic WhatsApp chat thread with bouncing typing dots)
                         <div className="flex flex-col gap-1.5 w-full max-w-[200px]">
-                          <div className="self-end bg-[#DFF7E4] text-[#141C17] text-[10px] px-2.5 py-1 rounded-xl rounded-br-xs shadow-2xs font-normal">
+                          <motion.div
+                            animate={shouldReduceMotion ? undefined : { x: [0, 2, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="self-end bg-[#DFF7E4] text-[#141C17] text-[10px] px-2.5 py-1 rounded-xl rounded-br-xs shadow-2xs font-normal"
+                          >
                             Is size 14 available?
-                          </div>
+                          </motion.div>
                           <div className="self-start bg-white border border-[#141C17]/10 text-[10px] px-2.5 py-1 rounded-xl rounded-bl-xs shadow-2xs flex items-center gap-1.5 text-[#0D6E42] font-medium">
                             <span>Yes! Reserve now?</span>
                             <span className="flex gap-0.5 ml-0.5">
@@ -160,15 +192,19 @@ export function HowItWorksTeaser() {
                       )}
 
                       {step.step === 4 && (
-                        // Vignette 4: You fulfil (Order summary slip with vibrant PAID stamp)
+                        // Vignette 4: You fulfil (Order summary slip with dynamic pulsing PAID stamp)
                         <div className="w-full max-w-[180px] bg-white rounded-xl p-2.5 border border-[#141C17]/10 shadow-xs relative flex items-center justify-between">
                           <div>
                             <div className="text-[9px] font-mono text-[#141C17]/55">Order #1042 · Lekki</div>
                             <div className="text-[11px] font-bold text-[#141C17] mt-0.5">₦18,500</div>
                           </div>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider bg-[#DBF361] text-[#0D6E42] border border-[#0D6E42]/20 shadow-2xs rotate-[-5deg]">
+                          <motion.span
+                            animate={shouldReduceMotion ? undefined : { scale: [1, 1.08, 1], rotate: [-5, -2, -5] }}
+                            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                            className="px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wider bg-[#DBF361] text-[#0D6E42] border border-[#0D6E42]/20 shadow-2xs"
+                          >
                             PAID
-                          </span>
+                          </motion.span>
                         </div>
                       )}
                     </div>

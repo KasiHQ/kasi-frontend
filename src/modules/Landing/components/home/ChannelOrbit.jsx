@@ -131,10 +131,10 @@ export function ChannelOrbit() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="lg:col-span-6 flex flex-col items-start"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DBF361]/30 border border-[#0D6E42]/20 shadow-xs mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0D6E42]" />
-              <span className="font-mono-labels text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
-                ONE BRAIN, EVERY CHANNEL
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-[#0D6E42]" />
+              <span className="font-poppins text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
+                Unified Social Channels
               </span>
             </div>
 
