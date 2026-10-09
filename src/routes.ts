@@ -31,7 +31,7 @@ export const ROUTES: Record<string, RouteConfig> = {
     path: '/how-it-works',
     name: 'How it works',
     specSectionId: '03',
-    status: 'stub',
+    status: 'built',
     metaTitle: 'How Kasi Works | Demo & Interactive Order Walkthrough',
     metaDescription: 'Watch Kasi take a customer from first message to paid and out for delivery.',
     h1: 'See a real order happen, start to finish.',

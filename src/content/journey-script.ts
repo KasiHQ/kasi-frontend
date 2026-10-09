@@ -1,55 +1,60 @@
 /**
  * Single source of truth for the Kasi interactive journey demo script.
- * Flagged for check-copy review.
+ * Verified against real dashboard screenshots:
+ * - products & store.png (Kay's Sweet Confections: Samosa ₦100)
+ * - fulfilment & orders.png (Customer Temi, Order KAS-CART-32-1791147016-43D9, Samosa ×1, Total ₦100)
+ * - chats.png (WhatsApp inquiries for Kay's Sweet Confections in Abuja)
  */
 export const JOURNEY_SCRIPT = {
   demoScript: true,
-  category: 'fashion',
+  category: 'food',
+  vendorName: "Kay's Sweet Confections",
   product: {
-    name: 'Ankara two-piece, size 14',
-    shortName: 'Ankara two-piece',
-    sku: 'ANK-014',
-    startPrice: '₦18,500',
-    agreedPrice: '₦17,000',
-    deliveryFee: '₦1,500',
-    totalPrice: '₦18,500',
+    name: 'Samosa',
+    shortName: 'Samosa',
+    quantity: '1',
+    itemDisplay: 'Samosa ×1',
+    startPrice: '₦100',
+    agreedPrice: '₦100',
+    deliveryFee: '₦0',
+    totalPrice: '₦100',
+    fulfillmentType: 'Store pickup',
+    location: 'Jabi, Abuja',
     image: '/images/products & store.png',
   },
   customer: {
-    name: 'Amaka',
-    initial: 'A',
-    locationName: 'Admiralty Way, Lekki Phase 1',
-    maskedPhone: '+234 803 ••• 8821',
+    name: 'Temi',
+    initial: 'T',
+    locationName: 'Store pickup · Jabi, Abuja',
+    maskedPhone: '+234 812 ••• 1134',
+    rawPhone: '2348127611134',
   },
-  rider: {
-    name: 'Ibrahim',
-    maskedPhone: '+234 802 ••• 4102',
-  },
-  orderId: 'ORD-8291',
+  orderId: 'KAS-CART-32-1791147016-43D9',
+  orderIdShort: 'KAS-43D9',
 
   // Script lines for Full Journey (Spec 3.4)
   full: {
     stage1_inquiry: {
-      customer: 'Hi! Is the Ankara two-piece in size 14 still available?',
+      customer: 'Hi! Do you have fresh Samosa available today?',
     },
     stage2_recommend: {
-      kasi: 'Yes, size 14 is in stock. ₦18,500. Pickup or delivery?',
+      kasi: 'Yes! Fresh crispy Samosas are in stock at ₦100 each. Store pickup or delivery in Abuja?',
     },
     stage3_agreePrice: {
-      customer: 'Delivery to Lekki. Can you do ₦16,000?',
-      kasi: 'I can do ₦17,000 for you today.',
+      customer: 'Store pickup in Jabi please. Ready today?',
+      kasi: 'Yes, store pickup at Jabi is ready today. Price is ₦100.',
     },
     stage4_checkout: {
-      customerLocation: 'Admiralty Way, Lekki Phase 1',
-      kasi: 'Delivery to Lekki is ₦1,500. Total ₦18,500. Tap below to pay via Paystack.',
+      customerLocation: 'Store pickup · Jabi, Abuja',
+      kasi: 'Store pickup selected. Total is ₦100. Tap below to pay via Paystack.',
     },
     stage5_paid: {
       kasi: 'Payment received. We are preparing your order now.',
     },
     stage6_delivered: {
-      autoPacked: 'Your order is packed and being dispatched.',
-      autoDispatched: 'Dispatched with rider Ibrahim (+234 802 ••• 4102).',
-      autoDelivered: 'Delivered. Thank you for shopping with us.',
+      autoPacked: 'Your order is marked as packed and ready for pickup.',
+      autoReady: 'Ready for pickup at Jabi.',
+      autoDelivered: 'Order picked up. Thank you for shopping with Kay\'s Sweet Confections.',
     },
   },
 
@@ -60,17 +65,17 @@ export const JOURNEY_SCRIPT = {
       status: 'Connected',
     },
     act2_loadShop: {
-      product: 'Ankara two-piece',
-      price: '₦18,500',
+      product: 'Samosa',
+      price: '₦100',
     },
     act3_sells: {
-      customer: 'Is size 14 available? Can you do ₦16,000?',
-      kasi: 'Yes, available at ₦17,000 today.',
-      payment: 'Paid ₦18,500 via Paystack',
+      customer: 'Hi! Do you have fresh Samosa available today?',
+      kasi: 'Yes, fresh Samosa in stock at ₦100. Store pickup or delivery in Abuja?',
+      payment: 'Paid ₦100 via Paystack',
     },
     act4_fulfil: {
-      order: 'ORD-8291 · Lekki Phase 1',
-      status: 'Dispatched',
+      order: 'KAS-CART-32-1791147016-43D9 · Store pickup',
+      status: 'Prepared',
     },
   },
 };

@@ -11,6 +11,8 @@ import path from 'path';
 
 const TARGET_DIRECTORIES = [
   path.resolve(process.cwd(), 'src/modules/Landing/components/home'),
+  path.resolve(process.cwd(), 'src/modules/Landing/components/journey'),
+  path.resolve(process.cwd(), 'src/modules/HowItWorks/pages'),
   path.resolve(process.cwd(), 'src/content'),
   path.resolve(process.cwd(), 'src/components/common'),
 ];

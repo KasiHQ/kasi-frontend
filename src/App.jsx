@@ -70,6 +70,7 @@ import FeatureChats from './modules/Features/pages/FeatureChats';
 import FeatureCustomers from './modules/Features/pages/FeatureCustomers';
 import FeatureAnalytics from './modules/Features/pages/FeatureAnalytics';
 import FeaturePlatforms from './modules/Features/pages/FeaturePlatforms';
+import HowItWorksPage from './modules/HowItWorks/pages/HowItWorksPage';
 
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
@@ -119,8 +120,8 @@ function App() {
           <Route path="/market/product/:id" element={<ProductDetail />} />
           <Route path="/market/vendor/:vendorId" element={<VendorProfile />} />
           
-          {/* Public Spec Routes (Zero-404 stubs for Wave 2) */}
-          <Route path="/how-it-works" element={<PageStub route={ROUTES.HOW_IT_WORKS} />} />
+          {/* Public Spec Routes */}
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/features" element={<FeaturesHub />} />
           <Route path="/features/sales-engine" element={<FeatureSalesEngine />} />
           <Route path="/features/fulfilment" element={<FeatureFulfilment />} />

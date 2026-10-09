@@ -81,6 +81,28 @@ const REQUIRED_SPEC_COPY = [
   { section: '2.9', label: 'Final CTA Button 1', needle: 'Start free' },
   { section: '2.9', label: 'Final CTA Button 2', needle: 'Book a live demo' },
 
+  // Spec 03 (How Kasi Works)
+  { section: '03.1', label: 'How It Works Hero H1', needle: 'See a real order happen, start to finish.' },
+  { section: '03.1', label: 'How It Works Hero Sub', needle: 'No slides. Watch Kasi take a customer from first message to paid and out for delivery, then try it yourself.' },
+  { section: '03.1', label: 'Hero Button 1', needle: 'Try the live demo' },
+  { section: '03.1', label: 'Hero Button 2', needle: 'Book a walkthrough' },
+  { section: '03.2', label: 'Demo Video Caption', needle: 'This is the whole thing: a customer asks, Kasi recommends, they settle a price, pay, and the order moves to fulfilment. You did nothing.' },
+  { section: '03.4', label: 'Stage 1 Inquiry', needle: 'Inquiry' },
+  { section: '03.4', label: 'Stage 1 Desc', needle: 'Asks about a product.' },
+  { section: '03.4', label: 'Stage 2 Recommend', needle: 'Recommend' },
+  { section: '03.4', label: 'Stage 2 Desc', needle: 'Options, images, prices.' },
+  { section: '03.4', label: 'Stage 3 Agree Price', needle: 'Agree price' },
+  { section: '03.4', label: 'Stage 3 Desc', needle: 'Fixed or negotiated.' },
+  { section: '03.4', label: 'Stage 4 Checkout', needle: 'Checkout' },
+  { section: '03.4', label: 'Stage 4 Desc', needle: 'Pickup/delivery, Paystack.' },
+  { section: '03.4', label: 'Stage 5 Paid', needle: 'Paid' },
+  { section: '03.4', label: 'Stage 5 Desc', needle: 'Webhook confirms.' },
+  { section: '03.4', label: 'Stage 6 Delivered', needle: 'Delivered' },
+  { section: '03.4', label: 'Stage 6 Desc', needle: 'After-sales closes it.' },
+  { section: '03.5', label: 'How It Works Close Heading', needle: 'Seen enough? Go and chat it yourself.' },
+  { section: '03.5', label: 'Close Button 1', needle: 'Chat the live demo' },
+  { section: '03.5', label: 'Close Button 2', needle: 'Start free' },
+
   // Spec 01 Footer
   { section: '01', label: 'Footer Sign-off', needle: 'Kasi is a product of Endogenous Technologies. Built in Nigeria, for the businesses that run on WhatsApp. © 2026 Endogenous Technologies Ltd.' },
 ];
@@ -100,6 +122,19 @@ const BANNED_COPY = [
   'Average reply speed',
   'DMs answered',
   'One unified inbox',
+  // Task 3B Banned Copy (violates content contract)
+  'Kasi Merchant Dashboard',
+  'STORE CATALOG & PRODUCTS',
+  'Official Meta Connected',
+  'STORE CATALOG LIVE',
+  '1 Product Loaded',
+  'Zero manual entry',
+  'Auto-synced with WhatsApp',
+  'KASI · INSTANT STOCK CHECK',
+  'Powered by Kasi',
+  'Type a message…',
+  '2s reply',
+  'Scroll to explore',
 ];
 
 const ALLOWLISTED_COPY = new Set([
@@ -111,6 +146,8 @@ const ALLOWLISTED_COPY = new Set([
   '/how-it-works',
   '/market',
   '/get-started',
+  '/try',
+  '/contact',
   '/images/chats.png',
   '/images/fulfilment & orders.png',
   '/images/analytics.png',
@@ -142,24 +179,47 @@ const ALLOWLISTED_COPY = new Set([
   // User-requested Spec 2.6 Header
   'Connect once. Let Kasi run the counter.',
   'Link WhatsApp or Instagram in minutes, load your shop, and let Kasi handle every customer from inquiry to delivery.',
+  // Journey Accessible UI labels
+  'Skip interactive journey',
+  'See how Kasi works',
 ]);
 
 async function main() {
   console.log('📜 Running check-copy.ts: rigorous 3-way spec copy verification...\n');
 
-  // Load home.ts
+  // Load files
   const homeContentPath = path.resolve(process.cwd(), 'src/content/home.ts');
+  const howItWorksContentPath = path.resolve(process.cwd(), 'src/content/how-it-works.ts');
   const footerPath = path.resolve(process.cwd(), 'src/components/common/GlobalFooter.jsx');
+  const howItWorksPath = path.resolve(process.cwd(), 'src/modules/HowItWorks/pages/HowItWorksPage.jsx');
+  const stagesPath = path.resolve(process.cwd(), 'src/modules/Landing/components/journey/stages.ts');
+  const scriptPath = path.resolve(process.cwd(), 'src/content/journey-script.ts');
 
   const homeContent = fs.readFileSync(homeContentPath, 'utf-8');
+  const howItWorksContent = fs.existsSync(howItWorksContentPath) ? fs.readFileSync(howItWorksContentPath, 'utf-8') : '';
   const footerContent = fs.readFileSync(footerPath, 'utf-8');
-  const aggregateCorpus = (homeContent + '\n' + footerContent).replace(/\\"/g, '"');
+  const howItWorksPageContent = fs.existsSync(howItWorksPath) ? fs.readFileSync(howItWorksPath, 'utf-8') : '';
+  const stagesContent = fs.existsSync(stagesPath) ? fs.readFileSync(stagesPath, 'utf-8') : '';
+
+  const aggregateCorpus = (homeContent + '\n' + howItWorksContent + '\n' + footerContent + '\n' + howItWorksPageContent + '\n' + stagesContent).replace(/\\"/g, '"');
+
+  // Verify journey-script has explicit demoScript: true exemption flag
+  if (!fs.existsSync(scriptPath)) {
+    console.error('❌ Missing src/content/journey-script.ts!');
+    process.exit(1);
+  }
+  const scriptContent = fs.readFileSync(scriptPath, 'utf-8');
+  if (!scriptContent.includes('demoScript: true')) {
+    console.error('❌ src/content/journey-script.ts is missing demoScript: true flag!');
+    process.exit(1);
+  }
+  console.log('[PASS] src/content/journey-script.ts verified with explicit demoScript: true flag.');
 
   let passed = 0;
   let failed = 0;
 
   // 1. FORWARD CHECK
-  console.log('--- Step 1: Forward Spec Verification ---');
+  console.log('\n--- Step 1: Forward Spec Verification ---');
   for (const item of REQUIRED_SPEC_COPY) {
     const isPresent = aggregateCorpus.includes(item.needle);
     if (isPresent) {
@@ -174,10 +234,17 @@ async function main() {
   // 2. BANNED STRINGS CHECK
   console.log('\n--- Step 2: Banned & Invented Copy Verification ---');
   const homeDir = path.resolve(process.cwd(), 'src/modules/Landing/components/home');
+  const journeyDir = path.resolve(process.cwd(), 'src/modules/Landing/components/journey');
+  const howItWorksDir = path.resolve(process.cwd(), 'src/modules/HowItWorks/pages');
+
   const filesToCheck = [
     homeContentPath,
+    howItWorksContentPath,
+    scriptPath,
     footerPath,
     ...fs.readdirSync(homeDir).map((f) => path.resolve(homeDir, f)),
+    ...(fs.existsSync(journeyDir) ? fs.readdirSync(journeyDir).map((f) => path.resolve(journeyDir, f)) : []),
+    ...(fs.existsSync(howItWorksDir) ? fs.readdirSync(howItWorksDir).map((f) => path.resolve(howItWorksDir, f)) : []),
   ];
 
   let bannedViolations = 0;

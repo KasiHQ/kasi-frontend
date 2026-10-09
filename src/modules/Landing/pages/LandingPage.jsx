@@ -12,7 +12,7 @@ import { PillarsSection } from "../components/home/PillarsSection";
 import { ChannelOrbit } from "../components/home/ChannelOrbit";
 import { LiveProductProof } from "../components/home/LiveProductProof";
 import { AudienceScroller } from "../components/home/AudienceScroller";
-import { HowItWorksTeaser } from "../components/home/HowItWorksTeaser";
+const JourneyScene = React.lazy(() => import("../components/journey/JourneyScene"));
 import { HumanBand } from "../components/home/HumanBand";
 import { MarketTeaser } from "../components/home/MarketTeaser";
 import { FinalCtaSection } from "../components/home/FinalCtaSection";
@@ -74,7 +74,7 @@ const LandingPage = () => {
   }, [user, loading, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#F6F8F3] text-[#141C17] font-poppins selection:bg-[#DBF361] selection:text-[#141C17] overflow-x-hidden w-full relative">
+    <div className="min-h-screen bg-[#F6F8F3] text-[#141C17] font-poppins selection:bg-[#DBF361] selection:text-[#141C17] overflow-x-clip w-full relative">
       {/* Spec 01: Top Navigation */}
       <NewNav />
 
@@ -99,8 +99,10 @@ const LandingPage = () => {
       {/* Spec 2.5: Audience Scroller (5 High-Volume Categories) */}
       <AudienceScroller />
 
-      {/* Spec 2.6: How It Works Teaser (4 Steps with Connecting Line) */}
-      <HowItWorksTeaser />
+      {/* Spec 2.6: The Kasi User Journey (Interactive Scroll-Driven Motion Piece) */}
+      <React.Suspense fallback={<div className="h-[330vh] bg-[#0B0F0C]" />}>
+        <JourneyScene variant="landing" />
+      </React.Suspense>
 
       {/* Spec 2.7: The Human Band (Warm Nigerian Merchant Photo + Quotes) */}
       <HumanBand />
