@@ -38,7 +38,7 @@ function scanFileForAssets(filePath: string): { remoteErrors: string[]; brokenLo
   }
 
   // Check for local image references like src="/images/..." or src="/kasi..." or src="/logos/..."
-  const localPattern = /["'`]((\/(?:images|logos|brand|[a-zA-Z0-9_\-\.]+)\.(?:png|jpg|jpeg|svg|webp|gif)))["'`]/gi;
+  const localPattern = /["'`]((\/(?:images|logos|brand|[a-zA-Z0-9_\-\s&]+)\/[^"'`]+\.(?:png|jpg|jpeg|svg|webp|gif)|\/[a-zA-Z0-9_\-\.]+\.(?:png|jpg|jpeg|svg|webp|gif)))["'`]/gi;
   while ((match = localPattern.exec(content)) !== null) {
     const localRel = match[1];
     // Resolve inside public

@@ -60,6 +60,17 @@ import PageStub from './components/common/PageStub';
 import DevLogos from './pages/DevLogos';
 import DevType from './pages/DevType';
 
+// Public Feature Pages (Specs 04-12)
+import FeaturesHub from './modules/Features/pages/FeaturesHub';
+import FeatureSalesEngine from './modules/Features/pages/FeatureSalesEngine';
+import FeatureFulfilment from './modules/Features/pages/FeatureFulfilment';
+import FeatureDelivery from './modules/Features/pages/FeatureDelivery';
+import FeaturePayments from './modules/Features/pages/FeaturePayments';
+import FeatureChats from './modules/Features/pages/FeatureChats';
+import FeatureCustomers from './modules/Features/pages/FeatureCustomers';
+import FeatureAnalytics from './modules/Features/pages/FeatureAnalytics';
+import FeaturePlatforms from './modules/Features/pages/FeaturePlatforms';
+
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
 
@@ -110,15 +121,15 @@ function App() {
           
           {/* Public Spec Routes (Zero-404 stubs for Wave 2) */}
           <Route path="/how-it-works" element={<PageStub route={ROUTES.HOW_IT_WORKS} />} />
-          <Route path="/features" element={<PageStub route={ROUTES.FEATURES} />} />
-          <Route path="/features/sales-engine" element={<PageStub route={ROUTES.FEATURE_SALES} />} />
-          <Route path="/features/fulfilment" element={<PageStub route={ROUTES.FEATURE_FULFILMENT} />} />
-          <Route path="/features/delivery" element={<PageStub route={ROUTES.FEATURE_DELIVERY} />} />
-          <Route path="/features/payments" element={<PageStub route={ROUTES.FEATURE_PAYMENTS} />} />
-          <Route path="/features/chats" element={<PageStub route={ROUTES.FEATURE_CHATS} />} />
-          <Route path="/features/customers" element={<PageStub route={ROUTES.FEATURE_CUSTOMERS} />} />
-          <Route path="/features/analytics" element={<PageStub route={ROUTES.FEATURE_ANALYTICS} />} />
-          <Route path="/platforms" element={<PageStub route={ROUTES.PLATFORMS} />} />
+          <Route path="/features" element={<FeaturesHub />} />
+          <Route path="/features/sales-engine" element={<FeatureSalesEngine />} />
+          <Route path="/features/fulfilment" element={<FeatureFulfilment />} />
+          <Route path="/features/delivery" element={<FeatureDelivery />} />
+          <Route path="/features/payments" element={<FeaturePayments />} />
+          <Route path="/features/chats" element={<FeatureChats />} />
+          <Route path="/features/customers" element={<FeatureCustomers />} />
+          <Route path="/features/analytics" element={<FeatureAnalytics />} />
+          <Route path="/platforms" element={<FeaturePlatforms />} />
           <Route path="/try" element={<PageStub route={ROUTES.TRY} />} />
           <Route path="/pricing" element={<PageStub route={ROUTES.PRICING} />} />
           <Route path="/about" element={<PageStub route={ROUTES.ABOUT} />} />

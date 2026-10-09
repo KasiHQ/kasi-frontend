@@ -32,7 +32,7 @@ export function NewNav() {
   const companyLinks = [
     { title: "About Endogenous", desc: "Why we build for social commerce", href: "/about" },
     { title: "Blog", desc: "Guides, seller stories and playbooks", href: "https://blog.usekasi.com" },
-    { title: "Contact", desc: "Talk to our team in Lagos", href: "/contact" },
+    { title: "Contact", desc: "Talk to our team", href: "/contact" },
   ];
 
   return (

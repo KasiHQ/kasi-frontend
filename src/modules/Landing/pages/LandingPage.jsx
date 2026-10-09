@@ -6,6 +6,7 @@ import { WaitlistModal } from "../components/WaitlistModal";
 // Modular Spec 01 & 02 Components
 import { NewNav } from "../components/home/NewNav";
 import { NewHero } from "../components/home/NewHero";
+import { DemoVideoSection } from "../components/home/DemoVideoSection";
 import { PositioningBand } from "../components/home/PositioningBand";
 import { PillarsSection } from "../components/home/PillarsSection";
 import { ChannelOrbit } from "../components/home/ChannelOrbit";
@@ -80,7 +81,10 @@ const LandingPage = () => {
       {/* Spec 2.1: Hero + Partner Strip */}
       <NewHero />
 
-      {/* Spec 2.2: Positioning Band (The One-Line Pitch + CountUp) */}
+      {/* World-Class Demo Explainer Video Section */}
+      <DemoVideoSection />
+
+      {/* Spec 2.2: Positioning Band (The One-Line Pitch) */}
       <PositioningBand />
 
       {/* Spec 2.3: The Three Pillars (It Sells, It Fulfils, It Grows) */}

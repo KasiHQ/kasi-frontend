@@ -39,7 +39,7 @@ export const HOME_COPY = {
         body: "Answers, recommends, negotiates within your rules, and closes the order without you touching the phone.",
         cta: "Sales Engine",
         href: "/features/sales-engine",
-        screenshot: "/images/hero-dashboard-desktop.png",
+        screenshot: "/images/chats.png",
         placeholderCaption: "Nigerian female entrepreneur packing fashion orders",
       },
       {
@@ -47,7 +47,7 @@ export const HOME_COPY = {
         body: "Paid orders drop into one list. Pack, dispatch, deliver, each step pings the customer automatically.",
         cta: "Fulfilment",
         href: "/features/fulfilment",
-        screenshot: "/images/order-pipeline.png",
+        screenshot: "/images/fulfilment & orders.png",
         placeholderCaption: "Retail vendor handing off orders for rider dispatch",
       },
       {
@@ -55,7 +55,7 @@ export const HOME_COPY = {
         body: "Every chat becomes a saved customer, a lead stage, and a number you can actually read.",
         cta: "Customers & Analytics",
         href: "/features/customers",
-        screenshot: "/images/analytics-dashboard-desktop.png",
+        screenshot: "/images/analytics.png",
         placeholderCaption: "Store owner reviewing analytics on phone",
       },
     ],
@@ -67,13 +67,13 @@ export const HOME_COPY = {
       {
         title: "Live Chats + AI summary + \"Instruct Kasi\"",
         caption: "Watch every conversation. Step in with one line whenever you want.",
-        screenshot: "/images/hero-dashboard-desktop.png",
+        screenshot: "/images/chats.png",
         href: "/features/chats",
       },
       {
         title: "Orders & Fulfilment pipeline with the phase tracker",
         caption: "Paid orders, one list, one next action each.",
-        screenshot: "/images/order-pipeline.png",
+        screenshot: "/images/fulfilment & orders.png",
         href: "/features/fulfilment",
       },
     ],
@@ -104,6 +104,8 @@ export const HOME_COPY = {
 
   // spec 2.6
   "2.6": {
+    heading: "Connect once. Let Kasi run the counter.",
+    sub: "Link WhatsApp or Instagram in minutes, load your shop, and let Kasi handle every customer from inquiry to delivery.",
     steps: [
       {
         step: 1,

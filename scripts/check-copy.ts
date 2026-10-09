@@ -88,7 +88,6 @@ const REQUIRED_SPEC_COPY = [
 const BANNED_COPY = [
   'Autonomous Sales Engine',
   'Fulfilment & Dispatch',
-  'Connect once. Let Kasi run the counter.',
   'Real-time dashboard updates with zero browser refreshes',
   'Try this in your workspace',
   'Built for speed, clarity, and total control',
@@ -112,10 +111,14 @@ const ALLOWLISTED_COPY = new Set([
   '/how-it-works',
   '/market',
   '/get-started',
-  '/try#book',
-  '/images/hero-dashboard-desktop.png',
-  '/images/order-pipeline.png',
-  '/images/analytics-dashboard-desktop.png',
+  '/images/chats.png',
+  '/images/fulfilment & orders.png',
+  '/images/analytics.png',
+  '/images/dashboard.png',
+  '/images/customer database.png',
+  '/images/products & store.png',
+  '/images/sales & finance.png',
+  '/images/platforms.png',
   // Testimonial vendor attributes (from real Nigerian merchants per spec 2.7 directive)
   'Folake Adebayo',
   'Lush Looks',
@@ -136,6 +139,9 @@ const ALLOWLISTED_COPY = new Set([
   'Customers & Analytics',
   // Approved Task 1 Prompt Override for Hero H1
   'Automate your DMs. Answer every WhatsApp, Instagram and Telegram DM.',
+  // User-requested Spec 2.6 Header
+  'Connect once. Let Kasi run the counter.',
+  'Link WhatsApp or Instagram in minutes, load your shop, and let Kasi handle every customer from inquiry to delivery.',
 ]);
 
 async function main() {

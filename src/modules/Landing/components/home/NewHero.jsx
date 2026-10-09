@@ -4,6 +4,7 @@ import { CHANNEL_THEMES, CHANNEL_SEQUENCE } from "./channel-themes";
 import { RotatingChannelHeadline } from "./RotatingChannelHeadline";
 import { ChatStage } from "./ChatStage";
 import { PartnerStrip } from "./PartnerStrip";
+import { Play } from "@phosphor-icons/react";
 
 export function NewHero() {
   const [activeChannel, setActiveChannel] = useState("whatsapp");
@@ -101,12 +102,15 @@ export function NewHero() {
                 Start free
               </Link>
               <a
-                href={waDemoLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#0D6E42]/25 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all text-center"
+                href="#demo-video"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("demo-video")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#0D6E42]/25 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all text-center cursor-pointer group"
               >
-                Chat the live demo
+                <Play size={16} weight="fill" className="text-[#0D6E42] group-hover:scale-110 transition-transform" />
+                <span>Watch demo video</span>
               </a>
             </div>
 
