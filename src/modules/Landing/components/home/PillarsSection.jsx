@@ -40,8 +40,8 @@ export function PillarsSection() {
         </div>
       </div>
 
-      {/* 3 bento cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* 3 bento cards: side-by-side swipeable track on mobile, 3-column grid on desktop */}
+      <div className="flex overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 snap-x snap-mandatory lg:grid lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 scrollbar-none">
         {copy.pillars.map((pillar, index) => {
           const IconComponent = ICONS[index];
           const verb = pillar.tag.replace("IT ", "").toLowerCase();
@@ -54,7 +54,7 @@ export function PillarsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.55, delay: index * 0.1 }}
-              className="bg-white rounded-[22px] border border-[#141C17]/10 p-6 sm:p-7 shadow-xs flex flex-col justify-between overflow-hidden group hover:border-[#141C17]/20 transition-colors"
+              className="min-w-[85vw] sm:min-w-[340px] lg:min-w-0 snap-center bg-white rounded-[22px] border border-[#141C17]/10 p-5 sm:p-7 shadow-xs flex flex-col justify-between overflow-hidden group hover:border-[#141C17]/20 transition-colors shrink-0 lg:shrink"
             >
               <div>
                 {/* Top: Real Vendor Photo or Designed Placeholder */}

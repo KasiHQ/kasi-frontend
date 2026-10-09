@@ -141,27 +141,77 @@ export function FeaturePageTemplate({
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              {moves.map((move, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-[24px] p-6 sm:p-8 border border-[#141C17]/10 shadow-xs hover:shadow-lg transition-shadow flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0D6E42] bg-[#0D6E42]/10 px-3 py-1 rounded-full">
-                        MOVE 0{idx + 1}
-                      </span>
+            <div className="flex overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 snap-x snap-mandatory md:grid md:grid-cols-2 gap-5 sm:gap-6 lg:gap-8 scrollbar-none">
+              {moves.map((move, idx) => {
+                // Interactive micro-accent for each move
+                const moveVisuals = [
+                  // Move 1: Recommendation preview
+                  <div key="v1" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <img src="/logos/whatsapp.svg" alt="WhatsApp" className="w-4 h-4 object-contain" />
+                      <span className="font-medium text-[#141C17]/90">Catalog Recommendation</span>
                     </div>
-                    <h3 className="font-display font-medium text-xl sm:text-2xl text-[#141C17] tracking-tight mb-3">
-                      {move.title}
-                    </h3>
-                    <p className="text-sm sm:text-base text-[#141C17]/75 font-normal leading-relaxed">
-                      {move.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                    <span className="font-mono text-[10px] text-[#0D6E42] bg-[#0D6E42]/10 px-2 py-0.5 rounded-full font-semibold">₦18,500</span>
+                  </div>,
+                  // Move 2: Negotiation band visual
+                  <div key="v2" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs">
+                    <div className="flex justify-between text-[11px] font-mono text-[#141C17]/70 mb-1.5">
+                      <span>Floor: ₦16,000</span>
+                      <span className="text-[#0D6E42] font-semibold">Start: ₦18,500</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-[#141C17]/10 overflow-hidden relative">
+                      <div className="h-full bg-[#0D6E42] rounded-full w-3/4" />
+                    </div>
+                  </div>,
+                  // Move 3: Delivery / Location check
+                  <div key="v3" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#0D6E42] animate-pulse" />
+                      <span className="font-medium text-[#141C17]/90">Lekki Phase 1 delivery</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-[#141C17]/70 font-semibold">+₦2,500</span>
+                  </div>,
+                  // Move 4: Payment verification
+                  <div key="v4" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <img src="/logos/paystack.svg" alt="Paystack" className="h-3.5 w-auto object-contain" />
+                      <span className="font-medium text-[#141C17]/90">Paystack Webhook</span>
+                    </div>
+                    <span className="text-[10px] text-[#0D6E42] font-semibold bg-[#DBF361] px-2 py-0.5 rounded-full">CONFIRMED</span>
+                  </div>,
+                ];
+
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.15 }}
+                    transition={{ duration: 0.45, delay: idx * 0.08 }}
+                    className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center bg-white rounded-[24px] p-6 sm:p-7 border border-[#141C17]/10 shadow-xs hover:shadow-md hover:border-[#0D6E42]/30 transition-all flex flex-col justify-between shrink-0 md:shrink group"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#0D6E42] bg-[#0D6E42]/10 px-3 py-1 rounded-full">
+                          MOVE 0{idx + 1}
+                        </span>
+                        <div className="flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                          <img src="/logos/whatsapp.svg" alt="WhatsApp" className="w-3.5 h-3.5 object-contain" />
+                          <img src="/logos/instagram.svg" alt="Instagram" className="w-3.5 h-3.5 object-contain" />
+                        </div>
+                      </div>
+                      <h3 className="font-display font-medium text-lg sm:text-xl text-[#141C17] tracking-tight mb-2.5">
+                        {move.title}
+                      </h3>
+                      <p className="text-sm text-[#141C17]/75 font-normal leading-relaxed">
+                        {move.desc}
+                      </p>
+                    </div>
+
+                    {moveVisuals[idx] || null}
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -169,29 +219,47 @@ export function FeaturePageTemplate({
         {/* Controls / Why It Matters */}
         {controls.length > 0 && (
           <div className="mt-20 sm:mt-28 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+            <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
               <h2 className="font-display font-medium text-3xl sm:text-4xl text-[#141C17] tracking-tight">
                 {controlsTitle}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {controls.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-[22px] p-6 sm:p-7 border border-[#141C17]/10 shadow-xs"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-[#DBF361]/30 text-[#0D6E42] flex items-center justify-center mb-4">
-                    <ShieldCheck size={24} weight="duotone" />
-                  </div>
-                  <h3 className="font-display font-medium text-lg text-[#141C17] tracking-tight mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-[#141C17]/75 font-light leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
+            <div className="flex overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 snap-x snap-mandatory md:grid md:grid-cols-3 gap-5 sm:gap-6 scrollbar-none">
+              {controls.map((item, idx) => {
+                // Official brand & partner logos instead of generic icons
+                const controlLogos = [
+                  // Control 1: Prices & checkout protection (Paystack)
+                  <img key="c1" src="/logos/paystack.svg" alt="Paystack Protected" className="h-5 w-auto object-contain" />,
+                  // Control 2: Voice & tone across official platforms (Meta)
+                  <img key="c2" src="/logos/meta.svg" alt="Meta Partner" className="h-5 w-auto object-contain" />,
+                  // Control 3: Override & Intelligence (OpenAI)
+                  <img key="c3" src="/logos/openai.svg" alt="OpenAI" className="h-5 w-auto object-contain" />,
+                ];
+
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.15 }}
+                    transition={{ duration: 0.45, delay: idx * 0.08 }}
+                    className="min-w-[80vw] sm:min-w-[280px] md:min-w-0 snap-center bg-white rounded-[22px] p-6 border border-[#141C17]/10 shadow-xs hover:border-[#141C17]/20 transition-all shrink-0 md:shrink"
+                  >
+                    <div className="h-10 px-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 inline-flex items-center justify-center mb-4">
+                      {controlLogos[idx] || (
+                        <ShieldCheck size={22} weight="duotone" className="text-[#0D6E42]" />
+                      )}
+                    </div>
+                    <h3 className="font-display font-medium text-lg text-[#141C17] tracking-tight mb-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-[#141C17]/75 font-normal leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         )}

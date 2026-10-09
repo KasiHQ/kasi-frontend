@@ -30,17 +30,17 @@ export function PartnerStrip() {
                   delay: shouldReduceMotion ? 0 : 0.15 + index * 0.1,
                   ease: "easeOut",
                 }}
-                className="group flex items-center gap-2.5 h-8 cursor-pointer"
+                className="group flex items-center gap-2 sm:gap-2.5 h-auto py-1"
                 title={partner.label}
               >
-                <div className="relative h-6 w-auto transition-all duration-300 filter grayscale opacity-60 contrast-125 group-hover:filter-none group-hover:opacity-100 group-hover:scale-105 flex items-center">
+                <div className="relative h-6 w-auto shrink-0 transition-all duration-300 filter grayscale opacity-75 contrast-125 group-hover:filter-none group-hover:opacity-100 group-hover:scale-105 flex items-center">
                   <img
                     src={partner.logo}
                     alt={partner.name}
                     className="h-5 sm:h-6 w-auto object-contain max-h-6"
                   />
                 </div>
-                <span className="font-poppins text-xs font-medium text-[#141C17]/60 group-hover:text-[#141C17] transition-colors hidden lg:inline-block">
+                <span className="font-poppins text-[11px] sm:text-xs font-medium text-[#141C17]/80 group-hover:text-[#141C17] transition-colors inline-block leading-tight">
                   {partner.label}
                 </span>
               </motion.div>
