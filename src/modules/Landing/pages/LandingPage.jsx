@@ -1,37 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { ArrowRight, Instagram, Twitter, Linkedin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import api from "../../../api/axios";
 import { WaitlistModal } from "../components/WaitlistModal";
-import { PRELAUNCH_WAITLIST_MODE } from "../../../config";
 
-// Import Modular Components
+// Modular Spec 01 & 02 Components
 import { NewNav } from "../components/home/NewNav";
 import { NewHero } from "../components/home/NewHero";
+import { PositioningBand } from "../components/home/PositioningBand";
+import { PillarsSection } from "../components/home/PillarsSection";
 import { ChannelOrbit } from "../components/home/ChannelOrbit";
-import { ExplainerVideoSection } from "../components/ExplainerVideoSection";
-import { DmSection } from "../components/DmSection";
-import { InvoiceSection } from "../components/InvoiceSection";
-import { NegotiationSection } from "../components/NegotiationSection";
-import { LogisticsSection } from "../components/LogisticsSection";
-import { AutomationSection } from "../components/AutomationSection";
-import { PricingVsAgentsSection } from "../components/PricingVsAgentsSection";
-import { BookingSection } from "../components/BookingSection";
-import { CustomerIntelligenceSection } from "../components/CustomerIntelligenceSection";
-import { ProactiveOutreachSection } from "../components/ProactiveOutreachSection";
-import { PricingSection } from "../components/PricingSection";
-import { TestimonialSection } from "../components/TestimonialSection";
-import { FAQSection } from "../components/FAQSection";
+import { LiveProductProof } from "../components/home/LiveProductProof";
+import { AudienceScroller } from "../components/home/AudienceScroller";
+import { HowItWorksTeaser } from "../components/home/HowItWorksTeaser";
+import { HumanBand } from "../components/home/HumanBand";
+import { MarketTeaser } from "../components/home/MarketTeaser";
+import { FinalCtaSection } from "../components/home/FinalCtaSection";
+import { GlobalFooter } from "../../../components/common/GlobalFooter";
 
 const LandingPage = () => {
-  const [activeSection, setActiveSection] = useState("hero");
-  const [scrolled, setScrolled] = useState(false);
   const { user, loading, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
-  const openWaitlist = () => setIsWaitlistOpen(true);
 
   const handleGoogleLogin = async (response) => {
     try {
@@ -82,494 +72,45 @@ const LandingPage = () => {
     }
   }, [user, loading, navigate]);
 
-  // Scroll Tracking & Intersection Observer
-  useEffect(() => {
-    const sections = [
-      "hero",
-      "dms",
-      "invoices",
-      "negotiation",
-      "logistics",
-      "automation",
-      "pricing-vs-agents",
-      "bookings",
-      "customer-intelligence",
-      "proactive-outreach",
-      "pricing",
-      "testimonials",
-      "faq",
-    ];
-
-    const observerOptions = {
-      root: null,
-      rootMargin: "-30% 0px -60% 0px",
-      threshold: 0,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    }, observerOptions);
-
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 280);
-    };
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  // Custom Animate on Scroll (AOS) Intersection Observer
-  useEffect(() => {
-    const revealElements = document.querySelectorAll(".reveal");
-    const observerOptions = {
-      root: null,
-      rootMargin: "0px 0px -50px 0px",
-      threshold: 0.1,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("reveal-active");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    revealElements.forEach((el) => observer.observe(el));
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans tracking-tight antialiased selection:bg-green-500/10 selection:text-green-600 overflow-x-hidden w-full relative">
-      {/* New Kasi Navigation & Hero Section */}
+    <div className="min-h-screen bg-[#F6F8F3] text-[#141C17] font-poppins selection:bg-[#DBF361] selection:text-[#141C17] overflow-x-hidden w-full relative">
+      {/* Spec 01: Top Navigation */}
       <NewNav />
+
+      {/* Spec 2.1: Hero + Partner Strip */}
       <NewHero />
 
-      {/* 2.2 Positioning Band (Green Band with Lime Highlights) */}
-      <section className="bg-[#0D6E42] text-white py-20 sm:py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="max-w-[960px] mx-auto text-center relative z-10 font-poppins">
-          <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-tight">
-            Selling on social was never the problem.{" "}
-            <span className="text-[#DBF361]">Keeping up with it was.</span>
-          </h2>
-          <p className="mt-6 font-light text-lg sm:text-xl text-white/85 leading-relaxed max-w-[760px] mx-auto">
-            Kasi replies in seconds, at 2pm or 2am, in the customer&apos;s own words.
-            Nothing sits unread. Nothing slips. You wake up to prepared orders, not a
-            backlog of &ldquo;is this available?&rdquo;
-          </p>
-        </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#DBF361]/10 blur-[100px] pointer-events-none" />
-      </section>
+      {/* Spec 2.2: Positioning Band (The One-Line Pitch + CountUp) */}
+      <PositioningBand />
 
-      {/* 2.3 The Three Pillars (It Sells, It Fulfils, It Grows) */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-[1280px] mx-auto font-poppins">
-        <div className="text-center max-w-[720px] mx-auto mb-16">
-          <span className="font-mono-labels text-xs font-semibold uppercase tracking-wider text-[#0D6E42] bg-[#0D6E42]/10 px-3 py-1 rounded-full">
-            THE FULL CYCLE
-          </span>
-          <h2 className="mt-4 font-bold text-3xl sm:text-4xl text-[#141C17] tracking-tight">
-            One assistant. The whole shop.
-          </h2>
-          <p className="mt-3 font-light text-base sm:text-lg text-[#141C17]/70">
-            From the first &ldquo;hello&rdquo; to the &ldquo;your order is on its way,&rdquo; Kasi handles the parts that used to eat your day.
-          </p>
-        </div>
+      {/* Spec 2.3: The Three Pillars (It Sells, It Fulfils, It Grows) */}
+      <PillarsSection />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          <div className="bg-white rounded-[18px] p-7 border border-[#141C17]/8 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
-            <div>
-              <span className="font-mono-labels text-xs font-bold uppercase tracking-wider text-[#0D6E42]">
-                IT SELLS
-              </span>
-              <h3 className="mt-2 font-bold text-xl text-[#141C17]">
-                Autonomous Sales Engine
-              </h3>
-              <p className="mt-3 text-sm text-[#141C17]/75 leading-relaxed">
-                Answers, recommends, negotiates within your rules, and closes the order without you touching the phone.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-[#141C17]/5">
-              <Link
-                to="/signup"
-                className="font-semibold text-sm text-[#0D6E42] hover:text-[#1C774E] inline-flex items-center gap-1 group"
-              >
-                <span>Explore Sales Engine</span>
-                <span className="transition-transform group-hover:translate-x-0.5">→</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-[18px] p-7 border border-[#141C17]/8 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
-            <div>
-              <span className="font-mono-labels text-xs font-bold uppercase tracking-wider text-[#0D6E42]">
-                IT FULFILS
-              </span>
-              <h3 className="mt-2 font-bold text-xl text-[#141C17]">
-                Fulfilment & Dispatch
-              </h3>
-              <p className="mt-3 text-sm text-[#141C17]/75 leading-relaxed">
-                Paid orders drop into one list. Pack, dispatch, deliver, each step pings the customer automatically.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-[#141C17]/5">
-              <Link
-                to="/signup"
-                className="font-semibold text-sm text-[#0D6E42] hover:text-[#1C774E] inline-flex items-center gap-1 group"
-              >
-                <span>Explore Fulfilment</span>
-                <span className="transition-transform group-hover:translate-x-0.5">→</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-[18px] p-7 border border-[#141C17]/8 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
-            <div>
-              <span className="font-mono-labels text-xs font-bold uppercase tracking-wider text-[#0D6E42]">
-                IT GROWS
-              </span>
-              <h3 className="mt-2 font-bold text-xl text-[#141C17]">
-                Customers & Analytics
-              </h3>
-              <p className="mt-3 text-sm text-[#141C17]/75 leading-relaxed">
-                Every chat becomes a saved customer, a lead stage, and a number you can actually read.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-[#141C17]/5">
-              <Link
-                to="/signup"
-                className="font-semibold text-sm text-[#0D6E42] hover:text-[#1C774E] inline-flex items-center gap-1 group"
-              >
-                <span>Explore Customers & Analytics</span>
-                <span className="transition-transform group-hover:translate-x-0.5">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* NEW SECTION: Channel Orbit (Between 2.3 and 2.4 per spec instruction) */}
+      {/* Spec 12 / Task 1 Orbit: Channel Orbit (Between 2.3 and 2.4) */}
       <ChannelOrbit />
 
-      <ExplainerVideoSection />
+      {/* Spec 2.4: Live Product Proof (Real Dashboard Screenshots) */}
+      <LiveProductProof />
 
-      <DmSection />
+      {/* Spec 2.5: Audience Scroller (5 High-Volume Categories) */}
+      <AudienceScroller />
 
-      <InvoiceSection />
+      {/* Spec 2.6: How It Works Teaser (4 Steps with Connecting Line) */}
+      <HowItWorksTeaser />
 
-      <NegotiationSection />
+      {/* Spec 2.7: The Human Band (Warm Nigerian Merchant Photo + Quotes) */}
+      <HumanBand />
 
-      <LogisticsSection />
+      {/* Spec 2.8: Kasi Market Teaser (Shoppers Band) */}
+      <MarketTeaser />
 
-      <AutomationSection />
+      {/* Spec 2.9: Final CTA (Typing Indicator Motif) */}
+      <FinalCtaSection />
 
-      <PricingVsAgentsSection />
+      {/* Spec 01: Global Footer (3 Columns + Official Sign-Off) */}
+      <GlobalFooter />
 
-      <BookingSection />
-
-      <CustomerIntelligenceSection />
-
-      <ProactiveOutreachSection />
-
-      <PricingSection onJoinWaitlistClick={openWaitlist} />
-
-      <TestimonialSection />
-
-      <FAQSection />
-
-      {/* PART 5 — High-Impact Bottom Call to Action Section (Pre-footer) */}
-      <section className="py-24 bg-[#1A7A4A] text-white relative overflow-hidden select-none">
-        <div className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(#fff_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none" />
-
-        <div className="max-w-5xl mx-auto px-4 relative z-10 text-center flex flex-col items-center space-y-8 font-sans">
-          {/* White Pill Tag Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 border border-white/20 text-white text-[12px] font-bold uppercase tracking-wider rounded-full shadow-xs">
-            <span>READY FOR AUTOPILOT?</span>
-          </div>
-
-          {/* Headline */}
-          <h2 className="text-4xl md:text-5.5xl font-black font-bricolage tracking-tight max-w-3xl mx-auto leading-none text-white text-center">
-            Turn social conversations
-            <br />
-            into predictable profit.
-          </h2>
-
-          {/* Body */}
-          <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed text-center font-medium">
-            Deploy an AI employee that handles your customer conversation from first DM to final delivery. Scale sales, protect profit margins, build customer retention, and organize your business for credit and long-term growth.
-          </p>
-
-          {/* 3 Centered Feature Chips */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-3 pt-4 max-w-4xl w-full">
-            {[
-              "✓ Omnichannel Autopilot — Zero missed leads on WhatsApp, Instagram & Telegram.",
-              "✓ Margin-Protected Bargaining — AI negotiates within your bottom floor thresholds.",
-              "✓ End-to-End Fulfilment — Instant bank transfer verification & automated delivery dispatch.",
-            ].map((chip, idx) => (
-              <div
-                key={idx}
-                className="bg-white/10 border border-white/15 rounded-xl px-5 py-2.5 text-white/95 text-[13.5px] font-medium text-center select-none backdrop-blur-xs"
-              >
-                {chip}
-              </div>
-            ))}
-          </div>
-
-          {/* CTA Button */}
-          <div className="pt-6">
-            {PRELAUNCH_WAITLIST_MODE ? (
-              <button
-                onClick={openWaitlist}
-                className="px-10 py-4 bg-white hover:bg-gray-50 text-[#1A7A4A] font-bold text-base rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
-              >
-                <span>Join the Waitlist</span>
-                <ArrowRight
-                  size={20}
-                  className="transition-transform group-hover:translate-x-1 stroke-[2.5]"
-                />
-              </button>
-            ) : (
-              <Link
-                to="/signup"
-                className="px-10 py-4 bg-white hover:bg-gray-50 text-[#1A7A4A] font-bold text-base rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group"
-              >
-                <span>Get Started with Kasi</span>
-                <ArrowRight
-                  size={20}
-                  className="transition-transform group-hover:translate-x-1 stroke-[2.5]"
-                />
-              </Link>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* PART 6 — Neubrutalist Rebranded Dark-Mode Footer */}
-      <footer className="bg-[#0A0A0A] text-[#9ca3af] py-20 font-sans select-none text-left">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16 items-start">
-            {/* Column 1 — Brand */}
-            <div className="lg:col-span-4 space-y-5">
-              <span className="text-2xl font-black tracking-tight text-white font-bricolage flex items-center gap-2">
-                <img
-                  src="/kasi.png"
-                  alt="Kasi"
-                  className="w-6 h-6 object-contain shrink-0 select-none"
-                />
-                <span>Kasi AI</span>
-              </span>
-              <p className="text-[15px] text-white/50 leading-relaxed font-medium max-w-xs mt-4">
-                Your AI sales agent that never sleeps.
-              </p>
-
-              {/* Official Meta Tech Provider Card - Prominent & Tall */}
-              <div className="pt-4">
-                <div className="p-3.5 bg-white rounded-2xl border border-white/20 shadow-md inline-block max-w-[210px] select-none hover:shadow-lg transition-all">
-                  <img 
-                    src="/official-meta-tech-provider.jpg" 
-                    alt="Official Meta Tech Provider" 
-                    className="w-full h-auto object-contain rounded-lg"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Column 2 — PRODUCT */}
-            <div className="lg:col-span-3 space-y-4">
-              <h4 className="text-[12px] font-bold text-white/40 uppercase tracking-widest">
-                PRODUCT
-              </h4>
-              <ul className="space-y-3 text-[15px] font-medium">
-                <li>
-                  <a
-                    href="#dms"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Direct Messages
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#invoices"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Invoices & Payments
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#negotiation"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Negotiations
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#logistics"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Logistics
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#bookings"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Booking & Scheduling
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#customer-intelligence"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Customer Intelligence
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#pricing"
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    Pricing
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3 — INTEGRATIONS */}
-            <div className="lg:col-span-3 space-y-4">
-              <h4 className="text-[12px] font-bold text-white/40 uppercase tracking-widest">
-                INTEGRATIONS
-              </h4>
-              <ul className="space-y-3 text-[15px] font-medium text-white/70">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    WhatsApp API
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Instagram DMs
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Facebook Messenger
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Telegram
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Paystack
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Google Calendar
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 4 — COMPANY */}
-            <div className="lg:col-span-2 space-y-4">
-              <h4 className="text-[12px] font-bold text-white/40 uppercase tracking-widest">
-                COMPANY
-              </h4>
-              <ul className="space-y-3 text-[15px] font-medium text-white/70">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    About Endogenous
-                  </a>
-                </li>
-                <li>
-                  <a href="https://blog.usekasi.com" className="hover:text-white transition-colors">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <Link to="/privacy" className="hover:text-white transition-colors">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/terms" className="hover:text-white transition-colors">
-                    Terms of Service
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/data-deletion" className="hover:text-white transition-colors">
-                    Data Deletion
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="mailto:support@usekasi.com"
-                    className="hover:text-white transition-colors"
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <span className="text-[13px] text-white/40 font-medium">
-              © 2026 Endogenous Technologies. All rights reserved.
-            </span>
-
-            {/* Social icons */}
-            <div className="flex items-center gap-3">
-              {[
-                { icon: <Instagram size={16} />, url: "https://www.instagram.com/kasi.official_ai" },
-                { icon: <Twitter size={16} />, url: "https://x.com/hq_kasi" },
-                { icon: <Linkedin size={16} />, url: "https://www.linkedin.com/company/122863967/" },
-              ].map((soc, idx) => (
-                <a
-                  key={idx}
-                  href={soc.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white transition-all"
-                >
-                  {soc.icon}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* Waitlist Modal */}
+      {/* Waitlist Modal (for lead capture if triggered) */}
       <WaitlistModal
         isOpen={isWaitlistOpen}
         onClose={() => setIsWaitlistOpen(false)}
