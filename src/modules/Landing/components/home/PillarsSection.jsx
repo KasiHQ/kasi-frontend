@@ -2,10 +2,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Bot, PackageCheck, TrendingUp } from "lucide-react";
+import {
+  ChatTeardropDots,
+  Package,
+  ChartLineUp,
+  ArrowRight,
+} from "@phosphor-icons/react";
 import { HOME_COPY } from "../../../../content/home";
+import { DesignedPlaceholder } from "../../../../components/common/DesignedPlaceholder";
 
-const PILLAR_ICONS = [Bot, PackageCheck, TrendingUp];
+const ICONS = [ChatTeardropDots, Package, ChartLineUp];
 
 export function PillarsSection() {
   const copy = HOME_COPY["2.3"];
@@ -13,82 +19,105 @@ export function PillarsSection() {
 
   return (
     <section className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 max-w-[1280px] mx-auto font-poppins">
-      <div className="text-center max-w-[760px] mx-auto mb-16 sm:mb-20">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D6E42]/10 border border-[#0D6E42]/15 mb-4">
-          <span className="font-mono-labels text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
-            {copy.badge}
-          </span>
+      {/* 2-col header: left title with marker, right sub copy */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end mb-14 sm:mb-18">
+        <div className="lg:col-span-7">
+          <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] text-[#141C17] tracking-tight leading-[1.12]">
+            One assistant.{" "}
+            <span className="relative inline-block">
+              <span className="relative z-10">The whole shop.</span>
+              <span
+                className="absolute left-0 bottom-1.5 sm:bottom-2 w-full h-3 sm:h-3.5 bg-[#DBF361] -rotate-1 rounded-xs -z-0"
+                aria-hidden="true"
+              />
+            </span>
+          </h2>
         </div>
-        <h2 className="font-bold text-3xl sm:text-4xl lg:text-[44px] text-[#141C17] tracking-tight leading-[1.1]">
-          {copy.heading}
-        </h2>
-        <p className="mt-4 font-light text-base sm:text-lg text-[#141C17]/75 max-w-xl mx-auto leading-relaxed">
-          {copy.sub}
-        </p>
+        <div className="lg:col-span-5">
+          <p className="text-base sm:text-lg text-[#141C17]/75 leading-relaxed font-light">
+            {copy.sub}
+          </p>
+        </div>
       </div>
 
+      {/* 3 bento cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {copy.pillars.map((pillar, index) => {
-          const IconComponent = PILLAR_ICONS[index];
+          const IconComponent = ICONS[index];
+          const verb = pillar.tag.replace("IT ", "").toLowerCase();
+          const labelTitle = `It ${verb.charAt(0).toUpperCase() + verb.slice(1)}`;
 
           return (
             <motion.div
               key={pillar.tag}
               initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.55, delay: index * 0.12 }}
-              whileHover={shouldReduceMotion ? undefined : { y: -6 }}
-              className="bg-white rounded-[22px] border border-[#141C17]/10 p-7 sm:p-8 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between overflow-hidden group"
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.55, delay: index * 0.1 }}
+              className="bg-white rounded-[22px] border border-[#141C17]/10 p-6 sm:p-7 shadow-xs flex flex-col justify-between overflow-hidden group hover:border-[#141C17]/20 transition-colors"
             >
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <span className="font-mono-labels text-xs font-bold uppercase tracking-wider text-[#0D6E42] bg-[#0D6E42]/10 px-3 py-1 rounded-full">
-                    {pillar.tag}
-                  </span>
-                  <div className="w-10 h-10 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 flex items-center justify-center text-[#0D6E42] group-hover:bg-[#0D6E42] group-hover:text-white transition-colors">
-                    <IconComponent size={20} />
-                  </div>
+                {/* Top: Designed Human/Vendor Placeholder */}
+                <div className="w-full h-44 rounded-xl overflow-hidden mb-6 border border-[#141C17]/8 shadow-inner">
+                  <DesignedPlaceholder
+                    aspect="16/9"
+                    caption={pillar.placeholderCaption}
+                    className="w-full h-full"
+                  />
                 </div>
 
-                <h3 className="font-bold text-xl sm:text-2xl text-[#141C17] tracking-tight">
-                  {pillar.title}
+                {/* Phosphor duotone icon bare over offset lime disc */}
+                <div className="relative inline-flex items-center justify-center w-12 h-12 mb-4">
+                  <div
+                    className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-[#DBF361] -z-0"
+                    aria-hidden="true"
+                  />
+                  <IconComponent
+                    size={32}
+                    weight="duotone"
+                    className="text-[#0D6E42] relative z-10"
+                  />
+                </div>
+
+                {/* Display label with lime marker under verb */}
+                <h3 className="font-display font-medium text-2xl text-[#141C17] tracking-tight mb-3">
+                  It{" "}
+                  <span className="relative inline-block">
+                    <span className="relative z-10">{verb}</span>
+                    <span
+                      className="absolute left-0 bottom-0.5 w-full h-2 bg-[#DBF361] rounded-xs -z-0"
+                      aria-hidden="true"
+                    />
+                  </span>
                 </h3>
 
-                <p className="mt-3 text-sm text-[#141C17]/75 leading-relaxed">
+                <p className="text-sm text-[#141C17]/80 leading-relaxed font-normal mb-6">
                   {pillar.body}
                 </p>
 
-                {/* Overlapping ProductShot + HumanPhoto Stage */}
-                <div className="mt-6 relative h-[210px] w-full rounded-2xl bg-[#F6F8F3] border border-[#141C17]/8 overflow-hidden p-3 flex items-center justify-center">
-                  {/* Product Screenshot layer */}
-                  <div className="absolute left-3 top-3 right-10 bottom-3 rounded-xl overflow-hidden shadow-sm border border-black/5 bg-white">
-                    <img
-                      src={pillar.screenshot}
-                      alt={`${pillar.title} dashboard UI`}
-                      className="w-full h-full object-cover object-left-top opacity-90 group-hover:scale-102 transition-transform duration-500"
-                    />
-                  </div>
-
-                  {/* Overlapping Human Photo pill */}
-                  <div className="absolute right-3 bottom-3 w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden shadow-lg border-2 border-white z-10">
-                    <img
-                      data-swap="vendor-real"
-                      src={pillar.humanPhoto}
-                      alt={pillar.humanAlt}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
+                {/* Real screenshot crop lower container */}
+                <div className="w-full h-36 rounded-xl overflow-hidden border border-[#141C17]/10 bg-[#F6F8F3] relative mb-6">
+                  <img
+                    src={pillar.screenshot}
+                    alt={`${labelTitle} product view`}
+                    className="w-full h-full object-cover object-left-top group-hover:scale-102 transition-transform duration-500"
+                    loading="lazy"
+                  />
                 </div>
               </div>
 
-              <div className="mt-8 pt-5 border-t border-[#141C17]/8">
+              {/* Plain explore link */}
+              <div className="pt-2 border-t border-[#141C17]/6 flex items-center justify-between">
                 <Link
                   to={pillar.href}
-                  className="inline-flex items-center gap-2 font-semibold text-sm text-[#0D6E42] group-hover:text-[#1C774E] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0D6E42] hover:text-[#1C774E] transition-colors group/link"
                 >
                   <span>{pillar.cta}</span>
-                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                  <ArrowRight
+                    size={16}
+                    weight="bold"
+                    className="group-hover/link:translate-x-1 transition-transform"
+                  />
                 </Link>
               </div>
             </motion.div>

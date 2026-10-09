@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { CHANNEL_THEMES, CHANNEL_SEQUENCE } from "./channel-themes";
 import { CHAT_SCRIPTS } from "./chat-scripts";
+import KasiLogo from "../../../../components/common/KasiLogo";
 
 function ReplyCounter({ seconds }) {
   const [val, setVal] = useState(0);
@@ -209,11 +210,7 @@ export function ChatStage({ activeChannel, onChannelChange, isPausedExternal = f
                   className="flex flex-col items-end self-end max-w-[85%]"
                 >
                   <div className="flex items-end gap-2 flex-row-reverse">
-                    <img
-                      src="/kasi-icon.svg"
-                      alt="Kasi"
-                      className="w-6 h-6 rounded-md object-contain shrink-0 shadow-xs"
-                    />
+                    <KasiLogo variant="avatar" size={24} />
                     <div
                       style={{ background: theme.kasiBubble }}
                       className="text-[#141C17] text-[13.5px] leading-relaxed px-4 py-2.5 rounded-[18px] rounded-br-sm shadow-sm border border-black/[0.04]"
@@ -267,11 +264,7 @@ export function ChatStage({ activeChannel, onChannelChange, isPausedExternal = f
                   className="flex flex-col items-end self-end max-w-[85%]"
                 >
                   <div className="flex items-end gap-2 flex-row-reverse">
-                    <img
-                      src="/kasi-icon.svg"
-                      alt="Kasi"
-                      className="w-6 h-6 rounded-md object-contain shrink-0 shadow-xs"
-                    />
+                    <KasiLogo variant="avatar" size={24} />
                     <div
                       style={{ background: theme.kasiBubble }}
                       className="text-[#141C17] text-[13.5px] leading-relaxed px-4 py-2.5 rounded-[18px] rounded-br-sm shadow-sm border border-black/[0.04]"

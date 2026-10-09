@@ -56,10 +56,10 @@
 ## 3. Assets Audit
 
 ### Brand Identity
-- **Real Brand Mark:** `frontend/public/kasi-icon.svg` — Green gradient (`#0F8C55` to `#0BBF6A`) rounded square with stylized white "K".
-- **Real Brand Wordmark:** `frontend/public/kasi-logo.svg` — Custom styled "kasi" in small-caps gradient.
-- **Brand Component:** `<KasiLogo variant="mark|full" className="..." />` standardizes brand rendering everywhere.
-- **Favicon:** Uses `kasi-icon.svg`.
+- **Real Brand Mark:** `frontend/public/kasi.png` — Official green chat bubble mark with lime smile accent (2000×2000 master). Resized variants generated via Sharp: `kasi-32.png`, `kasi-180.png`, `kasi-192.png`, `kasi-512.png`.
+- **Wordmark & Typography:** Clean brand text rendered via `KasiLogo` (`variant="full"` pairs the mark with clean geometric typography).
+- **Brand Component:** `<KasiLogo variant="mark|full|avatar" className="..." />` standardizes brand rendering everywhere (nav, footer, orbit center, chat stage avatars).
+- **Favicon & App Icons:** Reverted and pointed to `/kasi.png`, `apple-touch-icon.png` (180px), `pwa-192x192.png`, and `pwa-512x512.png`.
 
 ### Third-Party Partner Logos
 - Verified SVG files added to `frontend/public/logos/`:
@@ -73,10 +73,17 @@
 - **Documentation:** `public/logos/LOGO_SOURCES.md` logs origins, official URLs, licenses, and dates.
 - **Dev Route:** `/dev/logos` renders all 7 SVGs side-by-side with dimensions.
 
-### Photography & Video
-- Video: `frontend/public/video/Kasi Explainer Video.mp4` verified as primary demo asset.
-- Product Screenshots: `hero-dashboard-desktop.png`, `dashboard-analytics.png`, `mobile-chat-view.png`, `order-pipeline.png`.
-- Human Placeholders: Authentic Nigerian SME photography placeholders tagged with `data-swap="vendor-real"`.
+### Photography, Local Screenshots & Designed Placeholders
+Zero remote stock photos are permitted. All photography and screenshot assets originate locally from the repository:
+
+| Asset Path | Resolution / Size | Spec Section & Slot | Description / Notes |
+|---|---|---|---|
+| `public/images/hero-dashboard-desktop.png` | 232 KB | **2.4 Row 1** (Live Chats) & **2.3 Pillar 1** (It Sells) | Conversations list & live chat oversight panel. Crop tightly to readable chat/instruct UI. |
+| `public/images/order-pipeline.png` | 127 KB | **2.4 Row 2** (Orders & Fulfilment) & **2.3 Pillar 2** (It Fulfils) | Order Kanban pipeline with phase tracker (New, Packed, Dispatched, Delivered). |
+| `public/images/analytics-dashboard-desktop.png` | 74 KB | **2.3 Pillar 3** (It Grows) | Revenue metrics, lead stage conversion, and customer analytics panel. |
+| `public/images/booking-schedule-hours-desktop.png` | 68 KB | Wave 2 Features Hub / Booking | Working hours and appointment scheduling UI. |
+| `public/images/product-negotiation-limits-desktop.png` | 415 KB | Wave 2 Features Hub / Sales Engine | Minimum price limits and discount negotiation UI. |
+| `<DesignedPlaceholder />` | Dynamic SVG/Canvas | **2.3 Top Bento**, **2.5 Scroller (5 cards)**, **2.7 Human Band** | Warm Paper/Forest tinted panel with dot-grid and art-directed mono label, tagged `data-swap="vendor-real"`. |
 
 ---
 

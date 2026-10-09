@@ -2,10 +2,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Link2, Store, Sparkles, CheckCircle } from "lucide-react";
 import { HOME_COPY } from "../../../../content/home";
-
-const STEP_ICONS = [Link2, Store, Sparkles, CheckCircle];
+import { KasiLogo } from "../../../../components/common/KasiLogo";
 
 export function HowItWorksTeaser() {
   const copy = HOME_COPY["2.6"];
@@ -14,21 +12,10 @@ export function HowItWorksTeaser() {
   return (
     <section className="py-20 sm:py-28 lg:py-32 bg-[#F6F8F3] border-t border-[#141C17]/8 font-poppins relative overflow-hidden">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-[720px] mx-auto mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D6E42]/10 border border-[#0D6E42]/15 mb-4">
-            <span className="font-mono-labels text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
-              {copy.badge}
-            </span>
-          </div>
-          <h2 className="font-bold text-3xl sm:text-4xl lg:text-[42px] text-[#141C17] tracking-tight leading-[1.12]">
-            {copy.heading}
-          </h2>
-        </div>
-
-        {/* 4-Step Flow with animated connecting line */}
+        {/* Spec 2.6 has NO section heading: directly renders 4-step horizontal flow */}
         <div className="relative">
-          {/* Animated Connecting SVG Line */}
-          <div className="hidden lg:block absolute top-[52px] left-[10%] right-[10%] h-[2px] -z-0">
+          {/* Animated Connecting SVG Line on desktop */}
+          <div className="hidden lg:block absolute top-[130px] left-[12%] right-[12%] h-[2px] -z-0 pointer-events-none">
             <svg className="w-full h-full overflow-visible" preserveAspectRatio="none">
               <line
                 x1="0"
@@ -55,49 +42,116 @@ export function HowItWorksTeaser() {
             </svg>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 relative z-10">
             {copy.steps.map((step, index) => {
-              const IconComp = STEP_ICONS[index];
-
               return (
                 <motion.div
                   key={step.step}
                   initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-white rounded-2xl p-6 sm:p-7 border border-[#141C17]/10 shadow-xs flex flex-col items-start relative group hover:shadow-md transition-shadow"
+                  className="bg-white rounded-[22px] p-6 sm:p-7 border border-[#141C17]/10 shadow-xs flex flex-col justify-between group hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-center justify-between w-full mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-[#0D6E42]/10 border border-[#0D6E42]/15 flex items-center justify-center text-[#0D6E42] group-hover:bg-[#0D6E42] group-hover:text-white transition-colors">
-                      <IconComp size={22} />
+                  <div>
+                    {/* Step numeral */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-mono text-2xl font-bold text-[#141C17]/25 group-hover:text-[#0D6E42] transition-colors">
+                        0{step.step}
+                      </span>
                     </div>
-                    <span className="font-mono text-2xl font-black text-[#141C17]/20">
-                      0{step.step}
-                    </span>
+
+                    {/* Illustrated vignette container */}
+                    <div className="w-full h-28 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 p-3 flex items-center justify-center relative overflow-hidden select-none">
+                      {step.step === 1 && (
+                        // Vignette 1: Connect (WhatsApp & IG to Kasi mark)
+                        <div className="flex items-center gap-3">
+                          <img
+                            src="/logos/whatsapp.svg"
+                            alt="WhatsApp"
+                            className="w-7 h-7 object-contain opacity-85"
+                          />
+                          <div className="w-4 border-t-2 border-dashed border-[#0D6E42]/40" />
+                          <div className="w-9 h-9 rounded-full bg-white shadow-xs border border-[#141C17]/10 flex items-center justify-center p-1.5">
+                            <KasiLogo variant="mark" size={24} />
+                          </div>
+                          <div className="w-4 border-t-2 border-dashed border-[#0D6E42]/40" />
+                          <img
+                            src="/logos/instagram.svg"
+                            alt="Instagram"
+                            className="w-7 h-7 object-contain opacity-85"
+                          />
+                        </div>
+                      )}
+
+                      {step.step === 2 && (
+                        // Vignette 2: Load shop (3 skeleton product cards with prices)
+                        <div className="flex gap-2 w-full justify-center">
+                          {[1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className="w-16 bg-white rounded-lg p-1.5 border border-[#141C17]/10 shadow-2xs flex flex-col gap-1"
+                            >
+                              <div className="w-full h-7 rounded bg-[#141C17]/8" />
+                              <div className="w-3/4 h-1.5 rounded bg-[#141C17]/15" />
+                              <div className="w-1/2 h-1.5 rounded bg-[#0D6E42]/30" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {step.step === 3 && (
+                        // Vignette 3: Kasi sells (2 bubbles + typing dots)
+                        <div className="flex flex-col gap-1.5 w-full max-w-[170px]">
+                          <div className="self-end bg-[#DFF7E4] text-[#141C17] text-[10px] px-2.5 py-1 rounded-lg rounded-br-none shadow-2xs">
+                            Is this in stock?
+                          </div>
+                          <div className="self-start bg-white border border-[#141C17]/10 text-[10px] px-2.5 py-1 rounded-lg rounded-bl-none shadow-2xs flex items-center gap-1 text-[#0D6E42]">
+                            <span>Yes! Reserve now</span>
+                            <span className="flex gap-0.5 ml-1">
+                              <span className="w-1 h-1 rounded-full bg-[#0D6E42] animate-bounce" />
+                              <span className="w-1 h-1 rounded-full bg-[#0D6E42] animate-bounce [animation-delay:0.15s]" />
+                              <span className="w-1 h-1 rounded-full bg-[#0D6E42] animate-bounce [animation-delay:0.3s]" />
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {step.step === 4 && (
+                        // Vignette 4: You fulfil (order card + PAID stamp)
+                        <div className="w-full max-w-[160px] bg-white rounded-lg p-2 border border-[#141C17]/10 shadow-2xs relative flex items-center justify-between">
+                          <div>
+                            <div className="text-[10px] font-mono text-[#141C17]/50">Order #1042</div>
+                            <div className="text-[11px] font-bold text-[#141C17]">₦45,000</div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-[#DBF361] text-[#0D6E42] border border-[#0D6E42]/20 rotate-[-4deg]">
+                            PAID
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <h3 className="font-display font-medium text-xl text-[#141C17] tracking-tight mt-5 mb-2">
+                      {step.title}
+                    </h3>
+
+                    <p className="text-sm text-[#141C17]/75 font-normal leading-relaxed">
+                      {step.desc}
+                    </p>
                   </div>
-
-                  <h3 className="font-bold text-lg text-[#141C17] tracking-tight">
-                    {step.title}
-                  </h3>
-
-                  <p className="mt-2 text-sm text-[#141C17]/75 leading-relaxed">
-                    {step.desc}
-                  </p>
                 </motion.div>
               );
             })}
           </div>
         </div>
 
-        {/* CTA Button */}
-        <div className="mt-14 text-center">
+        {/* Action button */}
+        <div className="mt-14 sm:mt-18 text-center">
           <Link
-            to="/how-it-works"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#141C17] text-white font-semibold text-base shadow-sm hover:bg-[#141C17]/90 hover:-translate-y-0.5 active:scale-95 transition-all group"
+            to={copy.href}
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#0D6E42] text-[#F6F8F3] font-semibold text-sm hover:bg-[#1C774E] transition-all shadow-sm hover:shadow-md cursor-pointer"
           >
-            <span>{copy.button}</span>
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            {copy.button}
           </Link>
         </div>
       </div>

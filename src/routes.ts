@@ -211,4 +211,13 @@ export const ROUTES: Record<string, RouteConfig> = {
     h1: 'Verified Vector Assets Test Suite',
     sub: 'Internal inspector for brand and partner SVGs.',
   },
+  DEV_TYPE: {
+    path: '/dev/type',
+    name: 'Typography Inspector',
+    status: 'built',
+    metaTitle: 'Dev: Typography Inspector',
+    metaDescription: 'Side-by-side font comparison of Bricolage Grotesque vs Poppins.',
+    h1: 'Typography Comparison',
+    sub: 'Display font inspector for section headings.',
+  },
 };

@@ -58,6 +58,7 @@ import DataDeletion from './modules/Legal/pages/DataDeletion';
 import { ROUTES } from './routes';
 import PageStub from './components/common/PageStub';
 import DevLogos from './pages/DevLogos';
+import DevType from './pages/DevType';
 
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
@@ -124,8 +125,9 @@ function App() {
           <Route path="/contact" element={<PageStub route={ROUTES.CONTACT} />} />
           <Route path="/get-started" element={<Signup />} />
           
-          {/* Dev-only inspection route */}
+          {/* Dev-only inspection routes */}
           <Route path="/dev/logos" element={<DevLogos />} />
+          <Route path="/dev/type" element={<DevType />} />
           
           <Route element={<MainLayout />}>
               <Route path="/dashboard" element={

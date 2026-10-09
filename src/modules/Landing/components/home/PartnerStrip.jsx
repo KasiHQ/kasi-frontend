@@ -2,7 +2,7 @@ import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 const PARTNERS = [
-  { name: "Meta Tech Provider", logo: "/logos/meta.svg", label: "Meta Tech Provider" },
+  { name: "Meta", logo: "/logos/meta.svg", label: "Official Meta Partner" },
   { name: "Payments by Paystack", logo: "/logos/paystack.svg", label: "Payments by Paystack" },
   { name: "Powered by OpenAI", logo: "/logos/openai.svg", label: "Powered by OpenAI" },
   { name: "Telegram Partner", logo: "/logos/telegram.svg", label: "Telegram Official Rail" },

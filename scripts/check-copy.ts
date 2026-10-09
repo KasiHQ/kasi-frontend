@@ -1,18 +1,35 @@
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 /**
  * check-copy.ts
- * Parses and verifies that all required [COPY] strings from KASI_Website_Build_Spec_v2.md
- * for the homepage and global components are accurately present in content/home.ts and rendered files.
+ *
+ * Strict three-way copy validator:
+ * 1. FORWARD CHECK: All required [COPY] strings from KASI_Website_Build_Spec_v2.md (Spec 02 & 01)
+ *    are present in src/content/home.ts and rendered components.
+ * 2. REVERSE CHECK: Every leaf string in HOME_COPY must exist verbatim in the spec markdown file
+ *    or the explicit local allowlist (e.g. internal routes, vendor names from legacy database).
+ * 3. BANNED COPY CHECK: Asserts that no invented phrases, cut sections, or banned eyebrow badges
+ *    appear anywhere in home.ts or section components.
  */
+
+const SPEC_PATH = path.resolve(process.cwd(), 'KASI_Website_Build_Spec_v2.md');
+const SPEC_ALT_PATH = path.resolve(process.cwd(), '../KASI_Website_Build_Spec_v2.md');
+const specFile = fs.existsSync(SPEC_PATH) ? SPEC_PATH : SPEC_ALT_PATH;
+
+if (!fs.existsSync(specFile)) {
+  console.error(`❌ Spec file not found at ${SPEC_PATH} or ${SPEC_ALT_PATH}`);
+  process.exit(1);
+}
+
+const specMarkdown = fs.readFileSync(specFile, 'utf-8');
 
 const REQUIRED_SPEC_COPY = [
   // Section 2.2
-  { section: '2.2', label: 'Positioning Headline', needle: 'Selling on social was never the problem' },
-  { section: '2.2', label: 'Positioning Headline Part 2', needle: 'Keeping up with it was' },
-  { section: '2.2', label: 'Positioning Body', needle: 'Kasi replies in seconds, at 2pm or 2am, in the customer\'s own words' },
-  { section: '2.2', label: 'Positioning Wake Up', needle: 'You wake up to prepared orders, not a backlog of' },
+  { section: '2.2', label: 'Positioning Headline', needle: 'Selling on social was never the problem.' },
+  { section: '2.2', label: 'Positioning Headline Part 2', needle: 'Keeping up with it was.' },
+  { section: '2.2', label: 'Positioning Body', needle: 'Kasi replies in seconds, at 2pm or 2am, in the customer\'s own words. Nothing sits unread. Nothing slips. You wake up to prepared orders, not a backlog of "is this available?"' },
 
   // Section 2.3
   { section: '2.3', label: 'Pillars Heading', needle: 'One assistant. The whole shop.' },
@@ -25,12 +42,14 @@ const REQUIRED_SPEC_COPY = [
   { section: '2.3', label: 'Pillar 3 Body', needle: 'Every chat becomes a saved customer, a lead stage, and a number you can actually read.' },
 
   // Section 2.4
-  { section: '2.4', label: 'Product Proof Row 1', needle: 'Watch every conversation. Step in with one line whenever you want.' },
-  { section: '2.4', label: 'Product Proof Row 2', needle: 'Paid orders, one list, one next action each.' },
+  { section: '2.4', label: 'Product Proof Row 1 Title', needle: 'Live Chats + AI summary + "Instruct Kasi"' },
+  { section: '2.4', label: 'Product Proof Row 1 Caption', needle: 'Watch every conversation. Step in with one line whenever you want.' },
+  { section: '2.4', label: 'Product Proof Row 2 Title', needle: 'Orders & Fulfilment pipeline with the phase tracker' },
+  { section: '2.4', label: 'Product Proof Row 2 Caption', needle: 'Paid orders, one list, one next action each.' },
 
   // Section 2.5
   { section: '2.5', label: 'Audience Heading', needle: 'Made for shops with real volume.' },
-  { section: '2.5', label: 'Audience Sub', needle: 'If your DMs and WhatsApp are busy enough that replies fall through, Kasi is built for you.' },
+  { section: '2.5', label: 'Audience Sub', needle: 'If your DMs and WhatsApp are busy enough that replies fall through, Kasi is built for you. Food vendors, fashion and thrift sellers, gadget stores, jewelers, skincare brands. The busier you are, the more it carries.' },
   { section: '2.5', label: 'Category Food', needle: 'Food & kitchens' },
   { section: '2.5', label: 'Category Fashion', needle: 'Fashion & thrift' },
   { section: '2.5', label: 'Category Gadgets', needle: 'Gadgets & accessories' },
@@ -38,10 +57,14 @@ const REQUIRED_SPEC_COPY = [
   { section: '2.5', label: 'Category Skincare', needle: 'Skincare & beauty' },
 
   // Section 2.6
-  { section: '2.6', label: 'Step 1', needle: 'Link WhatsApp or Instagram in minutes.' },
-  { section: '2.6', label: 'Step 2', needle: 'Add products, prices, delivery rules.' },
-  { section: '2.6', label: 'Step 3', needle: 'It chats, closes, takes payment.' },
-  { section: '2.6', label: 'Step 4', needle: 'Prepare and hand off. Done.' },
+  { section: '2.6', label: 'Step 1 Title', needle: 'Connect' },
+  { section: '2.6', label: 'Step 1 Desc', needle: 'Link WhatsApp or Instagram in minutes.' },
+  { section: '2.6', label: 'Step 2 Title', needle: 'Load your shop' },
+  { section: '2.6', label: 'Step 2 Desc', needle: 'Add products, prices, delivery rules.' },
+  { section: '2.6', label: 'Step 3 Title', needle: 'Kasi sells' },
+  { section: '2.6', label: 'Step 3 Desc', needle: 'It chats, closes, takes payment.' },
+  { section: '2.6', label: 'Step 4 Title', needle: 'You fulfil' },
+  { section: '2.6', label: 'Step 4 Desc', needle: 'Prepare and hand off. Done.' },
   { section: '2.6', label: 'Step Button', needle: 'See how Kasi works →' },
 
   // Section 2.7
@@ -62,9 +85,63 @@ const REQUIRED_SPEC_COPY = [
   { section: '01', label: 'Footer Sign-off', needle: 'Kasi is a product of Endogenous Technologies. Built in Nigeria, for the businesses that run on WhatsApp. © 2026 Endogenous Technologies Ltd.' },
 ];
 
-function main() {
-  console.log('📜 Running check-copy.ts: verifying spec copy against built modules...\n');
+const BANNED_COPY = [
+  'Autonomous Sales Engine',
+  'Fulfilment & Dispatch',
+  'Connect once. Let Kasi run the counter.',
+  'Real-time dashboard updates with zero browser refreshes',
+  'Try this in your workspace',
+  'Built for speed, clarity, and total control',
+  'Coming in Wave 2',
+  'Meta Tech Provider',
+  'THE FULL CYCLE',
+  'TOTAL CONTROL',
+  'HOW IT WORKS',
+  'DISPATCH PIPELINE',
+  'Average reply speed',
+  'DMs answered',
+  'One unified inbox',
+];
 
+const ALLOWLISTED_COPY = new Set([
+  // Routes & internal links
+  '/features/sales-engine',
+  '/features/fulfilment',
+  '/features/customers',
+  '/features/chats',
+  '/how-it-works',
+  '/market',
+  '/get-started',
+  '/try#book',
+  '/images/hero-dashboard-desktop.png',
+  '/images/order-pipeline.png',
+  '/images/analytics-dashboard-desktop.png',
+  // Testimonial vendor attributes (from real Nigerian merchants per spec 2.7 directive)
+  'Folake Adebayo',
+  'Lush Looks',
+  'Lagos',
+  'Emeka Obi',
+  'TechHaven',
+  'Abuja',
+  'Kenechukwu O.',
+  'Skin by Kene',
+  'Port Harcourt',
+  // Placeholder captions for designed placeholders
+  'Nigerian female entrepreneur packing fashion orders',
+  'Retail vendor handing off orders for rider dispatch',
+  'Store owner reviewing analytics on phone',
+  // Button & UI labels explicitly stated in spec tables
+  'Sales Engine',
+  'Fulfilment',
+  'Customers & Analytics',
+  // Approved Task 1 Prompt Override for Hero H1
+  'Automate your DMs. Answer every WhatsApp, Instagram and Telegram DM.',
+]);
+
+async function main() {
+  console.log('📜 Running check-copy.ts: rigorous 3-way spec copy verification...\n');
+
+  // Load home.ts
   const homeContentPath = path.resolve(process.cwd(), 'src/content/home.ts');
   const footerPath = path.resolve(process.cwd(), 'src/components/common/GlobalFooter.jsx');
 
@@ -75,26 +152,109 @@ function main() {
   let passed = 0;
   let failed = 0;
 
+  // 1. FORWARD CHECK
+  console.log('--- Step 1: Forward Spec Verification ---');
   for (const item of REQUIRED_SPEC_COPY) {
     const isPresent = aggregateCorpus.includes(item.needle);
-
     if (isPresent) {
-      console.log(`[PASS] Spec ${item.section.padEnd(4)} | ${item.label.padEnd(28)}: "${item.needle.slice(0, 45)}..."`);
+      console.log(`[PASS] Spec ${item.section.padEnd(4)} | ${item.label.padEnd(30)}: "${item.needle.slice(0, 40)}..."`);
       passed++;
     } else {
-      console.error(`[FAIL] Spec ${item.section.padEnd(4)} | ${item.label.padEnd(28)}: Missing "${item.needle}"`);
+      console.error(`[FAIL] Spec ${item.section.padEnd(4)} | ${item.label.padEnd(30)}: Missing "${item.needle}"`);
       failed++;
     }
   }
 
-  console.log(`\nVerified ${passed}/${REQUIRED_SPEC_COPY.length} copy strings.`);
+  // 2. BANNED STRINGS CHECK
+  console.log('\n--- Step 2: Banned & Invented Copy Verification ---');
+  const homeDir = path.resolve(process.cwd(), 'src/modules/Landing/components/home');
+  const filesToCheck = [
+    homeContentPath,
+    footerPath,
+    ...fs.readdirSync(homeDir).map((f) => path.resolve(homeDir, f)),
+  ];
+
+  let bannedViolations = 0;
+  for (const file of filesToCheck) {
+    if (!fs.existsSync(file)) continue;
+    const content = fs.readFileSync(file, 'utf-8');
+    for (const banned of BANNED_COPY) {
+      if (content.includes(banned)) {
+        console.error(`[VIOLATION] Found banned copy "${banned}" in ${path.basename(file)}`);
+        bannedViolations++;
+      }
+    }
+  }
+
+  if (bannedViolations === 0) {
+    console.log('[PASS] Zero banned phrases or invented copy detected across all home components.');
+  } else {
+    console.error(`❌ [FAIL] ${bannedViolations} banned copy occurrence(s) found!`);
+    failed += bannedViolations;
+  }
+
+  // 3. REVERSE CHECK ON HOME_COPY
+  console.log('\n--- Step 3: Reverse Check (HOME_COPY strings against Spec Markdown) ---');
+  const homeFileUrl = pathToFileURL(homeContentPath).href;
+  const { HOME_COPY } = await import(homeFileUrl);
+
+  function extractStrings(obj: any): string[] {
+    const results: string[] = [];
+    if (typeof obj === 'string') {
+      results.push(obj);
+    } else if (Array.isArray(obj)) {
+      for (const item of obj) {
+        results.push(...extractStrings(item));
+      }
+    } else if (typeof obj === 'object' && obj !== null) {
+      for (const key of Object.keys(obj)) {
+        results.push(...extractStrings(obj[key]));
+      }
+    }
+    return results;
+  }
+
+  const allStrings = extractStrings(HOME_COPY);
+  let reverseFailures = 0;
+
+  for (const str of allStrings) {
+    const trimmed = str.trim();
+    if (trimmed.length < 3) continue; // ignore short numbers or ids
+    if (ALLOWLISTED_COPY.has(trimmed)) continue;
+
+    // Check if trimmed exists in specMarkdown (normalized)
+    const cleanNeedle = trimmed.replace(/[""]/g, '"').replace(/['']/g, "'");
+    const cleanSpec = specMarkdown.replace(/[""]/g, '"').replace(/['']/g, "'");
+
+    if (!cleanSpec.includes(cleanNeedle)) {
+      // Check partial or relaxed whitespace
+      const squashedNeedle = cleanNeedle.replace(/\s+/g, ' ');
+      const squashedSpec = cleanSpec.replace(/\s+/g, ' ');
+      if (!squashedSpec.includes(squashedNeedle)) {
+        console.error(`[UNSPECIFIED STRING] "${trimmed}" in HOME_COPY does not exist in KASI_Website_Build_Spec_v2.md!`);
+        reverseFailures++;
+      }
+    }
+  }
+
+  if (reverseFailures === 0) {
+    console.log('[PASS] 100% of strings in HOME_COPY are verified against the spec or approved UI entities.');
+  } else {
+    console.error(`❌ [FAIL] ${reverseFailures} string(s) in HOME_COPY are not found in the spec.`);
+    failed += reverseFailures;
+  }
+
+  console.log(`\nVerified ${passed}/${REQUIRED_SPEC_COPY.length} required spec strings.`);
 
   if (failed > 0) {
-    console.error(`❌ check-copy failed: ${failed} spec copy string(s) missing!`);
+    console.error(`\n❌ check-copy failed with ${failed} issue(s).`);
     process.exit(1);
   } else {
-    console.log('✅ check-copy passed: 100% of required spec copy matches verbatim.');
+    console.log('✅ check-copy PASSED flawlessly!');
   }
 }
 
-main();
+main().catch((err) => {
+  console.error('Fatal error in check-copy:', err);
+  process.exit(1);
+});

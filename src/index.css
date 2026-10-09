@@ -25,6 +25,7 @@
 
   --font-sans: "Bricolage Grotesque", sans-serif;
   --font-bricolage: "Bricolage Grotesque", sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
   --font-prompt: "Bricolage Grotesque", sans-serif;
 
   --spacing-space-xs: 8px;
@@ -56,6 +57,10 @@
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
+}
+
+.font-display {
+  font-family: var(--font-display, "Bricolage Grotesque Variable", sans-serif);
 }
 
 /* Custom premium slim scrollbars for the entire application */
@@ -103,12 +108,7 @@
 
 /* Modern Typography Utilities */
 .font-display {
-  font-size: clamp(48px, 7vw, 88px);
-  font-weight: 900;
-  line-height: 1.0;
-  letter-spacing: -0.03em;
-  font-family: "Bricolage Grotesque", sans-serif;
-  color: #0A0A0A;
+  font-family: "Bricolage Grotesque Variable", "Bricolage Grotesque", sans-serif;
 }
 .font-section-h2 {
   font-size: clamp(36px, 4.5vw, 56px);

@@ -40,16 +40,8 @@ export function PageStub({ route }) {
       <NewNav />
 
       <main className="flex-1 pt-36 pb-24 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto w-full flex flex-col justify-center text-center">
-        {/* Spec Badge */}
-        <div className="inline-flex items-center gap-2 self-center px-3.5 py-1.5 rounded-full bg-[#0D6E42]/10 border border-[#0D6E42]/20 mb-6">
-          <span className="w-2 h-2 rounded-full bg-[#0D6E42] animate-pulse" />
-          <span className="font-mono-labels text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
-            Coming in Wave 2 · Spec {route.specSectionId || "01"}
-          </span>
-        </div>
-
         {/* In-Spec H1 */}
-        <h1 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#141C17] tracking-tight leading-[1.1] max-w-3xl mx-auto">
+        <h1 className="font-display font-medium text-3xl sm:text-4xl lg:text-5xl text-[#141C17] tracking-tight leading-[1.1] max-w-3xl mx-auto">
           {route.h1}
         </h1>
 
