@@ -44,13 +44,14 @@ export function FeaturePageTemplate({
       <main className="flex-1 pt-32 sm:pt-40 pb-20">
         {/* Hero Section */}
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0D6E42]/10 border border-[#0D6E42]/20 mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#0D6E42]" />
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
-              {badge} · SPEC {specId}
-            </span>
-          </div>
+          {/* Feature Category Tag */}
+          {badge && (
+            <div className="mb-4">
+              <span className="font-poppins text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
+                {badge}
+              </span>
+            </div>
+          )}
 
           {/* H1 with marker */}
           <h1 className="font-display font-medium text-3xl sm:text-5xl lg:text-[62px] text-[#141C17] tracking-tight leading-[1.08] max-w-4xl mx-auto">

@@ -131,13 +131,6 @@ export function ChannelOrbit() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="lg:col-span-6 flex flex-col items-start"
           >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-[#0D6E42]" />
-              <span className="font-poppins text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
-                Unified Social Channels
-              </span>
-            </div>
-
             <h2 className="font-poppins font-bold text-3xl sm:text-4xl lg:text-[42px] leading-[1.08] tracking-tight text-[#141C17]">
               Wherever your customers message you, Kasi is already there.
             </h2>
