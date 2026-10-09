@@ -23,6 +23,8 @@ dist-ssr
 .agent/
 *.md
 !README.md
+!docs/*.md
+!public/**/*.md
 
 # Editor directories and files
 .vscode/*
