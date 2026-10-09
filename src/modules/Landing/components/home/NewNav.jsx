@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import KasiLogo from "../../../components/common/KasiLogo";
+import KasiLogo from "../../../../components/common/KasiLogo";
 
 export function NewNav() {
   const [scrolled, setScrolled] = useState(false);

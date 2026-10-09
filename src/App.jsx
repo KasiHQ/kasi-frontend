@@ -55,6 +55,9 @@ import Fulfilment from './modules/Fulfilment/pages/Fulfilment';
 import PrivacyPolicy from './modules/Legal/pages/PrivacyPolicy';
 import TermsOfService from './modules/Legal/pages/TermsOfService';
 import DataDeletion from './modules/Legal/pages/DataDeletion';
+import { ROUTES } from './routes';
+import PageStub from './components/common/PageStub';
+import DevLogos from './pages/DevLogos';
 
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
@@ -103,6 +106,26 @@ function App() {
           <Route path="/market" element={<Marketplace />} />
           <Route path="/market/product/:id" element={<ProductDetail />} />
           <Route path="/market/vendor/:vendorId" element={<VendorProfile />} />
+          
+          {/* Public Spec Routes (Zero-404 stubs for Wave 2) */}
+          <Route path="/how-it-works" element={<PageStub route={ROUTES.HOW_IT_WORKS} />} />
+          <Route path="/features" element={<PageStub route={ROUTES.FEATURES} />} />
+          <Route path="/features/sales-engine" element={<PageStub route={ROUTES.FEATURE_SALES} />} />
+          <Route path="/features/fulfilment" element={<PageStub route={ROUTES.FEATURE_FULFILMENT} />} />
+          <Route path="/features/delivery" element={<PageStub route={ROUTES.FEATURE_DELIVERY} />} />
+          <Route path="/features/payments" element={<PageStub route={ROUTES.FEATURE_PAYMENTS} />} />
+          <Route path="/features/chats" element={<PageStub route={ROUTES.FEATURE_CHATS} />} />
+          <Route path="/features/customers" element={<PageStub route={ROUTES.FEATURE_CUSTOMERS} />} />
+          <Route path="/features/analytics" element={<PageStub route={ROUTES.FEATURE_ANALYTICS} />} />
+          <Route path="/platforms" element={<PageStub route={ROUTES.PLATFORMS} />} />
+          <Route path="/try" element={<PageStub route={ROUTES.TRY} />} />
+          <Route path="/pricing" element={<PageStub route={ROUTES.PRICING} />} />
+          <Route path="/about" element={<PageStub route={ROUTES.ABOUT} />} />
+          <Route path="/contact" element={<PageStub route={ROUTES.CONTACT} />} />
+          <Route path="/get-started" element={<Signup />} />
+          
+          {/* Dev-only inspection route */}
+          <Route path="/dev/logos" element={<DevLogos />} />
           
           <Route element={<MainLayout />}>
               <Route path="/dashboard" element={

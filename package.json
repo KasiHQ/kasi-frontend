@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:links": "node --experimental-strip-types scripts/check-links.ts",
+    "check:copy": "node --experimental-strip-types scripts/check-copy.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

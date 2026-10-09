@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import KasiLogo from "../../../components/common/KasiLogo";
+import KasiLogo from "../../../../components/common/KasiLogo";
 
 const INNER_NODES = [
   {
