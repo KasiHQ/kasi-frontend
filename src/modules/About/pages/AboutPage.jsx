@@ -132,6 +132,58 @@ export function AboutPage() {
             </motion.div>
           </div>
 
+          {/* Founders Section */}
+          <div className="mt-20 sm:mt-28">
+            <div className="mb-10 sm:mb-14">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#0D6E42] bg-[#0D6E42]/10 px-3 py-1 rounded-full inline-block mb-3">
+                LEADERSHIP
+              </span>
+              <h2 className="font-display font-medium text-3xl sm:text-4xl text-[#141C17] tracking-tight">
+                The people building it.
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+              {ABOUT_COPY.founders.map((founder, idx) => (
+                <motion.div
+                  key={founder.name}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="bg-white rounded-[28px] p-7 sm:p-9 border border-[#141C17]/10 shadow-xs flex flex-col justify-between group hover:border-[#141C17]/20 transition-all"
+                >
+                  <div>
+                    {/* Founder Portrait */}
+                    <div className="w-full h-72 sm:h-80 rounded-2xl overflow-hidden mb-6 bg-[#F6F8F3] border border-[#141C17]/8 relative">
+                      <img
+                        src={founder.image}
+                        alt={founder.name}
+                        className="w-full h-full object-cover object-top group-hover:scale-102 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    {/* Role & Name */}
+                    <div className="flex flex-col mb-4">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[#0D6E42] mb-1">
+                        {founder.role}
+                      </span>
+                      <h3 className="font-display font-medium text-2xl text-[#141C17] tracking-tight">
+                        {founder.name}
+                      </h3>
+                    </div>
+
+                    {/* Bio */}
+                    <p className="text-sm sm:text-[15px] text-[#141C17]/80 font-light leading-relaxed">
+                      {founder.bio}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
           {/* Corporate Metadata & Foundation Block */}
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
