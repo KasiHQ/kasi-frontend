@@ -10,7 +10,7 @@ export interface PricingPlan {
 
 export const PRICING_DATA = {
   heading: "Simple, transparent pricing for growing sellers.",
-  sub: "No commissions. No hidden cuts. Keep 100% of your sales with flat monthly plans built for African businesses.",
+  sub: "Predictable, flat monthly plans built for African social commerce businesses.",
   tabs: [
     { id: "product", label: "Product Vendors" },
     { id: "service", label: "Service Vendors" },
@@ -108,8 +108,8 @@ export const PRICING_DATA = {
   ],
   faq: [
     {
-      q: "Do you take a percentage or commission on my sales?",
-      a: "No. Never. You pay your flat monthly subscription and keep 100% of your revenue. Standard Paystack processing fees apply directly to transactions.",
+      q: "How do customer payments and settlements work?",
+      a: "Customer payments are processed directly through official Paystack rails. Confirmed funds are deposited into your connected bank account according to your standard settlement schedule.",
     },
     {
       q: "Can I switch between plans or cancel anytime?",

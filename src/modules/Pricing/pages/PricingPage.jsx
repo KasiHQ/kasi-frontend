@@ -135,7 +135,7 @@ export function PricingPage() {
             })}
           </div>
 
-          {/* Guarantee / Zero Commission Banner */}
+          {/* Getting Started Banner */}
           <div className="mt-20 py-10 px-8 rounded-[28px] bg-white border border-[#141C17]/10 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-[#DBF361]/40 flex items-center justify-center text-[#0D6E42] shrink-0">
@@ -143,10 +143,10 @@ export function PricingPage() {
               </div>
               <div>
                 <h3 className="font-display font-medium text-lg sm:text-xl text-[#141C17]">
-                  Zero Commissions. Ever.
+                  Start simple, scale as you grow.
                 </h3>
                 <p className="text-sm text-[#141C17]/70 font-light mt-0.5">
-                  Every naira you make goes straight into your Paystack balance. We never take a cut.
+                  Link your WhatsApp or Instagram shop in minutes and let Kasi handle sales around the clock.
                 </p>
               </div>
             </div>
