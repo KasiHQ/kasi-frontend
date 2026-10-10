@@ -72,6 +72,7 @@ import FeatureAnalytics from './modules/Features/pages/FeatureAnalytics';
 import FeaturePlatforms from './modules/Features/pages/FeaturePlatforms';
 import HowItWorksPage from './modules/HowItWorks/pages/HowItWorksPage';
 import AboutPage from './modules/About/pages/AboutPage';
+import PricingPage from './modules/Pricing/pages/PricingPage';
 
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
@@ -133,7 +134,7 @@ function App() {
           <Route path="/features/analytics" element={<FeatureAnalytics />} />
           <Route path="/platforms" element={<FeaturePlatforms />} />
           <Route path="/try" element={<PageStub route={ROUTES.TRY} />} />
-          <Route path="/pricing" element={<PageStub route={ROUTES.PRICING} />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<PageStub route={ROUTES.CONTACT} />} />
           <Route path="/get-started" element={<Signup />} />

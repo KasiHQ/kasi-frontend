@@ -141,7 +141,7 @@ export function FeaturesHub() {
                 to="/#demo-video"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 transition-all text-center"
               >
-                Watch demo video
+                Watch explainer video
               </Link>
             </div>
           </div>

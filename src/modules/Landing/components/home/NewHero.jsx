@@ -110,7 +110,7 @@ export function NewHero() {
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#0D6E42]/25 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all text-center cursor-pointer group"
               >
                 <Play size={16} weight="fill" className="text-[#0D6E42] group-hover:scale-110 transition-transform" />
-                <span>Watch demo video</span>
+                <span>Watch explainer video</span>
               </a>
             </div>
 

@@ -6,6 +6,7 @@ export function FeatureSalesEngine() {
   return (
     <FeaturePageTemplate
       specId="05"
+      layoutVariant="split"
       badge="SALES ENGINE"
       headlinePart1="A salesperson who"
       highlightText="never sleeps,"

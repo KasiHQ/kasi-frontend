@@ -34,14 +34,11 @@ export function GlobalFooter() {
             <Link to="/features" className="hover:text-white transition-colors">
               Features
             </Link>
-            <Link to="/try" className="hover:text-white transition-colors">
-              Try it
+            <Link to="/pricing" className="hover:text-white transition-colors">
+              Pricing
             </Link>
             <Link to="/market" className="hover:text-white transition-colors">
               Market
-            </Link>
-            <Link to="/pricing" className="hover:text-white transition-colors">
-              Pricing
             </Link>
             <Link to="/platforms" className="hover:text-white transition-colors">
               Platforms
@@ -99,17 +96,12 @@ export function GlobalFooter() {
             <Link to="/signup" className="hover:text-white transition-colors">
               Create a store
             </Link>
-            <Link to="/try#book" className="hover:text-white transition-colors">
-              Book a demo
-            </Link>
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition-colors"
-            >
-              Chat the live demo
+            <a href="/#demo-video" className="hover:text-white transition-colors">
+              Watch explainer
             </a>
+            <Link to="/pricing" className="hover:text-white transition-colors">
+              View pricing
+            </Link>
             <Link to="/login" className="hover:text-white transition-colors">
               Sign in
             </Link>

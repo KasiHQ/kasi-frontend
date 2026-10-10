@@ -155,11 +155,11 @@ export const ROUTES: Record<string, RouteConfig> = {
     path: '/pricing',
     name: 'Pricing',
     specSectionId: '15',
-    status: 'stub',
+    status: 'built',
     metaTitle: 'Pricing | Simple Flat Monthly Plans for Social Commerce Sellers',
     metaDescription: 'Transparent pricing with no commissions on your sales. Starting from ₦18,000/month.',
     h1: 'Simple, transparent pricing for growing sellers.',
-    sub: 'No hidden cuts. Keep 100% of your sales with flat monthly plans built for Nigerian SMEs.',
+    sub: 'No commissions. No hidden cuts. Keep 100% of your sales with flat monthly plans built for African businesses.',
     isNav: true,
   },
   ABOUT: {

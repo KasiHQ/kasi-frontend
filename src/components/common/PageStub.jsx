@@ -59,12 +59,10 @@ export function PageStub({ route }) {
             Start free
           </Link>
           <a
-            href={waDemoLink}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/#demo-video"
             className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-sm sm:text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 active:scale-95 transition-all"
           >
-            Chat the live demo
+            Watch explainer video
           </a>
           <Link
             to="/"

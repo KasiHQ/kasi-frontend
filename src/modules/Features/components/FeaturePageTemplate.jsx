@@ -23,6 +23,7 @@ export function FeaturePageTemplate({
   controls = [],
   ctaHeading,
   ctaSub,
+  layoutVariant = "stacked", // "stacked" | "split"
 }) {
   const shouldReduceMotion = useReducedMotion();
 
@@ -43,81 +44,157 @@ export function FeaturePageTemplate({
 
       <main className="flex-1 pt-32 sm:pt-40 pb-20">
         {/* Hero Section */}
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Feature Category Tag */}
-          {badge && (
-            <div className="mb-4">
-              <span className="font-poppins text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
-                {badge}
-              </span>
-            </div>
-          )}
+        {layoutVariant === "split" ? (
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+              {/* Left Column: Typography & CTAs */}
+              <div className="lg:col-span-6 text-left">
+                {badge && (
+                  <div className="mb-4">
+                    <span className="font-poppins text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
+                      {badge}
+                    </span>
+                  </div>
+                )}
 
-          {/* H1 with marker */}
-          <h1 className="font-display font-medium text-3xl sm:text-5xl lg:text-[62px] text-[#141C17] tracking-tight leading-[1.08] max-w-4xl mx-auto">
-            {headlinePart1}{" "}
-            <span className="relative inline-block text-[#0D6E42]">
-              <span className="relative z-10">{highlightText}</span>
-              <span
-                className="absolute left-0 bottom-1 sm:bottom-2 w-full h-3 sm:h-4 bg-[#DBF361] -rotate-1 rounded-xs -z-0"
+                <h1 className="font-display font-medium text-3xl sm:text-5xl lg:text-[56px] text-[#141C17] tracking-tight leading-[1.08]">
+                  {headlinePart1}{" "}
+                  <span className="relative inline-block text-[#0D6E42]">
+                    <span className="relative z-10">{highlightText}</span>
+                    <span
+                      className="absolute left-0 bottom-1 sm:bottom-2 w-full h-3 sm:h-4 bg-[#DBF361] -rotate-1 rounded-xs -z-0"
+                      aria-hidden="true"
+                    />
+                  </span>{" "}
+                  {headlinePart2}
+                </h1>
+
+                <p className="mt-6 text-base sm:text-lg text-[#141C17]/80 font-light leading-relaxed">
+                  {sub}
+                </p>
+
+                <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                  <Link
+                    to="/signup"
+                    className="px-8 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-base shadow-sm hover:shadow-md hover:brightness-105 active:scale-95 transition-all text-center"
+                  >
+                    Start free
+                  </Link>
+                  <a
+                    href="/#demo-video"
+                    className="px-7 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 active:scale-95 transition-all text-center"
+                  >
+                    Watch explainer video
+                  </a>
+                </div>
+              </div>
+
+              {/* Right Column: Screenshot Showcase */}
+              <motion.div
+                initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.65, delay: 0.1 }}
+                className="lg:col-span-6 relative"
+              >
+                <div
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-[#DBF361]/25 blur-[100px] rounded-full -z-10 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <div className="rounded-[28px] p-3 sm:p-4 bg-white border border-[#141C17]/10 shadow-2xl overflow-hidden">
+                  <div className="rounded-2xl overflow-hidden bg-[#F6F8F3] border border-[#141C17]/6">
+                    <img
+                      src={screenshot}
+                      alt={screenshotAlt}
+                      className="w-full h-auto object-cover object-left-top hover:scale-[1.01] transition-transform duration-500"
+                      loading="eager"
+                    />
+                  </div>
+                </div>
+                {screenshotCaption && (
+                  <p className="mt-3 text-center text-xs text-[#141C17]/60 font-light">
+                    {screenshotCaption}
+                  </p>
+                )}
+              </motion.div>
+            </div>
+          </div>
+        ) : (
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            {/* Feature Category Tag */}
+            {badge && (
+              <div className="mb-4">
+                <span className="font-poppins text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
+                  {badge}
+                </span>
+              </div>
+            )}
+
+            {/* H1 with marker */}
+            <h1 className="font-display font-medium text-3xl sm:text-5xl lg:text-[62px] text-[#141C17] tracking-tight leading-[1.08] max-w-4xl mx-auto">
+              {headlinePart1}{" "}
+              <span className="relative inline-block text-[#0D6E42]">
+                <span className="relative z-10">{highlightText}</span>
+                <span
+                  className="absolute left-0 bottom-1 sm:bottom-2 w-full h-3 sm:h-4 bg-[#DBF361] -rotate-1 rounded-xs -z-0"
+                  aria-hidden="true"
+                />
+              </span>{" "}
+              {headlinePart2}
+            </h1>
+
+            {/* Sub */}
+            <p className="mt-6 text-base sm:text-lg lg:text-xl text-[#141C17]/80 font-light max-w-2xl mx-auto leading-relaxed">
+              {sub}
+            </p>
+
+            {/* CTAs */}
+            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                to="/signup"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-base shadow-sm hover:shadow-md hover:brightness-105 active:scale-95 transition-all text-center"
+              >
+                Start free
+              </Link>
+              <a
+                href="/#demo-video"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 active:scale-95 transition-all text-center"
+              >
+                Watch explainer video
+              </a>
+            </div>
+
+            {/* Hero Screenshot Showcase */}
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="mt-12 sm:mt-16 max-w-[1100px] mx-auto relative"
+            >
+              {/* Ambient Lime Glow behind player */}
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-[#DBF361]/20 blur-[130px] rounded-full -z-10 pointer-events-none"
                 aria-hidden="true"
               />
-            </span>{" "}
-            {headlinePart2}
-          </h1>
 
-          {/* Sub */}
-          <p className="mt-6 text-base sm:text-lg lg:text-xl text-[#141C17]/80 font-light max-w-2xl mx-auto leading-relaxed">
-            {sub}
-          </p>
-
-          {/* CTAs */}
-          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/signup"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-base shadow-sm hover:shadow-md hover:brightness-105 active:scale-95 transition-all text-center"
-            >
-              Start free
-            </Link>
-            <Link
-              to="/#demo-video"
-              className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 active:scale-95 transition-all text-center"
-            >
-              Watch demo video
-            </Link>
-          </div>
-
-          {/* Hero Screenshot Showcase */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="mt-12 sm:mt-16 max-w-[1100px] mx-auto relative"
-          >
-            {/* Ambient Lime Glow behind player */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-[#DBF361]/20 blur-[130px] rounded-full -z-10 pointer-events-none"
-              aria-hidden="true"
-            />
-
-            <div className="rounded-[24px] sm:rounded-[32px] p-2.5 sm:p-4 bg-white border border-[#141C17]/10 shadow-2xl overflow-hidden">
-              <div className="rounded-2xl overflow-hidden bg-[#F6F8F3] border border-[#141C17]/6">
-                <img
-                  src={screenshot}
-                  alt={screenshotAlt}
-                  className="w-full h-auto object-cover object-left-top hover:scale-[1.01] transition-transform duration-500"
-                  loading="eager"
-                />
+              <div className="rounded-[24px] sm:rounded-[32px] p-2.5 sm:p-4 bg-white border border-[#141C17]/10 shadow-2xl overflow-hidden">
+                <div className="rounded-2xl overflow-hidden bg-[#F6F8F3] border border-[#141C17]/6">
+                  <img
+                    src={screenshot}
+                    alt={screenshotAlt}
+                    className="w-full h-auto object-cover object-left-top hover:scale-[1.01] transition-transform duration-500"
+                    loading="eager"
+                  />
+                </div>
               </div>
-            </div>
 
-            {screenshotCaption && (
-              <p className="mt-4 text-center text-xs sm:text-sm text-[#141C17]/65 font-light">
-                {screenshotCaption}
-              </p>
-            )}
-          </motion.div>
-        </div>
+              {screenshotCaption && (
+                <p className="mt-4 text-center text-xs sm:text-sm text-[#141C17]/65 font-light">
+                  {screenshotCaption}
+                </p>
+              )}
+            </motion.div>
+          </div>
+        )}
 
         {/* Problem It Kills Band (Optional) */}
         {problemHeading && (
@@ -311,12 +388,12 @@ export function FeaturePageTemplate({
               >
                 Start free
               </Link>
-              <Link
-                to="/#demo-video"
+              <a
+                href="/#demo-video"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white/10 text-white font-semibold text-base border border-white/20 hover:bg-white/20 transition-all text-center"
               >
-                Watch demo video
-              </Link>
+                Watch explainer video
+              </a>
             </div>
           </div>
         </div>

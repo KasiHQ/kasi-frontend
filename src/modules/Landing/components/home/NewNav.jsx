@@ -119,13 +119,6 @@ export function NewNav() {
             </div>
 
             <Link
-              to="/try"
-              className="text-sm font-medium text-[#141C17]/80 hover:text-[#141C17] transition-colors"
-            >
-              Try it
-            </Link>
-
-            <Link
               to="/market"
               className="text-sm font-medium text-[#141C17]/80 hover:text-[#141C17] transition-colors"
             >
@@ -258,9 +251,6 @@ export function NewNav() {
               </Link>
               <Link to="/features" onClick={() => setMobileMenuOpen(false)} className="py-1 text-[#141C17]">
                 Features
-              </Link>
-              <Link to="/try" onClick={() => setMobileMenuOpen(false)} className="py-1 text-[#141C17]">
-                Try it
               </Link>
               <Link to="/market" onClick={() => setMobileMenuOpen(false)} className="py-1 text-[#141C17]">
                 Market

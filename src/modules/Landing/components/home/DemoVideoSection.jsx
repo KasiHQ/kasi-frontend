@@ -126,7 +126,7 @@ export function DemoVideoSection() {
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
         <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-5xl text-[#141C17] tracking-tight leading-[1.12]">
-          See a real order happen,{" "}
+          See how Kasi runs your shop,{" "}
           <span className="relative inline-block">
             <span className="relative z-10 text-[#0D6E42]">start to finish.</span>
             <span
@@ -136,7 +136,7 @@ export function DemoVideoSection() {
           </span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-[#141C17]/75 font-light leading-relaxed">
-          No slides. Watch Kasi take a customer from first message to paid and out for delivery.
+          Watch how Kasi automates conversations, takes payments, and manages fulfilment in under two minutes.
         </p>
       </div>
 

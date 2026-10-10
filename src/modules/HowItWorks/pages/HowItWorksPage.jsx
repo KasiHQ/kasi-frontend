@@ -160,17 +160,17 @@ export const HowItWorksPage = () => {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
-            to="/try"
-            className="px-6 py-3.5 rounded-full bg-[#0D6E42] text-[#DBF361] font-medium text-sm hover:bg-[#1C774E] transition-all shadow-md hover:shadow-lg"
+            to="/signup"
+            className="px-7 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-sm hover:brightness-105 transition-all shadow-md hover:shadow-lg"
           >
-            Try the live demo
+            Get started
           </Link>
-          <Link
-            to="/contact"
-            className="px-6 py-3.5 rounded-full bg-transparent text-[#141C17] border border-[#141C17]/20 font-medium text-sm hover:bg-[#141C17]/5 transition-all"
+          <a
+            href="/#demo-video"
+            className="px-6 py-3.5 rounded-full bg-white text-[#141C17] border border-[#141C17]/15 font-semibold text-sm hover:bg-[#141C17]/5 transition-all shadow-xs"
           >
-            Book a walkthrough
-          </Link>
+            Watch explainer video
+          </a>
         </div>
       </section>
 
@@ -319,20 +319,20 @@ export const HowItWorksPage = () => {
       {/* Spec 3.5: Close */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center">
         <h2 className="font-display font-medium text-3xl sm:text-4xl text-[#141C17] tracking-tight">
-          Seen enough? Go and chat it yourself.
+          Ready to put your store on autopilot?
         </h2>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
-            to="/try"
-            className="px-6 py-3.5 rounded-full bg-[#0D6E42] text-[#DBF361] font-medium text-sm hover:bg-[#1C774E] transition-all shadow-md hover:shadow-lg"
+            to="/signup"
+            className="px-7 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-sm hover:brightness-105 transition-all shadow-md hover:shadow-lg"
           >
-            Chat the live demo
+            Get started
           </Link>
           <Link
-            to="/get-started"
-            className="px-6 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-sm hover:bg-[#c9e34a] transition-all shadow-md hover:shadow-lg"
+            to="/pricing"
+            className="px-6 py-3.5 rounded-full bg-white text-[#141C17] border border-[#141C17]/15 font-semibold text-sm hover:bg-[#141C17]/5 transition-all shadow-xs"
           >
-            Start free
+            View pricing
           </Link>
         </div>
       </section>

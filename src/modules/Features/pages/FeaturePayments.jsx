@@ -6,6 +6,7 @@ export function FeaturePayments() {
   return (
     <FeaturePageTemplate
       specId="08"
+      layoutVariant="split"
       badge="PAYMENTS & CHECKOUT"
       headlinePart1="Paid means paid."
       highlightText="Kasi knows the moment"
