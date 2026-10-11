@@ -179,6 +179,10 @@ const ALLOWLISTED_COPY = new Set([
   'Port Harcourt',
   'Arike',
   'Ogun',
+  // Distinct testimonial quotes
+  'I stopped losing customers at midnight. Kasi handles sizing, takes Paystack payments, and arranges delivery while I sleep.',
+  'Selling tech on WhatsApp means constant bargaining. Kasi negotiates within my floor prices and closes before buyers leave.',
+  'Customers always need skincare advice before buying. Kasi recommends the right products, adds bundles, and confirms payment instantly.',
   // Placeholder captions for designed placeholders
   'Nigerian female entrepreneur packing fashion orders',
   'Retail vendor handing off orders for rider dispatch',

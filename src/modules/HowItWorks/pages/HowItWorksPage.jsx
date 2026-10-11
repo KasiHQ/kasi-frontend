@@ -165,12 +165,12 @@ export const HowItWorksPage = () => {
           >
             Get started
           </Link>
-          <a
-            href="/#demo-video"
+          <Link
+            to="/#demo-video"
             className="px-6 py-3.5 rounded-full bg-white text-[#141C17] border border-[#141C17]/15 font-semibold text-sm hover:bg-[#141C17]/5 transition-all shadow-xs"
           >
             Watch explainer video
-          </a>
+          </Link>
         </div>
       </section>
 

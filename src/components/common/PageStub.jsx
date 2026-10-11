@@ -58,12 +58,12 @@ export function PageStub({ route }) {
           >
             Start free
           </Link>
-          <a
-            href="/#demo-video"
+          <Link
+            to="/#demo-video"
             className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-sm sm:text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 active:scale-95 transition-all"
           >
             Watch explainer video
-          </a>
+          </Link>
           <Link
             to="/"
             className="w-full sm:w-auto px-5 py-3.5 text-sm font-medium text-[#141C17]/70 hover:text-[#0D6E42] transition-colors"

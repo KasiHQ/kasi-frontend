@@ -19,7 +19,7 @@ export function GlobalFooter() {
               <KasiLogo variant="full" theme="dark" size={32} />
             </Link>
             <p className="text-sm text-white/60 font-light max-w-sm leading-relaxed mt-2">
-              The operating system for businesses that sell on WhatsApp, Instagram, and Telegram.
+              The operating system for businesses that sell on WhatsApp, Instagram, Facebook, and Telegram.
             </p>
           </div>
 
@@ -96,9 +96,9 @@ export function GlobalFooter() {
             <Link to="/signup" className="hover:text-white transition-colors">
               Create a store
             </Link>
-            <a href="/#demo-video" className="hover:text-white transition-colors">
+            <Link to="/#demo-video" className="hover:text-white transition-colors">
               Watch explainer
-            </a>
+            </Link>
             <Link to="/pricing" className="hover:text-white transition-colors">
               View pricing
             </Link>

@@ -80,12 +80,12 @@ export function FeaturePageTemplate({
                   >
                     Start free
                   </Link>
-                  <a
-                    href="/#demo-video"
+                  <Link
+                    to="/#demo-video"
                     className="px-7 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 active:scale-95 transition-all text-center"
                   >
                     Watch explainer video
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -155,12 +155,12 @@ export function FeaturePageTemplate({
               >
                 Start free
               </Link>
-              <a
-                href="/#demo-video"
+              <Link
+                to="/#demo-video"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white text-[#141C17] font-semibold text-base border border-[#141C17]/15 shadow-xs hover:border-[#0D6E42] hover:bg-[#0D6E42]/5 active:scale-95 transition-all text-center"
               >
                 Watch explainer video
-              </a>
+              </Link>
             </div>
 
             {/* Hero Screenshot Showcase */}
@@ -388,12 +388,12 @@ export function FeaturePageTemplate({
               >
                 Start free
               </Link>
-              <a
-                href="/#demo-video"
+              <Link
+                to="/#demo-video"
                 className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white/10 text-white font-semibold text-base border border-white/20 hover:bg-white/20 transition-all text-center"
               >
                 Watch explainer video
-              </a>
+              </Link>
             </div>
           </div>
         </div>

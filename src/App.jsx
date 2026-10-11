@@ -82,13 +82,36 @@ function AnalyticsTracker() {
   return null;
 }
 
-// Helper component to scroll to top on navigation changes
+// Helper component to scroll to top or target hash element on navigation changes
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (hash) {
+      const id = hash.replace(/^#/, '');
+      const scrollToElement = () => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          return true;
+        }
+        return false;
+      };
+
+      if (!scrollToElement()) {
+        const t1 = setTimeout(scrollToElement, 80);
+        const t2 = setTimeout(scrollToElement, 250);
+        const t3 = setTimeout(scrollToElement, 500);
+        return () => {
+          clearTimeout(t1);
+          clearTimeout(t2);
+          clearTimeout(t3);
+        };
+      }
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
 
   return null;
 }
