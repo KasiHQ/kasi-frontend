@@ -159,6 +159,11 @@ const ALLOWLISTED_COPY = new Set([
   '/images/One assistant. The whole shop/fashion vendor.jpeg',
   '/images/One assistant. The whole shop/retail vendor handing off.jpeg',
   '/images/One assistant. The whole shop/store owner analytics.jpeg',
+  '/images/categories/food-kitchens.jpg',
+  '/images/categories/fashion-thrift.jpg',
+  '/images/categories/gadgets-accessories.jpg',
+  '/images/categories/jewelry.jpg',
+  '/images/categories/skincare-beauty.jpg',
   // Testimonial vendor attributes (from real Nigerian merchants per spec 2.7 directive)
   'Folake Adebayo',
   'Lush Looks',

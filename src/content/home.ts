@@ -89,18 +89,23 @@ export const HOME_COPY = {
     categories: [
       {
         title: "Food & kitchens",
+        image: "/images/categories/food-kitchens.jpg",
       },
       {
         title: "Fashion & thrift",
+        image: "/images/categories/fashion-thrift.jpg",
       },
       {
         title: "Gadgets & accessories",
+        image: "/images/categories/gadgets-accessories.jpg",
       },
       {
         title: "Jewelry",
+        image: "/images/categories/jewelry.jpg",
       },
       {
         title: "Skincare & beauty",
+        image: "/images/categories/skincare-beauty.jpg",
       },
     ],
   },

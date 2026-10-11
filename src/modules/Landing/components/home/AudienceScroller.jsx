@@ -66,10 +66,25 @@ export function AudienceScroller() {
         {copy.categories.map((cat) => (
           <div
             key={cat.title}
-            className="snap-start shrink-0 w-[280px] sm:w-[310px] h-[390px] rounded-[22px] overflow-hidden relative border border-[#141C17]/10 shadow-xs hover:shadow-lg transition-all group"
+            className="snap-start shrink-0 w-[280px] sm:w-[310px] h-[400px] rounded-[24px] overflow-hidden relative border border-[#141C17]/10 shadow-xs hover:shadow-xl transition-all duration-300 group bg-[#141C17]"
           >
-            {/* Background Designed Placeholder */}
-            <div className="absolute inset-0 w-full h-full">
+            {/* Background 3D Animation Image or Designed Placeholder */}
+            {cat.image ? (
+              <img
+                src={cat.image}
+                alt={cat.title}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  if (e.currentTarget.nextElementSibling) {
+                    e.currentTarget.nextElementSibling.style.display = "block";
+                  }
+                }}
+              />
+            ) : null}
+
+            <div style={{ display: cat.image ? "none" : "block" }} className="absolute inset-0 w-full h-full">
               <DesignedPlaceholder
                 aspect="3/4"
                 caption={cat.title}
@@ -78,8 +93,11 @@ export function AudienceScroller() {
             </div>
 
             {/* Bottom gradient & category title */}
-            <div className="absolute inset-x-0 bottom-0 p-6 pt-20 bg-gradient-to-t from-[#141C17]/90 via-[#141C17]/40 to-transparent flex flex-col justify-end">
-              <h3 className="font-display font-medium text-2xl text-[#F6F8F3] tracking-tight">
+            <div className="absolute inset-x-0 bottom-0 p-6 pt-24 bg-gradient-to-t from-[#141C17] via-[#141C17]/60 to-transparent flex flex-col justify-end pointer-events-none">
+              <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[#DBF361] mb-1">
+                High Volume
+              </span>
+              <h3 className="font-display font-medium text-2xl text-white tracking-tight">
                 {cat.title}
               </h3>
             </div>
