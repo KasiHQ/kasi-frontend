@@ -236,46 +236,114 @@ export function NewNav() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Full-Screen Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="sm:hidden bg-[#F6F8F3]/98 backdrop-blur-xl border-b border-[#141C17]/10 px-6 py-6 overflow-hidden"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 top-0 left-0 w-full h-[100dvh] z-50 bg-[#F6F8F3] flex flex-col justify-between px-6 pt-6 pb-8 overflow-y-auto sm:hidden"
           >
-            <nav className="flex flex-col gap-4 text-base font-medium">
-              <Link to="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="py-1 text-[#141C17]">
+            {/* Top Bar inside Fullscreen Nav */}
+            <div className="flex items-center justify-between pb-6 border-b border-[#141C17]/10">
+              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center">
+                <KasiLogo variant="full" size={32} />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-10 h-10 rounded-full bg-white border border-[#141C17]/10 flex items-center justify-center text-[#141C17]"
+                aria-label="Close navigation menu"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Main Links */}
+            <nav className="flex-1 py-8 flex flex-col justify-center gap-6">
+              <Link
+                to="/how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-2xl font-display font-medium text-[#141C17] hover:text-[#0D6E42] transition-colors"
+              >
                 How it works
               </Link>
-              <Link to="/features" onClick={() => setMobileMenuOpen(false)} className="py-1 text-[#141C17]">
+              <Link
+                to="/features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-2xl font-display font-medium text-[#141C17] hover:text-[#0D6E42] transition-colors"
+              >
                 Features
               </Link>
-              <Link to="/market" onClick={() => setMobileMenuOpen(false)} className="py-1 text-[#141C17]">
+              <Link
+                to="/market"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-2xl font-display font-medium text-[#141C17] hover:text-[#0D6E42] transition-colors"
+              >
                 Market
               </Link>
-              <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="py-1 text-[#141C17]">
+              <Link
+                to="/pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-2xl font-display font-medium text-[#141C17] hover:text-[#0D6E42] transition-colors"
+              >
                 Pricing
               </Link>
 
-              <div className="pt-4 border-t border-[#141C17]/10 flex flex-col gap-3">
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center font-semibold text-[#141C17] border border-[#141C17]/15 rounded-full"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center font-semibold bg-[#DBF361] text-[#141C17] rounded-full shadow-sm"
-                >
-                  Start free
-                </Link>
+              {/* Company Section in Mobile */}
+              <div className="pt-4 border-t border-[#141C17]/10">
+                <div className="text-xs font-mono uppercase tracking-wider text-[#141C17]/50 mb-3">
+                  Company
+                </div>
+                <div className="flex flex-col gap-3 pl-1">
+                  <Link
+                    to="/about"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-lg font-medium text-[#141C17] hover:text-[#0D6E42] transition-colors"
+                  >
+                    About Endogenous
+                  </Link>
+                  <a
+                    href="https://blog.usekasi.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-lg font-medium text-[#141C17] hover:text-[#0D6E42] transition-colors"
+                  >
+                    Blog
+                  </a>
+                  <Link
+                    to="/contact"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-lg font-medium text-[#141C17] hover:text-[#0D6E42] transition-colors"
+                  >
+                    Contact
+                  </Link>
+                </div>
               </div>
             </nav>
+
+            {/* Bottom Actions */}
+            <div className="pt-6 border-t border-[#141C17]/10 flex flex-col gap-3">
+              <Link
+                to="/signup"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 text-center font-semibold bg-[#DBF361] text-[#141C17] rounded-full text-base shadow-sm active:scale-95 transition-all"
+              >
+                Start free
+              </Link>
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3 text-center font-medium text-sm text-[#141C17]/80 hover:text-[#141C17] border border-[#141C17]/15 rounded-full"
+              >
+                Sign in
+              </Link>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

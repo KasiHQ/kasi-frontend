@@ -54,7 +54,7 @@ export function PillarsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.55, delay: index * 0.1 }}
-              className="min-w-[85vw] sm:min-w-[340px] lg:min-w-0 snap-center bg-white rounded-[22px] border border-[#141C17]/10 p-5 sm:p-7 shadow-xs flex flex-col justify-between overflow-hidden group hover:border-[#141C17]/20 transition-colors shrink-0 lg:shrink"
+              className="w-[82vw] max-w-[320px] sm:w-[320px] lg:w-auto lg:max-w-none snap-center bg-white rounded-[22px] border border-[#141C17]/10 p-5 sm:p-6 shadow-xs flex flex-col justify-between overflow-hidden group hover:border-[#141C17]/20 transition-colors shrink-0 lg:shrink"
             >
               <div>
                 {/* Top: Real Vendor Photo or Designed Placeholder */}
