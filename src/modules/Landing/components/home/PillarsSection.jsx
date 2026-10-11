@@ -60,18 +60,21 @@ export function PillarsSection() {
                 {/* Top: Real Vendor Photo or Designed Placeholder */}
                 <div className="w-full h-44 rounded-xl overflow-hidden mb-6 border border-[#141C17]/8 shadow-inner bg-[#F6F8F3] relative">
                   {pillar.photo ? (
-                    <img
-                      src={pillar.photo}
-                      alt={pillar.placeholderCaption || `${labelTitle} vendor in shop`}
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.nextElementSibling) {
-                          e.currentTarget.nextElementSibling.style.display = 'block';
-                        }
-                      }}
-                    />
+                    <>
+                      <img
+                        src={pillar.photo}
+                        alt={pillar.placeholderCaption || `${labelTitle} vendor in shop`}
+                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          if (e.currentTarget.nextElementSibling) {
+                            e.currentTarget.nextElementSibling.style.display = 'block';
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black/25 pointer-events-none" aria-hidden="true" />
+                    </>
                   ) : null}
                   <div style={{ display: pillar.photo ? 'none' : 'block' }} className="w-full h-full">
                     <DesignedPlaceholder

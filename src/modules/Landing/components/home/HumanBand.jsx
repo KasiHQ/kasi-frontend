@@ -30,14 +30,37 @@ export function HumanBand() {
 
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          {/* Left Column: Designed Placeholder for authentic Nigerian merchant */}
+          {/* Left Column: Authentic Nigerian merchant portrait with dark overlay */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[420px] aspect-[4/5] rounded-[24px] overflow-hidden shadow-2xl border border-white/10">
-              <DesignedPlaceholder
-                aspect="4/5"
-                caption={`${current.name} — ${current.business}, ${current.city}`}
-                className="w-full h-full"
+            <div className="relative w-full max-w-[420px] aspect-[4/5] rounded-[24px] overflow-hidden shadow-2xl border border-white/10 bg-[#141C17]">
+              {current.image ? (
+                <img
+                  src={current.image}
+                  alt={`${current.name} — ${current.business}, ${current.city}`}
+                  className="w-full h-full object-cover transition-opacity duration-300"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    if (e.currentTarget.nextElementSibling) {
+                      e.currentTarget.nextElementSibling.style.display = "block";
+                    }
+                  }}
+                />
+              ) : null}
+
+              {/* Dark overlay for clean contrast and cinematic tone */}
+              <div
+                className="absolute inset-0 bg-black/40 pointer-events-none"
+                aria-hidden="true"
               />
+
+              <div style={{ display: current.image ? "none" : "block" }} className="w-full h-full">
+                <DesignedPlaceholder
+                  aspect="4/5"
+                  caption={`${current.name} — ${current.business}, ${current.city}`}
+                  className="w-full h-full"
+                />
+              </div>
             </div>
           </div>
 
