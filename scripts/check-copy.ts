@@ -164,6 +164,9 @@ const ALLOWLISTED_COPY = new Set([
   '/images/categories/gadgets-accessories.jpg',
   '/images/categories/jewelry.jpg',
   '/images/categories/skincare-beauty.jpg',
+  '/images/testimonials/folake.jpg',
+  '/images/testimonials/emeka.jpg',
+  '/images/testimonials/arike.jpg',
   // Testimonial vendor attributes (from real Nigerian merchants per spec 2.7 directive)
   'Folake Adebayo',
   'Lush Looks',
@@ -174,6 +177,8 @@ const ALLOWLISTED_COPY = new Set([
   'Kenechukwu O.',
   'Skin by Kene',
   'Port Harcourt',
+  'Arike',
+  'Ogun',
   // Placeholder captions for designed placeholders
   'Nigerian female entrepreneur packing fashion orders',
   'Retail vendor handing off orders for rider dispatch',

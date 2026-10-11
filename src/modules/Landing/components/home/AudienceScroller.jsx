@@ -84,6 +84,12 @@ export function AudienceScroller() {
               />
             ) : null}
 
+            {/* Dark overlay for consistent moody contrast and text readability */}
+            <div
+              className="absolute inset-0 bg-black/35 pointer-events-none z-10"
+              aria-hidden="true"
+            />
+
             <div style={{ display: cat.image ? "none" : "block" }} className="absolute inset-0 w-full h-full">
               <DesignedPlaceholder
                 aspect="3/4"
