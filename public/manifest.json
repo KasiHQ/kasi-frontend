@@ -1,11 +1,11 @@
 {
   "name": "Kasi",
   "short_name": "Kasi",
-  "description": "AI-powered sales assistant. Manage invoices, sales, and payments for your business.",
+  "description": "The AI Agent and Operating System for Social Commerce. Answers, negotiates, collects payment, and arranges delivery.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0F8C55",
+  "theme_color": "#0D6E42",
   "orientation": "portrait-primary",
   "icons": [
     {

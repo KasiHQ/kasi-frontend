@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
 import { WaitlistModal } from "../components/WaitlistModal";
 
 // Modular Spec 01 & 02 Components
@@ -19,59 +17,11 @@ import { FinalCtaSection } from "../components/home/FinalCtaSection";
 import { GlobalFooter } from "../../../components/common/GlobalFooter";
 
 const LandingPage = () => {
-  const { user, loading, loginWithGoogle } = useAuth();
-  const navigate = useNavigate();
-
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
-  const handleGoogleLogin = async (response) => {
-    try {
-      const loggedInUser = await loginWithGoogle(response.credential);
-      if (loggedInUser?.is_admin) {
-        navigate("/kasisalienceadministration");
-      } else {
-        if (!loggedInUser.onboarding_completed) {
-          navigate("/onboarding");
-        } else {
-          navigate("/dashboard");
-        }
-      }
-    } catch (err) {
-      console.error("Google auto-login failed on landing page:", err);
-    }
-  };
-
   useEffect(() => {
-    /* global google */
-    if (window.google && !user && !loading) {
-      try {
-        google.accounts.id.initialize({
-          client_id: "418652112968-i6bv554036fq1p6stf6ujhsf5qkste3q.apps.googleusercontent.com",
-          callback: handleGoogleLogin,
-          auto_select: true,
-        });
-
-        // Trigger One Tap overlay
-        google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed()) {
-            console.log("One Tap not displayed on landing:", notification.getNotDisplayedReason());
-          }
-        });
-      } catch (err) {
-        console.error("Google One Tap init failed on landing:", err);
-      }
-    }
-  }, [user, loading]);
-
-  useEffect(() => {
-    if (user && !loading) {
-      if (user.is_admin) {
-        navigate("/kasisalienceadministration");
-      } else {
-        navigate("/dashboard");
-      }
-    }
-  }, [user, loading, navigate]);
+    document.title = "Kasi | The AI Agent and Operating System for Social Commerce";
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F6F8F3] text-[#141C17] font-poppins selection:bg-[#DBF361] selection:text-[#141C17] overflow-x-clip w-full relative">

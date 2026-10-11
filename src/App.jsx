@@ -77,8 +77,8 @@ import PricingPage from './modules/Pricing/pages/PricingPage';
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
 
+// Analytics tracker disabled on marketing and public pages to ensure instantaneous page load
 function AnalyticsTracker() {
-  usePageTracker();
   return null;
 }
 
