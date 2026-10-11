@@ -55,6 +55,24 @@ import Fulfilment from './modules/Fulfilment/pages/Fulfilment';
 import PrivacyPolicy from './modules/Legal/pages/PrivacyPolicy';
 import TermsOfService from './modules/Legal/pages/TermsOfService';
 import DataDeletion from './modules/Legal/pages/DataDeletion';
+import { ROUTES } from './routes';
+import PageStub from './components/common/PageStub';
+import DevLogos from './pages/DevLogos';
+import DevType from './pages/DevType';
+
+// Public Feature Pages (Specs 04-12)
+import FeaturesHub from './modules/Features/pages/FeaturesHub';
+import FeatureSalesEngine from './modules/Features/pages/FeatureSalesEngine';
+import FeatureFulfilment from './modules/Features/pages/FeatureFulfilment';
+import FeatureDelivery from './modules/Features/pages/FeatureDelivery';
+import FeaturePayments from './modules/Features/pages/FeaturePayments';
+import FeatureChats from './modules/Features/pages/FeatureChats';
+import FeatureCustomers from './modules/Features/pages/FeatureCustomers';
+import FeatureAnalytics from './modules/Features/pages/FeatureAnalytics';
+import FeaturePlatforms from './modules/Features/pages/FeaturePlatforms';
+import HowItWorksPage from './modules/HowItWorks/pages/HowItWorksPage';
+import AboutPage from './modules/About/pages/AboutPage';
+import PricingPage from './modules/Pricing/pages/PricingPage';
 
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
@@ -103,6 +121,27 @@ function App() {
           <Route path="/market" element={<Marketplace />} />
           <Route path="/market/product/:id" element={<ProductDetail />} />
           <Route path="/market/vendor/:vendorId" element={<VendorProfile />} />
+          
+          {/* Public Spec Routes */}
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/features" element={<FeaturesHub />} />
+          <Route path="/features/sales-engine" element={<FeatureSalesEngine />} />
+          <Route path="/features/fulfilment" element={<FeatureFulfilment />} />
+          <Route path="/features/delivery" element={<FeatureDelivery />} />
+          <Route path="/features/payments" element={<FeaturePayments />} />
+          <Route path="/features/chats" element={<FeatureChats />} />
+          <Route path="/features/customers" element={<FeatureCustomers />} />
+          <Route path="/features/analytics" element={<FeatureAnalytics />} />
+          <Route path="/platforms" element={<FeaturePlatforms />} />
+          <Route path="/try" element={<PageStub route={ROUTES.TRY} />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<PageStub route={ROUTES.CONTACT} />} />
+          <Route path="/get-started" element={<Signup />} />
+          
+          {/* Dev-only inspection routes */}
+          <Route path="/dev/logos" element={<DevLogos />} />
+          <Route path="/dev/type" element={<DevType />} />
           
           <Route element={<MainLayout />}>
               <Route path="/dashboard" element={

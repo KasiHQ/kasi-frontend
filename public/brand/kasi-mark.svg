@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Official Kasi Mark: White rounded-square chat bubble with lime smile -->
+  <defs>
+    <filter id="softKasiShadow" x="-10%" y="-10%" width="125%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0D6E42" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <!-- Rounded-square bubble container -->
+  <rect x="8" y="8" width="84" height="84" rx="26" fill="#FFFFFF" filter="url(#softKasiShadow)"/>
+  <path d="M28 84L16 94V84H28Z" fill="#FFFFFF"/>
+  <!-- The signature lime smile -->
+  <path d="M30 52C33 63 41 70 50 70C59 70 67 63 70 52" stroke="#DBF361" stroke-width="7" stroke-linecap="round"/>
+  <!-- Subtle Forest/Green accent dots or clean smile -->
+  <circle cx="34" cy="40" r="4.5" fill="#0D6E42"/>
+  <circle cx="66" cy="40" r="4.5" fill="#0D6E42"/>
+</svg>

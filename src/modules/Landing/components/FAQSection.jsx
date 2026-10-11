@@ -8,7 +8,7 @@ export const FAQSection = () => {
   const FAQS = [
     {
       q: "How exactly does Kasi's pricing work?",
-      a: "Kasi offers simple, predictable pricing. You start with a free trial to explore our automation tools, and can upgrade to a flat monthly subscription tier that best fits your business. Kasi does not take a sales commission from your transactions."
+      a: "Kasi offers simple, predictable pricing. You start with a free trial to explore our automation tools, and can upgrade to a flat monthly subscription tier that best fits your business."
     },
     {
       q: "Can I connect my own Naira bank details directly?",
@@ -19,8 +19,8 @@ export const FAQSection = () => {
       a: "Absolutely. You can connect your WhatsApp Business line, Telegram bot, or Instagram Direct Messages straight from the onboarding wizard in your dashboard. Our AI agent will manage customer chats on these platforms."
     },
     {
-      q: "Are there transaction fees or hidden charges?",
-      a: "Kasi does not charge any setup fees or sales commission on transactions. Your flat monthly subscription covers all Kasi AI features. Please note that standard payment gateway processing fees (such as Paystack processing fees) apply to transactions processed through customer checkout links."
+      q: "Are there setup fees or hidden charges?",
+      a: "Kasi does not charge any upfront setup fees. Your flat monthly subscription covers your Kasi AI features. Standard payment gateway processing fees (such as Paystack processing fees) apply to customer checkout links."
     }
   ];
 

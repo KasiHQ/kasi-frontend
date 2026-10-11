@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+test-results/
+playwright-report/
 
 # Environment variables (SENSITIVE — never push)
 .env
@@ -23,6 +25,8 @@ dist-ssr
 .agent/
 *.md
 !README.md
+!docs/*.md
+!public/**/*.md
 
 # Editor directories and files
 .vscode/*

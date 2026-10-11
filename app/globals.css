@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forest: #0D6E42;
+  --color-green: #1C774E;
+  --color-lime: #DBF361;
+  --color-ink: #141C17;
+  --color-paper: #F6F8F3;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  overflow-x: hidden;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Subtle dot-grid texture on Paper background */
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(20, 28, 23, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Very subtle grain overlay (<= 4% opacity) */
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Mask fade for chat stage top: dissolves older messages smoothly */
+.mask-chat-top {
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 14%, black 28%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 14%, black 28%, black 100%);
+}
+
+/* Paused animation helper */
+.is-paused *,
+.is-paused {
+  animation-play-state: paused !important;
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

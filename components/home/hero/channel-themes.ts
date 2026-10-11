@@ -1,0 +1,59 @@
+export type ChannelId = "whatsapp" | "instagram" | "telegram";
+
+export interface ChannelTheme {
+  id: ChannelId;
+  name: string;
+  word: string;
+  highlight: string; // CSS background for marker bar
+  blobA: string; // main tint @ ~40%
+  blobB: string; // secondary subtle tint @ ~30%
+  blobC: string; // tertiary accent tint @ ~20%
+  kasiBubble: string; // Kasi chat bubble background
+  pillDot: string; // live pill pulsing dot color
+  hasLimeGlow: boolean; // lime glow behind chat stage (WhatsApp only)
+  iconPath: string;
+}
+
+export const CHANNEL_THEMES: Record<ChannelId, ChannelTheme> = {
+  whatsapp: {
+    id: "whatsapp",
+    name: "WhatsApp",
+    word: "WhatsApp",
+    highlight: "#25D366",
+    blobA: "rgba(37, 211, 102, 0.38)",
+    blobB: "rgba(219, 243, 97, 0.30)",
+    blobC: "rgba(13, 110, 66, 0.22)",
+    kasiBubble: "#DFF7E4",
+    pillDot: "#25D366",
+    hasLimeGlow: true,
+    iconPath: "/logos/whatsapp.svg",
+  },
+  instagram: {
+    id: "instagram",
+    name: "Instagram",
+    word: "Instagram",
+    highlight: "linear-gradient(90deg, #FFB067 0%, #F58529 100%)",
+    blobA: "rgba(245, 133, 41, 0.38)",
+    blobB: "rgba(81, 91, 212, 0.28)",
+    blobC: "rgba(255, 176, 103, 0.20)",
+    kasiBubble: "linear-gradient(135deg, #FFE9D6 0%, #E6E9FF 100%)",
+    pillDot: "#F58529",
+    hasLimeGlow: false,
+    iconPath: "/logos/instagram.svg",
+  },
+  telegram: {
+    id: "telegram",
+    name: "Telegram",
+    word: "Telegram",
+    highlight: "#2AABEE",
+    blobA: "rgba(42, 171, 238, 0.38)",
+    blobB: "rgba(125, 211, 252, 0.30)",
+    blobC: "rgba(14, 165, 233, 0.20)",
+    kasiBubble: "#DCEFFC",
+    pillDot: "#2AABEE",
+    hasLimeGlow: false,
+    iconPath: "/logos/telegram.svg",
+  },
+};
+
+export const CHANNEL_SEQUENCE: ChannelId[] = ["whatsapp", "instagram", "telegram"];
