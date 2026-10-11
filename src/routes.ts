@@ -21,10 +21,10 @@ export const ROUTES: Record<string, RouteConfig> = {
     name: 'Home',
     specSectionId: '02',
     status: 'built',
-    metaTitle: 'Kasi | Automate your DMs. Answer every WhatsApp & Instagram DM.',
-    metaDescription: 'Kasi is the social commerce operating system that answers every customer, negotiates, takes payment, and manages fulfilment.',
+    metaTitle: 'Kasi | The AI Agent and Operating System for Social Commerce',
+    metaDescription: 'Kasi is the AI agent that runs your whole sale inside the chat. It answers, negotiates, takes verified payment and arranges delivery.',
     h1: 'Automate your DMs. Answer every WhatsApp, Instagram and Telegram DM.',
-    sub: 'Kasi is the operating system for businesses that sell on WhatsApp and Instagram.',
+    sub: 'Kasi is the operating system for businesses that sell on WhatsApp, Instagram and more.',
     isNav: true,
   },
   HOW_IT_WORKS: {

@@ -27,15 +27,15 @@ const ChartsSection = ({ cashflowData, invoiceData }) => {
                 <AreaChart data={cashflowData}>
                     <defs>
                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#0F8C55" stopOpacity={0.1}/>
-                        <stop offset="95%" stopColor="#0F8C55" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#0D6E42" stopOpacity={0.1}/>
+                        <stop offset="95%" stopColor="#0D6E42" stopOpacity={0}/>
                         </linearGradient>
                     </defs>
                     <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#F3F4F6" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#9CA3AF'}} dy={10} />
                     <YAxis axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#9CA3AF'}} tickFormatter={(value) => `₦${value/1000}K`} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Area type="monotone" dataKey="value" stroke="#0F8C55" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
+                    <Area type="monotone" dataKey="value" stroke="#0D6E42" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
                 </AreaChart>
             </ResponsiveContainer>
         </div>

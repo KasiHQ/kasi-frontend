@@ -6,7 +6,7 @@ const THEME_KEY = 'bfm-theme';
 
 /* ── Available Themes ─────────────────────────────── */
 export const THEMES = [
-  { id: 'light',           name: 'Light',         emoji: '☀️',  body: '#FFFFFF', card: '#FFFFFF', accent: '#0F8C55', isDark: false },
+  { id: 'light',           name: 'Light',         emoji: '☀️',  body: '#FFFFFF', card: '#FFFFFF', accent: '#0D6E42', isDark: false },
   { id: 'sepia',           name: 'Sepia',          emoji: '📜',  body: '#faf6f1', card: '#f5efe6', accent: '#92713a', isDark: false },
   { id: 'dark',            name: 'Dark',           emoji: '🌑',  body: '#1e1e1e', card: '#272727', accent: '#34d399', isDark: true },
   { id: 'midnight-blue',   name: 'Midnight Blue',  emoji: '🌌',  body: '#0f172a', card: '#1e293b', accent: '#38bdf8', isDark: true },

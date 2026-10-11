@@ -32,7 +32,7 @@ import { formatCurrency } from "../../../utils/formatters";
 import clsx from "clsx";
 
 const CATEGORIES = [
-  { id: "Consulting", label: "Consulting", icon: User, color: "#0F8C55" },
+  { id: "Consulting", label: "Consulting", icon: User, color: "#0D6E42" },
   { id: "Lessons", label: "Lessons", icon: Zap, color: "#FF9500" },
   { id: "Events", label: "Events", icon: Sparkles, color: "#FFD600" },
   { id: "Performance", label: "Performance", icon: Heart, color: "#FF4D8D" },
