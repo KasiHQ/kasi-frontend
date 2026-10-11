@@ -33,83 +33,102 @@ export function HumanBand() {
           {/* Left Column: Authentic Nigerian merchant portrait with dark overlay */}
           <div className="lg:col-span-5 flex justify-center">
             <div className="relative w-full max-w-[420px] aspect-[4/5] rounded-[24px] overflow-hidden shadow-2xl border border-white/10 bg-[#141C17]">
-              {current.image ? (
-                <img
-                  src={current.image}
-                  alt={`${current.name} — ${current.business}, ${current.city}`}
-                  className="w-full h-full object-cover transition-opacity duration-300"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                    if (e.currentTarget.nextElementSibling) {
-                      e.currentTarget.nextElementSibling.style.display = "block";
-                    }
-                  }}
-                />
-              ) : null}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={current.image || current.name}
+                  initial={shouldReduceMotion ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full h-full relative"
+                >
+                  {current.image ? (
+                    <img
+                      src={current.image}
+                      alt={`${current.name} — ${current.business}, ${current.city}`}
+                      className="w-full h-full object-cover transition-opacity duration-300"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        if (e.currentTarget.nextElementSibling) {
+                          e.currentTarget.nextElementSibling.style.display = "block";
+                        }
+                      }}
+                    />
+                  ) : null}
 
-              {/* Dark overlay for clean contrast and cinematic tone */}
-              <div
-                className="absolute inset-0 bg-black/40 pointer-events-none"
-                aria-hidden="true"
-              />
+                  {/* Dark overlay for clean contrast and cinematic tone */}
+                  <div
+                    className="absolute inset-0 bg-black/40 pointer-events-none"
+                    aria-hidden="true"
+                  />
 
-              <div style={{ display: current.image ? "none" : "block" }} className="w-full h-full">
-                <DesignedPlaceholder
-                  aspect="4/5"
-                  caption={`${current.name} — ${current.business}, ${current.city}`}
-                  className="w-full h-full"
-                />
-              </div>
+                  <div style={{ display: current.image ? "none" : "block" }} className="w-full h-full">
+                    <DesignedPlaceholder
+                      aspect="4/5"
+                      caption={`${current.name} — ${current.business}, ${current.city}`}
+                      className="w-full h-full"
+                    />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
 
           {/* Right Column: Spec Headline & rotating vendor details */}
           <div className="lg:col-span-7 flex flex-col justify-between">
-            <div>
-              <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-[46px] text-white tracking-tight leading-[1.16]">
-                {copy.headline}
-              </h2>
-
+            <div className="min-h-[160px] sm:min-h-[180px] lg:min-h-[200px] flex items-center">
               <AnimatePresence mode="wait">
-                <motion.div
+                <motion.h2
                   key={current.name}
                   initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={shouldReduceMotion ? undefined : { opacity: 0, y: -12 }}
-                  transition={{ duration: 0.35 }}
-                  className="mt-10 pt-6 border-t border-white/15 flex items-center justify-between"
+                  transition={{ duration: 0.3 }}
+                  className="font-display font-medium text-2xl sm:text-3xl lg:text-[38px] text-white tracking-tight leading-[1.24]"
                 >
-                  <div>
-                    <div className="font-display font-medium text-xl text-white">
-                      {current.name}
-                    </div>
-                    <div className="text-sm text-[#DBF361] font-mono mt-1">
-                      {current.business} · {current.city}
-                    </div>
-                  </div>
+                  "{String(current.quote || copy.headline || "").replace(/^["']|["']$/g, "")}"
+                </motion.h2>
+              </AnimatePresence>
+            </div>
 
-                  {/* Testimonial slider controls */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handlePrev}
-                      aria-label="Previous testimonial"
-                      className="w-10 h-10 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors cursor-pointer"
-                    >
-                      <CaretLeft size={18} weight="bold" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleNext}
-                      aria-label="Next testimonial"
-                      className="w-10 h-10 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors cursor-pointer"
-                    >
-                      <CaretRight size={18} weight="bold" />
-                    </button>
+            <div className="mt-8 pt-6 border-t border-white/15 flex items-center justify-between">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={current.name}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <div className="font-display font-medium text-xl text-white">
+                    {current.name}
+                  </div>
+                  <div className="text-sm text-[#DBF361] font-mono mt-1">
+                    {current.business} · {current.city}
                   </div>
                 </motion.div>
               </AnimatePresence>
+
+              {/* Testimonial slider controls */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  aria-label="Previous testimonial"
+                  className="w-10 h-10 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors cursor-pointer"
+                >
+                  <CaretLeft size={18} weight="bold" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  aria-label="Next testimonial"
+                  className="w-10 h-10 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors cursor-pointer"
+                >
+                  <CaretRight size={18} weight="bold" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

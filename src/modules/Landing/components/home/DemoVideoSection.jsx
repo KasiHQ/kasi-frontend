@@ -121,7 +121,7 @@ export function DemoVideoSection() {
   return (
     <section
       id="demo-video"
-      className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-[1280px] mx-auto font-poppins relative selection:bg-[#DBF361] selection:text-[#141C17]"
+      className="scroll-mt-24 sm:scroll-mt-28 py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-[1280px] mx-auto font-poppins relative selection:bg-[#DBF361] selection:text-[#141C17]"
     >
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
