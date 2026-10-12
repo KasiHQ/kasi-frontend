@@ -266,6 +266,21 @@ function RightSupportHumanSvg({ className = "w-full h-auto" }) {
   );
 }
 
+function TiktokLogo({ size = 20, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.12V9.42a6.34 6.34 0 0 0-.86-.06A6.34 6.34 0 0 0 3 15.7a6.34 6.34 0 0 0 10.82 4.48c1.37-1.37 2.06-3.21 2.06-5.18V8.37a8.27 8.27 0 0 0 4.71 1.48v-3.16z" />
+    </svg>
+  );
+}
+
 export function ContactPage() {
   const shouldReduceMotion = useReducedMotion();
   const [formState, setFormState] = useState({
@@ -308,9 +323,15 @@ export function ContactPage() {
   const socials = [
     {
       name: "Instagram",
-      handle: "@kasi.official_ai",
-      href: "https://www.instagram.com/kasi.official_ai",
+      handle: "@kasi.sales.os",
+      href: "https://www.instagram.com/kasi.sales.os/",
       icon: InstagramLogo,
+    },
+    {
+      name: "TikTok",
+      handle: "@usekasi.com",
+      href: "https://www.tiktok.com/@usekasi.com",
+      icon: TiktokLogo,
     },
     {
       name: "X (Twitter)",
@@ -522,7 +543,7 @@ export function ContactPage() {
         </div>
 
         {/* Company Socials Section */}
-        <div className="mt-20 pt-12 border-t border-[#141C17]/10 text-center max-w-4xl mx-auto">
+        <div className="mt-20 pt-12 border-t border-[#141C17]/10 text-center max-w-5xl mx-auto">
           <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0D6E42] bg-[#0D6E42]/10 px-3 py-1 rounded-full inline-block mb-3">
             OFFICIAL CHANNELS
           </span>
@@ -533,7 +554,7 @@ export function ContactPage() {
             Stay up to date with product launches, seller playbooks, and community updates.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
             {socials.map((social) => {
               const Icon = social.icon;
               return (

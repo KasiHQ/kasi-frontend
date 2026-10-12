@@ -116,13 +116,24 @@ export function GlobalFooter() {
 
           <div className="flex items-center gap-3">
             <a
-              href="https://www.instagram.com/kasi.official_ai"
+              href="https://www.instagram.com/kasi.sales.os/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
               className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:text-white hover:border-white transition-colors"
             >
               <InstagramLogo size={16} weight="regular" />
+            </a>
+            <a
+              href="https://www.tiktok.com/@usekasi.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:text-white hover:border-white transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.12V9.42a6.34 6.34 0 0 0-.86-.06A6.34 6.34 0 0 0 3 15.7a6.34 6.34 0 0 0 10.82 4.48c1.37-1.37 2.06-3.21 2.06-5.18V8.37a8.27 8.27 0 0 0 4.71 1.48v-3.16z" />
+              </svg>
             </a>
             <a
               href="https://x.com/hq_kasi"
