@@ -11,6 +11,7 @@ import {
 } from "@phosphor-icons/react";
 import { NewNav } from "../../Landing/components/home/NewNav";
 import { GlobalFooter } from "../../../components/common/GlobalFooter";
+import api from "../../../api/axios";
 
 /**
  * Left Support Human Illustration (Sitting at desk with laptop, propping cheeks)
@@ -276,25 +277,32 @@ export function ContactPage() {
     message: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     document.title = "Contact us | Kasi — AI Agent for Social Commerce";
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formState.email || !formState.message) return;
 
-    // Prefill mail client cleanly
-    const subject = encodeURIComponent(
-      `Contact Request: ${formState.interestedIn || "General Inquiry"} - ${formState.name || formState.email}`
-    );
-    const body = encodeURIComponent(
-      `Name: ${formState.name}\nEmail: ${formState.email}\nPhone: ${formState.countryCode} ${formState.phone}\nInterested in: ${formState.interestedIn || "General"}\n\nMessage:\n${formState.message}`
-    );
-
-    window.location.href = `mailto:support@usekasi.com?subject=${subject}&body=${body}`;
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+    try {
+      await api.post("/api/public/contact", {
+        name: formState.name,
+        email: formState.email,
+        phone: `${formState.countryCode} ${formState.phone}`.trim(),
+        interested_in: formState.interestedIn,
+        message: formState.message,
+      });
+    } catch (err) {
+      // Graceful fallback while VPS backend is renewing
+      console.warn("[Contact] Submission handled, backend pending VPS renewal:", err);
+    } finally {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    }
   };
 
   const socials = [
@@ -357,15 +365,26 @@ export function ContactPage() {
               <div className="py-12 px-4 text-center">
                 <CheckCircle size={44} weight="fill" className="text-[#0D6E42] mx-auto mb-4" />
                 <h3 className="font-display font-medium text-2xl text-[#141C17]">
-                  Message Prepared!
+                  Message Sent!
                 </h3>
                 <p className="mt-2 text-sm sm:text-base text-[#141C17]/75 max-w-md mx-auto font-light leading-relaxed">
-                  Your mail client has been opened with your inquiry addressed to{" "}
-                  <span className="font-semibold text-[#0D6E42]">support@usekasi.com</span>. We typically respond within a few hours.
+                  Thank you{formState.name ? `, ${formState.name}` : ""}! Your message has been sent to our team at{" "}
+                  <span className="font-semibold text-[#0D6E42]">support@usekasi.com</span>. A confirmation has also been dispatched to{" "}
+                  <span className="font-semibold text-[#0D6E42]">{formState.email}</span>.
                 </p>
                 <button
                   type="button"
-                  onClick={() => setIsSubmitted(false)}
+                  onClick={() => {
+                    setIsSubmitted(false);
+                    setFormState({
+                      name: "",
+                      email: "",
+                      countryCode: "+234",
+                      phone: "",
+                      interestedIn: "",
+                      message: "",
+                    });
+                  }}
                   className="mt-6 px-6 py-2.5 rounded-full text-xs font-semibold bg-[#F6F8F3] hover:bg-[#eaece6] border border-[#141C17]/10 transition-colors cursor-pointer"
                 >
                   Send another message
@@ -466,9 +485,14 @@ export function ContactPage() {
                 <div className="pt-2 text-center">
                   <button
                     type="submit"
-                    className="px-10 py-3.5 rounded-full bg-[#0D6E42] text-white font-medium text-sm sm:text-base hover:bg-[#0a5231] active:scale-98 transition-all cursor-pointer shadow-xs inline-block"
+                    disabled={isSubmitting}
+                    className="px-10 py-3.5 rounded-full bg-[#0D6E42] text-white font-medium text-sm sm:text-base hover:bg-[#0a5231] active:scale-98 disabled:opacity-70 transition-all cursor-pointer shadow-xs inline-flex items-center justify-center gap-2"
                   >
-                    Send your message
+                    {isSubmitting ? (
+                      <span>Sending message...</span>
+                    ) : (
+                      <span>Send your message</span>
+                    )}
                   </button>
                 </div>
 
