@@ -73,6 +73,7 @@ import FeaturePlatforms from './modules/Features/pages/FeaturePlatforms';
 import HowItWorksPage from './modules/HowItWorks/pages/HowItWorksPage';
 import AboutPage from './modules/About/pages/AboutPage';
 import PricingPage from './modules/Pricing/pages/PricingPage';
+import ContactPage from './modules/Contact/pages/ContactPage';
 
 import { OnboardingWizard } from './modules/Onboarding';
 import { usePageTracker } from './hooks/usePageTracker';
@@ -159,7 +160,7 @@ function App() {
           <Route path="/try" element={<PageStub route={ROUTES.TRY} />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<PageStub route={ROUTES.CONTACT} />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/get-started" element={<Signup />} />
           
           {/* Dev-only inspection routes */}
