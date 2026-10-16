@@ -192,7 +192,7 @@ export const HowItWorksPage = () => {
             <video
               ref={videoRef}
               data-kasi="demo-primary"
-              src="/video/Kasi Explainer Video.mp4"
+              src="/video/Kasi How it works video.mp4"
               className="w-full h-full object-contain cursor-pointer"
               onClick={togglePlay}
               onTimeUpdate={handleTimeUpdate}
