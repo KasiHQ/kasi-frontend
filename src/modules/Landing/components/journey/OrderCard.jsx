@@ -24,9 +24,16 @@ export const OrderCard = ({
             {item}
           </h4>
         </div>
-        <span className="font-mono text-sm font-bold text-[#141C17]">
-          {amount}
-        </span>
+        <div className="flex items-center gap-2.5 shrink-0">
+          {isPaid && (
+            <div className="pointer-events-none">
+              <PaidStamp isStamped={true} />
+            </div>
+          )}
+          <span className="font-mono text-sm font-bold text-[#141C17]">
+            {amount}
+          </span>
+        </div>
       </div>
 
       <div className="flex items-center justify-between text-xs text-[#141C17]/70 pt-2 border-t border-[#141C17]/10 font-mono">
@@ -38,12 +45,6 @@ export const OrderCard = ({
           {status}
         </span>
       </div>
-
-      {isPaid && (
-        <div className="absolute right-3 top-6 pointer-events-none">
-          <PaidStamp isStamped={true} />
-        </div>
-      )}
     </div>
   );
 };

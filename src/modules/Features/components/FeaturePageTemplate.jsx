@@ -1,9 +1,56 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, CheckCircle, ShieldCheck } from "@phosphor-icons/react";
+import { ShieldCheck } from "@phosphor-icons/react";
 import { NewNav } from "../../Landing/components/home/NewNav";
 import { GlobalFooter } from "../../../components/common/GlobalFooter";
+
+function StudioScreenshotFrame({ screenshot, screenshotAlt, screenshotCaption, badge }) {
+  return (
+    <div className="relative">
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-[#DBF361]/22 blur-[120px] rounded-full -z-10 pointer-events-none"
+        aria-hidden="true"
+      />
+
+      <div className="rounded-[26px] sm:rounded-[32px] p-3 sm:p-5 bg-gradient-to-br from-[#EAF2E8] via-white to-[#E6F0E7] border border-[#141C17]/10 shadow-[0_24px_56px_-20px_rgba(13,110,66,0.18)] overflow-hidden">
+        <div className="rounded-2xl overflow-hidden bg-white border border-[#141C17]/8">
+          <div className="px-4 py-2.5 bg-[#FAFCF9] border-b border-[#141C17]/8 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#141C17]/15" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#141C17]/15" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0D6E42]/45" />
+            </div>
+            {badge && (
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[#0D6E42] bg-[#EBF8EF] px-2.5 py-0.5 rounded-full">
+                {badge}
+              </span>
+            )}
+          </div>
+
+          <div className="relative max-h-[520px] overflow-hidden">
+            <img
+              src={screenshot}
+              alt={screenshotAlt}
+              className="w-full h-auto object-cover object-left-top"
+              loading="eager"
+            />
+            <div
+              className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/85 via-white/30 to-transparent pointer-events-none"
+              aria-hidden="true"
+            />
+          </div>
+        </div>
+      </div>
+
+      {screenshotCaption && (
+        <p className="mt-4 text-center text-xs sm:text-sm text-[#141C17]/65 font-light max-w-2xl mx-auto">
+          {screenshotCaption}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function FeaturePageTemplate({
   specId,
@@ -51,7 +98,8 @@ export function FeaturePageTemplate({
               <div className="lg:col-span-6 text-left">
                 {badge && (
                   <div className="mb-4">
-                    <span className="font-poppins text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D6E42]/10 border border-[#0D6E42]/20 font-mono text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0D6E42]" />
                       {badge}
                     </span>
                   </div>
@@ -89,47 +137,33 @@ export function FeaturePageTemplate({
                 </div>
               </div>
 
-              {/* Right Column: Screenshot Showcase */}
+              {/* Right Column: Studio Screenshot Frame */}
               <motion.div
                 initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.65, delay: 0.1 }}
-                className="lg:col-span-6 relative"
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="lg:col-span-6"
               >
-                <div
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-[#DBF361]/25 blur-[100px] rounded-full -z-10 pointer-events-none"
-                  aria-hidden="true"
+                <StudioScreenshotFrame
+                  screenshot={screenshot}
+                  screenshotAlt={screenshotAlt}
+                  screenshotCaption={screenshotCaption}
+                  badge={badge}
                 />
-                <div className="rounded-[28px] p-3 sm:p-4 bg-white border border-[#141C17]/10 shadow-2xl overflow-hidden">
-                  <div className="rounded-2xl overflow-hidden bg-[#F6F8F3] border border-[#141C17]/6">
-                    <img
-                      src={screenshot}
-                      alt={screenshotAlt}
-                      className="w-full h-auto object-cover object-left-top hover:scale-[1.01] transition-transform duration-500"
-                      loading="eager"
-                    />
-                  </div>
-                </div>
-                {screenshotCaption && (
-                  <p className="mt-3 text-center text-xs text-[#141C17]/60 font-light">
-                    {screenshotCaption}
-                  </p>
-                )}
               </motion.div>
             </div>
           </div>
         ) : (
           <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            {/* Feature Category Tag */}
             {badge && (
               <div className="mb-4">
-                <span className="font-poppins text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
+                <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0D6E42]/10 border border-[#0D6E42]/20 font-mono text-xs font-semibold tracking-wider text-[#0D6E42] uppercase">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0D6E42]" />
                   {badge}
                 </span>
               </div>
             )}
 
-            {/* H1 with marker */}
             <h1 className="font-display font-medium text-3xl sm:text-5xl lg:text-[62px] text-[#141C17] tracking-tight leading-[1.08] max-w-4xl mx-auto">
               {headlinePart1}{" "}
               <span className="relative inline-block text-[#0D6E42]">
@@ -142,12 +176,10 @@ export function FeaturePageTemplate({
               {headlinePart2}
             </h1>
 
-            {/* Sub */}
             <p className="mt-6 text-base sm:text-lg lg:text-xl text-[#141C17]/80 font-light max-w-2xl mx-auto leading-relaxed">
               {sub}
             </p>
 
-            {/* CTAs */}
             <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 to="/signup"
@@ -163,40 +195,23 @@ export function FeaturePageTemplate({
               </Link>
             </div>
 
-            {/* Hero Screenshot Showcase */}
             <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="mt-12 sm:mt-16 max-w-[1100px] mx-auto relative"
+              transition={{ duration: 0.65, delay: 0.12 }}
+              className="mt-12 sm:mt-16 max-w-[1060px] mx-auto"
             >
-              {/* Ambient Lime Glow behind player */}
-              <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-[#DBF361]/20 blur-[130px] rounded-full -z-10 pointer-events-none"
-                aria-hidden="true"
+              <StudioScreenshotFrame
+                screenshot={screenshot}
+                screenshotAlt={screenshotAlt}
+                screenshotCaption={screenshotCaption}
+                badge={badge}
               />
-
-              <div className="rounded-[24px] sm:rounded-[32px] p-2.5 sm:p-4 bg-white border border-[#141C17]/10 shadow-2xl overflow-hidden">
-                <div className="rounded-2xl overflow-hidden bg-[#F6F8F3] border border-[#141C17]/6">
-                  <img
-                    src={screenshot}
-                    alt={screenshotAlt}
-                    className="w-full h-auto object-cover object-left-top hover:scale-[1.01] transition-transform duration-500"
-                    loading="eager"
-                  />
-                </div>
-              </div>
-
-              {screenshotCaption && (
-                <p className="mt-4 text-center text-xs sm:text-sm text-[#141C17]/65 font-light">
-                  {screenshotCaption}
-                </p>
-              )}
             </motion.div>
           </div>
         )}
 
-        {/* Problem It Kills Band (Optional) */}
+        {/* Problem It Kills Band */}
         {problemHeading && (
           <div className="mt-20 sm:mt-28 py-16 sm:py-20 bg-[#0D6E42] text-white selection:bg-[#DBF361] selection:text-[#141C17]">
             <div className="max-w-[960px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -221,9 +236,7 @@ export function FeaturePageTemplate({
 
             <div className="flex overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 snap-x snap-mandatory md:grid md:grid-cols-2 gap-5 sm:gap-6 lg:gap-8 scrollbar-none">
               {moves.map((move, idx) => {
-                // Interactive micro-accent for each move
                 const moveVisuals = [
-                  // Move 1: Recommendation preview
                   <div key="v1" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <img src="/logos/whatsapp.svg" alt="WhatsApp" className="w-4 h-4 object-contain" />
@@ -231,7 +244,6 @@ export function FeaturePageTemplate({
                     </div>
                     <span className="font-mono text-[10px] text-[#0D6E42] bg-[#0D6E42]/10 px-2 py-0.5 rounded-full font-semibold">₦18,500</span>
                   </div>,
-                  // Move 2: Negotiation band visual
                   <div key="v2" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs">
                     <div className="flex justify-between text-[11px] font-mono text-[#141C17]/70 mb-1.5">
                       <span>Floor: ₦16,000</span>
@@ -241,21 +253,19 @@ export function FeaturePageTemplate({
                       <div className="h-full bg-[#0D6E42] rounded-full w-3/4" />
                     </div>
                   </div>,
-                  // Move 3: Delivery / Location check
                   <div key="v3" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[#0D6E42] animate-pulse" />
                       <span className="font-medium text-[#141C17]/90">Lekki Phase 1 delivery</span>
                     </div>
-                    <span className="font-mono text-[10px] text-[#141C17]/70 font-semibold">+₦2,500</span>
+                    <span className="font-mono text-[10px] text-[#141C17]/70 font-semibold">+₦2,650</span>
                   </div>,
-                  // Move 4: Payment verification
                   <div key="v4" className="mt-4 p-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 text-xs flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <img src="/logos/paystack.svg" alt="Paystack" className="h-3.5 w-auto object-contain" />
                       <span className="font-medium text-[#141C17]/90">Paystack Webhook</span>
                     </div>
-                    <span className="text-[10px] text-[#0D6E42] font-semibold bg-[#DBF361] px-2 py-0.5 rounded-full">CONFIRMED</span>
+                    <span className="text-[10px] text-[#141C17] font-semibold bg-[#DBF361] px-2 py-0.5 rounded-full">CONFIRMED</span>
                   </div>,
                 ];
 
@@ -266,12 +276,12 @@ export function FeaturePageTemplate({
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.15 }}
                     transition={{ duration: 0.45, delay: idx * 0.08 }}
-                    className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center bg-white rounded-[24px] p-6 sm:p-7 border border-[#141C17]/10 shadow-xs hover:shadow-md hover:border-[#0D6E42]/30 transition-all flex flex-col justify-between shrink-0 md:shrink group"
+                    className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center bg-white rounded-[24px] p-6 sm:p-7 border border-[#141C17]/10 shadow-2xs hover:shadow-md hover:border-[#0D6E42]/30 transition-all flex flex-col justify-between shrink-0 md:shrink group"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#0D6E42] bg-[#0D6E42]/10 px-3 py-1 rounded-full">
-                          MOVE 0{idx + 1}
+                          STEP 0{idx + 1}
                         </span>
                         <div className="flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                           <img src="/logos/whatsapp.svg" alt="WhatsApp" className="w-3.5 h-3.5 object-contain" />
@@ -305,13 +315,9 @@ export function FeaturePageTemplate({
 
             <div className="flex overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 snap-x snap-mandatory md:grid md:grid-cols-3 gap-5 sm:gap-6 scrollbar-none">
               {controls.map((item, idx) => {
-                // Official brand & partner logos instead of generic icons
                 const controlLogos = [
-                  // Control 1: Prices & checkout protection (Paystack)
                   <img key="c1" src="/logos/paystack.svg" alt="Paystack Protected" className="h-5 w-auto object-contain" />,
-                  // Control 2: Voice & tone across official platforms (Meta)
                   <img key="c2" src="/logos/meta.svg" alt="Meta Partner" className="h-5 w-auto object-contain" />,
-                  // Control 3: Override & Intelligence (OpenAI)
                   <img key="c3" src="/logos/openai.svg" alt="OpenAI" className="h-5 w-auto object-contain" />,
                 ];
 
@@ -322,7 +328,7 @@ export function FeaturePageTemplate({
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.15 }}
                     transition={{ duration: 0.45, delay: idx * 0.08 }}
-                    className="min-w-[80vw] sm:min-w-[280px] md:min-w-0 snap-center bg-white rounded-[22px] p-6 border border-[#141C17]/10 shadow-xs hover:border-[#141C17]/20 transition-all shrink-0 md:shrink"
+                    className="min-w-[80vw] sm:min-w-[280px] md:min-w-0 snap-center bg-white rounded-[22px] p-6 border border-[#141C17]/10 shadow-2xs hover:border-[#141C17]/20 transition-all shrink-0 md:shrink"
                   >
                     <div className="h-10 px-3 rounded-xl bg-[#F6F8F3] border border-[#141C17]/8 inline-flex items-center justify-center mb-4">
                       {controlLogos[idx] || (
