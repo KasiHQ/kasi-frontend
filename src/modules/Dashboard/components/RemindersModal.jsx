@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, MessageCircle, ExternalLink } from 'lucide-react';
+import { X, ChatCircle as MessageCircle, ArrowSquareOut as ExternalLink } from '@phosphor-icons/react';
 import Button from '../../../components/ui/Button';
 
 const RemindersModal = ({ isOpen, onClose, overdueInvoices }) => {

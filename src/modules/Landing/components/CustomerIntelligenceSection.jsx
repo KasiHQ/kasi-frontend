@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, MessageSquare, Award, ArrowUpRight } from 'lucide-react';
+import { Database, ChatText as MessageSquare, Medal as Award, ArrowUpRight } from '@phosphor-icons/react';
 
 export const CustomerIntelligenceSection = () => {
   const segments = [

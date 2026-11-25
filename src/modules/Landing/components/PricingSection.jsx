@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 import { PRELAUNCH_WAITLIST_MODE } from '../../../config';
 

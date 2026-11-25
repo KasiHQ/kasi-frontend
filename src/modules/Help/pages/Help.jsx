@@ -1,5 +1,5 @@
 import React from 'react';
-import { HelpCircle, Mail, MessageCircle, FileText, ChevronRight } from 'lucide-react';
+import { Question as HelpCircle, EnvelopeSimple as Mail, ChatCircle as MessageCircle, FileText, CaretRight as ChevronRight } from '@phosphor-icons/react';
 import Button from '../../../components/ui/Button';
 
 const Help = () => {

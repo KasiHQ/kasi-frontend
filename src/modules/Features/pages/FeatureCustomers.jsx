@@ -10,48 +10,48 @@ export function FeatureCustomers() {
       headlinePart1="Every chat becomes a"
       highlightText="customer you can keep."
       headlinePart2=""
-      sub="Kasi saves who they are, what they bought, and where they are in the buying journey. Your customer list builds itself while you sell."
+      sub="Kasi saves who they are, what they bought, and where they stopped in the conversation. Your buyer directory updates itself with every order."
       screenshot="/images/customer database.png"
-      screenshotAlt="Kasi Customer Database and Social CRM UI"
-      screenshotCaption="Customer CRM with lead stages: your whole customer base, sorted by how close they are to buying."
-      problemHeading="Stop letting social chats disappear into the void"
-      problemBody="Thousands of customers message your Instagram and WhatsApp every month, but without a CRM they vanish as new chats arrive. Kasi turns every inquiry into a lasting customer profile."
-      movesTitle="What Kasi captures automatically"
+      screenshotAlt="Kasi Customer Directory and CRM UI"
+      screenshotCaption="Customer directory sorted by New, Regular, and VIP segments with verified spend totals."
+      problemHeading="Stop losing buyer records inside old chat threads"
+      problemBody="Hundreds of people message your WhatsApp and Instagram every month, then get buried under newer chats. Kasi logs each buyer's name, phone number, address, and verified spend automatically."
+      movesTitle="What gets recorded from every chat"
       moves={[
         {
-          title: "Automatic Customer Profiles",
-          desc: "Names, phone numbers, delivery addresses, and full order history are saved organically from chat messages.",
+          title: "Verified Contact & Address Records",
+          desc: "Names, phone numbers, delivery pins, and past invoices are linked automatically as orders close.",
         },
         {
-          title: "Dynamic Lead Stages",
-          desc: "Categorizes contacts into stages: New Inquiry, In Negotiation, Paid, Fulfilled, and Loyal Repeat Buyer.",
+          title: "Behavioral Buyer Segments",
+          desc: "Groups contacts into New, Regular, and VIP tiers based on verified paid order counts and total spend.",
         },
         {
-          title: "Instant Context On Return",
-          desc: "When a customer returns weeks later, Kasi welcomes them back and references their previous orders.",
+          title: "Memory When Buyers Return",
+          desc: "When a repeat buyer messages weeks later, Kasi sees their previous purchases and saved address context.",
         },
         {
-          title: "Warm Buyer Re-engagement",
-          desc: "Identify warm shoppers who browsed but didn't check out, and re-engage them when new stock arrives.",
+          title: "Targeted Restock Broadcasts",
+          desc: "Filter past buyers or open inquiries and notify them when fresh stock lands, with built-in pacing.",
         },
       ]}
       controlsTitle="Why it matters"
       controls={[
         {
-          title: "Zero Manual Entry",
-          desc: "No copying phone numbers or pasting into Excel sheets after long working days.",
+          title: "No Late-Night Spreadsheet Entry",
+          desc: "Stop copying phone numbers and addresses out of WhatsApp into notebooks after closing.",
         },
         {
-          title: "A Business Asset You Own",
-          desc: "Your customer contacts belong to you, ready for export or outreach anytime.",
+          title: "Records You Own & Export",
+          desc: "Export your customer directory and invoice history as CSV whenever your accountant needs it.",
         },
         {
-          title: "Cheaper Repeat Sales",
-          desc: "Repeat buyers cost zero ad spend to reach and convert 3x faster than cold traffic.",
+          title: "Direct Repeat Orders",
+          desc: "Reach people who already trust your quality without paying for another social ad click.",
         },
       ]}
-      ctaHeading="Build your customer list on autopilot."
-      ctaSub="Start transforming anonymous chats into long-term customer relationships."
+      ctaHeading="Keep every buyer who messages your shop."
+      ctaSub="Link your channels and start building an organized buyer ledger from day one."
     />
   );
 }

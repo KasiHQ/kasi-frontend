@@ -10,48 +10,48 @@ export function FeatureDelivery() {
       headlinePart1="The right delivery fee,"
       highlightText="before they pay."
       headlinePart2="Every time."
-      sub="Kasi asks for the customer's live location and a written description, works out the distance, and adds a fair fee to checkout. No guessing, no losses, no 'the rider says it's more.'"
+      sub="Kasi requests the buyer's WhatsApp location pin, calculates real road distance via Google Maps, and locks the delivery fee into the Paystack link before payment."
       screenshot="/images/dashboard.png"
-      screenshotAlt="Kasi Delivery Fee Calculation and Logistics UI"
-      screenshotCaption="Dynamic delivery fee computation: distance-calculated and locked into checkout before payment is made."
-      problemHeading="Stop losing money on delivery you underpriced."
-      problemBody="Vendors lose tens of thousands every month guessing delivery rates, arguing with riders, or eating the cost when a customer lives further than expected. Kasi solves logistics before the invoice is sent."
-      movesTitle="How live delivery calculation works"
+      screenshotAlt="Kasi Road Distance Delivery Calculation UI"
+      screenshotCaption="Road-distance delivery calculation rounded to the nearest ₦50 and added before checkout."
+      problemHeading="Stop eating the difference on underquoted dispatch"
+      problemBody="Flat-rate city guesses lose money whenever traffic or winding roads double the trip distance. Kasi checks actual driving distance and travel time from your store pin before quoting a single Naira."
+      movesTitle="How delivery pricing runs in chat"
       moves={[
         {
-          title: "Live Location Capture",
-          desc: "Customer easily sends their live WhatsApp pin directly within the chat conversation.",
+          title: "Pickup vs Delivery Gate",
+          desc: "Before generating any payment link, Kasi asks whether the buyer wants in-store pickup (₦0 fee) or road delivery.",
         },
         {
-          title: "Detailed Address Description",
-          desc: "Captures building number, estate gate, street, and landmarks so riders find the door immediately.",
+          title: "WhatsApp Location Pin Check",
+          desc: "Buyers tap 'Send Current Location' in WhatsApp so coordinates are exact rather than vague street names.",
         },
         {
-          title: "Distance Fee Computed",
-          desc: "Kasi computes the exact distance from your store to customer address and applies your rate formula.",
+          title: "Google Road Distance & Floor Rule",
+          desc: "Computes driving distance and traffic duration from your store coordinates, enforces minimum dispatch floor, and rounds up to the nearest ₦50.",
         },
         {
-          title: "Added to In-Chat Checkout",
-          desc: "Product subtotal and delivery fee are bundled into a single Paystack checkout link.",
+          title: "Bundled Into One Checkout Link",
+          desc: "Item subtotal and calculated delivery fee combine into a single Paystack invoice — or escalate to you if outside your delivery radius.",
         },
       ]}
-      controlsTitle="Why it matters"
+      controlsTitle="What you configure"
       controls={[
         {
-          title: "Distance-Based",
-          desc: "Short trips stay affordable while long-distance deliveries are completely covered.",
+          title: "Store Pin & Pickup Address",
+          desc: "Pin your exact shop or kitchen coordinates once during onboarding; pickup buyers receive your Google Maps link automatically.",
         },
         {
-          title: "Locked In Before Pay",
-          desc: "You never have to message back asking for extra delivery money.",
+          title: "Never Quotes ₦0 By Mistake",
+          desc: "If a pin fails validation, Kasi blocks payment link creation and asks the buyer to re-share their pin instead of guessing.",
         },
         {
-          title: "Your Own Rates",
-          desc: "Set your own starting base fares, kilometer tiers, and free delivery thresholds.",
+          title: "Radius Escalation",
+          desc: "Orders beyond your configured kilometer radius pause and flag you to quote custom interstate shipping.",
         },
       ]}
-      ctaHeading="Stop losing money on delivery you underpriced."
-      ctaSub="Automate logistics pricing and make every delivery smooth and profitable."
+      ctaHeading="Quote accurate dispatch fees before checkout."
+      ctaSub="Set your store coordinates once and let Kasi calculate road distance on every delivery order."
     />
   );
 }

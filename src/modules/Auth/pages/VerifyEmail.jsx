@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Check, ShieldCheck, Mail, RefreshCw, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, ShieldCheck, EnvelopeSimple as Mail, ArrowsClockwise as RefreshCw, CircleNotch as Loader2 } from '@phosphor-icons/react';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 

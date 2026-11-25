@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, MessageSquare, Package, Truck, MoreHorizontal, Users, Settings, TrendingUp, LogOut, X, Sun, Moon, PanelLeft, PanelTop, Briefcase, Calendar, DollarSign, Store } from 'lucide-react';
+import { SquaresFour as LayoutDashboard, ChatText as MessageSquare, Package, Truck, DotsThree as MoreHorizontal, Users, GearSix as Settings, TrendUp as TrendingUp, SignOut as LogOut, X, Sun, Moon, SidebarSimple as PanelLeft, Browser as PanelTop, Briefcase, CalendarBlank as Calendar, CurrencyDollar as DollarSign, Storefront as Store } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
 import { useLayout } from '../../context/LayoutContext';

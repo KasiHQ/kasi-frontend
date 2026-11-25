@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Check, Mail, Lock, ShieldCheck, HelpCircle, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Check, EnvelopeSimple as Mail, LockKey as Lock, ShieldCheck, Question as HelpCircle, Eye, EyeSlash as EyeOff } from '@phosphor-icons/react';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 

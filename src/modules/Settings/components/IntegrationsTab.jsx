@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  ExternalLink, Copy, Loader2, Wifi, WifiOff, RefreshCw, LogOut, Zap, Cpu,
-  ShieldCheck, ChevronDown, ChevronUp, AlertTriangle, Sparkles, Check, CheckCircle2
-} from 'lucide-react';
+import { ArrowSquareOut as ExternalLink, Copy, CircleNotch as Loader2, WifiHigh as Wifi, WifiSlash as WifiOff, ArrowsClockwise as RefreshCw, SignOut as LogOut, Lightning as Zap, Cpu, ShieldCheck, CaretDown as ChevronDown, CaretUp as ChevronUp, Warning as AlertTriangle, Lightning as Sparkles, Check, CheckCircle as CheckCircle2 } from '@phosphor-icons/react';
 import { SiWhatsapp, SiTelegram, SiInstagram, SiMessenger } from 'react-icons/si';
 import { PiCheckCircleFill, PiArrowSquareOut, PiCopy, PiShieldCheck, PiLightning } from 'react-icons/pi';
 import api from '../../../api/axios';

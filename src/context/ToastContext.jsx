@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { X, Check, AlertCircle, Info } from 'lucide-react';
+import { X, Check, WarningCircle as AlertCircle, Info } from '@phosphor-icons/react';
 import clsx from 'clsx';
 
 const ToastContext = createContext();

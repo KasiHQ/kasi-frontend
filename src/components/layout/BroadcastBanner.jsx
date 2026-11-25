@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, AlertTriangle, Info, CheckCircle } from 'lucide-react';
+import { X, Warning as AlertTriangle, Info, CheckCircle } from '@phosphor-icons/react';
 import api from '../../api/axios';
 
 const BroadcastBanner = () => {

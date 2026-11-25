@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Plus, Loader2, Search, UserCheck } from 'lucide-react';
+import { Shield, Plus, CircleNotch as Loader2, MagnifyingGlass as Search, UserCheck } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 
 const AdminStaff = () => {

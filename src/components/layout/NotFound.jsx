@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Home, MessageSquare, ShoppingBag } from "lucide-react";
+import { ArrowRight, House as Home, ChatText as MessageSquare, ShoppingBag } from '@phosphor-icons/react';
 import KasiLogo from "../common/KasiLogo";
 import { GlobalFooter } from "../common/GlobalFooter";
 

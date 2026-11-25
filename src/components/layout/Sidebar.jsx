@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Sun, Moon, PanelTop, LogOut } from 'lucide-react';
+import { Sun, Moon, Browser as PanelTop, SignOut as LogOut } from '@phosphor-icons/react';
 import {
   PiHouse, PiShoppingBag, PiTruck, PiChatCircleDots, PiUsers,
   PiChartLineUp, PiCurrencyDollar, PiStorefront, PiGearSix,

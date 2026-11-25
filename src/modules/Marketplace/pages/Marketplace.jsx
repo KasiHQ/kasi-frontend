@@ -1,27 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Store, 
-  X, 
-  ArrowRight,
-  ArrowLeft,
-  Globe,
-  Phone, 
-  MapPin, 
-  Clock, 
-  Sparkles, 
-  CheckCircle2, 
-  Truck, 
-  ExternalLink, 
-  MessageSquare, 
-  Filter, 
-  ArrowUpDown, 
-  Tag, 
-  Building, 
-  ShoppingBag,
-  HelpCircle
-} from 'lucide-react';
+import { MagnifyingGlass as Search, Storefront as Store, X, ArrowRight, ArrowLeft, Globe, Phone, MapPin, Clock, Lightning as Sparkles, CheckCircle as CheckCircle2, Truck, ArrowSquareOut as ExternalLink, ChatText as MessageSquare, Funnel as Filter, ArrowsDownUp as ArrowUpDown, Tag, Buildings as Building, ShoppingBag, Question as HelpCircle } from '@phosphor-icons/react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
 import { formatCurrency } from '../../../utils/formatters';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, ChevronDown } from 'lucide-react';
+import { MagnifyingGlass as Search, Bell, CaretDown as ChevronDown } from '@phosphor-icons/react';
 
 const Header = () => {
   return (

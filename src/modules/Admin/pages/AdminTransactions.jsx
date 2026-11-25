@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Search, ArrowDownIcon, ArrowUpIcon, DollarSign, Activity, X, Calendar, User, FileText, Hash, ShieldCheck, Landmark } from 'lucide-react';
+import { CreditCard, MagnifyingGlass as Search, ArrowDown as ArrowDownIcon, ArrowUp as ArrowUpIcon, CurrencyDollar as DollarSign, Pulse as Activity, X, CalendarBlank as Calendar, User, FileText, Hash, ShieldCheck, Bank as Landmark } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { useToast } from '../../../context/ToastContext';
 

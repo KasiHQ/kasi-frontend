@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, Eye } from 'lucide-react';
+import { SignOut as LogOut, Eye } from '@phosphor-icons/react';
 import { useAuth } from '../../context/AuthContext';
 
 const ImpersonationBanner = () => {

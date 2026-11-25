@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Clock, CreditCard, Truck, CheckCircle, AlertTriangle, Volume2, VolumeX } from 'lucide-react';
+import { ChatCircle as MessageCircle, Clock, CreditCard, Truck, CheckCircle, Warning as AlertTriangle, SpeakerHigh as Volume2, SpeakerSimpleX as VolumeX } from '@phosphor-icons/react';
 import { conversationAPI } from '../../api/conversations';
 
 const ConversationPipeline = () => {

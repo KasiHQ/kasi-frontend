@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../../api/axios';
-import { Send, Bot, User, AlertCircle, CheckCircle } from 'lucide-react';
+import { PaperPlaneRight as Send, Robot as Bot, User, WarningCircle as AlertCircle, CheckCircle } from '@phosphor-icons/react';
 import Button from '../../components/ui/Button';
 
 const WebhookSimulator = () => {

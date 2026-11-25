@@ -9,11 +9,11 @@ import {
   CornersIn,
   ArrowCounterClockwise,
   ArrowClockwise,
-  ArrowRight,
 } from '@phosphor-icons/react';
 import { NewNav } from '../../Landing/components/home/NewNav';
 import { HowItWorksTeaser } from '../../Landing/components/home/HowItWorksTeaser';
 import { GlobalFooter } from '../../../components/common/GlobalFooter';
+import { HOW_IT_WORKS_COPY } from '../../../content/how-it-works';
 
 const JourneyScene = React.lazy(() => import('../../Landing/components/journey/JourneyScene'));
 
@@ -30,11 +30,14 @@ export const HowItWorksPage = () => {
   const [showControls, setShowControls] = useState(true);
   const controlsTimeoutRef = useRef(null);
 
+  const heroCopy = HOW_IT_WORKS_COPY['3.1'];
+  const videoCopy = HOW_IT_WORKS_COPY['3.2'];
+  const closeCopy = HOW_IT_WORKS_COPY['3.5'];
+
   useEffect(() => {
-    document.title = 'How It Works | Kasi — From First Message to Delivered';
+    document.title = 'How It Works | Kasi';
   }, []);
 
-  // Autoplay muted on scroll into view per spec 3.2
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -145,227 +148,196 @@ export const HowItWorksPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F6F8F3] text-[#141C17] font-poppins selection:bg-[#DBF361] selection:text-[#141C17] overflow-x-clip w-full relative">
-      {/* Spec 01: Top Navigation */}
       <NewNav />
 
-      {/* Spec 3.1: Hero */}
-      <section className="pt-32 pb-14 sm:pt-40 sm:pb-18 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center relative">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0D6E42]/10 border border-[#0D6E42]/20 mb-5">
-          <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
-          <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0D6E42]">
-            LIVE WALKTHROUGH
-          </span>
-        </div>
+      {/* Spec 3.1: Asymmetric Split Hero (not centered cookie-cutter) */}
+      <section className="pt-32 pb-12 sm:pt-40 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-[1280px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end">
+          <div className="lg:col-span-7">
+            <h1 className="font-display font-medium text-4xl sm:text-5xl lg:text-[58px] text-[#141C17] tracking-tight leading-[1.08]">
+              {heroCopy.h1}
+            </h1>
+          </div>
 
-        <h1 className="font-display font-medium text-4xl sm:text-5xl lg:text-6xl text-[#141C17] tracking-tight leading-[1.1]">
-          See a real order happen,{' '}
-          <span className="relative inline-block">
-            <span className="relative z-10 text-[#0D6E42]">start to finish.</span>
-            <span
-              className="absolute left-0 bottom-1 sm:bottom-2 w-full h-3 sm:h-4 bg-[#DBF361] -rotate-1 rounded-xs -z-0"
-              aria-hidden="true"
-            />
-          </span>
-        </h1>
-        <p className="mt-5 max-w-2xl mx-auto text-base sm:text-lg text-[#141C17]/80 font-light leading-relaxed">
-          No slides. Watch Kasi take a customer from first message to paid and out for delivery, then try it yourself.
-        </p>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            to="/signup"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-sm hover:brightness-105 transition-all shadow-md hover:shadow-lg group"
-          >
-            <span>Get started</span>
-            <ArrowRight size={15} weight="bold" className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-          <Link
-            to="/#demo-video"
-            className="px-6 py-3.5 rounded-full bg-white text-[#141C17] border border-[#141C17]/15 font-semibold text-sm hover:bg-[#141C17]/5 transition-all shadow-xs"
-          >
-            Watch explainer video
-          </Link>
+          <div className="lg:col-span-5">
+            <p className="text-base sm:text-lg text-[#141C17]/80 font-normal leading-relaxed">
+              {heroCopy.sub}
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link
+                to={heroCopy.hrefPrimary}
+                className="px-6 py-3 rounded-xl bg-[#0D6E42] text-white font-semibold text-sm hover:bg-[#0A5835] transition-colors"
+              >
+                {heroCopy.ctaPrimary}
+              </Link>
+              <Link
+                to={heroCopy.hrefSecondary}
+                className="px-6 py-3 rounded-xl bg-white text-[#141C17] border border-[#141C17]/18 font-semibold text-sm hover:border-[#141C17]/40 transition-colors"
+              >
+                {heroCopy.ctaSecondary}
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Spec 3.2: Primary Demo Video */}
-      <section className="pb-20 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-[1120px] mx-auto">
-        <div className="relative">
-          {/* Ambient lime glow behind video */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 bg-[#DBF361]/25 blur-[120px] rounded-full -z-10 pointer-events-none"
-            aria-hidden="true"
+      {/* Spec 3.2: Primary Demo Video (zero blur blobs) */}
+      <section className="pb-20 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-[1280px] mx-auto">
+        <div
+          ref={containerRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => isPlaying && setShowControls(false)}
+          className="relative rounded-2xl overflow-hidden bg-[#141C17] border border-[#141C17]/18 shadow-[0_8px_30px_rgba(20,28,23,0.12)] aspect-[16/9] flex items-center justify-center group"
+        >
+          <video
+            ref={videoRef}
+            data-kasi="demo-primary"
+            src="/video/Kasi How it works video.mp4"
+            className="w-full h-full object-contain cursor-pointer"
+            onClick={togglePlay}
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            onEnded={() => setIsPlaying(false)}
+            playsInline
+            muted={isMuted}
+            preload="metadata"
           />
 
-          <div className="rounded-[28px] sm:rounded-[36px] p-2 sm:p-3 bg-white/80 border border-[#141C17]/10 shadow-2xl">
-            <div
-              ref={containerRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={() => isPlaying && setShowControls(false)}
-              className="relative rounded-[22px] sm:rounded-[28px] overflow-hidden bg-[#141C17] aspect-[16/9] flex items-center justify-center group"
+          {!isPlaying && (
+            <button
+              type="button"
+              onClick={togglePlay}
+              aria-label="Play video"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-18 h-18 sm:w-22 sm:h-22 rounded-full bg-[#DBF361] text-[#141C17] flex items-center justify-center shadow-lg hover:scale-105 active:scale-97 transition-transform cursor-pointer z-20"
             >
-              <video
-                ref={videoRef}
-                data-kasi="demo-primary"
-                src="/video/Kasi How it works video.mp4"
-                className="w-full h-full object-contain cursor-pointer"
-                onClick={togglePlay}
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onEnded={() => setIsPlaying(false)}
-                playsInline
-                muted={isMuted}
-                preload="metadata"
-              />
+              <Play size={32} weight="fill" className="ml-1 text-[#141C17]" />
+            </button>
+          )}
 
-              {/* Play Button Overlay */}
-              {!isPlaying && (
+          <div
+            className={`absolute inset-x-0 bottom-0 p-4 sm:p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent transition-opacity duration-200 z-30 ${
+              showControls || !isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          >
+            <div
+              onClick={handleSeek}
+              className="relative w-full h-3 flex items-center cursor-pointer py-1 mb-2 group/timeline"
+            >
+              <div className="w-full h-1.5 bg-white/25 rounded-full overflow-hidden relative group-hover/timeline:h-2 transition-all">
+                <div
+                  className="h-full bg-[#DBF361] rounded-full"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 text-white">
+              <div className="flex items-center gap-2 sm:gap-3.5">
                 <button
                   type="button"
                   onClick={togglePlay}
-                  aria-label="Play video"
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0D6E42] text-[#DBF361] flex items-center justify-center shadow-2xl hover:scale-108 active:scale-95 transition-all cursor-pointer z-20 border-2 border-[#DBF361]/30 backdrop-blur-xs"
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
+                  className="w-9 h-9 rounded-lg bg-white/12 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <Play size={36} weight="fill" className="ml-1 text-[#DBF361]" />
+                  {isPlaying ? <Pause size={18} weight="fill" /> : <Play size={18} weight="fill" className="ml-0.5" />}
                 </button>
-              )}
 
-              {/* Floating Custom Controllers */}
-              <div
-                className={`absolute inset-x-0 bottom-0 p-4 sm:p-6 bg-gradient-to-t from-black/85 via-black/40 to-transparent transition-opacity duration-300 z-30 ${
-                  showControls || !isPlaying ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
-              >
-                {/* Timeline Scrubber */}
-                <div
-                  onClick={handleSeek}
-                  className="relative w-full h-3 flex items-center cursor-pointer py-1 mb-2 group/timeline"
+                <button
+                  type="button"
+                  onClick={() => skipTime(-10)}
+                  aria-label="Skip back 10 seconds"
+                  className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
                 >
-                  <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden relative group-hover/timeline:h-2 transition-all">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#DBF361] to-[#25D366] rounded-full"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
+                  <ArrowCounterClockwise size={18} weight="bold" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => skipTime(10)}
+                  aria-label="Skip forward 10 seconds"
+                  className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
+                >
+                  <ArrowClockwise size={18} weight="bold" />
+                </button>
+
+                <span className="font-mono text-xs sm:text-sm text-white/80 tracking-tight ml-1">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+                    className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
+                  >
+                    {isMuted || volume === 0 ? <SpeakerSimpleX size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
+                  </button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolumeChange}
+                    aria-label="Volume slider"
+                    className="w-14 sm:w-20 h-1 bg-white/25 rounded-lg appearance-none cursor-pointer accent-[#DBF361]"
+                  />
                 </div>
 
-                {/* Control Buttons */}
-                <div className="flex items-center justify-between gap-4 text-white">
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    <button
-                      type="button"
-                      onClick={togglePlay}
-                      aria-label={isPlaying ? 'Pause' : 'Play'}
-                      className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer"
-                    >
-                      {isPlaying ? <Pause size={18} weight="fill" /> : <Play size={18} weight="fill" className="ml-0.5" />}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => skipTime(-10)}
-                      aria-label="Skip back 10 seconds"
-                      className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
-                    >
-                      <ArrowCounterClockwise size={18} weight="bold" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => skipTime(10)}
-                      aria-label="Skip forward 10 seconds"
-                      className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
-                    >
-                      <ArrowClockwise size={18} weight="bold" />
-                    </button>
-
-                    <span className="font-mono text-xs sm:text-sm text-white/80 tracking-tight ml-1">
-                      {formatTime(currentTime)} / {formatTime(duration)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={toggleMute}
-                        aria-label={isMuted ? 'Unmute' : 'Mute'}
-                        className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
-                      >
-                        {isMuted || volume === 0 ? <SpeakerSimpleX size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
-                      </button>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value={isMuted ? 0 : volume}
-                        onChange={handleVolumeChange}
-                        aria-label="Volume slider"
-                        className="w-14 sm:w-20 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#DBF361]"
-                      />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={toggleFullscreen}
-                      aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-                      className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
-                    >
-                      {isFullscreen ? <CornersIn size={20} weight="bold" /> : <CornersOut size={20} weight="bold" />}
-                    </button>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                  className="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors text-white/80 hover:text-white cursor-pointer"
+                >
+                  {isFullscreen ? <CornersIn size={20} weight="bold" /> : <CornersOut size={20} weight="bold" />}
+                </button>
               </div>
             </div>
           </div>
-
-          {/* Caption under video from Spec 3.2 */}
-          <p className="mt-5 text-center text-sm sm:text-base text-[#141C17]/70 font-light max-w-2xl mx-auto leading-relaxed">
-            This is the whole thing: a customer asks, Kasi recommends, they settle a price, pay, and the order moves to fulfilment. You did nothing.
-          </p>
         </div>
+
+        <p className="mt-4 text-sm sm:text-base text-[#141C17]/70 font-normal max-w-3xl leading-relaxed">
+          {videoCopy.caption}
+        </p>
       </section>
 
-      {/* 4-Step Connected Setup Overview (Connect -> Load your shop -> Kasi sells -> You fulfil) */}
+      {/* 4-Step Connected Setup Band */}
       <HowItWorksTeaser showCta={false} />
 
-      {/* Spec 3.4: The 6-Stage Order Journey (Interactive Scroll-Driven Motion Piece) */}
+      {/* Spec 3.4: 6-Stage Order Journey */}
       <React.Suspense fallback={<div className="h-[460vh] bg-[#F6F8F3]" />}>
         <JourneyScene variant="full" />
       </React.Suspense>
 
-      {/* Spec 3.5: Premium Closing CTA */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <div className="rounded-[28px] sm:rounded-[36px] bg-[#141C17] text-white p-8 sm:p-14 text-center relative overflow-hidden shadow-2xl">
-          <div
-            className="absolute top-0 right-1/4 w-80 h-80 rounded-full bg-[#DBF361]/15 blur-[100px] pointer-events-none"
-            aria-hidden="true"
-          />
-          <h2 className="font-display font-medium text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight relative z-10">
-            Ready to put your store on autopilot?
-          </h2>
-          <p className="mt-4 text-sm sm:text-base text-white/75 font-light max-w-xl mx-auto relative z-10">
-            Connect WhatsApp or Instagram in minutes and let Kasi close your next order automatically.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 relative z-10">
+      {/* Spec 3.5: Close */}
+      <section className="py-20 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-[1280px] mx-auto">
+        <div className="rounded-2xl bg-[#141C17] text-white p-8 sm:p-14 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-7">
+            <h2 className="font-display font-medium text-3xl sm:text-4xl text-white tracking-tight">
+              {closeCopy.heading}
+            </h2>
+          </div>
+          <div className="lg:col-span-5 flex flex-wrap lg:justify-end items-center gap-3.5">
             <Link
-              to="/signup"
-              className="px-8 py-3.5 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-sm hover:brightness-105 transition-all shadow-md hover:shadow-lg"
+              to={closeCopy.hrefPrimary}
+              className="px-7 py-3.5 rounded-xl bg-[#DBF361] text-[#141C17] font-semibold text-sm hover:brightness-98 transition-all"
             >
-              Get started
+              {closeCopy.ctaPrimary}
             </Link>
             <Link
-              to="/pricing"
-              className="px-7 py-3.5 rounded-full bg-white/10 text-white border border-white/20 font-semibold text-sm hover:bg-white/20 transition-all"
+              to={closeCopy.hrefSecondary}
+              className="px-7 py-3.5 rounded-xl bg-transparent text-white border border-white/25 font-semibold text-sm hover:bg-white/10 transition-colors"
             >
-              View pricing
+              {closeCopy.ctaSecondary}
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Spec 01: Global Footer */}
       <GlobalFooter />
     </div>
   );

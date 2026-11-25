@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock, CreditCard, CheckCircle2 } from 'lucide-react';
+import { CalendarBlank as Calendar, Clock, CreditCard, CheckCircle as CheckCircle2 } from '@phosphor-icons/react';
 
 export const BookingSection = () => {
   return (

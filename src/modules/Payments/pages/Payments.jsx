@@ -4,11 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import useNetwork from '../../../hooks/useNetwork';
 import { getLocalInvoices, addInvoiceToLocal } from '../../../db/db';
-import { 
-  Search, CheckCircle, Calendar, ArrowUpRight, Eye, CreditCard, 
-  ShieldCheck, Landmark, DollarSign, Wallet, FileText, 
-  RefreshCw, Clock, XCircle, ArrowRightLeft, HelpCircle, X
-} from 'lucide-react';
+import { MagnifyingGlass as Search, CheckCircle, CalendarBlank as Calendar, ArrowUpRight, Eye, CreditCard, ShieldCheck, Bank as Landmark, CurrencyDollar as DollarSign, Wallet, FileText, ArrowsClockwise as RefreshCw, Clock, XCircle, ArrowsLeftRight as ArrowRightLeft, Question as HelpCircle, X } from '@phosphor-icons/react';
 import Button from '../../../components/ui/Button';
 import DetailModal from '../../../components/ui/DetailModal';
 import { TableSkeleton } from '../../../components/ui/Skeleton';

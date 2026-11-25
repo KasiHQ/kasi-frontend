@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { Warning as AlertTriangle, X } from '@phosphor-icons/react';
 
 const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, title, message, loading }) => {
     useEffect(() => {

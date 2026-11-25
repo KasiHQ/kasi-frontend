@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageCircle, CreditCard, Truck, CheckCircle, AlertTriangle, VolumeX, ArrowRight } from 'lucide-react';
+import { ChatCircle as MessageCircle, CreditCard, Truck, CheckCircle, Warning as AlertTriangle, SpeakerSimpleX as VolumeX, ArrowRight } from '@phosphor-icons/react';
 import { conversationAPI } from '../../api/conversations';
 
 const ConversationSummaryWidget = () => {

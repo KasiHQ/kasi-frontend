@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, ListOrdered, UserCircle, Users } from 'lucide-react';
+import { X, CircleNotch as Loader2, ListNumbers as ListOrdered, UserCircle, Users } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 
 const formatNaira = (amount) => {

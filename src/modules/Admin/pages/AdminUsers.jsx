@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Loader2, Search } from 'lucide-react';
+import { Users, CircleNotch as Loader2, MagnifyingGlass as Search } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import AdminUserDetailModal from '../components/AdminUserDetailModal';
 

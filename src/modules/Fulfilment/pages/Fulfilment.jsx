@@ -3,12 +3,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
-import {
-  Package, Truck, CheckCircle2, Clock, MapPin, Phone, User,
-  Search, AlertCircle, ShoppingBag, Send, Bike, ChevronRight,
-  ChevronLeft, RotateCcw, X, Check, Smartphone, Monitor,
-  LayoutGrid, List, Store, Sparkles
-} from 'lucide-react';
+import { Package, Truck, CheckCircle as CheckCircle2, Clock, MapPin, Phone, User, MagnifyingGlass as Search, WarningCircle as AlertCircle, ShoppingBag, PaperPlaneRight as Send, Bicycle as Bike, CaretRight as ChevronRight, CaretLeft as ChevronLeft, ArrowCounterClockwise as RotateCcw, X, Check, DeviceMobile as Smartphone, Monitor, GridFour as LayoutGrid, ListBullets as List, Storefront as Store, Lightning as Sparkles } from '@phosphor-icons/react';
 
 // ─── Pathway Steps Definition ──────────────────────────────────────────────────
 const STEPS = {
@@ -547,7 +542,7 @@ export default function Fulfilment() {
                         {order.displayId}
                       </td>
 
-                      {/* Type Badge - Clean Lucide SVG icons, NO emojis */}
+                      {/* Type Badge - Phosphor SVG icons */}
                       <td className="py-3.5 px-3 whitespace-nowrap">
                         {order.delivery_type === 'delivery' ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-[#1C774E] dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
@@ -840,7 +835,7 @@ export default function Fulfilment() {
             ))}
           </div>
 
-          {/* Cards vs List View Switch with Lucide Icons (NO EMOJIS) */}
+          {/* Cards vs List View Switch with Phosphor Icons */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setMobileViewMode('cards')}

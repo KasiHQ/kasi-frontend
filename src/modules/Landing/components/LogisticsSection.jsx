@@ -1,5 +1,5 @@
 import React from 'react';
-import { Truck, Check } from 'lucide-react';
+import { Truck, Check } from '@phosphor-icons/react';
 
 export const LogisticsSection = () => {
   const steps = [

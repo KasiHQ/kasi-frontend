@@ -6,7 +6,7 @@ import ImpersonationBanner from './ImpersonationBanner';
 import BroadcastBanner from './BroadcastBanner';
 import { useLayout } from '../../context/LayoutContext';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Bell, X, DollarSign, Calendar, AlertTriangle, User, Truck, Settings, LogOut, Zap, Wallet } from 'lucide-react';
+import { MagnifyingGlass as Search, Bell, X, CurrencyDollar as DollarSign, CalendarBlank as Calendar, Warning as AlertTriangle, User, Truck, GearSix as Settings, SignOut as LogOut, Lightning as Zap, Wallet } from '@phosphor-icons/react';
 import { PiSidebarSimple } from 'react-icons/pi';
 import api from '../../api/axios';
 

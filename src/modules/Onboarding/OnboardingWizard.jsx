@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Check, ArrowRight, ArrowLeft, ShoppingBag, 
-  Briefcase, Phone, Instagram as InstagramIcon, 
-  Building, MapPin, Loader2, Send, UploadCloud,
-  MessageSquare, DollarSign, Wallet, ShieldCheck,
-  CheckCircle, Landmark, Copy
-} from 'lucide-react';
+import { Check, ArrowRight, ArrowLeft, ShoppingBag, Briefcase, Phone, InstagramLogo as InstagramIcon, Buildings as Building, MapPin, CircleNotch as Loader2, PaperPlaneRight as Send, CloudArrowUp as UploadCloud, ChatText as MessageSquare, CurrencyDollar as DollarSign, Wallet, ShieldCheck, CheckCircle, Bank as Landmark, Copy } from '@phosphor-icons/react';
 import { onboardingAPI } from '../../api/onboarding';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';

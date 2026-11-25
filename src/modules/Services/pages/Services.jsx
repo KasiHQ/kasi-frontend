@@ -1,29 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Plus,
-  Search,
-  MapPin,
-  Clock,
-  Edit2,
-  Trash2,
-  X,
-  AlertTriangle,
-  CheckCircle2,
-  Scissors,
-  Sparkles,
-  Smile,
-  Footprints,
-  Heart,
-  User,
-  Dumbbell,
-  Flower2,
-  Zap,
-  MoreHorizontal,
-  Info,
-  ChevronRight,
-  Save,
-  Eye,
-} from "lucide-react";
+import { Plus, MagnifyingGlass as Search, MapPin, Clock, PencilSimpleLine as Edit2, Trash as Trash2, X, Warning as AlertTriangle, CheckCircle as CheckCircle2, Scissors, Lightning as Sparkles, Smiley as Smile, Footprints, Heart, User, Barbell as Dumbbell, Flower as Flower2, Lightning as Zap, DotsThree as MoreHorizontal, Info, CaretRight as ChevronRight, FloppyDisk as Save, Eye } from '@phosphor-icons/react';
 import api from "../../../api/axios";
 import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "../../../context/ToastContext";

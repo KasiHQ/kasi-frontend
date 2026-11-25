@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Package, Truck, CheckCircle, MapPin, Phone, User, 
-  Grid, List, Search, Copy, Check, ExternalLink, RefreshCw 
-} from 'lucide-react';
+import { Package, Truck, CheckCircle, MapPin, Phone, User, SquaresFour as Grid, ListBullets as List, MagnifyingGlass as Search, Copy, Check, ArrowSquareOut as ExternalLink, ArrowsClockwise as RefreshCw } from '@phosphor-icons/react';
 import { conversationAPI } from '../../../api/conversations';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';

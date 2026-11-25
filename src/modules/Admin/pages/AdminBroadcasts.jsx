@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Megaphone, Plus, Trash2, Power, PowerOff, Loader2, Info, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Megaphone, Plus, Trash as Trash2, Power, Power as PowerOff, CircleNotch as Loader2, Info, Warning as AlertTriangle, CheckCircle } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 
 const AdminBroadcasts = () => {

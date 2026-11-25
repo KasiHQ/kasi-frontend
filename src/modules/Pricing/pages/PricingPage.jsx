@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
-import { Check, ArrowRight, ShieldCheck, Sparkle } from "@phosphor-icons/react";
+import { Check, ShieldCheck } from "@phosphor-icons/react";
 import { NewNav } from "../../Landing/components/home/NewNav";
 import { GlobalFooter } from "../../../components/common/GlobalFooter";
 import { PRICING_DATA } from "../../../content/pricing";
 
 export function PricingPage() {
-  const [activeTab, setActiveTab] = useState("product"); // "product" | "service"
-  const shouldReduceMotion = useReducedMotion();
+  const [activeTab, setActiveTab] = useState("product");
 
   useEffect(() => {
-    document.title = "Pricing | Kasi — Simple Flat Monthly Plans";
+    document.title = "Pricing | Kasi";
   }, []);
 
   const plans = activeTab === "product" ? PRICING_DATA.productPlans : PRICING_DATA.servicePlans;
@@ -22,25 +20,29 @@ export function PricingPage() {
 
       <main className="flex-1 pt-32 sm:pt-40 lg:pt-44 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-[1240px] mx-auto">
-          {/* Header */}
-          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-            <h1 className="font-display font-medium text-3xl sm:text-5xl lg:text-6xl text-[#141C17] tracking-tight leading-[1.08]">
-              {PRICING_DATA.heading}
-            </h1>
-            <p className="mt-5 text-base sm:text-lg lg:text-xl text-[#141C17]/75 font-light leading-relaxed max-w-2xl mx-auto">
-              {PRICING_DATA.sub}
-            </p>
+          {/* Split Header + Segmented Switch */}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pb-12 border-b border-[#141C17]/15">
+            <div className="max-w-2xl">
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#0D6E42] block mb-3">
+                FLAT MONTHLY PLANS · 14-DAY FREE TRIAL
+              </span>
+              <h1 className="font-display font-medium text-3xl sm:text-5xl lg:text-[54px] text-[#141C17] tracking-tight leading-[1.06]">
+                {PRICING_DATA.heading}
+              </h1>
+              <p className="mt-4 text-base sm:text-lg text-[#141C17]/75 font-normal leading-relaxed">
+                {PRICING_DATA.sub}
+              </p>
+            </div>
 
-            {/* Toggle Segmented Pill */}
-            <div className="mt-10 inline-flex items-center p-1.5 rounded-full bg-[#141C17]/6 border border-[#141C17]/10">
+            <div className="inline-flex items-center p-1 rounded-xl bg-white border border-[#141C17]/15 self-start lg:self-auto shrink-0">
               {PRICING_DATA.tabs.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                  className={`px-5 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
                     activeTab === tab.id
-                      ? "bg-white text-[#141C17] shadow-sm font-bold"
+                      ? "bg-[#141C17] text-white"
                       : "text-[#141C17]/70 hover:text-[#141C17]"
                   }`}
                 >
@@ -50,49 +52,43 @@ export function PricingPage() {
             </div>
           </div>
 
-          {/* Pricing Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch mt-12">
-            {plans.map((plan, index) => {
+          {/* Architectural 3-Column Pricing Table */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mt-12">
+            {plans.map((plan) => {
               const isPopular = plan.isPopular;
 
               return (
-                <motion.div
+                <div
                   key={plan.id}
-                  initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, delay: index * 0.08 }}
-                  className={`rounded-[30px] p-7 sm:p-9 flex flex-col justify-between relative transition-all ${
+                  className={`rounded-2xl p-7 sm:p-8 flex flex-col justify-between relative ${
                     isPopular
-                      ? "bg-[#141C17] text-white shadow-2xl border-2 border-[#DBF361]/40 md:-translate-y-2"
-                      : "bg-white text-[#141C17] shadow-xs border border-[#141C17]/10 hover:border-[#141C17]/25"
+                      ? "bg-[#141C17] text-white border-2 border-[#141C17]"
+                      : "bg-white text-[#141C17] border border-[#141C17]/15"
                   }`}
                 >
-                  {/* Badge */}
-                  {isPopular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-[#DBF361] text-[#141C17] px-3.5 py-1 rounded-full shadow-md">
-                        MOST POPULAR
-                      </span>
-                    </div>
-                  )}
-
                   <div>
-                    {/* Tier Name */}
-                    <span
-                      className={`font-mono text-xs font-bold tracking-wider uppercase ${
-                        isPopular ? "text-[#DBF361]" : "text-[#141C17]/60"
-                      }`}
-                    >
-                      {plan.name}
-                    </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`font-mono text-xs font-bold tracking-wider uppercase ${
+                          isPopular ? "text-[#DBF361]" : "text-[#0D6E42]"
+                        }`}
+                      >
+                        {plan.name}
+                      </span>
 
-                    {/* Price */}
+                      {isPopular && (
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider bg-[#DBF361] text-[#141C17] px-2.5 py-0.5 rounded-xs">
+                          Recommended
+                        </span>
+                      )}
+                    </div>
+
                     <div className="mt-4 mb-6 flex items-baseline gap-1">
                       <span className="font-display font-medium text-4xl sm:text-5xl tracking-tight">
                         {plan.price}
                       </span>
                       <span
-                        className={`text-sm font-light ${
+                        className={`text-sm font-normal ${
                           isPopular ? "text-white/60" : "text-[#141C17]/60"
                         }`}
                       >
@@ -100,83 +96,75 @@ export function PricingPage() {
                       </span>
                     </div>
 
-                    {/* CTA Button */}
                     <Link
                       to="/signup"
-                      className={`w-full py-3.5 rounded-full text-center font-semibold text-sm transition-all block mb-8 ${
+                      className={`w-full py-3.5 rounded-xl text-center font-semibold text-sm transition-colors block mb-7 ${
                         isPopular
-                          ? "bg-[#0D6E42] text-white hover:bg-[#1C774E] shadow-md hover:brightness-105 active:scale-98"
-                          : "bg-[#141C17] text-white hover:bg-[#2A342E] shadow-xs active:scale-98"
+                          ? "bg-[#DBF361] text-[#141C17] hover:brightness-98"
+                          : "bg-[#0D6E42] text-white hover:bg-[#0A5835]"
                       }`}
                     >
-                      Get started
+                      Start 14-day free trial
                     </Link>
 
-                    {/* Features List */}
-                    <div className="space-y-3.5 pt-6 border-t border-current/10">
+                    <div className="space-y-3 pt-6 border-t border-current/12">
                       {plan.features.map((feature, fIdx) => (
-                        <div key={fIdx} className="flex items-start gap-3 text-xs sm:text-[13px] leading-relaxed">
+                        <div key={fIdx} className="flex items-start gap-2.5 text-xs sm:text-[13px] leading-relaxed">
                           <Check
-                            size={16}
+                            size={15}
                             weight="bold"
                             className={`shrink-0 mt-0.5 ${
                               isPopular ? "text-[#DBF361]" : "text-[#0D6E42]"
                             }`}
                           />
-                          <span className={isPopular ? "text-white/85" : "text-[#141C17]/80"}>
+                          <span className={isPopular ? "text-white/88" : "text-[#141C17]/80"}>
                             {feature}
                           </span>
                         </div>
                       ))}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
 
-          {/* Getting Started Banner */}
-          <div className="mt-20 py-10 px-8 rounded-[28px] bg-white border border-[#141C17]/10 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#DBF361]/40 flex items-center justify-center text-[#0D6E42] shrink-0">
-                <ShieldCheck size={28} weight="duotone" />
-              </div>
+          {/* Settlement Note + FAQ */}
+          <div className="mt-14 p-6 sm:p-8 rounded-xl bg-white border border-[#141C17]/12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex items-start sm:items-center gap-4">
+              <ShieldCheck size={26} weight="regular" className="text-[#0D6E42] shrink-0 mt-0.5 sm:mt-0" />
               <div>
-                <h3 className="font-display font-medium text-lg sm:text-xl text-[#141C17]">
-                  Start simple, scale as you grow.
+                <h3 className="font-display font-medium text-lg text-[#141C17]">
+                  Direct Paystack bank settlements · 2% transaction processing
                 </h3>
-                <p className="text-sm text-[#141C17]/70 font-light mt-0.5">
-                  Link your WhatsApp or Instagram shop in minutes and let Kasi handle sales around the clock.
+                <p className="text-sm text-[#141C17]/70 font-normal mt-0.5">
+                  Buyer payments settle straight to your linked Nigerian bank account via Paystack subaccount split.
                 </p>
               </div>
             </div>
 
             <Link
               to="/signup"
-              className="px-7 py-3 rounded-full bg-[#DBF361] text-[#141C17] font-semibold text-sm hover:brightness-105 transition-all shrink-0"
+              className="px-6 py-3 rounded-xl bg-[#141C17] text-white font-semibold text-sm hover:bg-[#0D6E42] transition-colors shrink-0"
             >
-              Get started free
+              Create your store
             </Link>
           </div>
 
-          {/* FAQ Accordion Grid */}
-          <div className="mt-20 sm:mt-24 max-w-3xl mx-auto">
-            <div className="text-center mb-10">
+          {/* FAQ Ledger */}
+          <div className="mt-16 pt-12 border-t border-[#141C17]/15 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-4">
               <h2 className="font-display font-medium text-2xl sm:text-3xl text-[#141C17] tracking-tight">
-                Frequently asked questions
+                Common questions
               </h2>
             </div>
-
-            <div className="space-y-4">
-              {PRICING_DATA.faq.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-2xl p-6 border border-[#141C17]/10 shadow-xs"
-                >
-                  <h4 className="font-display font-medium text-base text-[#141C17] mb-2">
+            <div className="lg:col-span-8 divide-y divide-[#141C17]/12">
+              {PRICING_DATA.faq.map((item) => (
+                <div key={item.q} className="py-5 first:pt-0">
+                  <h3 className="font-display font-medium text-lg text-[#141C17]">
                     {item.q}
-                  </h4>
-                  <p className="text-sm text-[#141C17]/75 font-light leading-relaxed">
+                  </h3>
+                  <p className="mt-2 text-sm text-[#141C17]/75 leading-relaxed">
                     {item.a}
                   </p>
                 </div>

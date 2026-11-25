@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Lock, ArrowRight } from 'lucide-react';
+import { LockKey as Lock, ArrowRight } from '@phosphor-icons/react';
 
 const SubscriptionGate = ({ children }) => {
   const { user } = useAuth();

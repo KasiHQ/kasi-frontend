@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FileText, Plus, Edit, Trash2, Globe, Eye, Upload, X, Loader2, ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, User, Bold, Italic, Link2, List, Code, Quote, AlertCircle, Image } from 'lucide-react';
+import { FileText, Plus, PencilSimple as Edit, Trash as Trash2, Globe, Eye, UploadSimple as Upload, X, CircleNotch as Loader2, ArrowLeft, ArrowsClockwise as RefreshCw, CheckCircle, Warning as AlertTriangle, User, TextB as Bold, TextItalic as Italic, LinkSimple as Link2, ListBullets as List, Code, Quotes as Quote, WarningCircle as AlertCircle, Image } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Handshake, TrendingUp } from 'lucide-react';
+import { ShieldCheck, Handshake, TrendUp as TrendingUp } from '@phosphor-icons/react';
 
 export const NegotiationSection = () => {
   return (

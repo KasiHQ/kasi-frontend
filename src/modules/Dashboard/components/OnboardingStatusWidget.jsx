@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, Circle, ArrowRight, Settings } from 'lucide-react';
+import { CheckCircle, Circle, ArrowRight, GearSix as Settings } from '@phosphor-icons/react';
 import { onboardingAPI } from '../../../api/onboarding';
 
 const OnboardingStatusWidget = () => {

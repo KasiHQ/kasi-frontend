@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Loader2, Search } from 'lucide-react';
+import { FileText, CircleNotch as Loader2, MagnifyingGlass as Search } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import AdminInvoiceDetailModal from '../components/AdminInvoiceDetailModal';
 

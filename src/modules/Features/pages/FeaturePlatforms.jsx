@@ -10,48 +10,48 @@ export function FeaturePlatforms() {
       headlinePart1="Wherever your customers message you,"
       highlightText="Kasi is already there."
       headlinePart2=""
-      sub="One brain, every channel. Your customers keep using the apps they know. You run it all from one place."
+      sub="Your buyers keep using WhatsApp, Instagram, Messenger, and Telegram. Every channel reads from the same catalog and lands in one inbox."
       screenshot="/images/platforms.png"
-      screenshotAlt="Kasi Platforms and Connected Channels Management UI"
-      screenshotCaption="Multi-channel connection hub: WhatsApp Cloud API, Instagram Direct, and Telegram operating on one synchronized catalog."
-      problemHeading="Stop fracturing your business across separate apps"
-      problemBody="Customers message you across WhatsApp, Instagram DMs, and Telegram. Juggling multiple apps causes dropped chats and lost revenue. Kasi unifies every customer rail into one central operating system."
-      movesTitle="Official channel integrations"
+      screenshotAlt="Kasi Connected Channels Management UI"
+      screenshotCaption="Channel settings: Meta WhatsApp Cloud API, Instagram Direct, Messenger, and Telegram Bot connected to one inventory."
+      problemHeading="Stop splitting stock across four separate apps"
+      problemBody="When buyers DM on Instagram while others message on WhatsApp, it is easy to sell the last unit twice or miss a thread completely. Kasi deducts from one shared stock count the moment Paystack confirms."
+      movesTitle="Supported messaging & payment channels"
       moves={[
         {
-          title: "WhatsApp Cloud API",
-          desc: "Built on Meta's official WhatsApp Business Cloud API. High deliverability, rich media, and 24/7 uptime.",
+          title: "Meta WhatsApp Cloud API",
+          desc: "Recommended primary connection using Meta's official Cloud API with support for visual PNG receipts and approved templates.",
         },
         {
-          title: "Instagram Direct Messaging",
-          desc: "Connects to Instagram Graph API to answer story replies, post inquiries, and direct messages instantly.",
+          title: "Instagram Direct",
+          desc: "Connects via Meta Graph API v21.0 to answer product DMs, recognize catalog screenshots, and send checkout links.",
         },
         {
           title: "Facebook Messenger",
-          desc: "Engage Facebook store visitors directly and drive them straight into an interactive checkout experience.",
+          desc: "Links your Facebook Page inbox so commenters and page visitors can negotiate and pay in-thread.",
         },
         {
-          title: "Telegram Commercial Bot",
-          desc: "Lightweight, ultra-fast Telegram integration supporting full product catalogs and automated invoices.",
+          title: "Telegram Bot API",
+          desc: "Connect any @BotFather token in seconds with instant webhook registration and full catalog access.",
         },
       ]}
-      controlsTitle="Why it matters"
+      controlsTitle="Why it holds up under volume"
       controls={[
         {
-          title: "Single Synchronized Catalog",
-          desc: "Update a price or product stock once; every channel updates instantaneously.",
+          title: "Shared Stock Lock",
+          desc: "Change a price or sell the last unit on WhatsApp and Instagram reflects the new stock count immediately.",
         },
         {
-          title: "Zero Risk of Bans",
-          desc: "Built strictly on official platform partner APIs, never unofficial browser-scraping hacks.",
+          title: "Official Meta & Paystack Webhooks",
+          desc: "Every inbound Meta and Paystack payload is verified via HMAC cryptographic signatures.",
         },
         {
-          title: "Unified Cross-Channel CRM",
-          desc: "If a customer messages on WhatsApp today and Instagram tomorrow, their history stays intact.",
+          title: "Quick Pairing Sandbox Included",
+          desc: "Need to prototype in 60 seconds before Meta verification? Pair a test number via 8-digit code, then switch to Cloud API for long-term scale.",
         },
       ]}
-      ctaHeading="Connect your channels in minutes."
-      ctaSub="Unify your customer chats and start selling across every platform."
+      ctaHeading="Link your first channel in minutes."
+      ctaSub="Connect WhatsApp, Instagram, or Telegram and manage every buyer from one counter."
     />
   );
 }

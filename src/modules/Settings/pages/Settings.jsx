@@ -5,11 +5,11 @@ import { useToast } from '../../../context/ToastContext';
 import { useTheme, THEMES } from '../../../context/ThemeContext';
 import Button from '../../../components/ui/Button';
 import api from '../../../api/axios';
-import { Save, Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, History, Wifi, WifiOff, MessageCircle, Instagram, Calendar, Zap, HelpCircle, FileText, ExternalLink, Send, Facebook, Layout, Wallet, ShieldCheck, Landmark, CheckCircle, AlertTriangle, Truck, Store } from 'lucide-react';
+import { FloppyDisk as Save, Buildings as Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, ClockCounterClockwise as History, WifiHigh as Wifi, WifiSlash as WifiOff, ChatCircle as MessageCircle, InstagramLogo as Instagram, CalendarBlank as Calendar, Lightning as Zap, Question as HelpCircle, FileText, ArrowSquareOut as ExternalLink, PaperPlaneRight as Send, FacebookLogo as Facebook, Layout, Wallet, ShieldCheck, Bank as Landmark, CheckCircle, Warning as AlertTriangle, Truck, Storefront as Store, X } from '@phosphor-icons/react';
 import { SiWhatsapp, SiTelegram, SiInstagram, SiMessenger } from 'react-icons/si';
 import ActivityLogsTable from '../components/ActivityLogsTable';
 import IntegrationsTab from '../components/IntegrationsTab';
-import { X } from 'lucide-react';
+
 
 const CITY_AREAS = {
   'Lagos': ["Ikeja", "Lekki", "Victoria Island", "Surulere", "Yaba", "Ajah", "Gbagada", "Maryland", "Ikoyi", "Apapa", "Ogba", "Agege"],

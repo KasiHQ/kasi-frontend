@@ -1,20 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { 
-  Store, 
-  MapPin, 
-  Clock, 
-  Phone, 
-  MessageSquare, 
-  Search, 
-  ChevronRight, 
-  ShieldCheck, 
-  Calendar,
-  AlertTriangle,
-  ShoppingBag,
-  ExternalLink,
-  ChevronLeft
-} from 'lucide-react';
+import { Storefront as Store, MapPin, Clock, Phone, ChatText as MessageSquare, MagnifyingGlass as Search, CaretRight as ChevronRight, ShieldCheck, CalendarBlank as Calendar, Warning as AlertTriangle, ShoppingBag, ArrowSquareOut as ExternalLink, CaretLeft as ChevronLeft } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { formatCurrency } from '../../../utils/formatters';
 import { MarketplaceHeader, MarketplaceFooter } from './ProductDetail';

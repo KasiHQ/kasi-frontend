@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
-import { TrendingUp, DollarSign, Target, Activity, Crown, Award, MessageSquare, Users, ArrowUpRight } from 'lucide-react';
+import { TrendUp as TrendingUp, CurrencyDollar as DollarSign, Target, Pulse as Activity, Crown, Medal as Award, ChatText as MessageSquare, Users, ArrowUpRight } from '@phosphor-icons/react';
 import { getAnalyticsData } from '../../../api/analytics';
 import api from '../../../api/axios';
 import { AnalyticsSkeleton } from '../../../components/ui/Skeleton';

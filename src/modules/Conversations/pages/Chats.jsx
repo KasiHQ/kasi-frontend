@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MessageSquare, Search, AlertTriangle, Sparkles, Phone, ArrowRight, ArrowLeft, Send, User, Shield, Tag, History, CheckCircle2, X } from 'lucide-react';
+import { ChatText as MessageSquare, MagnifyingGlass as Search, Warning as AlertTriangle, Lightning as Sparkles, Phone, ArrowRight, ArrowLeft, PaperPlaneRight as Send, User, Shield, Tag, ClockCounterClockwise as History, CheckCircle as CheckCircle2, X } from '@phosphor-icons/react';
 import { PiSpeakerSimpleSlash, PiSpeakerSimpleHigh, PiTrash, PiReceipt, PiImageSquare, PiSmiley } from 'react-icons/pi';
 import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si';
 import { conversationAPI } from '../../../api/conversations';

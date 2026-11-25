@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, Package, Users, FileText, Ban, ShieldAlert, CheckCircle, LogIn, Trash2, AlertTriangle } from 'lucide-react';
+import { X, CircleNotch as Loader2, Package, Users, FileText, Prohibit as Ban, ShieldWarning as ShieldAlert, CheckCircle, SignIn as LogIn, Trash as Trash2, Warning as AlertTriangle } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 
 const AdminUserDetailModal = ({ isOpen, onClose, userId }) => {

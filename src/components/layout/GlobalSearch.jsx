@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Package, Users, FileText, ChevronRight, LayoutDashboard, Settings, Calendar, Briefcase, Truck, MessageSquare } from 'lucide-react';
+import { MagnifyingGlass as Search, Package, Users, FileText, CaretRight as ChevronRight, SquaresFour as LayoutDashboard, GearSix as Settings, CalendarBlank as Calendar, Briefcase, Truck, ChatText as MessageSquare } from '@phosphor-icons/react';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 

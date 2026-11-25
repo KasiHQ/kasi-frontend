@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, Search, X, Mail, Phone, Clock, 
-  MessageSquare, Award, TrendingUp, AlertTriangle, 
-  Crown, Lightbulb, Zap, BarChart3, Settings
-} from 'lucide-react';
+import { Users, MagnifyingGlass as Search, X, EnvelopeSimple as Mail, Phone, Clock, ChatText as MessageSquare, Medal as Award, TrendUp as TrendingUp, Warning as AlertTriangle, Crown, Lightbulb, Lightning as Zap, ChartBar as BarChart3, GearSix as Settings } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { useToast } from '../../../context/ToastContext';
 

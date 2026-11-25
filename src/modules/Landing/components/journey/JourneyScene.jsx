@@ -195,14 +195,6 @@ export const JourneyScene = ({ variant = 'landing' }) => {
             }}
           />
 
-          {/* Soft ambient lime glow tracking stage */}
-          {!isLowPower && (
-            <motion.div
-              className="absolute top-1/4 w-[480px] h-[480px] rounded-full bg-[#DBF361]/18 blur-[120px] pointer-events-none"
-              style={{ left: glowX }}
-            />
-          )}
-
           {/* Top Bar: Step Counter + Active Title with Lime Highlight + Auto-Flow Control */}
           <header className="relative z-20 max-w-6xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-2 pt-0.5 text-center sm:text-left shrink-0">
             <AnimatePresence mode="wait">

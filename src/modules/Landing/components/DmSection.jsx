@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, PieChart, TrendingUp } from 'lucide-react';
+import { ShoppingBag, ChartPieSlice as PieChart, TrendUp as TrendingUp } from '@phosphor-icons/react';
 
 export const DmSection = () => {
   return (

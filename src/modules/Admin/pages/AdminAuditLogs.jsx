@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Search, ChevronLeft, ChevronRight, Info, Eye } from 'lucide-react';
+import { ShieldWarning as ShieldAlert, MagnifyingGlass as Search, CaretLeft as ChevronLeft, CaretRight as ChevronRight, Info, Eye } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 
 const AdminAuditLogs = () => {

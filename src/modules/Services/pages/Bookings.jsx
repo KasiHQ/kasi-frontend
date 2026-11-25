@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../api/axios';
 import { useToast } from '../../../context/ToastContext';
-import { Calendar as CalendarIcon, Clock, MapPin, User, CheckCircle, XCircle, ChevronRight, CreditCard, CalendarDays, ArrowLeft, MoreHorizontal, Pen, X } from 'lucide-react';
+import { CalendarBlank as CalendarIcon, Clock, MapPin, User, CheckCircle, XCircle, CaretRight as ChevronRight, CreditCard, CalendarDots as CalendarDays, ArrowLeft, DotsThree as MoreHorizontal, Pen, X } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { formatCurrency } from '../../../utils/formatters';
 import useNetwork from '../../../hooks/useNetwork';

@@ -4,7 +4,7 @@ import { useToast } from '../../../context/ToastContext';
 import api from '../../../api/axios';
 import useNetwork from '../../../hooks/useNetwork';
 import { getLocalInvoices, addInvoiceToLocal, addToSyncQueue } from '../../../db/db';
-import { Plus, Search, Filter, Calendar, UploadCloud, FileText, Eye } from 'lucide-react';
+import { Plus, MagnifyingGlass as Search, Funnel as Filter, CalendarBlank as Calendar, CloudArrowUp as UploadCloud, FileText, Eye } from '@phosphor-icons/react';
 import Button from '../../../components/ui/Button';
 import DetailModal from '../../../components/ui/DetailModal';
 import { TableSkeleton } from '../../../components/ui/Skeleton';

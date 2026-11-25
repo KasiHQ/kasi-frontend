@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, ArrowRight, Check, Send } from "lucide-react";
+import { X, ArrowRight, Check, PaperPlaneRight as Send } from '@phosphor-icons/react';
 import api from "../../../api/axios";
 
 export const WaitlistModal = ({ isOpen, onClose }) => {

@@ -1,27 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { 
-  Store, 
-  X, 
-  ArrowRight, 
-  Phone, 
-  MapPin, 
-  Clock, 
-  Sparkles, 
-  CheckCircle2, 
-  Truck, 
-  ExternalLink, 
-  MessageSquare, 
-  ArrowUpDown, 
-  Building,
-  ArrowLeft,
-  ChevronRight,
-  ShieldCheck,
-  Instagram,
-  Twitter,
-  Linkedin,
-  ShoppingBag
-} from 'lucide-react';
+import { Storefront as Store, X, ArrowRight, Phone, MapPin, Clock, Lightning as Sparkles, CheckCircle as CheckCircle2, Truck, ArrowSquareOut as ExternalLink, ChatText as MessageSquare, ArrowsDownUp as ArrowUpDown, Buildings as Building, ArrowLeft, CaretRight as ChevronRight, ShieldCheck, InstagramLogo as Instagram, XLogo as Twitter, LinkedinLogo as Linkedin, ShoppingBag } from '@phosphor-icons/react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../api/axios';
 import { formatCurrency } from '../../../utils/formatters';

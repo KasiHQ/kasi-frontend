@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, CreditCard, ArrowRight, ShieldCheck, Zap, AlertCircle, TrendingUp, History, Download } from 'lucide-react';
+import { Wallet, CreditCard, ArrowRight, ShieldCheck, Lightning as Zap, WarningCircle as AlertCircle, TrendUp as TrendingUp, ClockCounterClockwise as History, DownloadSimple as Download } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';

@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Shield, Users, TrendingUp, MessageSquare, DollarSign, Cpu, 
-  Activity, Zap, AlertTriangle, Server, HardDrive, Brain, 
-  Wifi, WifiOff, ArrowUpRight, ArrowDownRight, RefreshCw, 
-  Eye, BarChart3, Clock, Coins, ShieldAlert, Ban, CheckCircle,
-  TrendingDown, CheckSquare, XCircle, ShoppingBag
-} from 'lucide-react';
+import { Shield, Users, TrendUp as TrendingUp, ChatText as MessageSquare, CurrencyDollar as DollarSign, Cpu, Pulse as Activity, Lightning as Zap, Warning as AlertTriangle, HardDrives as Server, HardDrives as HardDrive, Brain, WifiHigh as Wifi, WifiSlash as WifiOff, ArrowUpRight, ArrowDownRight, ArrowsClockwise as RefreshCw, Eye, ChartBar as BarChart3, Clock, Coins, ShieldWarning as ShieldAlert, Prohibit as Ban, CheckCircle, TrendDown as TrendingDown, CheckSquare, XCircle, ShoppingBag } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import AdminUserDetailModal from '../components/AdminUserDetailModal';
 

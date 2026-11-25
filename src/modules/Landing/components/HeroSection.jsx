@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Play } from "lucide-react";
+import { Play } from '@phosphor-icons/react';
 import { CountdownTimer } from "./CountdownTimer";
 import { PRELAUNCH_WAITLIST_MODE } from "../../../config";
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CheckCircle2, MessageSquare, Loader2, ShieldCheck } from 'lucide-react';
+import { CheckCircle as CheckCircle2, ChatText as MessageSquare, CircleNotch as Loader2, ShieldCheck } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 
 const PaymentSuccess = () => {

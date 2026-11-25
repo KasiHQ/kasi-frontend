@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../api/axios';
-import { History, Search, FileText, ChevronLeft, ChevronRight, Activity, Eye, X } from 'lucide-react';
+import { ClockCounterClockwise as History, MagnifyingGlass as Search, FileText, CaretLeft as ChevronLeft, CaretRight as ChevronRight, Pulse as Activity, Eye, X } from '@phosphor-icons/react';
 
 const ActivityLogsTable = () => {
     const [logs, setLogs] = useState([]);

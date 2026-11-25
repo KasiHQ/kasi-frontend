@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { Question as HelpCircle, CaretDown as ChevronDown, CaretUp as ChevronUp, ChatCircle as MessageCircle } from '@phosphor-icons/react';
 import clsx from 'clsx';
 
 export const FAQSection = () => {

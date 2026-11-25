@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { CheckCircle as CheckCircle2, XCircle, CircleNotch as Loader2 } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';

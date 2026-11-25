@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X } from '@phosphor-icons/react';
 
 const DetailModal = ({ isOpen, onClose, title, subtitle, icon: Icon, accentColor = 'primary', children }) => {
     useEffect(() => {

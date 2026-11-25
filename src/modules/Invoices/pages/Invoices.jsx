@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Filter, MoreHorizontal, FileText, Download, Share2, Eye, Trash, CheckCircle } from 'lucide-react';
+import { Plus, MagnifyingGlass as Search, Funnel as Filter, DotsThree as MoreHorizontal, FileText, DownloadSimple as Download, ShareNetwork as Share2, Eye, Trash, CheckCircle } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { useAuth } from '../../../context/AuthContext';
 import useNetwork from '../../../hooks/useNetwork';

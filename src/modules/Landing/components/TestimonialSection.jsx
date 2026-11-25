@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Quote, MessageSquare } from 'lucide-react';
+import { Star, Quotes as Quote, ChatText as MessageSquare } from '@phosphor-icons/react';
 
 export const TestimonialSection = () => {
   const TESTIMONIALS = [

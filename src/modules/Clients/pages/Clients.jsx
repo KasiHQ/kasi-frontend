@@ -4,7 +4,7 @@ import api from '../../../api/axios';
 import { conversationAPI } from '../../../api/conversations';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
-import { Search, Users, Download, Send, MessageSquare, X, History, ShoppingBag, Receipt, Calendar, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
+import { MagnifyingGlass as Search, Users, DownloadSimple as Download, PaperPlaneRight as Send, ChatText as MessageSquare, X, ClockCounterClockwise as History, ShoppingBag, Receipt, CalendarBlank as Calendar, CaretRight as ChevronRight, Phone, EnvelopeSimple as Mail, MapPin } from '@phosphor-icons/react';
 import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si';
 import { TableSkeleton } from '../../../components/ui/Skeleton';
 import useNetwork from '../../../hooks/useNetwork';

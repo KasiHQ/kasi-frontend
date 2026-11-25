@@ -1,21 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  MessageSquare,
-  FileText,
-  Scale,
-  Truck,
-  Calendar,
-  Sparkles,
-  Users,
-  Send,
-  ArrowRight,
-  ShieldCheck,
-  Zap,
-} from "lucide-react";
+import { List as Menu, X, CaretDown as ChevronDown, ChatText as MessageSquare, FileText, Scales as Scale, Truck, CalendarBlank as Calendar, Lightning as Sparkles, Users, PaperPlaneRight as Send, ArrowRight, ShieldCheck, Lightning as Zap } from '@phosphor-icons/react';
 import clsx from "clsx";
 import { PRELAUNCH_WAITLIST_MODE } from "../../../config";
 

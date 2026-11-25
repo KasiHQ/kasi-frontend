@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Rocket } from 'lucide-react';
+import { Eye, RocketLaunch as Rocket } from '@phosphor-icons/react';
 
 export const ProactiveOutreachSection = () => {
   return (

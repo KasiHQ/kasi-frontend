@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Package, Plus, Pencil, Trash2, X, Upload, ImageIcon, Star, Image as ImageIcon2, Grid, List, Search, Info, Coins, Truck, Store, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Package, Plus, PencilSimple as Pencil, Trash as Trash2, X, UploadSimple as Upload, ImageSquare as ImageIcon, Star, Image as ImageIcon2, SquaresFour as Grid, ListBullets as List, MagnifyingGlass as Search, Info, Coins, Truck, Storefront as Store, Eye, EyeSlash as EyeOff, CaretDown as ChevronDown } from '@phosphor-icons/react';
 import api from '../../../api/axios';
 import { useToast } from '../../../context/ToastContext';
 import { ProductGridSkeleton } from '../../../components/ui/Skeleton';

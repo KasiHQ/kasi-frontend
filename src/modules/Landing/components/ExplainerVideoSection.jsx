@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize } from "lucide-react";
+import { Play, Pause, SpeakerHigh as Volume2, SpeakerSimpleX as VolumeX, CornersOut as Maximize } from '@phosphor-icons/react';
 
 export const ExplainerVideoSection = () => {
   const [isPlaying, setIsPlaying] = useState(true);

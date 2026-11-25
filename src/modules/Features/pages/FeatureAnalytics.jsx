@@ -10,48 +10,48 @@ export function FeatureAnalytics() {
       headlinePart1="Know what's selling."
       highlightText="Book what's next."
       headlinePart2=""
-      sub="Kasi turns your chats and orders into clear numbers, and handles bookings for services, so a salon, a clinic, or a studio runs on the same system as a store."
+      sub="Kasi turns paid orders and chat threads into readable daily numbers — and manages appointment slots and Paystack deposits for salons, clinics, and studios."
       screenshot="/images/analytics.png"
-      screenshotAlt="Kasi Analytics and Service Booking Interface"
-      screenshotCaption="Real-time revenue charts, conversion drop-off insights, and automated booking schedules."
-      problemHeading="Sell time, not just things."
-      problemBody="If you provide services or take appointments, Kasi manages the calendar right inside the chat: offering open slots, taking deposits through Paystack, and sending automatic reminders so clients actually show up."
-      movesTitle="Analytics and booking capabilities"
+      screenshotAlt="Kasi Sales Numbers and Service Booking Schedule UI"
+      screenshotCaption="Verified revenue totals, SKU demand breakdown, and weekly service availability schedules."
+      problemHeading="Built for salons, studios, and clinics too"
+      problemBody="Service businesses lose hours going back and forth over open times and no-shows. Kasi checks your weekly schedule inside the chat, collects upfront deposits via Paystack, and locks the slot."
+      movesTitle="Numbers and scheduling in one place"
       moves={[
         {
-          title: "Clear Sales & Revenue Metrics",
-          desc: "Track total revenue, average order value, and daily sales trends with zero complicated financial jargon.",
+          title: "Verified Revenue & Order Counts",
+          desc: "Tracks confirmed Paystack takings, unit counts, and average basket size without counting unpaid inquiries.",
         },
         {
-          title: "Chat Conversion Funnels",
-          desc: "Understand exactly what percentage of incoming inquiries convert into paying customers.",
+          title: "Inquiry-to-Paid Conversion",
+          desc: "Shows where shoppers drop off between initial price inquiry, negotiation, and completed payment.",
         },
         {
-          title: "Top Products & Demand Insights",
-          desc: "See which items receive the highest inquiries and sales so you restock inventory with confidence.",
+          title: "SKU Stock & Demand Signals",
+          desc: "Highlights which products get asked about most often and which items are running low on stock.",
         },
         {
-          title: "In-Chat Service Appointments",
-          desc: "Kasi presents available calendar slots, collects appointment deposits via Paystack, and confirms bookings.",
+          title: "In-Chat Appointment Deposits",
+          desc: "Shares open dates from your weekly availability table, collects fixed or percentage deposits, and records in-shop or home service bookings.",
         },
       ]}
-      controlsTitle="Why it matters"
+      controlsTitle="Operational safeguards"
       controls={[
         {
-          title: "Actionable Clarity",
-          desc: "Understand exactly which marketing posts and channels drive paying revenue.",
+          title: "Channel Attribution",
+          desc: "See whether WhatsApp, Instagram, or Telegram brings in your highest-paying buyers.",
         },
         {
-          title: "Reduce Costly No-Shows",
-          desc: "Automated deposit requirements ensure clients commit and respect your business time.",
+          title: "Upfront Deposit Rules",
+          desc: "Require full payment or a deposit before locking a calendar slot so no-shows stop costing you slots.",
         },
         {
-          title: "Automated Calendar Sync",
-          desc: "Set your working hours and buffer periods with zero double-booking risks.",
+          title: "Weekly Hours & Buffers",
+          desc: "Toggle working days and opening hours per day of the week directly from settings.",
         },
       ]}
-      ctaHeading="Gain total clarity on your business numbers."
-      ctaSub="Start tracking sales trends and automating your appointments today."
+      ctaHeading="See daily takings and booked slots clearly."
+      ctaSub="Run product orders or deposit-backed service appointments from the same workspace."
     />
   );
 }

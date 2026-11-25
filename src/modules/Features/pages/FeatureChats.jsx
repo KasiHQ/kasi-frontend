@@ -10,48 +10,48 @@ export function FeatureChats() {
       headlinePart1="Hands-off,"
       highlightText="but never in the dark."
       headlinePart2=""
-      sub="Watch every chat as it happens, read a one-line AI summary of where each one is, and step in with a single instruction. Kasi runs the floor; you stay the owner."
+      sub="Watch every chat as it happens, read a one-line summary of where each buyer stands, and step in with a single instruction. Kasi runs the counter; you stay the owner."
       screenshot="/images/chats.png"
-      screenshotAlt="Kasi Live Chats and AI Conversation Oversight UI"
-      screenshotCaption="Live Chats with AI summary + 'Instruct Kasi': see the whole conversation, nudge it with one line, and never lose the thread."
-      problemHeading="Automate the work. Keep the wheel."
-      problemBody="Most bots are rigid black boxes that frustrate customers and embarrass your brand. Kasi gives you a live dashboard and full control: see every message live, give one-line instructions, or jump in yourself anytime."
-      movesTitle="Total control in four capabilities"
+      screenshotAlt="Kasi Live Chats and Conversation Oversight UI"
+      screenshotCaption="Live Chats with thread summary and 'Instruct Kasi': read the whole conversation, steer it with one line, or mute Kasi to reply yourself."
+      problemHeading="Automate the replies. Keep the wheel."
+      problemBody="Rigid menu bots frustrate buyers who just want to ask a normal question in English or Pidgin. Kasi shows you every thread live so you can send a quick whisper instruction or reply directly whenever a conversation needs your personal touch."
+      movesTitle="Four controls inside every thread"
       moves={[
         {
-          title: "Live Unified Inbox",
-          desc: "Every conversation across WhatsApp, Instagram, and Telegram in a single fast, synchronized inbox.",
+          title: "Unified Channel Inbox",
+          desc: "Every active conversation from WhatsApp, Instagram Direct, Messenger, and Telegram appears in one chronological list.",
         },
         {
-          title: "AI Summary Per Chat",
-          desc: "One glance tells you where each customer is: inquiring, negotiating, checking delivery, or paid.",
+          title: "One-Line Thread Summary",
+          desc: "See immediately what items are in the buyer's cart, what price was quoted, and whether they chose pickup or delivery.",
         },
         {
           title: "Instruct Kasi",
-          desc: "Type a quick command ('give 5% off', 'this size is out of stock') and Kasi carries it out in natural conversation.",
+          desc: "Type a plain note ('give her ₦1,500 off', 'red size 42 is finished') and Kasi works it naturally into its next reply.",
         },
         {
-          title: "Instant Seamless Takeover",
-          desc: "Jump into the conversation as yourself. When you're finished, hand the chat right back to Kasi.",
+          title: "Direct Manual Reply",
+          desc: "Click Mute Kasi to message the customer yourself, then unmute when you want Kasi to finish checkout.",
         },
       ]}
-      controlsTitle="Why it matters"
+      controlsTitle="Operational details"
       controls={[
         {
-          title: "Zero Swapping Apps",
-          desc: "No more toggling between WhatsApp Business, Instagram apps, and separate devices.",
+          title: "Automatic Handoff Flags",
+          desc: "Requests for refunds, complaints, or out-of-radius pins flag the chat as 'Requires Attention' and pause auto-replies.",
         },
         {
-          title: "Customer Context",
-          desc: "View customer order history and previous preferences directly alongside the chat.",
+          title: "Buyer Order History Alongside Chat",
+          desc: "Past paid invoices and saved delivery addresses sit right next to the active thread.",
         },
         {
-          title: "Team Collaboration",
-          desc: "Your staff can review conversation logs without needing direct access to your personal phone.",
+          title: "Staff Oversight Without Phone Sharing",
+          desc: "Your team can monitor and pack orders from the web workspace while your SIM stays in your pocket.",
         },
       ]}
-      ctaHeading="Automate the work. Keep the wheel."
-      ctaSub="Experience the power of autonomous commerce with total oversight."
+      ctaHeading="See every chat. Step in anytime."
+      ctaSub="Connect your WhatsApp or Instagram shop and test 'Instruct Kasi' on a real thread."
     />
   );
 }

@@ -119,18 +119,10 @@ export function ChannelOrbit() {
       ref={sectionRef}
       className="relative py-20 sm:py-28 lg:py-32 overflow-hidden bg-[#F6F8F3]"
     >
-      <div className="absolute top-1/2 right-0 md:right-[10%] -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-[#0D6E42]/[0.06] blur-[120px] pointer-events-none -z-10" />
-
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Column: Copy */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="lg:col-span-6 flex flex-col items-start"
-          >
+          <div className="lg:col-span-6 flex flex-col items-start">
             <h2 className="font-poppins font-bold text-3xl sm:text-4xl lg:text-[42px] leading-[1.08] tracking-tight text-[#141C17]">
               Wherever your customers message you, Kasi is already there.
             </h2>
@@ -165,16 +157,10 @@ export function ChannelOrbit() {
                 WhatsApp · Instagram · Messenger · Telegram
               </p>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Orbit Diagram */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.94 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="lg:col-span-6 flex justify-center items-center w-full"
-          >
+          <div className="lg:col-span-6 flex justify-center items-center w-full">
             <div className="relative w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px] flex items-center justify-center select-none">
               <div className="absolute w-[240px] sm:w-[290px] h-[240px] sm:h-[290px] rounded-full bg-[#0D6E42]/[0.03] pointer-events-none" />
               <div className="absolute w-[180px] sm:w-[220px] h-[180px] sm:h-[220px] rounded-full bg-[#0D6E42]/[0.05] pointer-events-none" />
@@ -376,7 +362,7 @@ export function ChannelOrbit() {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
