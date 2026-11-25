@@ -320,7 +320,7 @@ const OnboardingWizard = () => {
     setConnectingWA(true);
     setPairingCode('');
     try {
-      const res = await api.post('/api/whatsapp/connect', { phone_number: cleanNumber });
+      const res = await api.post('/api/whatsapp/connect', { phone_number: cleanNumber }, { timeout: 45000 });
       if (res.data.pairing_code) {
         setPairingCode(res.data.pairing_code);
         addToast('Pairing code generated!', 'success');
