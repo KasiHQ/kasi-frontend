@@ -28,6 +28,8 @@ const OnboardingWizard = () => {
   const [storeLocation, setStoreLocation] = useState(user?.address || '');
   const [storeLat, setStoreLat] = useState(user?.store_latitude || null);
   const [storeLng, setStoreLng] = useState(user?.store_longitude || null);
+  const [pickupContactName, setPickupContactName] = useState(user?.pickup_contact_name || '');
+  const [pickupContactPhone, setPickupContactPhone] = useState(user?.general_enquiry_phone || user?.phone || '');
   const [locationLoading, setLocationLoading] = useState(false);
 
 
@@ -219,6 +221,16 @@ const OnboardingWizard = () => {
           business_bio: storeDesc,
           address: storeLocation,
           store_category: storeCategory,
+        });
+
+        await api.patch('/api/auth/profile', {
+          pickup_contact_name: pickupContactName || undefined,
+          general_enquiry_phone: pickupContactPhone || undefined,
+          ...(storeLat !== null && storeLng !== null ? {
+            store_latitude: storeLat,
+            store_longitude: storeLng,
+            store_google_maps_link: `https://maps.google.com/?q=${storeLat},${storeLng}`,
+          } : {}),
         });
 
         // Save GPS pin if the vendor used location detection
@@ -713,6 +725,30 @@ const OnboardingWizard = () => {
                       placeholder="Or type your address manually (e.g. Computer Village, Ikeja, Lagos)"
                       className="w-full h-10 px-3.5 border border-[#D0D5DD] rounded-lg text-xs text-[#101828] focus:border-[#1A7A4A] focus:ring-4 focus:ring-[#1A7A4A]/12 outline-none transition-all text-[#667085]"
                     />
+                  </div>
+
+                  {/* Pickup Contact Person & Phone */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-[#344054]">PICKUP CONTACT PERSON</label>
+                      <input
+                        type="text"
+                        value={pickupContactName}
+                        onChange={(e) => setPickupContactName(e.target.value)}
+                        placeholder="e.g. Tunde (Store Desk)"
+                        className="w-full h-10 px-3.5 border border-[#D0D5DD] rounded-lg text-xs text-[#101828] focus:border-[#1A7A4A] outline-none transition-all"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-[#344054]">PICKUP CONTACT PHONE</label>
+                      <input
+                        type="tel"
+                        value={pickupContactPhone}
+                        onChange={(e) => setPickupContactPhone(e.target.value)}
+                        placeholder="e.g. 0803 123 4567"
+                        className="w-full h-10 px-3.5 border border-[#D0D5DD] rounded-lg text-xs text-[#101828] focus:border-[#1A7A4A] outline-none transition-all"
+                      />
+                    </div>
                   </div>
 
                 </div>

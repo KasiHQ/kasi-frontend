@@ -3,7 +3,8 @@ import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import { conversationAPI } from '../../../api/conversations';
 import api from '../../../api/axios';
-import { Package, Truck, CheckCircle as CheckCircle2, Clock, MapPin, Phone, User, MagnifyingGlass as Search, WarningCircle as AlertCircle, ShoppingBag, PaperPlaneRight as Send, Bicycle as Bike, CaretRight as ChevronRight, CaretLeft as ChevronLeft, ArrowCounterClockwise as RotateCcw, X, Check, DeviceMobile as Smartphone, Monitor, GridFour as LayoutGrid, ListBullets as List, Storefront as Store, Lightning as Sparkles } from '@phosphor-icons/react';
+import { Package, Truck, CheckCircle as CheckCircle2, Clock, MapPin, Phone, User, MagnifyingGlass as Search, WarningCircle as AlertCircle, ShoppingBag, PaperPlaneRight as Send, Bicycle as Bike, CaretRight as ChevronRight, CaretLeft as ChevronLeft, ArrowCounterClockwise as RotateCcw, X, Check, DeviceMobile as Smartphone, Monitor, GridFour as LayoutGrid, ListBullets as List, Storefront as Store, Lightning as Sparkles, ArrowSquareOut as ExternalLink, Gear as SettingsIcon } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
 
 // ─── Pathway Steps Definition ──────────────────────────────────────────────────
 const STEPS = {
@@ -149,88 +150,103 @@ export default function Fulfilment() {
   const [mobileViewMode, setMobileViewMode] = useState('cards'); // 'cards' | 'list'
   const [mobileFlowOpen, setMobileFlowOpen] = useState(false);
 
-  // Rider modal
+  // Rider modal & saved riders roster
   const [riderModalOrder, setRiderModalOrder] = useState(null);
+  const [selectedRiderId, setSelectedRiderId] = useState(null);
   const [riderName, setRiderName] = useState('');
   const [riderPhone, setRiderPhone] = useState('');
+  const [savedRiders, setSavedRiders] = useState([]);
+  const [autoDispatchRiders, setAutoDispatchRiders] = useState(false);
   const [updating, setUpdating] = useState(false);
 
   const showWaToast = (name, msg) => {
     const firstName = (name || 'Customer').split(' ')[0];
-    addToast(`WhatsApp sent to ${firstName}: ${msg}`, 'success');
+    addToast(`Update sent to ${firstName}: ${msg}`, 'success');
   };
 
-  // ─── Fetch Orders from Backend ──────────────────────────────────────────────
+  // ─── Fetch Orders from Backend (Invoice/Order-centric: N orders per customer) ───
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const [convRes, invRes] = await Promise.all([
+      const [convRes, invRes, ridersRes] = await Promise.all([
         conversationAPI.getConversations().catch(() => ({ data: [] })),
-        api.get('/api/invoices/').catch(() => ({ data: [] }))
+        api.get('/api/invoices/').catch(() => ({ data: [] })),
+        api.get('/api/delivery/riders').catch(() => ({ data: { riders: [], auto_dispatch_riders: false } }))
       ]);
 
       const conversations = convRes.data || [];
       const invoices = invRes.data || [];
+      setSavedRiders((ridersRes.data?.riders || []).filter(r => r.is_active !== false));
+      setAutoDispatchRiders(Boolean(ridersRes.data?.auto_dispatch_riders));
 
-      // Filter and harmonize orders - strictly paid / confirmed orders
-      // Check invoice.status == 'Paid' (or cart.status == 'paid') directly - never rely on conversation.status alone
-      const normalizedOrders = conversations
-        .map(c => {
-          const normalizePhone = (p) => (p ? p.toString().replace(/\D/g, '') : '');
-          const matchingInv = invoices.find(i =>
-            (c.customer_phone && i.customer?.phone && normalizePhone(i.customer.phone) === normalizePhone(c.customer_phone)) ||
-            (c.customer_name && i.customer?.name && i.customer.name.toLowerCase().trim() === c.customer_name.toLowerCase().trim())
+      const normalizePhone = (p) => {
+        if (!p) return '';
+        let d = p.toString().replace(/\D/g, '');
+        if (d.length === 11 && d.startsWith('0')) d = '234' + d.slice(1);
+        return d;
+      };
+
+      const FULFILMENT_STATUSES = ['Paid', 'Packed', 'Prepared', 'Ready for Pickup', 'Ready', 'In Transit', 'Delivered', 'Collected'];
+
+      // International E-Commerce Standard: Each paid Invoice is 1 independent Order row,
+      // so repeat buyers ordering 2, 3, or 10 times never overwrite or hide earlier orders!
+      const normalizedOrders = invoices
+        .filter(inv => FULFILMENT_STATUSES.includes(inv.status))
+        .map(inv => {
+          const invPhone = normalizePhone(inv.customer?.phone);
+          const matchingConv = conversations.find(c =>
+            (inv.conversation_id && c.id === inv.conversation_id) ||
+            (invPhone && normalizePhone(c.customer_phone) === invPhone)
           );
 
-          // STRICT PAYMENT GUARD: Never show an order in the Fulfilment pipeline if its invoice is unpaid!
-          const invStatus = matchingInv?.status || c.invoice_status;
-          if (matchingInv && ['Pending', 'Sent', 'Failed'].includes(matchingInv.status)) {
-            return null;
-          }
-          const isGenuinelyPaid = invStatus
-            ? ['Paid', 'Packed', 'Ready for Pickup', 'Ready', 'In Transit', 'Delivered', 'Collected'].includes(invStatus)
-            : Boolean(c.is_paid);
-          if (!isGenuinelyPaid) {
-            return null;
-          }
+          const isPickup =
+            (inv.fulfilment_type || '').toLowerCase() === 'pickup' ||
+            (inv.delivery_address || '').trim().toUpperCase() === 'PICKUP';
+          const deliveryMode = isPickup ? 'PICKUP' : 'DELIVERY';
+          const deliveryType = isPickup ? 'pickup' : 'delivery';
+          const state = mapToState(inv.status, deliveryMode);
 
-          const deliveryMode = (c.delivery_address || matchingInv?.delivery_address || '').toUpperCase() === 'PICKUP' ? 'PICKUP' : 'DELIVERY';
-          const deliveryType = deliveryMode === 'PICKUP' ? 'pickup' : 'delivery';
-          const state = mapToState(matchingInv?.status || c.status, deliveryMode);
-
-          const rawItems = matchingInv?.items || c.invoice_items || [];
+          const rawItems = (inv.items || []).filter(
+            it => (it.description || '').trim().toLowerCase() !== 'delivery fee'
+          );
+          const deliveryFeeItem = (inv.items || []).find(
+            it => (it.description || '').trim().toLowerCase() === 'delivery fee'
+          );
           const items = rawItems.map(it => [
             it.description || it.product_name || 'Item',
             it.quantity || 1,
             it.unit_price || it.price || (it.total_price ? it.total_price / (it.quantity || 1) : 0)
           ]);
 
-          const total = matchingInv?.total_amount || c.agreed_price || c.listed_price || 0;
+          const total = inv.total_amount || inv.amount || 0;
           const itemsSubtotal = items.reduce((sum, item) => sum + item[1] * item[2], 0);
-          const fee = total > itemsSubtotal ? total - itemsSubtotal : 0;
+          const fee = inv.delivery_fee_calculated ?? deliveryFeeItem?.total_price ?? (total > itemsSubtotal ? total - itemsSubtotal : 0);
 
           return {
-            id: c.id,
-            displayId: matchingInv?.reference || c.invoice_reference || `KAS-${c.id}`,
-            name: c.customer_name || 'Customer',
-            phone: c.customer_phone || 'No phone',
+            id: inv.id,
+            conversationId: matchingConv?.id || inv.conversation_id || null,
+            displayId: inv.reference || `KAS-${inv.id}`,
+            name: inv.customer?.name || matchingConv?.customer_name || 'Customer',
+            phone: inv.customer?.phone || matchingConv?.customer_phone || 'No phone',
+            platform: matchingConv?.platform || 'whatsapp',
             delivery_type: deliveryType,
             state: state,
-            backend_status: matchingInv?.status || c.status,
-            delivery_address: c.delivery_address || matchingInv?.delivery_address || '',
-            items: items.length > 0 ? items : [['Order agreement', 1, total]],
-            fee: fee,
+            backend_status: inv.status,
+            delivery_address: isPickup ? 'PICKUP' : (inv.delivery_address || matchingConv?.delivery_address || ''),
+            google_maps_link: inv.google_maps_link || (inv.customer_latitude && inv.customer_longitude ? `https://maps.google.com/?q=${inv.customer_latitude},${inv.customer_longitude}` : null),
+            items: items.length > 0 ? items : [['Order items', 1, total]],
+            fee: isPickup ? 0 : fee,
             total_amount: total,
-            rider: (c.rider_name || matchingInv?.rider_name) ? {
-              n: c.rider_name || matchingInv?.rider_name,
-              p: c.rider_phone || matchingInv?.rider_phone || ''
+            rider: inv.rider_name ? {
+              n: inv.rider_name,
+              p: inv.rider_phone || ''
             } : null,
-            note: c.ai_summary || c.vendor_instructions || '',
-            created_at: c.created_at,
-            updated_at: c.updated_at
+            rider_dispatched_at: inv.rider_dispatched_at || null,
+            note: matchingConv?.detailed_summary || matchingConv?.vendor_instructions || '',
+            created_at: inv.created_at,
+            updated_at: inv.delivery_timestamp || inv.created_at
           };
-        })
-        .filter(Boolean);
+        });
 
       setOrders(normalizedOrders);
     } catch (err) {
@@ -245,10 +261,9 @@ export default function Fulfilment() {
     fetchOrders();
   }, [fetchOrders]);
 
-  // ─── Status Advancement Handler ─────────────────────────────────────────────
+  // ─── Status Advancement Handler (Updates Invoice directly + dispatches notifications) ───
   const advanceOrder = async (order, nextState, backendStatus, message, riderData = null) => {
     setUpdating(true);
-    // Optimistically update order in state
     setOrders(prev =>
       prev.map(o => {
         if (o.id === order.id) {
@@ -268,12 +283,13 @@ export default function Fulfilment() {
     try {
       const payload = { status: backendStatus };
       if (riderData) {
+        if (riderData.rider_id) payload.rider_id = riderData.rider_id;
         payload.rider_name = riderData.rider_name;
         payload.rider_phone = riderData.rider_phone;
       }
-      await conversationAPI.updateStatus(order.id, payload);
+      await api.patch(`/api/invoices/${order.id}`, payload);
     } catch (err) {
-      console.error('Failed to update status on server:', err);
+      console.error('Failed to update order status on server:', err);
       addToast('Could not sync update with server. Please refresh.', 'error');
       fetchOrders();
     } finally {
@@ -297,11 +313,23 @@ export default function Fulfilment() {
       }
       if (order.state === 'packed') {
         return {
-          label: 'Book rider',
+          label: order.rider ? 'Dispatch rider' : 'Assign rider',
           run: () => {
             setRiderModalOrder(order);
-            setRiderName(order.rider?.n || '');
-            setRiderPhone(order.rider?.p || '');
+            const defaultSaved = savedRiders.find(r => r.is_default) || savedRiders[0] || null;
+            if (order.rider) {
+              setSelectedRiderId(null);
+              setRiderName(order.rider.n || '');
+              setRiderPhone(order.rider.p || '');
+            } else if (defaultSaved) {
+              setSelectedRiderId(defaultSaved.id);
+              setRiderName(defaultSaved.name);
+              setRiderPhone(defaultSaved.phone);
+            } else {
+              setSelectedRiderId(null);
+              setRiderName('');
+              setRiderPhone('');
+            }
           }
         };
       }
@@ -391,16 +419,17 @@ export default function Fulfilment() {
   const handleConfirmRider = () => {
     if (!riderModalOrder) return;
     const name = riderName.trim() || 'Rider';
-    const phone = riderPhone.trim() || '—';
+    const phone = riderPhone.trim() || '';
 
     advanceOrder(
       riderModalOrder,
       'on_way',
       'In Transit',
-      `Your order is on the way! Rider: ${name} (${phone}).`,
-      { rider_name: name, rider_phone: phone }
+      `Your order is on the way! Rider: ${name}${phone ? ` (${phone})` : ''}.`,
+      { rider_id: selectedRiderId, rider_name: name, rider_phone: phone }
     );
     setRiderModalOrder(null);
+    setSelectedRiderId(null);
     setRiderName('');
     setRiderPhone('');
   };
@@ -426,7 +455,15 @@ export default function Fulfilment() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            to="/settings?tab=logistics"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <span className={`w-2 h-2 rounded-full ${autoDispatchRiders ? 'bg-[#1C774E]' : 'bg-amber-500'}`} />
+            <span>{autoDispatchRiders ? 'Auto-dispatch riders ON' : 'Manual rider assignment'}</span>
+            <SettingsIcon size={13} className="text-gray-400" />
+          </Link>
           <button
             onClick={fetchOrders}
             className="inline-flex items-center gap-2 px-3.5 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-2xs cursor-pointer"
@@ -766,8 +803,18 @@ export default function Fulfilment() {
                 <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                   {selectedOrder.delivery_type === 'delivery' ? 'Deliver to' : 'Pickup at'}
                 </h3>
-                <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/60 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800">
-                  {getDestination(selectedOrder)}
+                <div className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800/60 p-3.5 rounded-2xl border border-gray-100 dark:border-gray-800 space-y-1.5">
+                  <div>{getDestination(selectedOrder)}</div>
+                  {selectedOrder.delivery_type === 'delivery' && selectedOrder.google_maps_link && (
+                    <a
+                      href={selectedOrder.google_maps_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1C774E] dark:text-[#DBF361] hover:underline"
+                    >
+                      <MapPin size={12} /> Open customer map pin <ExternalLink size={11} />
+                    </a>
+                  )}
                 </div>
 
                 {selectedOrder.delivery_type === 'delivery' && (
@@ -1173,14 +1220,14 @@ export default function Fulfilment() {
           className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={(e) => e.target === e.currentTarget && setRiderModalOrder(null)}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-sm p-6 sm:p-7 space-y-4 border border-gray-100 dark:border-gray-700/80 animate-in zoom-in-95 duration-150">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-7 space-y-4 border border-gray-100 dark:border-gray-700/80 animate-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                  Book a rider
+                  Assign & dispatch rider
                 </h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Enter rider details. Kasi sends them to {riderModalOrder.name.split(' ')[0]} on WhatsApp.
+                  Kasi WhatsApps the rider the pickup pin + customer drop-off pin, and notifies {riderModalOrder.name.split(' ')[0]}.
                 </p>
               </div>
               <button
@@ -1191,6 +1238,49 @@ export default function Fulfilment() {
               </button>
             </div>
 
+            {savedRiders.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Saved riders (1-click select)
+                  </label>
+                  <Link to="/settings?tab=logistics" className="text-[11px] font-semibold text-[#1C774E] hover:underline">
+                    Manage riders
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 gap-2 max-h-36 overflow-y-auto">
+                  {savedRiders.map(r => {
+                    const active = selectedRiderId === r.id;
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedRiderId(r.id);
+                          setRiderName(r.name);
+                          setRiderPhone(r.phone);
+                        }}
+                        className={`w-full px-3.5 py-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
+                          active
+                            ? 'border-[#1C774E] bg-[#1C774E]/10 text-gray-900 dark:text-white'
+                            : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/60 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Bike size={15} className="text-[#1C774E] shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-900 dark:text-white">{r.name}</p>
+                            <p className="text-[11px] font-mono text-gray-500">{r.phone}</p>
+                          </div>
+                        </div>
+                        {active && <Check size={14} className="text-[#1C774E]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
@@ -1200,21 +1290,27 @@ export default function Fulfilment() {
                   type="text"
                   placeholder="e.g. Musa or Samuel"
                   value={riderName}
-                  onChange={(e) => setRiderName(e.target.value)}
-                  autoFocus
+                  onChange={(e) => {
+                    setSelectedRiderId(null);
+                    setRiderName(e.target.value);
+                  }}
+                  autoFocus={savedRiders.length === 0}
                   className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                  Rider's phone number
+                  Rider's WhatsApp phone number
                 </label>
                 <input
                   type="tel"
                   placeholder="e.g. 0803 000 0000"
                   value={riderPhone}
-                  onChange={(e) => setRiderPhone(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedRiderId(null);
+                    setRiderPhone(e.target.value);
+                  }}
                   className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-[#1C774E] focus:ring-2 focus:ring-[#1C774E]/20 transition-all text-gray-900 dark:text-white"
                 />
               </div>

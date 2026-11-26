@@ -5,7 +5,7 @@ import { useToast } from '../../../context/ToastContext';
 import { useTheme, THEMES } from '../../../context/ThemeContext';
 import Button from '../../../components/ui/Button';
 import api from '../../../api/axios';
-import { FloppyDisk as Save, Buildings as Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, ClockCounterClockwise as History, WifiHigh as Wifi, WifiSlash as WifiOff, ChatCircle as MessageCircle, InstagramLogo as Instagram, CalendarBlank as Calendar, Lightning as Zap, Question as HelpCircle, FileText, ArrowSquareOut as ExternalLink, PaperPlaneRight as Send, FacebookLogo as Facebook, Layout, Wallet, ShieldCheck, Bank as Landmark, CheckCircle, Warning as AlertTriangle, Truck, Storefront as Store, X } from '@phosphor-icons/react';
+import { FloppyDisk as Save, Buildings as Building, Phone, MapPin, CreditCard, Image as ImageIcon, Palette, User, Check, Brain, ClockCounterClockwise as History, WifiHigh as Wifi, WifiSlash as WifiOff, ChatCircle as MessageCircle, InstagramLogo as Instagram, CalendarBlank as Calendar, Lightning as Zap, Question as HelpCircle, FileText, ArrowSquareOut as ExternalLink, PaperPlaneRight as Send, FacebookLogo as Facebook, Layout, Wallet, ShieldCheck, Bank as Landmark, CheckCircle, Warning as AlertTriangle, Truck, Storefront as Store, X, Plus, Trash, Bicycle as Bike, Star } from '@phosphor-icons/react';
 import { SiWhatsapp, SiTelegram, SiInstagram, SiMessenger } from 'react-icons/si';
 import ActivityLogsTable from '../components/ActivityLogsTable';
 import IntegrationsTab from '../components/IntegrationsTab';
@@ -251,44 +251,48 @@ const Settings = () => {
     const [selectedPlatform, setSelectedPlatform] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Logistics & Distance-Based Delivery Pricing states
-    const [deliveryPricingEnabled, setDeliveryPricingEnabled] = useState(true);
-    const [deliveryBaseFee, setDeliveryBaseFee] = useState(800);
-    const [deliveryRatePerKm, setDeliveryRatePerKm] = useState(200);
-    const [deliveryBaseKm, setDeliveryBaseKm] = useState(2.0);
+    // Logistics, Pickup & Rider Dispatch states (100% Automated Bolt-calibrated Google Distance + Traffic)
     const [deliveryMaxRadiusKm, setDeliveryMaxRadiusKm] = useState(25.0);
     const [storeLatitude, setStoreLatitude] = useState('');
     const [storeLongitude, setStoreLongitude] = useState('');
     const [detectingLocation, setDetectingLocation] = useState(false);
     const [deliveryCity, setDeliveryCity] = useState('');
-    const [deliveryRates, setDeliveryRates] = useState({});
-    const [customAreaName, setCustomAreaName] = useState('');
+    const [pickupContactName, setPickupContactName] = useState('');
+    const [autoDispatchRiders, setAutoDispatchRiders] = useState(false);
+    const [ridersList, setRidersList] = useState([]);
+    const [newRiderName, setNewRiderName] = useState('');
+    const [newRiderPhone, setNewRiderPhone] = useState('');
+    const [newRiderVehicle, setNewRiderVehicle] = useState('Motorbike');
+    const [riderSaving, setRiderSaving] = useState(false);
+
+    const fetchRiders = async () => {
+        try {
+            const res = await api.get('/api/delivery/riders');
+            if (res.data) {
+                setRidersList(res.data.riders || []);
+                if (res.data.auto_dispatch_riders !== undefined) {
+                    setAutoDispatchRiders(Boolean(res.data.auto_dispatch_riders));
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load riders:', err);
+        }
+    };
 
     useEffect(() => {
         if (user) {
-            setDeliveryPricingEnabled(user.delivery_pricing_enabled !== undefined ? Boolean(user.delivery_pricing_enabled) : true);
-            setDeliveryBaseFee(user.delivery_base_fee !== undefined ? user.delivery_base_fee : 800);
-            setDeliveryRatePerKm(user.delivery_rate_per_km !== undefined ? user.delivery_rate_per_km : 200);
-            setDeliveryBaseKm(user.delivery_base_km !== undefined ? user.delivery_base_km : 2.0);
             setDeliveryMaxRadiusKm(user.delivery_max_radius_km !== undefined ? user.delivery_max_radius_km : 25.0);
             setStoreLatitude(user.store_latitude !== null && user.store_latitude !== undefined ? user.store_latitude : '');
             setStoreLongitude(user.store_longitude !== null && user.store_longitude !== undefined ? user.store_longitude : '');
             setDeliveryCity(user.delivery_city || '');
-            let rates = {};
-            if (user.delivery_rates) {
-                if (typeof user.delivery_rates === 'object') {
-                    rates = user.delivery_rates;
-                } else {
-                    try {
-                        rates = JSON.parse(user.delivery_rates);
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            }
-            setDeliveryRates(rates);
+            setPickupContactName(user.pickup_contact_name || '');
+            setAutoDispatchRiders(Boolean(user.auto_dispatch_riders));
         }
     }, [user]);
+
+    useEffect(() => {
+        fetchRiders();
+    }, []);
 
     const handleDetectLocation = () => {
         if (!navigator.geolocation) {
@@ -303,7 +307,6 @@ const Settings = () => {
                 setStoreLatitude(lat);
                 setStoreLongitude(lon);
                 
-                // Auto-save immediately to database
                 try {
                     await api.patch('/api/auth/profile', {
                         store_latitude: lat,
@@ -311,7 +314,7 @@ const Settings = () => {
                         store_google_maps_link: `https://maps.google.com/?q=${lat},${lon}`
                     });
                     if (fetchUser) await fetchUser();
-                    addToast('📍 Store GPS location detected & saved! Google Maps link generated for pickup orders.', 'success');
+                    addToast('Store GPS location detected & saved! Google Maps link generated for pickup & delivery.', 'success');
                 } catch (saveErr) {
                     console.error('Auto-save error:', saveErr);
                     addToast('GPS coordinates detected. Click "Save Logistics Settings" below to finalize.', 'info');
@@ -328,57 +331,85 @@ const Settings = () => {
         );
     };
 
-    const handleCityChange = (city) => {
-        setDeliveryCity(city);
-        const areas = CITY_AREAS[city] || [];
-        const newRates = { ...deliveryRates };
-        areas.forEach(area => {
-            if (newRates[area] === undefined) {
-                newRates[area] = '';
-            }
-        });
-        setDeliveryRates(newRates);
-    };
-
-    const handleAddCustomArea = (e) => {
-        e.preventDefault();
-        if (!customAreaName.trim()) return;
-        const name = customAreaName.trim();
-        if (deliveryRates[name] !== undefined) {
-            addToast('Area already exists', 'info');
+    const handleAddRider = async (e) => {
+        e?.preventDefault?.();
+        if (!newRiderName.trim() || !newRiderPhone.trim()) {
+            addToast('Enter both the rider name and WhatsApp phone number', 'warning');
             return;
         }
-        setDeliveryRates(prev => ({
-            ...prev,
-            [name]: ''
-        }));
-        setCustomAreaName('');
+        setRiderSaving(true);
+        try {
+            await api.post('/api/delivery/riders', {
+                name: newRiderName.trim(),
+                phone: newRiderPhone.trim(),
+                vehicle_type: newRiderVehicle,
+            });
+            setNewRiderName('');
+            setNewRiderPhone('');
+            await fetchRiders();
+            addToast('Rider added to your dispatch roster', 'success');
+        } catch (err) {
+            addToast(err.response?.data?.error || 'Failed to add rider', 'error');
+        } finally {
+            setRiderSaving(false);
+        }
+    };
+
+    const handleSetDefaultRider = async (riderId) => {
+        try {
+            await api.patch(`/api/delivery/riders/${riderId}`, { is_default: true });
+            await fetchRiders();
+            addToast('Default dispatch rider updated', 'success');
+        } catch {
+            addToast('Could not update default rider', 'error');
+        }
+    };
+
+    const handleDeleteRider = async (riderId) => {
+        try {
+            await api.delete(`/api/delivery/riders/${riderId}`);
+            await fetchRiders();
+            addToast('Rider removed', 'success');
+        } catch {
+            addToast('Could not remove rider', 'error');
+        }
+    };
+
+    const handleToggleAutoDispatch = async (nextVal) => {
+        setAutoDispatchRiders(nextVal);
+        try {
+            await api.patch('/api/auth/profile', { auto_dispatch_riders: nextVal });
+            if (fetchUser) await fetchUser();
+            addToast(
+                nextVal
+                    ? 'Automated rider WhatsApp dispatch enabled'
+                    : 'Switched to manual rider assignment in Fulfilment',
+                'success'
+            );
+        } catch {
+            setAutoDispatchRiders(!nextVal);
+            addToast('Failed to update rider dispatch mode', 'error');
+        }
     };
 
     const handleSaveLogistics = async (e) => {
         e?.preventDefault?.();
         setLoading(true);
         try {
-            const cleanedRates = {};
-            Object.keys(deliveryRates).forEach(area => {
-                const val = deliveryRates[area];
-                if (val !== '') {
-                    cleanedRates[area] = Number(val);
-                }
-            });
             await api.patch('/api/auth/profile', {
-                delivery_pricing_enabled: deliveryPricingEnabled,
-                delivery_base_fee: Number(deliveryBaseFee) || 800.0,
-                delivery_rate_per_km: Number(deliveryRatePerKm) || 200.0,
-                delivery_base_km: Number(deliveryBaseKm) || 2.0,
+                delivery_pricing_enabled: true,
                 delivery_max_radius_km: Number(deliveryMaxRadiusKm) || 25.0,
                 store_latitude: storeLatitude !== '' ? Number(storeLatitude) : null,
                 store_longitude: storeLongitude !== '' ? Number(storeLongitude) : null,
+                store_google_maps_link: formData.store_google_maps_link || (storeLatitude !== '' && storeLongitude !== '' ? `https://maps.google.com/?q=${storeLatitude},${storeLongitude}` : ''),
+                address: formData.address,
                 delivery_city: deliveryCity,
-                delivery_rates: cleanedRates
+                pickup_contact_name: pickupContactName,
+                general_enquiry_phone: formData.general_enquiry_phone,
+                auto_dispatch_riders: autoDispatchRiders,
             });
             if (fetchUser) await fetchUser();
-            addToast('Logistics & delivery pricing updated successfully', 'success');
+            addToast('Logistics, pickup & rider settings updated successfully', 'success');
         } catch (err) {
             console.error(err);
             addToast('Failed to save logistics settings', 'error');
@@ -424,6 +455,7 @@ const Settings = () => {
         logistics_phone: '',
         store_google_maps_link: '',
         general_enquiry_phone: '',
+        pickup_contact_name: '',
         marketplace_enabled: true
     });
 
@@ -578,6 +610,7 @@ const Settings = () => {
                 logistics_phone: user.logistics_phone || '',
                 store_google_maps_link: user.store_google_maps_link || '',
                 general_enquiry_phone: user.general_enquiry_phone || '',
+                pickup_contact_name: user.pickup_contact_name || '',
                 marketplace_enabled: user.marketplace_enabled !== undefined ? Boolean(user.marketplace_enabled) : true
             });
         }
@@ -1097,18 +1130,31 @@ const Settings = () => {
                                 <p className="text-xs text-gray-400">Shared by Kasi when customers choose store pickup.</p>
                             </div>
 
-                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">General Enquiry Phone Line (optional)</label>
-                                <input
-                                    type="text"
-                                    name="general_enquiry_phone"
-                                    value={formData.general_enquiry_phone}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
-                                    placeholder="e.g. +234 803 123 4567"
-                                />
-                                <p className="text-xs text-gray-400">Shared by Kasi for general offline pickup calls.</p>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700">Pickup Contact Person (optional)</label>
+                                    <input
+                                        type="text"
+                                        name="pickup_contact_name"
+                                        value={formData.pickup_contact_name}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
+                                        placeholder="e.g. Tunde (Front Desk)"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700">Pickup / Enquiry Phone Line (optional)</label>
+                                    <input
+                                        type="text"
+                                        name="general_enquiry_phone"
+                                        value={formData.general_enquiry_phone}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-green-500 focus:ring-0 transition-all text-sm"
+                                        placeholder="e.g. +234 803 123 4567"
+                                    />
+                                </div>
                             </div>
+                            <p className="text-xs text-gray-400 -mt-2">Shared automatically by Kasi when customers choose Store Pickup.</p>
 
                             <Button
                                 type="submit"
@@ -1557,183 +1603,341 @@ const Settings = () => {
                 <ActivityLogsTable />
             )}
 
-            {/* ── LOGISTICS & DELIVERY PRICING TAB ─────────────────────── */}
+            {/* ── LOGISTICS, PICKUP & RIDER DISPATCH TAB ─────────────────────── */}
             {activeTab === 'logistics' && (
                 <div className="space-y-6 animate-in fade-in duration-300">
-                    {/* Header Card */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                    {/* 1. Automated Bolt-Calibrated Road + Live Traffic Pricing Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-700">
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                                    <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                                    <div className="p-2 rounded-xl bg-[#1C774E]/10 text-[#1C774E]">
                                         <Truck size={22} />
                                     </div>
-                                    Delivery & Logistics Pricing
+                                    Automated Delivery & Store Pickup
                                 </h2>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    Configure Chowdeck/Bolt-style distance pricing and fallback rates for WhatsApp sales.
+                                    Kasi prices deliveries automatically using live Google road distance and real-time traffic — whether the buyer shares a WhatsApp GPS pin or types their street address.
                                 </p>
                             </div>
-                            <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <span className="text-xs font-bold text-gray-700 dark:text-gray-200">
-                                    Distance Pricing
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => setDeliveryPricingEnabled(!deliveryPricingEnabled)}
-                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                        deliveryPricingEnabled ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
-                                    }`}
-                                >
-                                    <span
-                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                            deliveryPricingEnabled ? 'translate-x-5' : 'translate-x-0'
-                                        }`}
+                            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs font-bold text-[#1C774E] dark:text-[#DBF361] shrink-0">
+                                <span className="w-2 h-2 rounded-full bg-[#1C774E]" />
+                                Bolt-Calibrated Engine Active
+                            </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
+                                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                                    Primary City / State
+                                </label>
+                                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3">
+                                    Used to accurately match street & landmark names when buyers type their address instead of dropping a pin.
+                                </p>
+                                <input
+                                    type="text"
+                                    value={deliveryCity}
+                                    onChange={(e) => setDeliveryCity(e.target.value)}
+                                    placeholder="e.g. Lagos, Abuja, Port Harcourt, Ibadan"
+                                    className="w-full px-3.5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-900 dark:text-white focus:border-[#1C774E] outline-none"
+                                />
+                            </div>
+
+                            <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
+                                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                                    Max Automatic Delivery Radius
+                                </label>
+                                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3">
+                                    Orders beyond this road distance are flagged for your manual review or offered Store Pickup.
+                                </p>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        value={deliveryMaxRadiusKm}
+                                        onChange={(e) => setDeliveryMaxRadiusKm(e.target.value)}
+                                        placeholder="25"
+                                        className="w-full pl-3.5 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-[#1C774E] outline-none"
+                                        min="1"
                                     />
-                                </button>
+                                    <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-xs font-bold">km</span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Distance-Based Pricing Settings */}
-                        <div className="pt-6 space-y-6">
-                            {/* Kasi manages base fee / per-km / minimum internally; vendors only control max radius */}
-                            <div className="flex items-start gap-3 bg-primary/5 border border-primary/20 rounded-xl p-4">
-                                <div className="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">i</div>
-                                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                                    Delivery fees are calculated automatically by Kasi using real bike-dispatch rates, calibrated to your city. You don't need to set pricing manually — just choose how far you're willing to deliver.
-                                </p>
-                            </div>
-
-                            <div className="max-w-xs">
-                                {/* Max Delivery Radius */}
-                                <div className="bg-gray-50/80 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-200/80 dark:border-gray-700">
-                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
-                                        Max Delivery Radius
-                                    </label>
-                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3">
-                                        Customers beyond this distance will be offered store pickup instead.
+                        {/* Store Location & Pickup Contact */}
+                        <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/40 dark:bg-gray-900/30 space-y-5">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <MapPin size={16} className="text-[#1C774E]" />
+                                        Store Origin & Pickup Contact Details
+                                    </h3>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                        Origin point for delivery pricing AND shared with customers when they choose Store Pickup.
                                     </p>
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            value={deliveryMaxRadiusKm}
-                                            onChange={(e) => setDeliveryMaxRadiusKm(e.target.value)}
-                                            placeholder="25"
-                                            className="w-full pl-3 pr-10 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                                            min="1"
-                                        />
-                                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-xs font-bold">km</span>
-                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleDetectLocation}
+                                    disabled={detectingLocation}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-xl border border-gray-300 dark:border-gray-600 shadow-xs transition-all shrink-0 cursor-pointer"
+                                >
+                                    <MapPin size={14} className="text-[#1C774E]" />
+                                    {detectingLocation ? 'Detecting GPS...' : 'Pin My Current Store GPS'}
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                        Physical Store Address
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Shop 14, Banex Plaza, Wuse 2, Abuja"
+                                        className="w-full px-3.5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                        Store Google Maps Link
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="store_google_maps_link"
+                                        value={formData.store_google_maps_link}
+                                        onChange={handleChange}
+                                        placeholder="e.g. https://maps.google.com/?q=9.0765,7.3986"
+                                        className="w-full px-3.5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                        Store Latitude
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.000001"
+                                        value={storeLatitude}
+                                        onChange={(e) => setStoreLatitude(e.target.value)}
+                                        placeholder="e.g. 6.4281"
+                                        className="w-full px-3.5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-mono font-semibold text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                        Store Longitude
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.000001"
+                                        value={storeLongitude}
+                                        onChange={(e) => setStoreLongitude(e.target.value)}
+                                        placeholder="e.g. 3.4219"
+                                        className="w-full px-3.5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-mono font-semibold text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                        Pickup Contact Person Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={pickupContactName}
+                                        onChange={(e) => setPickupContactName(e.target.value)}
+                                        placeholder="e.g. Chidinma (Store Attendant)"
+                                        className="w-full px-3.5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                                        Pickup Contact Phone Number
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        name="general_enquiry_phone"
+                                        value={formData.general_enquiry_phone}
+                                        onChange={handleChange}
+                                        placeholder="e.g. 0803 123 4567"
+                                        className="w-full px-3.5 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                                    />
                                 </div>
                             </div>
 
-                            {/* Store Location GPS Section */}
-                            <div className="bg-gradient-to-r from-emerald-500/5 via-primary/5 to-transparent p-5 rounded-2xl border border-primary/20">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                                    <div>
-                                        <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                            <MapPin size={16} className="text-primary" />
-                                            Store GPS Location (Dispatch Center)
-                                        </h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                            Used as the starting point to calculate distance to your customer's WhatsApp location.
-                                        </p>
+                            {storeLatitude && storeLongitude && (
+                                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 text-xs">
+                                    <div className="flex items-center gap-2 text-[#1C774E] dark:text-emerald-300 font-semibold">
+                                        <CheckCircle size={15} />
+                                        <span>Store GPS active ({storeLatitude}, {storeLongitude})</span>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={handleDetectLocation}
-                                        disabled={detectingLocation}
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-bold rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm transition-all shrink-0"
+                                    <a
+                                        href={`https://maps.google.com/?q=${storeLatitude},${storeLongitude}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="underline text-[#1C774E] dark:text-[#DBF361] inline-flex items-center gap-1 font-bold"
                                     >
-                                        <MapPin size={14} className="text-primary" />
-                                        {detectingLocation ? 'Detecting GPS...' : '📍 Auto-Detect My Store GPS'}
-                                    </button>
+                                        Open on Google Maps <ExternalLink size={12} />
+                                    </a>
                                 </div>
+                            )}
+                        </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
-                                            Store Latitude
-                                        </label>
-                                        <input
-                                            type="number"
-                                            step="0.000001"
-                                            value={storeLatitude}
-                                            onChange={(e) => setStoreLatitude(e.target.value)}
-                                            placeholder="e.g. 6.4281"
-                                            className="w-full px-3.5 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-mono font-semibold text-gray-900 dark:text-white outline-none focus:border-primary"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
-                                            Store Longitude
-                                        </label>
-                                        <input
-                                            type="number"
-                                            step="0.000001"
-                                            value={storeLongitude}
-                                            onChange={(e) => setStoreLongitude(e.target.value)}
-                                            placeholder="e.g. 3.4219"
-                                            className="w-full px-3.5 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-mono font-semibold text-gray-900 dark:text-white outline-none focus:border-primary"
-                                        />
-                                    </div>
-                                </div>
-
-                                {storeLatitude && storeLongitude && (
-                                    <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1">
-                                        <div className="flex items-center gap-2 text-xs text-primary font-bold">
-                                            <CheckCircle size={15} />
-                                            <span>Store GPS Active & Saved</span>
-                                            <a
-                                                href={`https://maps.google.com/?q=${storeLatitude},${storeLongitude}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="ml-auto underline hover:text-emerald-700 inline-flex items-center gap-1 font-semibold"
-                                            >
-                                                Preview on Google Maps <ExternalLink size={12} />
-                                            </a>
-                                        </div>
-                                        <p className="text-[11px] text-emerald-800 dark:text-emerald-300">
-                                            📦 <strong>Automated Pickup Navigation:</strong> Whenever a customer or dispatch rider requests pickup, Kasi AI automatically sends them this exact Google Maps navigation pin along with your store address!
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Live Pricing Preview Demo */}
-                            <div className="bg-gray-50 dark:bg-gray-700/40 p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 space-y-1">
-                                <p className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                                    💡 How your customer will be charged:
-                                </p>
-                                <p className="text-gray-500 dark:text-gray-400">
-                                    • Up to <strong>{deliveryBaseKm} km</strong>: Flat <strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong> + <strong>15% safety margin</strong> (covers dispatch courier & traffic surge).
-                                </p>
-                                <p className="text-gray-500 dark:text-gray-400">
-                                    • Beyond {deliveryBaseKm} km: [<strong>₦{Number(deliveryBaseFee).toLocaleString()}</strong> + <strong>₦{Number(deliveryRatePerKm).toLocaleString()}/km</strong>] × <strong>1.15 (+15% margin)</strong>.
-                                </p>
-                                <p className="text-emerald-600 dark:text-emerald-400 font-semibold pt-1">
-                                    Example: A customer 7.5 km away pays ₦{Math.ceil(((Number(deliveryBaseFee) + (7.5 - Number(deliveryBaseKm)) * Number(deliveryRatePerKm)) * 1.15) / 50) * 50} (incl. 15% buffer, rounded to nearest ₦50)
-                                </p>
-                                <p className="text-[11px] text-gray-400 dark:text-gray-500 italic pt-0.5">
-                                    * The 15% margin acts as a dynamic cushion so your business never bears unexpected courier surge or distance miscalculations.
-                                </p>
-                            </div>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={handleSaveLogistics}
+                                disabled={loading}
+                                className="px-7 py-3 bg-[#1C774E] hover:bg-[#15603A] text-white text-xs font-bold rounded-xl shadow-xs transition-all inline-flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                            >
+                                <Save size={16} />
+                                {loading ? 'Saving...' : 'Save Store & Pickup Settings'}
+                            </button>
                         </div>
                     </div>
 
-                    {/* Fallback Rate Sheet Card — Removed per CEO feedback */}
+                    {/* 2. Delivery Riders Roster & Automated vs Manual Dispatch Toggle */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-gray-100 dark:border-gray-700">
+                            <div>
+                                <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                                    <div className="p-2 rounded-xl bg-[#1C774E]/10 text-[#1C774E]">
+                                        <Bike size={20} />
+                                    </div>
+                                    Delivery Riders & Dispatch Automation
+                                </h2>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Choose whether Kasi dispatches your default rider on WhatsApp automatically when an order is paid, or waits for you to assign manually in Fulfilment.
+                                </p>
+                            </div>
+                        </div>
 
+                        {/* Dispatch Mode Selector Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button
+                                type="button"
+                                onClick={() => handleToggleAutoDispatch(true)}
+                                className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                                    autoDispatchRiders
+                                        ? 'border-[#1C774E] bg-[#1C774E]/5 dark:bg-[#1C774E]/15'
+                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-sm font-bold text-gray-900 dark:text-white">Automated WhatsApp Dispatch</span>
+                                    {autoDispatchRiders && <CheckCircle size={18} className="text-[#1C774E]" />}
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                    As soon as a delivery order is paid, Kasi WhatsApps your default rider the store pickup pin, items, customer phone, and drop-off map pin.
+                                </p>
+                            </button>
 
-                    {/* Master Save Button */}
-                    <div className="flex justify-end">
-                        <button
-                            onClick={handleSaveLogistics}
-                            disabled={loading}
-                            className="px-8 py-3 bg-primary hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all inline-flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Save size={18} />
-                            {loading ? 'Saving Pricing...' : 'Save Logistics & Pricing Settings'}
-                        </button>
+                            <button
+                                type="button"
+                                onClick={() => handleToggleAutoDispatch(false)}
+                                className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                                    !autoDispatchRiders
+                                        ? 'border-[#1C774E] bg-[#1C774E]/5 dark:bg-[#1C774E]/15'
+                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="text-sm font-bold text-gray-900 dark:text-white">Manual Assignment per Order</span>
+                                    {!autoDispatchRiders && <CheckCircle size={18} className="text-[#1C774E]" />}
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                    You pack the order first, then pick a saved rider (or type a new rider) in Fulfilment when ready to send.
+                                </p>
+                            </button>
+                        </div>
+
+                        {/* Add Rider Form */}
+                        <form onSubmit={handleAddRider} className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
+                            <input
+                                type="text"
+                                placeholder="Rider name (e.g. Musa)"
+                                value={newRiderName}
+                                onChange={(e) => setNewRiderName(e.target.value)}
+                                className="px-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                            />
+                            <input
+                                type="tel"
+                                placeholder="WhatsApp phone (e.g. 0803...)"
+                                value={newRiderPhone}
+                                onChange={(e) => setNewRiderPhone(e.target.value)}
+                                className="px-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                            />
+                            <select
+                                value={newRiderVehicle}
+                                onChange={(e) => setNewRiderVehicle(e.target.value)}
+                                className="px-3.5 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#1C774E]"
+                            >
+                                <option value="Motorbike">Motorbike</option>
+                                <option value="Car / Van">Car / Van</option>
+                                <option value="Bicycle">Bicycle</option>
+                            </select>
+                            <button
+                                type="submit"
+                                disabled={riderSaving}
+                                className="px-4 py-2.5 bg-gray-900 hover:bg-black dark:bg-white dark:text-gray-900 text-white rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                            >
+                                <Plus size={14} />
+                                {riderSaving ? 'Adding...' : 'Add Rider'}
+                            </button>
+                        </form>
+
+                        {/* Saved Riders List */}
+                        {ridersList.length === 0 ? (
+                            <div className="p-6 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500">
+                                No delivery riders saved yet. Add your go-to dispatch riders above for automated or 1-click assignment.
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-gray-100 dark:divide-gray-700 border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden">
+                                {ridersList.map((r) => (
+                                    <div key={r.id} className="p-3.5 flex items-center justify-between gap-3 bg-white dark:bg-gray-800">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-xl bg-[#1C774E]/10 text-[#1C774E] flex items-center justify-center">
+                                                <Bike size={16} />
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs font-bold text-gray-900 dark:text-white">{r.name}</span>
+                                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-semibold">
+                                                        {r.vehicle_type}
+                                                    </span>
+                                                    {r.is_default && (
+                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-[#1C774E] dark:text-[#DBF361] font-bold border border-emerald-200/70">
+                                                            Default Auto-Rider
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-[11px] font-mono text-gray-500 mt-0.5">{r.phone}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {!r.is_default && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSetDefaultRider(r.id)}
+                                                    className="px-2.5 py-1.5 text-[11px] font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-lg inline-flex items-center gap-1 cursor-pointer"
+                                                >
+                                                    <Star size={12} /> Set default
+                                                </button>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteRider(r.id)}
+                                                className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg cursor-pointer"
+                                                title="Remove rider"
+                                            >
+                                                <Trash size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
